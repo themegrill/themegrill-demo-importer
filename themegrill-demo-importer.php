@@ -70,9 +70,13 @@ final class ThemeGrill_Demo_Importer {
 	 * Install TG Importer.
 	 */
 	public static function install() {
-		// Install files and folders for uploading files and prevent hotlinking.
 		$upload_dir = wp_upload_dir();
 
+		if ( ! is_blog_installed() ) {
+			return;
+		}
+
+		// Install files and folders for uploading files and prevent hotlinking.
 		$files = array(
 			array(
 				'base'    => $upload_dir['basedir'] . '/tg-demo-pack',
