@@ -130,7 +130,7 @@ function tg_is_plugins_active( $raw_plugins_list ) {
 	$plugins_list = wp_list_pluck( $raw_plugins_list, 'slug' );
 
 	foreach ( $plugins_list as $plugin_name => $plugin_slug ) {
-		if ( in_array( $plugin_slug, get_option( 'active_plugins' ) ) ) {
+		if ( is_plugin_active( $plugin_slug ) ) {
 			$plugins_data[ $plugin_name ] = $plugin_slug;
 		}
 	}
