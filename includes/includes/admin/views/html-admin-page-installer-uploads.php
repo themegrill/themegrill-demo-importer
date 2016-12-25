@@ -1,13 +1,11 @@
 <?php
 /**
- * Admin View: Page - Demo Uploaded
+ * Admin View: Page - Demo Uploads
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
-
-global $current_tab;
 
 $demos = $this->prepare_demos_for_js( $this->demo_config );
 

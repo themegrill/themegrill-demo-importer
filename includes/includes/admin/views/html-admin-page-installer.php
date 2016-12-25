@@ -48,7 +48,7 @@ $demo_filter_links = apply_filters( 'themegrill_demo_importer_filter_links_array
 
 	<div class="wp-filter hide-if-no-js">
 		<div class="filter-count">
-			<span class="count demo-count"><?php echo 'previews' == $current_filter ? count( $this->demo_packages ) : count( $this->demo_config ); ?></span>
+			<span class="count demo-count"><?php echo 'preview' == $current_filter ? count( $this->demo_packages ) : count( $this->demo_config ); ?></span>
 		</div>
 
 		<ul class="filter-links">
