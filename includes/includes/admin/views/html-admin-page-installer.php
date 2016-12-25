@@ -76,7 +76,7 @@ $demo_filter_links = apply_filters( 'themegrill_demo_importer_filter_links_array
 							<li><?php printf( __( '1. Visit <a href="%s" target="_blank"><strong>this page</strong></a> and download demo zip file.','themegrill-demo-importer' ),esc_url( 'http://themegrill.com/theme-demo-file-downloads/' ) ); ?></li>
 							<li><?php _e( '2. Click <strong>Upload Demo</strong> button on the top of this Page.','themegrill-demo-importer' ); ?></li>
 							<li><?php _e( '3. Browse the demo zip file and click <strong>Install Now</strong>.','themegrill-demo-importer' ); ?></li>
-							<li><?php _e( '4. Go to <strong>Available Demos</strong> tab.','themegrill-demo-importer' ); ?></li>
+							<li><?php _e( '4. Go to <strong>Installed Demos</strong> tab.','themegrill-demo-importer' ); ?></li>
 							<li><?php _e( '5. Click <strong>Import</strong> button and wait for few minutes. Done!','themegrill-demo-importer' ); ?></li>
 						</ul>
 					</div>
