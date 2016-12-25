@@ -1,20 +1,16 @@
 <?php
 /**
- * Admin View: Page - Demo Previews
+ * Admin View: Page - Demo Preview
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-global $current_tab;
-
 $template    = get_option( 'template' );
 $assets_path = tg_get_demo_importer_assets_path();
 
 ?>
-<h2 class="screen-reader-text hide-if-no-js"><?php _e( 'Theme demos list', 'themegrill-demo-importer' ); ?></h2>
-
 <div class="theme-browser content-filterable">
 	<div class="themes wp-clearfix">
 		<?php foreach ( $this->demo_packages as $pack_id => $pack_data ) : ?>

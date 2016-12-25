@@ -1,22 +1,30 @@
 <?php
 /**
- * Admin View: Page - Importer
+ * Admin View: Page - Installer
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$demo_imported_id = get_option( 'themegrill_demo_imported_id' );
+global $current_filter;
+
+$current_filter    = empty( $_GET['browse'] ) ? 'welcome' : sanitize_title( $_GET['browse'] );
+$demo_imported_id  = get_option( 'themegrill_demo_imported_id' );
+$demo_filter_links = apply_filters( 'themegrill_demo_importer_filter_links_array', array(
+	'welcome' => __( 'Welcome', 'themegrill-demo-importer' ),
+	'uploads' => __( 'Installed Demos', 'themegrill-demo-importer' ),
+	'preview' => __( 'Theme Demos', 'themegrill-demo-importer' ),
+) );
 
 ?>
-<div class="wrap demo-importer">
-	<h1><?php esc_html_e( 'Demo Importer', 'themegrill-demo-importer' ); ?>
-		<span class="title-count demo-count"><?php echo count( $this->demo_config ); ?></span>
-		<?php if ( apply_filters( 'themegrill_demo_importer_new_demos', false ) ) : ?>
-			<a href="<?php echo esc_url( 'https://themegrill.com/upcoming-new-demos' ); ?>" class="page-title-action" target="_blank"><?php esc_html_e( 'New Demos', 'themegrill-demo-importer' ); ?></a>
-		<?php endif; ?>
-	</h1>
+<div class="wrap demo-installer">
+	<h1><?php
+		esc_html_e( 'Demo Importer', 'themegrill-demo-importer' );
+		if ( current_user_can( 'upload_files' ) ) {
+			echo ' <button type="button" class="upload-view-toggle page-title-action hide-if-no-js tg-demo-upload" aria-expanded="false">' . __( 'Upload Demo', 'themegrill-demo-importer' ) . '</button>';
+		}
+	?></h1>
 	<?php if ( ! get_option( 'themegrill_demo_imported_notice_dismiss' ) && in_array( $demo_imported_id, array_keys( $this->demo_config ) ) ) : ?>
 		<div id="message" class="notice notice-info is-dismissible" data-notice_id="demo-importer">
 			<p><?php printf( __( '<strong>Notice</strong> &#8211; If you want to completely remove a demo installation after importing it, you can use a plugin like %1$sWordPress Reset%2$s.', 'themegrill-demo-importer' ), '<a target="_blank" href="' . esc_url( 'https://wordpress.org/plugins/wordpress-reset/' ) . '">', '</a>' ); ?></p>
@@ -26,70 +34,68 @@ $demo_imported_id = get_option( 'themegrill_demo_imported_id' );
 		<p><?php _e( 'The Demo Importer screen requires JavaScript.', 'themegrill-demo-importer' ); ?></p>
 	</div>
 
-	<div class="theme-browser">
-		<div class="themes wp-clearfix">
+	<div class="upload-theme">
+		<p class="install-help"><?php _e( 'If you have a demo pack in a .zip format, you may install it by uploading it here.', 'themegrill-demo-importer' ); ?></p>
+		<form method="post" enctype="multipart/form-data" class="wp-upload-form" action="<?php echo self_admin_url( 'themes.php?page=demo-importer&action=upload-demo' ); ?>">
+			<?php wp_nonce_field( 'demo-upload' ); ?>
+			<label class="screen-reader-text" for="demozip"><?php _e( 'Demo zip file', 'themegrill-demo-importer' ); ?></label>
+			<input type="file" id="demozip" name="demozip" />
+			<?php submit_button( __( 'Install Now', 'themegrill-demo-importer' ), 'button', 'install-demo-submit', false ); ?>
+		</form>
+	</div>
+
+	<h2 class="screen-reader-text hide-if-no-js"><?php _e( 'Filter demos list', 'themegrill-demo-importer' ); ?></h2>
+
+	<div class="wp-filter hide-if-no-js">
+		<div class="filter-count">
+			<span class="count demo-count"><?php echo 'previews' == $current_filter ? count( $this->demo_packages ) : count( $this->demo_config ); ?></span>
+		</div>
+
+		<ul class="filter-links">
 			<?php
-			/*
-			 * This PHP is synchronized with the tmpl-demo template below!
-			 */
+				foreach ( $demo_filter_links as $name => $label ) {
+					if ( ( empty( $this->demo_config ) && 'uploads' == $name ) || ( empty( $this->demo_packages ) && 'preview' == $name ) ) {
+						continue;
+					}
+					echo '<li><a href="' . admin_url( 'themes.php?page=demo-importer&browse=' . $name ) . '" class="demo-tab ' . ( $current_filter == $name ? 'current' : '' ) . '">' . $label . '</a></li>';
+				}
+				do_action( 'themegrill_demo_importer_filter_links' );
 			?>
-			<?php foreach ( $demos as $demo ) : ?>
-				<div class="theme<?php if ( $demo['active'] ) echo ' active'; ?>" tabindex="0" aria-describedby="<?php echo esc_attr( $demo['id'] . '-action ' . $demo['id'] . '-name' ); ?>">
-					<?php if ( $demo['screenshot'] ) : ?>
-						<div class="theme-screenshot">
-							<img src="<?php echo esc_url( $demo['screenshot'] ); ?>" alt="" />
-						</div>
-					<?php else : ?>
-						<div class="theme-screenshot blank"></div>
-					<?php endif; ?>
+		</ul>
 
-					<span class="more-details" id="<?php echo esc_attr( $demo['id'] . '-action' ); ?>"><?php esc_html_e( 'Demo Details', 'themegrill-demo-importer' ); ?></span>
-					<div class="theme-author"><?php
-						/* translators: %s: Demo author name */
-						printf( __( 'By %s', 'themegrill-demo-importer' ), $demo['author'] );
-					?></div>
-
-					<?php if ( $demo['active'] ) { ?>
-						<h2 class="theme-name" id="demo-name"><?php
-							/* translators: %s: Demo name */
-							printf( __( '<span>Imported:</span> %s', 'themegrill-demo-importer' ), esc_html( $demo['name'] ) );
-						?></h2>
-					<?php } else { ?>
-						<h2 class="theme-name" id="<?php echo esc_attr( $demo['id'] . '-name' ); ?>"><?php echo esc_html( $demo['name'] ); ?></h2>
-					<?php } ?>
-
-					<div class="theme-actions">
-						<?php if ( ! $demo['active'] ) : ?>
-							<?php if ( ! empty( $demo['hasNotice'] ) ) : ?>
-								<?php if ( isset( $demo['hasNotice']['required_theme'] ) ) : ?>
-									<a class="button button-primary hide-if-no-js tips import disabled" href="#" data-demo_id="<?php echo esc_attr( $demo['id'] ); ?>" data-tip="<?php echo esc_attr( sprintf( __( 'Required %s theme must be activated to import this demo.', 'themegrill-demo-importer' ), $demo['theme'] ) ); ?>"><?php _e( 'Import', 'themegrill-demo-importer' ); ?></a>
-								<?php elseif ( isset( $demo['hasNotice']['required_plugins'] ) ) : ?>
-									<a class="button button-primary hide-if-no-js tips import disabled" href="#" data-demo_id="<?php echo esc_attr( $demo['id'] ); ?>" data-tip="<?php echo esc_attr( 'Required Plugin must be activated to import this demo.', 'themegrill-demo-importer' ); ?>"><?php _e( 'Import', 'themegrill-demo-importer' ); ?></a>
-								<?php endif; ?>
-							<?php else : ?>
-								<?php
-								/* translators: %s: Demo name */
-								$aria_label = sprintf( _x( 'Import %s', 'demo', 'themegrill-demo-importer' ), esc_attr( $demo['name'] ) );
-								?>
-								<a class="button button-primary hide-if-no-js import" href="#" data-demo_id="<?php echo esc_attr( $demo['id'] ); ?>" aria-label="<?php echo $aria_label; ?>"><?php _e( 'Import', 'themegrill-demo-importer' ); ?></a>
-							<?php endif; ?>
-							<a class="button button-secondary live-preview" target="_blank" href="<?php echo esc_url( $demo['actions']['demo_url'] ); ?>"><?php _e( 'Live Preview', 'themegrill-demo-importer' ); ?></a>
-						<?php endif; ?>
-						<a class="button button-primary site-preview" target="_blank" href="<?php echo esc_url( $demo['actions']['preview'] ); ?>"><?php _e( 'Preview', 'themegrill-demo-importer' ); ?></a>
+		<div class="search-form"></div>
+	</div>
+	<?php if ( 'welcome' === $current_filter ) : ?>
+		<div id="welcome-panel" class="welcome-panel">
+			<div class="welcome-panel-content">
+				<h2><?php _e( 'Welcome to ThemeGrill Demo Importer!', 'themegrill-demo-importer' ); ?></h2>
+				<h3><?php _e( 'Get Started','themegrill-demo-importer' ); ?></h3>
+				<div class="welcome-panel-column-container">
+					<div class="welcome-panel-column">
+						<ul>
+							<li><?php printf( __( '1. Visit <a href="%s" target="_blank"><strong>this page</strong></a> and download demo zip file.','themegrill-demo-importer' ),esc_url( 'http://themegrill.com/theme-demo-file-downloads/' ) ); ?></li>
+							<li><?php _e( '2. Click <strong>Upload Demo</strong> button on the top of this Page.','themegrill-demo-importer' ); ?></li>
+							<li><?php _e( '3. Browse the demo zip file and click <strong>Install Now</strong>.','themegrill-demo-importer' ); ?></li>
+							<li><?php _e( '4. Go to <strong>Available Demos</strong> tab.','themegrill-demo-importer' ); ?></li>
+							<li><?php _e( '5. Click <strong>Import</strong> button and wait for few minutes. Done!','themegrill-demo-importer' ); ?></li>
+						</ul>
 					</div>
 				</div>
-			<?php endforeach; ?>
+			</div>
 		</div>
-	</div>
-	<div class="theme-overlay"></div>
-	<p class="no-themes"><?php _e( 'No demos found. Try a different search.', 'themegrill-demo-importer' ); ?></p>
+	<?php else: ?>
+		<h2 class="screen-reader-text hide-if-no-js"><?php _e( 'Available demos list', 'themegrill-demo-importer' ); ?></h2>
+		<?php
+			if ( in_array( $current_filter, array( 'uploads', 'preview' ) ) ) {
+				include_once( dirname( __FILE__ ) . "/html-admin-page-installer-{$current_filter}.php" );
+			}
+			do_action( 'themegrill_demo_importer_' . $current_filter );
+		?>
+		<p class="no-themes"><?php _e( 'No demos found. Try a different search.', 'themegrill-demo-importer' ); ?></p>
+		<span class="spinner"></span>
+	<?php endif; ?>
 </div>
 
-<?php
-/*
- * The tmpl-demo template is synchronized with PHP above!
- */
-?>
 <script id="tmpl-demo" type="text/template">
 	<# if ( data.screenshot ) { #>
 		<div class="theme-screenshot">
