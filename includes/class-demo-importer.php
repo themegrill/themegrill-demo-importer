@@ -181,24 +181,21 @@ class TG_Demo_Importer {
 			'i18n_import_data_error' => esc_js( __( 'Importing Failed. Try again!', 'themegrill-demo-importer' ) ),
 			'i18n_import_dummy_data' => esc_js( __( 'Importing demo content will replicate the live demo and overwrites your current customizer, widgets and other settings. It might take few minutes to complete the demo import. Are you sure you want to import this demo?', 'themegrill-demo-importer' ) ),
 
-			'demos'    => 'uploads' === $filter_link ? $this->prepare_demos_for_js( $this->demo_config ) : $this->prepare_previews_for_js( $this->demo_packages ),
+			'demos'    => ( $this->demo_install && 'uploads' !== $filter_link) ?  $this->prepare_previews_for_js( $this->demo_packages ) : $this->prepare_demos_for_js( $this->demo_config ),
 			'settings' => array(
 				'isBrowse'      => $filter_link,
 				'isInstall'     => $this->demo_install,
 				'canInstall'    => current_user_can( 'upload_files' ),
-				'installURI'    => current_user_can( 'upload_files' ) ? self_admin_url( 'themes.php?page=demo-importer' ) : null,
+				'installURI'    => current_user_can( 'upload_files' ) ? self_admin_url( 'themes.php?page=demo-importer&browse=preview' ) : null,
 				'confirmDelete' => __( "Are you sure you want to delete this demo?\n\nClick 'Cancel' to go back, 'OK' to confirm the delete.", 'themegrill-demo-importer' ),
 				'adminUrl'      => parse_url( self_admin_url(), PHP_URL_PATH )
 			),
 			'l10n' => array(
-				'addNew'                   => __( 'Add New Demo', 'themegrill-demo-importer' ),
-				'search'                   => __( 'Search Demos', 'themegrill-demo-importer' ),
-				'searchPlaceholder'        => __( 'Search demos...', 'themegrill-demo-importer' ), // placeholder (no ellipsis)
-				'searchInstallPlaceholder' => __( 'Search installed demos...', 'themegrill-demo-importer' ), // placeholder (no ellipsis)
-				'demosFound'               => __( 'Number of Demos found: %d', 'themegrill-demo-importer' ),
-				'noDemosFound'             => __( 'No demos found. Try a different search.', 'themegrill-demo-importer' ),
-				'upload'                   => __( 'Upload Demo', 'themegrill-demo-importer' ),
-				'back'                     => __( 'Back', 'themegrill-demo-importer' ),
+				'addNew'            => __( 'Add New Demo', 'themegrill-demo-importer' ),
+				'search'            => __( 'Search Demos', 'themegrill-demo-importer' ),
+				'searchPlaceholder' => __( 'Search demos...', 'themegrill-demo-importer' ), // placeholder (no ellipsis)
+				'demosFound'        => __( 'Number of Demos found: %d', 'themegrill-demo-importer' ),
+				'noDemosFound'      => __( 'No demos found. Try a different search.', 'themegrill-demo-importer' ),
 			),
 			'installedDemos' => array_keys( $this->demo_config ),
 		) );

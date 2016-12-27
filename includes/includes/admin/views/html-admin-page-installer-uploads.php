@@ -7,8 +7,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$demos = $this->prepare_demos_for_js( $this->demo_config );
-
 ?>
 <div class="theme-browser">
 	<div class="themes wp-clearfix">
@@ -50,12 +48,11 @@ $demos = $this->prepare_demos_for_js( $this->demo_config );
 							/* translators: %s: Demo name */
 							$aria_label = sprintf( _x( 'Import %s', 'demo', 'themegrill-demo-importer' ), esc_attr( $demo['name'] ) );
 							?>
-							<a class="button button-primary import" href="#" data-demo_id="<?php echo esc_attr( $demo['id'] ); ?>" aria-label="<?php echo $aria_label; ?>"><?php _e( 'Import', 'themegrill-demo-importer' ); ?></a>
+							<a class="button button-primary demo-import" href="#" data-demo_id="<?php echo esc_attr( $demo['id'] ); ?>" aria-label="<?php echo $aria_label; ?>"><?php _e( 'Import', 'themegrill-demo-importer' ); ?></a>
 						<?php endif; ?>
-						<a class="button button-secondary live-preview" target="_blank" href="<?php echo esc_url( $demo['actions']['demo_url'] ); ?>"><?php _e( 'Live Preview', 'themegrill-demo-importer' ); ?></a>
+						<a class="button button-secondary demo-preview" target="_blank" href="<?php echo esc_url( $demo['actions']['demo_url'] ); ?>"><?php _e( 'Preview', 'themegrill-demo-importer' ); ?></a>
 					<?php endif; ?>
-					<a class="button button-primary site-preview" target="_blank" href="<?php echo esc_url( $demo['actions']['preview'] ); ?>"><?php _e( 'Preview', 'themegrill-demo-importer' ); ?></a>
-					<span class="spinner"><?php _e( 'Please Wait&hellip;', 'themegrill-demo-importer' ); ?></span>
+					<a class="button button-primary live-preview" target="_blank" href="<?php echo esc_url( $demo['actions']['preview'] ); ?>"><?php _e( 'Live Preview', 'themegrill-demo-importer' ); ?></a>
 				</div>
 			</div>
 		<?php endforeach; ?>

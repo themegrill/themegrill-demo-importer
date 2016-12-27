@@ -182,12 +182,12 @@ img.tips {
 
 .theme-browser .theme .theme-actions.imported .button,
 .theme-browser .theme .theme-actions.importing .button,
-.theme-browser .theme:not( .active ) .theme-actions .site-preview {
+.theme-browser .theme:not( .active ) .theme-actions .live-preview {
 	display: none;
 	visibility: hidden;
 }
 
-.theme-browser .theme:not( .active ) .theme-actions.imported .site-preview {
+.theme-browser .theme:not( .active ) .theme-actions.imported .live-preview {
 	display: block;
 	visibility: visible;
 }

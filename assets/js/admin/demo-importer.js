@@ -652,7 +652,7 @@ demos.view.Demos = wp.Backbone.View.extend({
 			this.renderDemos( this.parent.page );
 		}
 
-		// Display a live theme count for the collection
+		// Display a live demo count for the collection
 		this.liveDemoCount = this.collection.count ? this.collection.count : this.collection.length;
 		this.count.text( this.liveDemoCount );
 	},
@@ -687,6 +687,11 @@ demos.view.Demos = wp.Backbone.View.extend({
 			// with the demo details
 			self.listenTo( self.demo, 'demo:expand', self.expand, self );
 		});
+
+		// 'Add new demo' element shown at the end of the grid
+		if ( ( demos.isInstall && 'preview' !== demos.isBrowse ) && demos.data.settings.canInstall ) {
+			this.$el.append( '<div class="theme add-new-theme"><a href="' + demos.data.settings.installURI + '"><div class="theme-screenshot"><span></span></div><h2 class="theme-name">' + l10n.addNew + '</h2></a></div>' );
+		}
 
 		this.parent.page++;
 	},
@@ -831,7 +836,7 @@ demos.view.Search = wp.Backbone.View.extend({
 	searching: false,
 
 	attributes: {
-		placeholder: ( demos.isInstall && 'uploads' !== demos.isBrowse ) ? l10n.searchPlaceholder : l10n.searchInstallPlaceholder,
+		placeholder: l10n.searchPlaceholder,
 		type: 'search',
 		'aria-describedby': 'live-search-desc'
 	},
