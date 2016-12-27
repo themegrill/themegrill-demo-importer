@@ -165,6 +165,7 @@ class TG_Demo_Importer {
 	public function enqueue_styles() {
 		$suffix      = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 		$assets_path = tg_get_demo_importer_assets_path();
+		$filter_link = isset( $_GET['browse'] ) ? sanitize_title( $_GET['browse'] ) : 'welcome';
 
 		// Register Scripts
 		wp_register_script( 'jquery-tiptip', $assets_path . 'js/jquery-tiptip/jquery.tipTip' . $suffix . '.js', array( 'jquery' ), '1.3', true );
@@ -180,8 +181,9 @@ class TG_Demo_Importer {
 			'i18n_import_data_error' => esc_js( __( 'Importing Failed. Try again!', 'themegrill-demo-importer' ) ),
 			'i18n_import_dummy_data' => esc_js( __( 'Importing demo content will replicate the live demo and overwrites your current customizer, widgets and other settings. It might take few minutes to complete the demo import. Are you sure you want to import this demo?', 'themegrill-demo-importer' ) ),
 
-			'demos' => $this->prepare_demos_for_js( $this->demo_config ),
+			'demos'    => 'uploads' === $filter_link ? $this->prepare_demos_for_js( $this->demo_config ) : $this->prepare_previews_for_js( $this->demo_packages ),
 			'settings' => array(
+				'isBrowse'      => $filter_link,
 				'isInstall'     => $this->demo_install,
 				'canInstall'    => current_user_can( 'upload_files' ),
 				'installURI'    => current_user_can( 'upload_files' ) ? self_admin_url( 'themes.php?page=demo-importer' ) : null,
@@ -189,20 +191,82 @@ class TG_Demo_Importer {
 				'adminUrl'      => parse_url( self_admin_url(), PHP_URL_PATH )
 			),
 			'l10n' => array(
-				'addNew'              => __( 'Add New Demo', 'themegrill-demo-importer' ),
-				'search'              => __( 'Search Installed Demos', 'themegrill-demo-importer' ),
-				'searchPlaceholder'   => __( 'Search installed demos...', 'themegrill-demo-importer' ), // placeholder (no ellipsis)
-				'demosFound'          => __( 'Number of Demos found: %d', 'themegrill-demo-importer' ),
-				'noDemosFound'        => __( 'No demos found. Try a different search.', 'themegrill-demo-importer' ),
-				'upload'              => __( 'Upload Demo', 'themegrill-demo-importer' ),
-				'back'                => __( 'Back', 'themegrill-demo-importer' ),
+				'addNew'                   => __( 'Add New Demo', 'themegrill-demo-importer' ),
+				'search'                   => __( 'Search Demos', 'themegrill-demo-importer' ),
+				'searchPlaceholder'        => __( 'Search demos...', 'themegrill-demo-importer' ), // placeholder (no ellipsis)
+				'searchInstallPlaceholder' => __( 'Search installed demos...', 'themegrill-demo-importer' ), // placeholder (no ellipsis)
+				'demosFound'               => __( 'Number of Demos found: %d', 'themegrill-demo-importer' ),
+				'noDemosFound'             => __( 'No demos found. Try a different search.', 'themegrill-demo-importer' ),
+				'upload'                   => __( 'Upload Demo', 'themegrill-demo-importer' ),
+				'back'                     => __( 'Back', 'themegrill-demo-importer' ),
 			),
 			'installedDemos' => array_keys( $this->demo_config ),
 		) );
 	}
 
 	/**
-	 * Prepare themes for JavaScript.
+	 * Prepare previews for JavaScript.
+	 */
+	private function prepare_previews_for_js( $demos = null ) {
+		$prepared_demos   = array();
+		$current_template = get_option( 'template' );
+		$demo_assets_path = tg_get_demo_importer_assets_path();
+		$demo_imported_id = get_option( 'themegrill_demo_imported_id' );
+
+		/**
+		 * Filters demo data before it is prepared for JavaScript.
+		 *
+		 * @param array      $prepared_demos   An associative array of demo data. Default empty array.
+		 * @param null|array $demos            An array of demo config to prepare, if any.
+		 * @param string     $demo_imported_id The current demo imported id.
+		 */
+		$prepared_demos = (array) apply_filters( 'themegrill_demo_importer_pre_prepare_demos_for_js', array(), $demos, $demo_imported_id );
+
+		if ( ! empty( $prepared_demos ) ) {
+			return $prepared_demos;
+		}
+
+		if ( ! empty( $demos ) ) {
+			foreach ( $demos as $demo_id => $demo_data ) {
+				$author       = isset( $demo_data['author'] ) ? $demo_data['author'] : __( 'ThemeGrill', 'themegrill-demo-importer' );
+				$download_url = isset( $demo_data['download'] ) ? $demo_data['download'] : "https://github.com/themegrill/themegrill-demo-pack/raw/master/packages/{$current_template}/{$demo_id}.zip";
+
+				// Check if demo is installed.
+				$installed = false;
+				if ( in_array( $demo_id, array_keys( $this->demo_config ) ) ) {
+					$installed = true;
+				}
+
+				// Prepare all demos.
+				$prepared_demos[ $demo_id ] = array(
+					'id'              => $demo_id,
+					'name'            => $demo_data['name'],
+					'author'          => $author,
+					'installed'       => $installed,
+					'screenshot'      => "{$demo_assets_path}images/{$current_template}/{$demo_id}.jpg",
+					'description'     => isset( $demo_data['description'] ) ? $demo_data['description'] : __( 'Demo pack description will go here in future from its header data too.', 'themegrill-demo-importer' ),
+					'actions'         => array(
+						'preview_url'  => $demo_data['preview'],
+						'download_url' => $download_url,
+					)
+				);
+			}
+		}
+
+		/**
+		 * Filters the demos prepared for JavaScript.
+		 *
+		 * Could be useful for changing the order, which is by name by default.
+		 *
+		 * @param array $prepared_demos Array of demos.
+		 */
+		$prepared_demos = apply_filters( 'themegrill_demo_importer_prepare_demos_for_js', $prepared_demos );
+		$prepared_demos = array_values( $prepared_demos );
+		return array_filter( $prepared_demos );
+	}
+
+	/**
+	 * Prepare demos for JavaScript.
 	 *
 	 * @param  array $demos Demo config array.
 	 * @return array An associative array of demo data, sorted by name.

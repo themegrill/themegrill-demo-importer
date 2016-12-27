@@ -62,4 +62,3 @@ $demos = $this->prepare_demos_for_js( $this->demo_config );
 	</div>
 </div>
 <div class="theme-overlay"></div>
-<p class="no-themes"><?php _e( 'No demos found. Try a different search.', 'themegrill-demo-importer' ); ?></p>

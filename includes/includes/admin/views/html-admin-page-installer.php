@@ -92,7 +92,6 @@ $demo_filter_links = apply_filters( 'themegrill_demo_importer_filter_links_array
 			do_action( 'themegrill_demo_importer_' . $current_filter );
 		?>
 		<p class="no-themes"><?php _e( 'No demos found. Try a different search.', 'themegrill-demo-importer' ); ?></p>
-		<span class="spinner"></span>
 	<?php endif; ?>
 </div>
 
@@ -247,6 +246,39 @@ $demo_filter_links = apply_filters( 'themegrill_demo_importer_filter_links_array
 			<# } #>
 		</div>
 	</div>
+</script>
+
+<script id="tmpl-demo-preview" type="text/template">
+	<a target="_blank" href="{{{ data.actions.preview_url }}}">
+		<# if ( data.screenshot ) { #>
+			<div class="theme-screenshot">
+				<img src="{{ data.screenshot }}" alt="" />
+			</div>
+		<# } else { #>
+			<div class="theme-screenshot blank"></div>
+		<# } #>
+		<span class="more-details"><?php _e( 'Demo Preview', 'themegrill-demo-importer' ); ?></span>
+	</a>
+	<div class="theme-author"><?php
+		/* translators: %s: Demo author name */
+		printf( __( 'By %s', 'themegrill-demo-importer' ), '{{{ data.author }}}' );
+	?></div>
+	<h3 class="theme-name">{{ data.name }}</h3>
+
+	<div class="theme-actions">
+		<# if ( ! data.installed ) { #>
+			<?php
+			/* translators: %s: Demo name */
+			$aria_label = sprintf( _x( 'Download %s', 'demo', 'themegrill-demo-importer' ), '{{ data.name }}' );
+			?>
+			<a class="button button-primary demo-download" data-name="{{ data.name }}" href="{{ data.download_url }}" aria-label="<?php echo esc_attr( $aria_label ); ?>"><?php _e( 'Download', 'themegrill-demo-importer' ); ?></a>
+		<# } #>
+		<a class="button button-secondary demo-preview" target="_blank" href="{{{ data.actions.preview_url }}}"><?php _e( 'Preview', 'themegrill-demo-importer' ); ?></a>
+	</div>
+
+	<# if ( data.installed ) { #>
+		<div class="notice notice-success notice-alt"><p><?php _ex( 'Installed', 'theme', 'themegrill-demo-importer' ); ?></p></div>
+	<# } #>
 </script>
 
 <?php

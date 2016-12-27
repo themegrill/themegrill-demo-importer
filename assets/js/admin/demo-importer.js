@@ -12,6 +12,9 @@ demos = wp.demos = wp.demos || {};
 demos.data = demoImporterLocalizeScript;
 l10n = demos.data.l10n;
 
+// Shortcut for isBrowse check
+demos.isBrowse = demos.data.settings.isBrowse;
+
 // Shortcut for isInstall check
 demos.isInstall = !! demos.data.settings.isInstall;
 
@@ -91,8 +94,8 @@ demos.view.Appearance = wp.Backbone.View.extend({
 		var view,
 			self = this;
 
-		// Don't render the search if there is only one demo
-		if ( demos.data.demos.length === 1 ) {
+		// Don't render the search if there is only one demo or not uploads view.
+		if ( demos.data.demos.length === 1 || ( demos.isInstall && 'welcome' === demos.isBrowse ) ) {
 			return;
 		}
 
@@ -121,6 +124,13 @@ demos.view.Appearance = wp.Backbone.View.extend({
 		if ( bottom > threshold ) {
 			this.trigger( 'demo:scroll' );
 		}
+	},
+
+	// Remove any lingering tooltips and initialize TipTip
+	initTipTip: function() {
+		$( '#tiptip_holder' ).removeAttr( 'style' );
+		$( '#tiptip_arrow' ).removeAttr( 'style' );
+		$( '.tips' ).tipTip({ 'attribute': 'data-tip', 'fadeIn': 50, 'fadeOut': 50, 'delay': 50 });
 	}
 });
 
@@ -229,7 +239,7 @@ demos.view.Demo = wp.Backbone.View.extend({
 	state: 'grid',
 
 	// The HTML template for each element to be rendered
-	html: demos.template( 'demo' ),
+	html: demos.template( ( demos.isInstall && 'uploads' !== demos.isBrowse ) ? 'demo-preview' : 'demo' ),
 
 	events: {
 		'click': 'expand',
@@ -299,6 +309,12 @@ demos.view.Demo = wp.Backbone.View.extend({
 		// Prevent the modal from showing when the user clicks
 		// one of the direct action buttons
 		if ( $( event.target ).is( '.theme-actions a' ) ) {
+			return;
+		}
+
+		// Prevent the modal from showing when the user clicks
+		// one of the direct demo previews.
+		if ( demos.isInstall && 'uploads' !== demos.isBrowse ) {
 			return;
 		}
 
@@ -551,6 +567,7 @@ demos.view.Demos = wp.Backbone.View.extend({
 			self.parent.page = 0;
 			self.importedDemo();
 			self.render( this );
+			self.parent.initTipTip();
 		} );
 
 		// Update demo count to full result set when available.
@@ -814,7 +831,7 @@ demos.view.Search = wp.Backbone.View.extend({
 	searching: false,
 
 	attributes: {
-		placeholder: l10n.searchPlaceholder,
+		placeholder: ( demos.isInstall && 'uploads' !== demos.isBrowse ) ? l10n.searchPlaceholder : l10n.searchInstallPlaceholder,
 		type: 'search',
 		'aria-describedby': 'live-search-desc'
 	},
@@ -832,7 +849,6 @@ demos.view.Search = wp.Backbone.View.extend({
 		this.listenTo( this.parent, 'demo:close', function() {
 			this.searching = false;
 		} );
-
 	},
 
 	search: function( event ) {
@@ -877,7 +893,6 @@ demos.view.Search = wp.Backbone.View.extend({
 
 		this.searching = false;
 		demos.router.navigate( url );
-
 	}
 });
 
@@ -928,19 +943,13 @@ demos.Run = {
 		});
 
 		this.render();
-		this.init_tiptip();
-	},
-
-	init_tiptip: function() {
-		$( '#tiptip_holder' ).removeAttr( 'style' );
-		$( '#tiptip_arrow' ).removeAttr( 'style' );
-		$( '.tips' ).tipTip({ 'attribute': 'data-tip', 'fadeIn': 50, 'fadeOut': 50, 'delay': 200 });
 	},
 
 	render: function() {
 
 		// Render results
 		this.view.render();
+		this.view.initTipTip();
 		this.routes();
 
 		Backbone.history.start({
@@ -979,16 +988,144 @@ demos.Run = {
 	}
 };
 
+demos.view.Installer = demos.view.Appearance.extend({
+
+	el: '#wpbody-content .wrap',
+
+	// Initial render method
+	render: function() {
+		this.search();
+		this.uploader();
+
+		// Don't render if not uploads view.
+		if ( 'welcome' === demos.isBrowse ) {
+			return;
+		}
+
+		// Setup the main demo view
+		// with the current demo collection
+		this.view = new demos.view.Demos({
+			collection: this.collection,
+			parent: this
+		});
+
+		// Render and append
+		this.$el.find( '.themes' ).remove();
+		this.view.render();
+		this.$el.find( '.theme-browser' ).append( this.view.el ).addClass( 'rendered' );
+	},
+
+	// Overwrite search container class to append search
+	// in new location
+	searchContainer: $( '.wp-filter .search-form' ),
+
+	/*
+	 * When users press the "Upload Theme" button, show the upload form in place.
+	 */
+	uploader: function() {
+		var uploadViewToggle = $( '.upload-view-toggle' ),
+			$body = $( document.body );
+
+		uploadViewToggle.on( 'click', function() {
+			// Toggle the upload view.
+			$body.toggleClass( 'show-upload-view' );
+			// Toggle the `aria-expanded` button attribute.
+			uploadViewToggle.attr( 'aria-expanded', $body.hasClass( 'show-upload-view' ) );
+		});
+	},
+
+	clearSearch: function() {
+		$( '#wp-filter-search-input').val( '' );
+	}
+});
+
+demos.InstallerRouter = Backbone.Router.extend({
+
+	routes: {
+		'themes.php?page=demo-importer&browse=uploaded&demo=:slug': 'demo',
+		'themes.php?page=demo-importer&browse=:sort&search=:query': 'search',
+		'themes.php?page=demo-importer&browse=:sort&s=:query': 'search',
+		'themes.php?page=demo-importer&browse=:sort': 'demos'
+	},
+
+	baseUrl: function( url ) {
+		var browse = 'uploads' !== demos.isBrowse ? 'preview' : 'uploads';
+		return 'themes.php?page=demo-importer&browse=' + browse + url;
+	},
+
+	demoPath: '&demo=',
+	searchPath: '&search=',
+
+	search: function( sort, query ) {
+		$( '.wp-filter-search' ).val( query );
+	},
+
+	demos: function() {
+		$( '.wp-filter-search' ).val( '' );
+	},
+
+	navigate: function() {
+		if ( Backbone.history._hasPushState ) {
+			Backbone.Router.prototype.navigate.apply( this, arguments );
+		}
+	}
+});
+
 demos.RunInstaller = {
 
 	init: function() {
-		this.init_tiptip();
+		// Initializes the blog's demo library view
+		// Create a new collection with data
+		this.demos = new demos.Collection( demos.data.demos );
+
+		// Set up the view
+		this.view = new demos.view.Installer({
+			collection: this.demos
+		});
+
+		this.render();
 	},
 
-	init_tiptip: function() {
-		$( '#tiptip_holder' ).removeAttr( 'style' );
-		$( '#tiptip_arrow' ).removeAttr( 'style' );
-		$( '.tips' ).tipTip({ 'attribute': 'data-tip', 'fadeIn': 50, 'fadeOut': 50, 'delay': 200 });
+	render: function() {
+
+		// Render results
+		this.view.render();
+		this.view.initTipTip();
+		this.routes();
+
+		Backbone.history.start({
+			root: demos.data.settings.adminUrl,
+			pushState: true,
+			hashChange: false
+		});
+	},
+
+	routes: function() {
+		var self = this;
+		// Bind to our global thx object
+		// so that the object is available to sub-views
+		demos.router = new demos.InstallerRouter();
+
+		// Handles demo details route event
+		demos.router.on( 'route:demo', function( slug ) {
+			self.view.view.expand( slug );
+		});
+
+		demos.router.on( 'route:demos', function() {
+			self.demos.doSearch( '' );
+			self.view.trigger( 'demo:close' );
+		});
+
+		// The `search` route event. The router populates the input field.
+		demos.router.on( 'route:search', function() {
+			$( '.wp-filter-search' ).focus().trigger( 'keyup' );
+		});
+
+		this.extraRoutes();
+	},
+
+	extraRoutes: function() {
+		return false;
 	}
 };
 
@@ -1016,56 +1153,6 @@ $( document ).ready( function() {
 		});
 
 		return false;
-	} );
-
-	// @deprecated Should not be needed now there is an alternative.
-	$( '.theme-actions' ).on( 'click', '.import', function( event ) {
-		event.preventDefault();
-
-		var $this_el = $( this );
-
-		if ( ! $this_el.hasClass( 'disabled' ) ) {
-			if ( window.confirm( demoImporterLocalizeScript.i18n_import_dummy_data ) ) {
-
-				var data = {
-					action: 'tg_import_demo_data',
-					demo_id: $this_el.data( 'demo_id' ),
-					security: demoImporterLocalizeScript.import_demo_data_nonce
-				};
-
-				$.ajax({
-					url:  demoImporterLocalizeScript.ajax_url,
-					data: data,
-					type: 'POST',
-					beforeSend: function() {
-						$this_el.parent().addClass( 'importing' );
-						$this_el.parent().find( '.spinner' ).addClass( 'is-active' );
-					},
-					success: function( response ) {
-						$this_el.closest( '.theme' ).find( '.notice' ).remove();
-						$this_el.parent().find( '.spinner' ).removeClass( 'is-active' );
-						$this_el.parent().removeClass( 'importing' ).addClass( 'imported' );
-
-						// Display import message.
-						if ( true === response.success ) {
-							$this_el.closest( '.theme' ).append( '<div class="notice notice-success notice-alt"><p>' + response.data.message + '</p></div>' );
-						} else {
-							$this_el.closest( '.theme' ).append( '<div class="update-message notice notice-error notice-alt"><p>' + demoImporterLocalizeScript.i18n_import_data_error + '</p></div>' );
-						}
-					},
-					error: function( jqXHR, textStatus, errorThrown ) {
-						$this_el.closest( '.theme' ).find( '.notice' ).remove();
-						$this_el.parent().find( '.spinner' ).removeClass( 'is-active' );
-						$this_el.parent().removeClass( 'importing' ).addClass( 'imported' );
-
-						// Display error message.
-						$this_el.closest( '.theme' ).append( '<div class="update-message notice notice-error notice-alt"><p>' + errorThrown + '</p></div>' );
-					}
-				});
-			}
-
-			return false;
-		}
 	} );
 });
 
