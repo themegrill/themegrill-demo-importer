@@ -165,7 +165,6 @@ class TG_Demo_Importer {
 	public function enqueue_styles() {
 		$suffix      = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 		$assets_path = tg_get_demo_importer_assets_path();
-		$filter_link = isset( $_GET['browse'] ) ? sanitize_title( $_GET['browse'] ) : 'welcome';
 
 		// Register Scripts
 		wp_register_script( 'jquery-tiptip', $assets_path . 'js/jquery-tiptip/jquery.tipTip' . $suffix . '.js', array( 'jquery' ), '1.3', true );
@@ -181,9 +180,9 @@ class TG_Demo_Importer {
 			'i18n_import_data_error' => esc_js( __( 'Importing Failed. Try again!', 'themegrill-demo-importer' ) ),
 			'i18n_import_dummy_data' => esc_js( __( 'Importing demo content will replicate the live demo and overwrites your current customizer, widgets and other settings. It might take few minutes to complete the demo import. Are you sure you want to import this demo?', 'themegrill-demo-importer' ) ),
 
-			'demos'    => ( $this->demo_install && 'uploads' !== $filter_link) ?  $this->prepare_previews_for_js( $this->demo_packages ) : $this->prepare_demos_for_js( $this->demo_config ),
+			'demos'    => $this->is_preview() ? $this->prepare_previews_for_js( $this->demo_packages ) : $this->prepare_demos_for_js( $this->demo_config ),
 			'settings' => array(
-				'isBrowse'      => $filter_link,
+				'isPreview'     => $this->is_preview(),
 				'isInstall'     => $this->demo_install,
 				'canInstall'    => current_user_can( 'upload_files' ),
 				'installURI'    => current_user_can( 'upload_files' ) ? self_admin_url( 'themes.php?page=demo-importer&browse=preview' ) : null,
@@ -199,6 +198,18 @@ class TG_Demo_Importer {
 			),
 			'installedDemos' => array_keys( $this->demo_config ),
 		) );
+	}
+
+	/**
+	 * Check for preview filter.
+	 * @return bool
+	 */
+	public function is_preview() {
+		if ( $this->demo_install && isset( $_GET['browse'] ) ) {
+			return 'preview' === $_GET['browse'] ? true : false;
+		}
+
+		return false;
 	}
 
 	/**

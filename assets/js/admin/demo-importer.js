@@ -12,8 +12,8 @@ demos = wp.demos = wp.demos || {};
 demos.data = demoImporterLocalizeScript;
 l10n = demos.data.l10n;
 
-// Shortcut for isBrowse check
-demos.isBrowse = demos.data.settings.isBrowse;
+// Shortcut for isPreview check
+demos.isPreview = !! demos.data.settings.isPreview;
 
 // Shortcut for isInstall check
 demos.isInstall = !! demos.data.settings.isInstall;
@@ -94,8 +94,8 @@ demos.view.Appearance = wp.Backbone.View.extend({
 		var view,
 			self = this;
 
-		// Don't render the search if there is only one demo or not uploads view.
-		if ( demos.data.demos.length === 1 || ( demos.isInstall && 'welcome' === demos.isBrowse ) ) {
+		// Don't render the search if there is only one demo
+		if ( demos.data.demos.length === 1 ) {
 			return;
 		}
 
@@ -239,7 +239,7 @@ demos.view.Demo = wp.Backbone.View.extend({
 	state: 'grid',
 
 	// The HTML template for each element to be rendered
-	html: demos.template( ( demos.isInstall && 'uploads' !== demos.isBrowse ) ? 'demo-preview' : 'demo' ),
+	html: demos.template( demos.isPreview ? 'demo-preview' : 'demo' ),
 
 	events: {
 		'click': 'expand',
@@ -294,6 +294,11 @@ demos.view.Demo = wp.Backbone.View.extend({
 	expand: function( event ) {
 		var self = this;
 
+		// Prevent the modal.
+		if ( demos.isPreview ) {
+			return;
+		}
+
 		event = event || window.event;
 
 		// 'enter' and 'space' keys expand the details view when a theme is :focused
@@ -309,12 +314,6 @@ demos.view.Demo = wp.Backbone.View.extend({
 		// Prevent the modal from showing when the user clicks
 		// one of the direct action buttons
 		if ( $( event.target ).is( '.theme-actions a' ) ) {
-			return;
-		}
-
-		// Prevent the modal from showing when the user clicks
-		// one of the direct demo previews.
-		if ( demos.isInstall && 'uploads' !== demos.isBrowse ) {
 			return;
 		}
 
@@ -689,7 +688,7 @@ demos.view.Demos = wp.Backbone.View.extend({
 		});
 
 		// 'Add new demo' element shown at the end of the grid
-		if ( ( demos.isInstall && 'preview' !== demos.isBrowse ) && demos.data.settings.canInstall ) {
+		if ( ! demos.isPreview && demos.isInstall && demos.data.settings.canInstall ) {
 			this.$el.append( '<div class="theme add-new-theme"><a href="' + demos.data.settings.installURI + '"><div class="theme-screenshot"><span></span></div><h2 class="theme-name">' + l10n.addNew + '</h2></a></div>' );
 		}
 
@@ -1002,11 +1001,6 @@ demos.view.Installer = demos.view.Appearance.extend({
 		this.search();
 		this.uploader();
 
-		// Don't render if not uploads view.
-		if ( 'welcome' === demos.isBrowse ) {
-			return;
-		}
-
 		// Setup the main demo view
 		// with the current demo collection
 		this.view = new demos.view.Demos({
@@ -1047,15 +1041,20 @@ demos.view.Installer = demos.view.Appearance.extend({
 demos.InstallerRouter = Backbone.Router.extend({
 
 	routes: {
-		'themes.php?page=demo-importer&browse=uploaded&demo=:slug': 'demo',
+		'themes.php?page=demo-importer&browse=uploads&demo=:slug': 'demo',
 		'themes.php?page=demo-importer&browse=:sort&search=:query': 'search',
 		'themes.php?page=demo-importer&browse=:sort&s=:query': 'search',
-		'themes.php?page=demo-importer&browse=:sort': 'demos'
+		'themes.php?page=demo-importer&browse=welcome': 'sort',
+		'themes.php?page=demo-importer&browse=:sort': 'demos',
+		'themes.php?page=demo-importer': 'sort'
+	},
+
+	browse: function() {
+		return demos.isPreview ? 'preview' : 'uploads';
 	},
 
 	baseUrl: function( url ) {
-		var browse = 'uploads' !== demos.isBrowse ? 'preview' : 'uploads';
-		return 'themes.php?page=demo-importer&browse=' + browse + url;
+		return 'themes.php?page=demo-importer&browse=' + this.browse() + url;
 	},
 
 	demoPath: '&demo=',
@@ -1119,6 +1118,15 @@ demos.RunInstaller = {
 		demos.router.on( 'route:demos', function() {
 			self.demos.doSearch( '' );
 			self.view.trigger( 'demo:close' );
+		});
+
+		// Handles sorting / browsing routes
+		// Also handles the root URL triggering a sort request
+		// for `welcome`, the default view
+		demos.router.on( 'route:sort', function( sort ) {
+			if ( ! sort || 'welcome' === sort ) {
+				$( '.wp-filter-search' ).hide();
+			}
 		});
 
 		// The `search` route event. The router populates the input field.
