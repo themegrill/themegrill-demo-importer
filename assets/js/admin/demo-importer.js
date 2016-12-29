@@ -483,12 +483,12 @@ demos.view.Details = wp.Backbone.View.extend({
 			_this.$el.find( '.close' ).trigger( 'click' );
 			$( '[data-slug="' + response.slug + '"' ).css( { backgroundColor:'#faafaa' } ).fadeOut( 350, function() {
 				$( this ).remove();
-				_demos.data.themes = _.without( _demos.data.demos, _.findWhere( _demos.data.demos, { id: response.slug } ) );
+				_demos.data.demos = _.without( _demos.data.demos, _.findWhere( _demos.data.demos, { id: response.slug } ) );
 
 				$( '.wp-filter-search' ).val( '' );
 				_collection.doSearch( '' );
 				_collection.remove( _this.model );
-				_collection.trigger( 'demo:update' );
+				_collection.trigger( 'demos:update' );
 			} );
 		} );
 
