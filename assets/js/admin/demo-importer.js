@@ -631,7 +631,7 @@ demos.view.Demos = wp.Backbone.View.extend({
 		// If the user doesn't have switch capabilities
 		// or there is only one demo in the collection
 		// render the detailed view of the active demo
-		if ( demos.data.demos.length === 1 ) {
+		if ( ! demos.isPreview && demos.data.demos.length === 1 ) {
 
 			// Constructs the view
 			this.singleDemo = new demos.view.Details({
