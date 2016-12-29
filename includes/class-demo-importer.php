@@ -168,11 +168,11 @@ class TG_Demo_Importer {
 
 		// Register Scripts
 		wp_register_script( 'jquery-tiptip', $assets_path . 'js/jquery-tiptip/jquery.tipTip' . $suffix . '.js', array( 'jquery' ), '1.3', true );
-		wp_register_script( 'tg-demo-updates', $assets_path . 'js/admin/demo-updates' . $suffix . '.js', array( 'jquery', 'updates' ), '1.0.0', true );
+		wp_register_script( 'tg-demo-updates', $assets_path . 'js/admin/demo-updates' . $suffix . '.js', array( 'jquery', 'updates' ), '1.1.0', true );
 
 		// Enqueue Scripts
 		wp_enqueue_style( 'tg-demo-importer', $assets_path . 'css/demo-importer.css', array() );
-		wp_enqueue_script( 'tg-demo-importer', $assets_path . 'js/admin/demo-importer' . $suffix . '.js', array( 'jquery', 'jquery-tiptip', 'wp-backbone', 'wp-a11y', 'tg-demo-updates' ), '1.0.0', true );
+		wp_enqueue_script( 'tg-demo-importer', $assets_path . 'js/admin/demo-importer' . $suffix . '.js', array( 'jquery', 'jquery-tiptip', 'wp-backbone', 'wp-a11y', 'tg-demo-updates' ), '1.1.0', true );
 
 		wp_localize_script( 'tg-demo-importer', 'demoImporterLocalizeScript', array(
 			'ajax_url'               => admin_url( 'admin-ajax.php' ),
@@ -252,7 +252,7 @@ class TG_Demo_Importer {
 					'author'          => $author,
 					'installed'       => $installed,
 					'screenshot'      => "{$demo_assets_path}images/{$current_template}/{$demo_id}.jpg",
-					'description'     => isset( $demo_data['description'] ) ? $demo_data['description'] : __( 'Demo pack description will go here in future from its header data too.', 'themegrill-demo-importer' ),
+					'description'     => isset( $demo_data['description'] ) ? $demo_data['description'] : '',
 					'actions'         => array(
 						'preview_url'  => $demo_data['preview'],
 						'download_url' => $download_url,
@@ -327,10 +327,10 @@ class TG_Demo_Importer {
 					'theme'           => $demo_data['theme'],
 					'package'         => $demo_data['demo_pack'],
 					'screenshot'      => $this->import_file_url( $demo_id, 'screenshot.jpg' ),
-					'description'     => isset( $demo_data['description'] ) ? $demo_data['description'] : __( 'Demo pack description will go here in future from its header data too.', 'themegrill-demo-importer' ),
-					'author'          => 'ThemeGrill',
-					'authorAndUri'    => '<a href="http://themegrill.com">ThemeGrill</a>',
-					'version'         => '1.0.0',
+					'description'     => isset( $demo_data['description'] ) ? $demo_data['description'] : '',
+					'author'          => isset( $demo_data['author'] ) ? $demo_data['author'] : __( 'ThemeGrill', 'themegrill-demo-importer' ),
+					'authorAndUri'    => '<a href="http://themegrill.com" target="_blank">ThemeGrill</a>',
+					'version'         => isset( $demo_data['version'] ) ? $demo_data['version'] : '1.1.0',
 					'active'          => $demo_id === $demo_imported_id,
 					'hasNotice'       => $demo_notices,
 					'plugins'         => $plugins_list,
