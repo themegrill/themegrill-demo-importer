@@ -2,7 +2,7 @@
 /**
  * Plugin Name: ThemeGrill Demo Importer
  * Plugin URI: http://themegrill.com/demo-importer/
- * Description: Import your demo content, widgets and theme settings with one click for ThemeGrill themes
+ * Description: Import your demo content, widgets and theme settings with one click for ThemeGrill official themes.
  * Version: 1.0.0
  * Author: ThemeGrill
  * Author URI: http://themegrill.com
@@ -49,6 +49,7 @@ final class ThemeGrill_Demo_Importer {
 			// Hooks.
 			add_filter( 'themegrill_demo_importer_assets_path', array( $this, 'plugin_assets_path' ) );
 			add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), array( $this, 'plugin_action_links' ) );
+			add_filter( 'plugin_row_meta', array( __CLASS__, 'plugin_row_meta' ), 10, 2 );
 		} else {
 			add_action( 'admin_notices', array( $this, 'theme_support_missing_notice' ) );
 		}
@@ -167,10 +168,29 @@ final class ThemeGrill_Demo_Importer {
 	 */
 	public function plugin_action_links( $actions ) {
 		$new_actions = array(
-			'previews' => '<a href="' . admin_url( 'themes.php?page=demo-importer&tab=previews' ) . '" aria-label="' . esc_attr( __( 'View Demos', 'themegrill-demo-importer' ) ) . '">' . __( 'Demos', 'themegrill-demo-importer' ) . '</a>',
+			'importer' => '<a href="' . admin_url( 'themes.php?page=demo-importer' ) . '" aria-label="' . esc_attr( __( 'View Demo Importer', 'themegrill-demo-importer' ) ) . '">' . __( 'Demo Importer', 'themegrill-demo-importer' ) . '</a>',
 		);
 
 		return array_merge( $new_actions, $actions );
+	}
+
+	/**
+	 * Display row meta in the Plugins list table.
+	 * @param  array  $plugin_meta
+	 * @param  string $plugin_file
+	 * @return array
+	 */
+	public function plugin_row_meta( $plugin_meta, $plugin_file ) {
+		if ( plugin_basename( __FILE__ ) == $plugin_file ) {
+			$new_plugin_meta = array(
+				'docs'    => '<a href="' . esc_url( apply_filters( 'themegrill_demo_importer_docs_url', 'http://themegrill.com/docs/themegrill-demo-importer/' ) ) . '" title="' . esc_attr( __( 'View Demo Importer Documentation', 'themegrill-demo-importer' ) ) . '">' . __( 'Docs', 'themegrill-demo-importer' ) . '</a>',
+				'support' => '<a href="' . esc_url( apply_filters( 'themegrill_demo_importer_support_url', 'http://themegrill.com/support-forum/' ) ) . '" title="' . esc_attr( __( 'Visit Free Customer Support Forum', 'themegrill-demo-importer' ) ) . '">' . __( 'Free Support', 'themegrill-demo-importer' ) . '</a>',
+			);
+
+			return array_merge( $plugin_meta, $new_plugin_meta );
+		}
+
+		return (array) $plugin_meta;
 	}
 
 	/**

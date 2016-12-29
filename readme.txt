@@ -7,11 +7,10 @@ Stable tag: 1.0.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-Import your demo content, widgets and theme settings with one click for themegrill themes
-
+Import your demo content, widgets and theme settings with one click for ThemeGrill official themes.
 == Description ==
 
-Import your demo content, widgets and theme settings with one click for <a href="https://themegrill.com/themes/" target="_blank" rel="nofollow">ThemeGrill</a> themes
+Import your demo content, widgets and theme settings with one click for <a href="https://themegrill.com/themes/" target="_blank" rel="nofollow">ThemeGrill</a> official themes.
 
 Get free support at http://themegrill.com/support-forum/
 

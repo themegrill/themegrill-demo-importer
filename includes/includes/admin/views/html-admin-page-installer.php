@@ -83,7 +83,7 @@ $demo_filter_links = apply_filters( 'themegrill_demo_importer_filter_links_array
 				</div>
 			</div>
 		</div>
-	<?php else: ?>
+	<?php else : ?>
 		<h2 class="screen-reader-text hide-if-no-js"><?php _e( 'Available demos list', 'themegrill-demo-importer' ); ?></h2>
 		<?php
 			if ( in_array( $current_filter, array( 'uploads', 'preview' ) ) ) {

@@ -187,7 +187,7 @@ class TG_Demo_Importer {
 				'canInstall'    => current_user_can( 'upload_files' ),
 				'installURI'    => current_user_can( 'upload_files' ) ? self_admin_url( 'themes.php?page=demo-importer&browse=preview' ) : null,
 				'confirmDelete' => __( "Are you sure you want to delete this demo?\n\nClick 'Cancel' to go back, 'OK' to confirm the delete.", 'themegrill-demo-importer' ),
-				'adminUrl'      => parse_url( self_admin_url(), PHP_URL_PATH )
+				'adminUrl'      => parse_url( self_admin_url(), PHP_URL_PATH ),
 			),
 			'l10n' => array(
 				'addNew'            => __( 'Add New Demo', 'themegrill-demo-importer' ),
@@ -256,7 +256,7 @@ class TG_Demo_Importer {
 					'actions'         => array(
 						'preview_url'  => $demo_data['preview'],
 						'download_url' => $download_url,
-					)
+					),
 				);
 			}
 		}

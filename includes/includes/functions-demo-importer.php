@@ -71,7 +71,7 @@ function tg_get_attachment_id( $filename ) {
 				'compare' => 'LIKE',
 				'key'     => '_wp_attachment_metadata',
 			),
-		)
+		),
 	);
 
 	$query = new WP_Query( $query_args );
@@ -184,10 +184,10 @@ function tg_delete_demo_pack( $demo_pack, $redirect = '' ) {
 	$data = ob_get_clean();
 
 	if ( false === $credentials ) {
-		if ( ! empty( $data ) ){
-			include_once( ABSPATH . 'wp-admin/admin-header.php');
+		if ( ! empty( $data ) ) {
+			include_once( ABSPATH . 'wp-admin/admin-header.php' );
 			echo $data;
-			include( ABSPATH . 'wp-admin/admin-footer.php');
+			include( ABSPATH . 'wp-admin/admin-footer.php' );
 			exit;
 		}
 		return;
@@ -198,10 +198,10 @@ function tg_delete_demo_pack( $demo_pack, $redirect = '' ) {
 		request_filesystem_credentials( $redirect, '', true ); // Failed to connect, Error and request again.
 		$data = ob_get_clean();
 
-		if ( ! empty($data) ) {
-			include_once( ABSPATH . 'wp-admin/admin-header.php');
+		if ( ! empty( $data ) ) {
+			include_once( ABSPATH . 'wp-admin/admin-header.php' );
 			echo $data;
-			include( ABSPATH . 'wp-admin/admin-footer.php');
+			include( ABSPATH . 'wp-admin/admin-footer.php' );
 			exit;
 		}
 		return;

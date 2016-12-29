@@ -28,11 +28,6 @@ $demo_imported_id = get_option( 'themegrill_demo_imported_id' );
 
 	<div class="theme-browser">
 		<div class="themes wp-clearfix">
-			<?php
-			/*
-			 * This PHP is synchronized with the tmpl-demo template below!
-			 */
-			?>
 			<?php foreach ( $demos as $demo ) : ?>
 				<div class="theme<?php if ( $demo['active'] ) echo ' active'; ?>" tabindex="0" aria-describedby="<?php echo esc_attr( $demo['id'] . '-action ' . $demo['id'] . '-name' ); ?>">
 					<?php if ( $demo['screenshot'] ) : ?>
@@ -85,11 +80,6 @@ $demo_imported_id = get_option( 'themegrill_demo_imported_id' );
 	<p class="no-themes"><?php _e( 'No demos found. Try a different search.', 'themegrill-demo-importer' ); ?></p>
 </div>
 
-<?php
-/*
- * The tmpl-demo template is synchronized with PHP above!
- */
-?>
 <script id="tmpl-demo" type="text/template">
 	<# if ( data.screenshot ) { #>
 		<div class="theme-screenshot">
