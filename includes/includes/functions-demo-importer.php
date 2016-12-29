@@ -122,7 +122,7 @@ function tg_ajax_delete_demo_pack() {
 	}
 
 	// Check filesystem credentials. `tg_delete_demo_pack()` will bail otherwise.
-	$url = wp_nonce_url( 'tthemes.php?page=demo-importer&tab=uploaded&action=delete&demo_pack=' . urlencode( $demo_pack ), 'delete-demo_' . $demo_pack );
+	$url = wp_nonce_url( 'tthemes.php?page=demo-importer&browse=uploads&action=delete&demo_pack=' . urlencode( $demo_pack ), 'delete-demo_' . $demo_pack );
 	ob_start();
 	$credentials = request_filesystem_credentials( $url );
 	ob_end_clean();
@@ -176,7 +176,7 @@ function tg_delete_demo_pack( $demo_pack, $redirect = '' ) {
 	}
 
 	if ( empty( $redirect ) ) {
-		$redirect = wp_nonce_url( 'themes.php?page=demo-importer&tab=uploaded&action=delete&demo_pack=' . urlencode( $demo_pack ), 'delete-demo_' . $demo_pack );
+		$redirect = wp_nonce_url( 'themes.php?page=demo-importer&browse=uploads&action=delete&demo_pack=' . urlencode( $demo_pack ), 'delete-demo_' . $demo_pack );
 	}
 
 	ob_start();

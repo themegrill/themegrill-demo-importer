@@ -337,7 +337,7 @@ class TG_Demo_Importer {
 					'actions'         => array(
 						'preview'  => home_url( '/' ),
 						'demo_url' => $demo_data['demo_url'],
-						'delete'   => current_user_can( 'upload_files' ) ? wp_nonce_url( admin_url( 'themes.php?page=demo-importer&tab=uploaded&action=delete&amp;demo_pack=' . urlencode( $demo_id ) ), 'delete-demo_' . $demo_id ) : null,
+						'delete'   => current_user_can( 'upload_files' ) ? wp_nonce_url( admin_url( 'themes.php?page=demo-importer&browse=uploads&action=delete&amp;demo_pack=' . urlencode( $demo_id ) ), 'delete-demo_' . $demo_id ) : null,
 					),
 				);
 			}
