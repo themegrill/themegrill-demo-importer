@@ -120,7 +120,9 @@ $demo_filter_links = apply_filters( 'themegrill_demo_importer_filter_links_array
 	<# } #>
 
 	<div class="theme-actions">
-		<# if ( ! data.active ) { #>
+		<# if ( data.active ) { #>
+			<a class="button button-primary live-preview" target="_blank" href="{{{ data.actions.preview }}}"><?php _e( 'Live Preview', 'themegrill-demo-importer' ); ?></a>
+		<# } else { #>
 			<# if ( ! _.isEmpty( data.hasNotice ) ) { #>
 				<# if ( data.hasNotice['required_theme'] ) { #>
 					<a class="button button-primary hide-if-no-js tips demo-import disabled" href="#" data-name="{{ data.name }}" data-slug="{{ data.id }}" data-tip="<?php echo esc_attr( sprintf( __( 'Required %s theme must be activated to import this demo.', 'themegrill-demo-importer' ), '{{{ data.theme }}}' ) ); ?>"><?php _e( 'Import', 'themegrill-demo-importer' ); ?></a>
@@ -136,8 +138,11 @@ $demo_filter_links = apply_filters( 'themegrill_demo_importer_filter_links_array
 			<# } #>
 			<a class="button button-secondary demo-preview" target="_blank" href="{{{ data.actions.demo_url }}}"><?php _e( 'Preview', 'themegrill-demo-importer' ); ?></a>
 		<# } #>
-		<a class="button button-primary live-preview" target="_blank" href="{{{ data.actions.preview }}}"><?php _e( 'Live Preview', 'themegrill-demo-importer' ); ?></a>
 	</div>
+
+	<# if ( data.imported ) { #>
+		<div class="notice notice-success notice-alt"><p><?php _ex( 'Imported', 'demo', 'themegrill-demo-importer' ); ?></p></div>
+	<# } #>
 </script>
 
 <script id="tmpl-demo-single" type="text/template">
@@ -277,7 +282,7 @@ $demo_filter_links = apply_filters( 'themegrill_demo_importer_filter_links_array
 	</div>
 
 	<# if ( data.installed ) { #>
-		<div class="notice notice-success notice-alt"><p><?php _ex( 'Installed', 'theme', 'themegrill-demo-importer' ); ?></p></div>
+		<div class="notice notice-success notice-alt"><p><?php _ex( 'Installed', 'demo', 'themegrill-demo-importer' ); ?></p></div>
 	<# } #>
 </script>
 

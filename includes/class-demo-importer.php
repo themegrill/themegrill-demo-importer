@@ -166,20 +166,32 @@ class TG_Demo_Importer {
 		$suffix      = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 		$assets_path = tg_get_demo_importer_assets_path();
 
+		// Enqueue Styles
+		wp_enqueue_style( 'tg-demo-importer', $assets_path . 'css/demo-importer.css', array() );
+
 		// Register Scripts
 		wp_register_script( 'jquery-tiptip', $assets_path . 'js/jquery-tiptip/jquery.tipTip' . $suffix . '.js', array( 'jquery' ), '1.3', true );
 		wp_register_script( 'tg-demo-updates', $assets_path . 'js/admin/demo-updates' . $suffix . '.js', array( 'jquery', 'updates' ), '1.1.0', true );
+		wp_localize_script( 'tg-demo-updates', '_demoUpdatesSettings', array(
+			'ajax_nonce' => wp_create_nonce( 'demo-updates' ),
+			'l10n'       => array(
+				'importing'             => __( 'Importing...', 'themegrill-demo-importer' ),
+				'demoImportingLabel'    => _x( 'Importing %s...', 'demo', 'themegrill-demo-importer' ), // no ellipsis
+				'importingMsg'          => __( 'Importing... please wait.', 'themegrill-demo-importer' ),
+				'importedMsg'           => __( 'Import completed successfully.', 'themegrill-demo-importer' ),
+				'importFailedShort'     => __( 'Import Failed!', 'themegrill-demo-importer' ),
+				'importFailed'          => __( 'Import failed: %s', 'themegrill-demo-importer' ),
+				'demoImportedLabel'     => _x( '%s imported!', 'demo', 'themegrill-demo-importer' ),
+				'demoImportFailedLabel' => _x( '%s import failed', 'demo', 'themegrill-demo-importer' ),
+				'livePreview'           => __( 'Live Preview', 'themegrill-demo-importer' ),
+				'livePreviewLabel'      => _x( 'Live Preview %s', 'demo', 'themegrill-demo-importer' ),
+				'imported'              => __( 'Imported!', 'themegrill-demo-importer' ),
+			)
+		) );
 
 		// Enqueue Scripts
-		wp_enqueue_style( 'tg-demo-importer', $assets_path . 'css/demo-importer.css', array() );
 		wp_enqueue_script( 'tg-demo-importer', $assets_path . 'js/admin/demo-importer' . $suffix . '.js', array( 'jquery', 'jquery-tiptip', 'wp-backbone', 'wp-a11y', 'tg-demo-updates' ), '1.1.0', true );
-
 		wp_localize_script( 'tg-demo-importer', 'demoImporterLocalizeScript', array(
-			'ajax_url'               => admin_url( 'admin-ajax.php' ),
-			'import_demo_data_nonce' => wp_create_nonce( 'import-demo-data' ),
-			'i18n_import_data_error' => esc_js( __( 'Importing Failed. Try again!', 'themegrill-demo-importer' ) ),
-			'i18n_import_dummy_data' => esc_js( __( 'Importing demo content will replicate the live demo and overwrites your current customizer, widgets and other settings. It might take few minutes to complete the demo import. Are you sure you want to import this demo?', 'themegrill-demo-importer' ) ),
-
 			'demos'    => $this->is_preview() ? $this->prepare_previews_for_js( $this->demo_packages ) : $this->prepare_demos_for_js( $this->demo_config ),
 			'settings' => array(
 				'isPreview'     => $this->is_preview(),
@@ -187,6 +199,8 @@ class TG_Demo_Importer {
 				'canInstall'    => current_user_can( 'upload_files' ),
 				'installURI'    => current_user_can( 'upload_files' ) ? self_admin_url( 'themes.php?page=demo-importer&browse=preview' ) : null,
 				'confirmDelete' => __( "Are you sure you want to delete this demo?\n\nClick 'Cancel' to go back, 'OK' to confirm the delete.", 'themegrill-demo-importer' ),
+				'confirmImport' => __( 'Importing demo content will replicate the live demo and overwrites your current customizer, widgets and other settings. It might take few minutes to complete the demo import. Are you sure you want to import this demo?', 'themegrill-demo-importer' ),
+				'ajaxUrl'       => admin_url( 'admin-ajax.php' ),
 				'adminUrl'      => parse_url( self_admin_url(), PHP_URL_PATH ),
 			),
 			'l10n' => array(
@@ -401,7 +415,7 @@ class TG_Demo_Importer {
 	}
 
 	/**
-	 * AJAX Dismissible notice.
+	 * Ajax handler for dismissing notice.
 	 */
 	public function dismissible_notice() {
 		if ( ! current_user_can( 'manage_options' ) ) {

@@ -1160,7 +1160,7 @@ $( document ).ready( function() {
 			return;
 		}
 
-		$.post( demoImporterLocalizeScript.ajax_url, {
+		$.post( demos.data.settings.ajaxUrl, {
 			action: 'tg_dismiss_notice',
 			notice_id: $this_el.parent().data( 'notice_id' )
 		});

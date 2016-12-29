@@ -1,4 +1,4 @@
-( function( $, wp ) {
+( function( $, wp, settings ) {
 	var $document = $( document );
 
 	wp = wp || {};
@@ -11,10 +11,17 @@
 	wp.updates = wp.updates || {};
 
 	/**
+	 * Localized strings.
+	 *
+	 * @type {object}
+	 */
+	wp.updates.l10n = _.extend( wp.updates.l10n, settings.l10n || {} );
+
+	/**
 	 * Sends an Ajax request to the server to delete a demo.
 	 *
 	 * @param {object}             args
-	 * @param {string}             args.slug    Demo Pack.
+	 * @param {string}             args.slug    Demo ID.
 	 * @param {deleteDemoSuccess=} args.success Optional. Success callback. Default: wp.updates.deleteDemoSuccess
 	 * @param {deleteDemoError=}   args.error   Optional. Error callback. Default: wp.updates.deleteDemoError
 	 * @return {$.promise} A jQuery promise that represents the request,
@@ -89,7 +96,6 @@
 
 	/**
 	 * Pulls available jobs from the queue and runs them.
-	 *
 	 * @see https://core.trac.wordpress.org/ticket/39364
 	 */
 	wp.updates.queueChecker = function() {
@@ -105,4 +111,4 @@
 		$document.trigger( 'wp-updates-queue-job', job );
 	};
 
-})( jQuery, window.wp );
+})( jQuery, window.wp, window._demoUpdatesSettings );

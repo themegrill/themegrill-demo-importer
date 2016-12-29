@@ -54,7 +54,9 @@ $demo_imported_id = get_option( 'themegrill_demo_imported_id' );
 					<?php } ?>
 
 					<div class="theme-actions">
-						<?php if ( ! $demo['active'] ) : ?>
+						<?php if ( $demo['active'] ) : ?>
+							<a class="button button-primary live-preview" target="_blank" href="<?php echo esc_url( $demo['actions']['preview'] ); ?>"><?php _e( 'Live Preview', 'themegrill-demo-importer' ); ?></a>
+						<?php else : ?>
 							<?php if ( ! empty( $demo['hasNotice'] ) ) : ?>
 								<?php if ( isset( $demo['hasNotice']['required_theme'] ) ) : ?>
 									<a class="button button-primary hide-if-no-js tips demo-import disabled" href="#" data-name=<?php echo esc_attr( $demo['name'] );?>" data-slug="<?php echo esc_attr( $demo['id'] ); ?>" data-tip="<?php echo esc_attr( sprintf( __( 'Required %s theme must be activated to import this demo.', 'themegrill-demo-importer' ), $demo['theme'] ) ); ?>"><?php _e( 'Import', 'themegrill-demo-importer' ); ?></a>
@@ -70,7 +72,6 @@ $demo_imported_id = get_option( 'themegrill_demo_imported_id' );
 							<?php endif; ?>
 							<a class="button button-secondary demo-preview" target="_blank" href="<?php echo esc_url( $demo['actions']['demo_url'] ); ?>"><?php _e( 'Preview', 'themegrill-demo-importer' ); ?></a>
 						<?php endif; ?>
-						<a class="button button-primary live-preview" target="_blank" href="<?php echo esc_url( $demo['actions']['preview'] ); ?>"><?php _e( 'Live Preview', 'themegrill-demo-importer' ); ?></a>
 					</div>
 				</div>
 			<?php endforeach; ?>
@@ -105,7 +106,9 @@ $demo_imported_id = get_option( 'themegrill_demo_imported_id' );
 	<# } #>
 
 	<div class="theme-actions">
-		<# if ( ! data.active ) { #>
+		<# if ( data.active ) { #>
+			<a class="button button-primary live-preview" target="_blank" href="{{{ data.actions.preview }}}"><?php _e( 'Live Preview', 'themegrill-demo-importer' ); ?></a>
+		<# } else { #>
 			<# if ( ! _.isEmpty( data.hasNotice ) ) { #>
 				<# if ( data.hasNotice['required_theme'] ) { #>
 					<a class="button button-primary hide-if-no-js tips demo-import disabled" href="#" data-name="{{ data.name }}" data-slug="{{ data.id }}" data-tip="<?php echo esc_attr( sprintf( __( 'Required %s theme must be activated to import this demo.', 'themegrill-demo-importer' ), '{{{ data.theme }}}' ) ); ?>"><?php _e( 'Import', 'themegrill-demo-importer' ); ?></a>
@@ -121,8 +124,11 @@ $demo_imported_id = get_option( 'themegrill_demo_imported_id' );
 			<# } #>
 			<a class="button button-secondary demo-preview" target="_blank" href="{{{ data.actions.demo_url }}}"><?php _e( 'Preview', 'themegrill-demo-importer' ); ?></a>
 		<# } #>
-		<a class="button button-primary live-preview" target="_blank" href="{{{ data.actions.preview }}}"><?php _e( 'Live Preview', 'themegrill-demo-importer' ); ?></a>
 	</div>
+
+	<# if ( data.imported ) { #>
+		<div class="notice notice-success notice-alt"><p><?php _ex( 'Imported', 'demo', 'themegrill-demo-importer' ); ?></p></div>
+	<# } #>
 </script>
 
 <script id="tmpl-demo-single" type="text/template">
