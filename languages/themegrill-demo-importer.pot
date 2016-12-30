@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ThemeGrill Demo Importer 1.1.0\n"
 "Report-Msgid-Bugs-To: themegrill@gmail.com\n"
-"POT-Creation-Date: 2016-12-30 07:15:35+00:00\n"
+"POT-Creation-Date: 2016-12-30 11:21:45+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -54,37 +54,41 @@ msgstr ""
 msgid "Imported!"
 msgstr ""
 
-#: includes/class-demo-importer.php:201
+#: includes/class-demo-importer.php:189
+msgid "Try this solution!"
+msgstr ""
+
+#: includes/class-demo-importer.php:202
 msgid ""
 "Are you sure you want to delete this demo?\n"
 "\n"
 "Click 'Cancel' to go back, 'OK' to confirm the delete."
 msgstr ""
 
-#: includes/class-demo-importer.php:202
+#: includes/class-demo-importer.php:203
 msgid ""
 "Importing demo content will replicate the live demo and overwrites your "
 "current customizer, widgets and other settings. It might take few minutes "
 "to complete the demo import. Are you sure you want to import this demo?"
 msgstr ""
 
-#: includes/class-demo-importer.php:207
+#: includes/class-demo-importer.php:208
 msgid "Add New Demo"
 msgstr ""
 
-#: includes/class-demo-importer.php:208
+#: includes/class-demo-importer.php:209
 msgid "Search Demos"
 msgstr ""
 
-#: includes/class-demo-importer.php:209
+#: includes/class-demo-importer.php:210
 msgid "Search demos..."
 msgstr ""
 
-#: includes/class-demo-importer.php:210
+#: includes/class-demo-importer.php:211
 msgid "Number of Demos found: %d"
 msgstr ""
 
-#: includes/class-demo-importer.php:211
+#: includes/class-demo-importer.php:212
 #: includes/includes/admin/views/html-admin-page-importer.php:81
 #: includes/includes/admin/views/html-admin-page-installer.php:94
 msgid "No demos found. Try a different search."
@@ -94,25 +98,33 @@ msgstr ""
 msgid "ThemeGrill"
 msgstr ""
 
-#: includes/class-demo-importer.php:393
+#: includes/class-demo-importer.php:394
 msgid "Sorry, you are not allowed to install demo on this site."
 msgstr ""
 
-#: includes/class-demo-importer.php:400
+#: includes/class-demo-importer.php:401
 msgid "Installing Demo from uploaded file: %s"
 msgstr ""
 
-#: includes/class-demo-importer.php:444
+#: includes/class-demo-importer.php:445
 #: includes/includes/functions-demo-importer.php:109
 msgid "No demo specified."
 msgstr ""
 
-#: includes/class-demo-importer.php:460
+#: includes/class-demo-importer.php:461
 msgid "Sorry, you are not allowed to import."
 msgstr ""
 
-#: includes/class-demo-importer.php:523
-msgid "The XML file containing the dummy content is not available."
+#: includes/class-demo-importer.php:526
+msgid "The XML file dummy content is missing."
+msgstr ""
+
+#: includes/class-demo-importer.php:589
+msgid "The DAT file customizer data is missing."
+msgstr ""
+
+#: includes/class-demo-importer.php:613
+msgid "The WIE file widget content is missing."
 msgstr ""
 
 #: includes/includes/admin/class-demo-installer-skin.php:47
