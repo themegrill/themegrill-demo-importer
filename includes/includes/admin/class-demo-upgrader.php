@@ -40,8 +40,8 @@ class TG_Demo_Upgrader extends WP_Upgrader {
 		$this->strings['no_package'] = __( 'Install package not available.', 'themegrill-demo-importer' );
 		$this->strings['downloading_package'] = __( 'Downloading install package from <span class="code">%s</span>&#8230;', 'themegrill-demo-importer' );
 		$this->strings['unpack_package'] = __( 'Unpacking the package&#8230;', 'themegrill-demo-importer' );
-		$this->strings['remove_old'] = __( 'Removing the old version of the demo&#8230;');
-		$this->strings['remove_old_failed'] = __( 'Could not remove the old demo.');
+		$this->strings['remove_old'] = __( 'Removing the old version of the demo&#8230;', 'themegrill-demo-importer' );
+		$this->strings['remove_old_failed'] = __( 'Could not remove the old demo.', 'themegrill-demo-importer' );
 		$this->strings['installing_package'] = __( 'Installing the demo&#8230;', 'themegrill-demo-importer' );
 		$this->strings['no_files'] = __( 'The demo contains no files.', 'themegrill-demo-importer' );
 		$this->strings['process_failed'] = __( 'Demo install failed.', 'themegrill-demo-importer' );
