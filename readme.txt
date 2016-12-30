@@ -39,5 +39,14 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 
 == Changelog ==
 
+= 1.1.0 =
+* Feature - Backbone views interface for demos and previews
+* Feature - Added download button for the preview not installed
+* Feature - Robust quick search view to change in demo interface
+* Feature - Detailed information in popup to showcase plugins, events, etc
+* Refactor - Replace old way to import demo with new `wp.updates` methods
+* Fix - Menu classes to hide admin menu if no JS using css class `hide-if-no-js`
+* Fix - Remove the old demo pack if found and to update the new demo packs
+
 = 1.0.0 =
 * Initial Public Release
