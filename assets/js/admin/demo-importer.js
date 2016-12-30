@@ -247,7 +247,7 @@ demos.view.Demo = wp.Backbone.View.extend({
 		'touchend': 'expand',
 		'keyup': 'addFocus',
 		'touchmove': 'preventExpand',
-		'click .demo-import:not(.disabled)': 'importDemo'
+		'click .demo-import': 'importDemo'
 	},
 
 	touchDrag: false,
@@ -334,9 +334,13 @@ demos.view.Demo = wp.Backbone.View.extend({
 	},
 
 	importDemo: function() {
-		var _this = this;
-
+		var _this = this,
+			$target = $( event.target );
 		event.preventDefault();
+
+		if ( $target.hasClass( 'disabled' ) ) {
+			return;
+		}
 
 		// Confirmation dialog for importing a demo.
 		if ( ! window.confirm( wp.demos.data.settings.confirmImport ) ) {
@@ -357,7 +361,7 @@ demos.view.Demo = wp.Backbone.View.extend({
 		} );
 
 		wp.updates.importDemo( {
-			slug: $( event.target ).data( 'slug' )
+			slug: $target.data( 'slug' )
 		} );
 	}
 });
@@ -374,7 +378,7 @@ demos.view.Details = wp.Backbone.View.extend({
 		'click .delete-demo': 'deleteDemo',
 		'click .left': 'previousDemo',
 		'click .right': 'nextDemo',
-		'click .demo-import:not(.disabled)': 'importDemo'
+		'click .demo-import': 'importDemo'
 	},
 
 	// The HTML template for the theme overlay
@@ -497,9 +501,13 @@ demos.view.Details = wp.Backbone.View.extend({
 	},
 
 	importDemo: function() {
-		var _this = this;
-
+		var _this = this,
+			$target = $( event.target );
 		event.preventDefault();
+
+		if ( $target.hasClass( 'disabled' ) ) {
+			return;
+		}
 
 		// Confirmation dialog for importing a demo.
 		if ( ! window.confirm( wp.demos.data.settings.confirmImport ) ) {
@@ -520,7 +528,7 @@ demos.view.Details = wp.Backbone.View.extend({
 		} );
 
 		wp.updates.importDemo( {
-			slug: $( event.target ).data( 'slug' )
+			slug: $target.data( 'slug' )
 		} );
 	},
 
