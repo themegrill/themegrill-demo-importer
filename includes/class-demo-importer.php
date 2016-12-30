@@ -173,8 +173,7 @@ class TG_Demo_Importer {
 		wp_register_script( 'jquery-tiptip', $assets_path . 'js/jquery-tiptip/jquery.tipTip' . $suffix . '.js', array( 'jquery' ), '1.3', true );
 		wp_register_script( 'tg-demo-updates', $assets_path . 'js/admin/demo-updates' . $suffix . '.js', array( 'jquery', 'updates' ), '1.1.0', true );
 		wp_localize_script( 'tg-demo-updates', '_demoUpdatesSettings', array(
-			'ajax_nonce' => wp_create_nonce( 'demo-updates' ),
-			'l10n'       => array(
+			'l10n' => array(
 				'importing'             => __( 'Importing...', 'themegrill-demo-importer' ),
 				'demoImportingLabel'    => _x( 'Importing %s...', 'demo', 'themegrill-demo-importer' ), // no ellipsis
 				'importingMsg'          => __( 'Importing... please wait.', 'themegrill-demo-importer' ),
