@@ -49,7 +49,7 @@ final class ThemeGrill_Demo_Importer {
 			// Hooks.
 			add_filter( 'themegrill_demo_importer_assets_path', array( $this, 'plugin_assets_path' ) );
 			add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), array( $this, 'plugin_action_links' ) );
-			add_filter( 'plugin_row_meta', array( __CLASS__, 'plugin_row_meta' ), 10, 2 );
+			add_filter( 'plugin_row_meta', array( $this, 'plugin_row_meta' ), 10, 2 );
 		} else {
 			add_action( 'admin_notices', array( $this, 'theme_support_missing_notice' ) );
 		}
