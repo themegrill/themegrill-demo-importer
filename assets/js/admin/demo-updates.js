@@ -18,6 +18,120 @@
 	wp.updates.l10n = _.extend( wp.updates.l10n, settings.l10n || {} );
 
 	/**
+	 * Sends an Ajax request to the server to import a demo.
+	 *
+	 * @param {object}             args
+	 * @param {string}             args.slug    Demo ID.
+	 * @param {importDemoSuccess=} args.success Optional. Success callback. Default: wp.updates.importDemoSuccess
+	 * @param {importDemoError=}   args.error   Optional. Error callback. Default: wp.updates.importDemoError
+	 * @return {$.promise} A jQuery promise that represents the request,
+	 *                     decorated with an abort() method.
+	 */
+	wp.updates.importDemo = function( args ) {
+		var $message = $( '.demo-import[data-slug="' + args.slug + '"]' );
+
+		args = _.extend( {
+			success: wp.updates.importDemoSuccess,
+			error: wp.updates.importDemoError
+		}, args );
+
+		$message.addClass( 'updating-message' );
+		$message.parents( '.theme' ).addClass( 'focus' );
+		if ( $message.html() !== wp.updates.l10n.importing ) {
+			$message.data( 'originaltext', $message.html() );
+		}
+
+		$message
+			.text( wp.updates.l10n.importing )
+			.attr( 'aria-label', wp.updates.l10n.demoImportingLabel.replace( '%s', $message.data( 'name' ) ) );
+		wp.a11y.speak( wp.updates.l10n.importingMsg, 'polite' );
+
+		// Remove previous error messages, if any.
+		$( '.theme-info .theme-description, [data-slug="' + args.slug + '"]' ).removeClass( 'demo-import-failed' ).find( '.notice.notice-error' ).remove();
+
+		$document.trigger( 'wp-demo-importing', args );
+
+		return wp.updates.ajax( 'import-demo', args );
+	};
+
+	/**
+	 * Updates the UI appropriately after a successful demo import.
+	 *
+	 * @typedef {object} importDemoSuccess
+	 * @param {object} response            Response from the server.
+	 * @param {string} response.slug       Slug of the demo that was imported.
+	 * @param {string} response.previewUrl URL to preview the just imported demo.
+	 */
+	wp.updates.importDemoSuccess = function( response ) {
+		var $card = $( '.theme-overlay, [data-slug=' + response.slug + ']' ),
+			$message;
+
+		$document.trigger( 'wp-demo-import-success', response );
+
+		$message = $card.find( '.button-primary' )
+			.removeClass( 'updating-message' )
+			.addClass( 'updated-message disabled' )
+			.attr( 'aria-label', wp.updates.l10n.demoImportedLabel.replace( '%s', response.demoName ) )
+			.text( wp.updates.l10n.imported );
+
+		wp.a11y.speak( wp.updates.l10n.importedMsg, 'polite' );
+
+		setTimeout( function() {
+
+			if ( response.previewUrl ) {
+
+				// Remove the 'Preview' button.
+				$message.siblings( '.demo-preview' ).remove();
+
+				// Transform the 'Import' button into an 'Live Preview' button.
+				$message
+					.attr( 'target', '_blank' )
+					.attr( 'href', response.previewUrl )
+					.removeClass( 'demo-import updated-message disabled' )
+					.addClass( 'live-preview' )
+					.attr( 'aria-label', wp.updates.l10n.livePreviewLabel.replace( '%s', response.demoName ) )
+					.text( wp.updates.l10n.livePreview );
+			}
+		}, 1000 );
+	};
+
+	/**
+	 * Updates the UI appropriately after a failed demo import.
+	 *
+	 * @typedef {object} importDemoError
+	 * @param {object} response              Response from the server.
+	 * @param {string} response.slug         Slug of the demo to be imported.
+	 * @param {string} response.errorCode    Error code for the error that occurred.
+	 * @param {string} response.errorMessage The error that occurred.
+	 */
+	wp.updates.importDemoError = function( response ) {
+		var $card, $button,
+			errorMessage = wp.updates.l10n.importFailed.replace( '%s', response.errorMessage ),
+			$message     = wp.updates.adminNotice( {
+				className: 'update-message notice-error notice-alt',
+				message:   errorMessage
+			} );
+
+
+		if ( $document.find( 'body' ).hasClass( 'modal-open' ) || $document.find( '.themes' ).hasClass( 'single-theme' ) ) {
+			$button = $( '.demo-import[data-slug="' + response.slug + '"]' );
+			$card   = $( '.theme-info .theme-description' ).prepend( $message );
+		} else {
+			$card   = $( '[data-slug="' + response.slug + '"]' ).removeClass( 'focus' ).addClass( 'demo-import-failed' ).append( $message );
+			$button = $card.find( '.demo-import' );
+		}
+
+		$button
+			.removeClass( 'updating-message' )
+			.attr( 'aria-label', wp.updates.l10n.demoImportFailedLabel.replace( '%s', $button.data( 'name' ) ) )
+			.text( wp.updates.l10n.importFailedShort );
+
+		wp.a11y.speak( errorMessage, 'assertive' );
+
+		$document.trigger( 'wp-demo-import-error', response );
+	};
+
+	/**
 	 * Sends an Ajax request to the server to delete a demo.
 	 *
 	 * @param {object}             args

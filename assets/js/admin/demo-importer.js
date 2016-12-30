@@ -246,7 +246,8 @@ demos.view.Demo = wp.Backbone.View.extend({
 		'keydown': 'expand',
 		'touchend': 'expand',
 		'keyup': 'addFocus',
-		'touchmove': 'preventExpand'
+		'touchmove': 'preventExpand',
+		'click .demo-import': 'importDemo'
 	},
 
 	touchDrag: false,
@@ -330,6 +331,34 @@ demos.view.Demo = wp.Backbone.View.extend({
 
 	preventExpand: function() {
 		this.touchDrag = true;
+	},
+
+	importDemo: function() {
+		var _this = this;
+
+		event.preventDefault();
+
+		// Confirmation dialog for importing a demo.
+		if ( ! window.confirm( wp.demos.data.settings.confirmImport ) ) {
+			return;
+		}
+
+		$( document ).on( 'wp-demo-import-success', function( event, response ) {
+			if ( _this.model.get( 'id' ) === response.slug ) {
+				_this.model.set( { 'imported': true } );
+			}
+		} );
+
+		// Handle a demo queue job.
+		$( document ).on( 'wp-updates-queue-job', function( event, job ) {
+			if ( 'import-demo' === job.action ) {
+				wp.updates.importDemo( job.data );
+			}
+		} );
+
+		wp.updates.importDemo( {
+			slug: $( event.target ).data( 'slug' )
+		} );
 	}
 });
 
@@ -344,7 +373,8 @@ demos.view.Details = wp.Backbone.View.extend({
 		'click': 'collapse',
 		'click .delete-demo': 'deleteDemo',
 		'click .left': 'previousDemo',
-		'click .right': 'nextDemo'
+		'click .right': 'nextDemo',
+		'click .demo-import': 'importDemo'
 	},
 
 	// The HTML template for the theme overlay
@@ -464,6 +494,34 @@ demos.view.Details = wp.Backbone.View.extend({
 		this.remove();
 		this.unbind();
 		this.trigger( 'demo:collapse' );
+	},
+
+	importDemo: function() {
+		var _this = this;
+
+		event.preventDefault();
+
+		// Confirmation dialog for importing a demo.
+		if ( ! window.confirm( wp.demos.data.settings.confirmImport ) ) {
+			return;
+		}
+
+		$( document ).on( 'wp-demo-import-success', function( event, response ) {
+			if ( _this.model.get( 'id' ) === response.slug ) {
+				_this.model.set( { 'imported': true } );
+			}
+		} );
+
+		// Handle a demo queue job.
+		$( document ).on( 'wp-updates-queue-job', function( event, job ) {
+			if ( 'import-demo' === job.action ) {
+				wp.updates.importDemo( job.data );
+			}
+		} );
+
+		wp.updates.importDemo( {
+			slug: $( event.target ).data( 'slug' )
+		} );
 	},
 
 	deleteDemo: function( event ) {
@@ -1161,7 +1219,7 @@ $( document ).ready( function() {
 		}
 
 		$.post( demos.data.settings.ajaxUrl, {
-			action: 'tg_dismiss_notice',
+			action: 'dismiss-notice',
 			notice_id: $this_el.parent().data( 'notice_id' )
 		});
 
