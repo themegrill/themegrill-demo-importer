@@ -186,6 +186,7 @@ class TG_Demo_Importer {
 				'livePreview'           => __( 'Live Preview', 'themegrill-demo-importer' ),
 				'livePreviewLabel'      => _x( 'Live Preview %s', 'demo', 'themegrill-demo-importer' ),
 				'imported'              => __( 'Imported!', 'themegrill-demo-importer' ),
+				'statusTextLink'        => '<a href="https://docs.themegrill.com/knowledgebase/demo-import-process-failed/" target="_blank">' . __( 'Try this solution!', 'themegrill-demo-importer' ) . '</a>',
 			)
 		) );
 
@@ -466,11 +467,12 @@ class TG_Demo_Importer {
 		do_action( 'themegrill_ajax_before_demo_import' );
 
 		if ( ! empty( $demo_data ) ) {
-			$this->import_dummy_xml( $slug, $demo_data );
+			$this->import_dummy_xml( $slug, $demo_data, $status );
 			$this->import_core_options( $slug, $demo_data );
-			$this->import_customizer_data( $slug, $demo_data );
-			$this->import_widget_settings( $slug, $demo_data );
+			$this->import_customizer_data( $slug, $demo_data, $status );
+			$this->import_widget_settings( $slug, $demo_data, $status );
 
+			// Update imported demo ID.
 			update_option( 'themegrill_demo_imported_id', $slug );
 
 			do_action( 'themegrill_ajax_demo_imported', $slug, $demo_data );
@@ -486,9 +488,10 @@ class TG_Demo_Importer {
 	 * Import dummy content from a XML file.
 	 * @param  string $demo_id
 	 * @param  array  $demo_data
+	 * @param  array  $status
 	 * @return bool
 	 */
-	public function import_dummy_xml( $demo_id, $demo_data ) {
+	public function import_dummy_xml( $demo_id, $demo_data, $status ) {
 		$import_file = $this->import_file_path( $demo_id, 'dummy-data.xml' );
 
 		// Load Importer API
@@ -520,8 +523,8 @@ class TG_Demo_Importer {
 
 			flush_rewrite_rules();
 		} else {
-			wp_send_json_error( array( 'message' => __( 'The XML file containing the dummy content is not available.', 'themegrill-demo-importer' ) ) );
-			exit;
+			$status['errorMessage'] = __( 'The XML file dummy content is missing.', 'themegrill-demo-importer' );
+			wp_send_json_error( $status );
 		}
 
 		return true;
@@ -570,9 +573,10 @@ class TG_Demo_Importer {
 	 * Import customizer data from a DAT file.
 	 * @param  string $demo_id
 	 * @param  array  $demo_data
+	 * @param  array  $status
 	 * @return bool
 	 */
-	public function import_customizer_data( $demo_id, $demo_data ) {
+	public function import_customizer_data( $demo_id, $demo_data, $status ) {
 		$import_file = $this->import_file_path( $demo_id, 'dummy-customizer.dat' );
 
 		if ( is_file( $import_file ) ) {
@@ -581,6 +585,9 @@ class TG_Demo_Importer {
 			if ( is_wp_error( $results ) ) {
 				return false;
 			}
+		} else {
+			$status['errorMessage'] = __( 'The DAT file customizer data is missing.', 'themegrill-demo-importer' );
+			wp_send_json_error( $status );
 		}
 
 		return true;
@@ -590,9 +597,10 @@ class TG_Demo_Importer {
 	 * Import widgets settings from WIE or JSON file.
 	 * @param  string $demo_id
 	 * @param  array  $demo_data
+	 * @param  array  $status
 	 * @return bool
 	 */
-	public function import_widget_settings( $demo_id, $demo_data ) {
+	public function import_widget_settings( $demo_id, $demo_data, $status ) {
 		$import_file = $this->import_file_path( $demo_id, 'dummy-widgets.wie' );
 
 		if ( is_file( $import_file ) ) {
@@ -601,6 +609,9 @@ class TG_Demo_Importer {
 			if ( is_wp_error( $results ) ) {
 				return false;
 			}
+		} else {
+			$status['errorMessage'] = __( 'The WIE file widget content is missing.', 'themegrill-demo-importer' );
+			wp_send_json_error( $status );
 		}
 
 		return true;

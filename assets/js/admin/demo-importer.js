@@ -247,7 +247,7 @@ demos.view.Demo = wp.Backbone.View.extend({
 		'touchend': 'expand',
 		'keyup': 'addFocus',
 		'touchmove': 'preventExpand',
-		'click .demo-import': 'importDemo'
+		'click .demo-import:not(.disabled)': 'importDemo'
 	},
 
 	touchDrag: false,
@@ -374,7 +374,7 @@ demos.view.Details = wp.Backbone.View.extend({
 		'click .delete-demo': 'deleteDemo',
 		'click .left': 'previousDemo',
 		'click .right': 'nextDemo',
-		'click .demo-import': 'importDemo'
+		'click .demo-import:not(.disabled)': 'importDemo'
 	},
 
 	// The HTML template for the theme overlay

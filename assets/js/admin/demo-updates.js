@@ -112,6 +112,9 @@
 				message:   errorMessage
 			} );
 
+		if ( ! wp.updates.isValidResponse( response, 'import' ) ) {
+			return;
+		}
 
 		if ( $document.find( 'body' ).hasClass( 'modal-open' ) || $document.find( '.themes' ).hasClass( 'single-theme' ) ) {
 			$button = $( '.demo-import[data-slug="' + response.slug + '"]' );
@@ -128,7 +131,7 @@
 
 		wp.a11y.speak( errorMessage, 'assertive' );
 
-		$document.trigger( 'wp-demo-import-error', response );
+		$document.trigger( 'wp-demo-install-error', response );
 	};
 
 	/**
@@ -206,6 +209,63 @@
 		wp.a11y.speak( errorMessage, 'assertive' );
 
 		$document.trigger( 'wp-demo-delete-error', response );
+	};
+
+	/**
+	 * Validates an AJAX response to ensure it's a proper object.
+	 *
+	 * If the response deems to be invalid, an admin notice is being displayed.
+	 *
+	 * @param {(object|string)} response              Response from the server.
+	 * @param {function=}       response.always       Optional. Callback for when the Deferred is resolved or rejected.
+	 * @param {string=}         response.statusText   Optional. Status message corresponding to the status code.
+	 * @param {string=}         response.responseText Optional. Request response as text.
+	 * @param {string}          action                Type of action the response is referring to. Can be 'delete',
+	 *                                                'update' or 'install'.
+	 */
+	wp.updates.isValidResponse = function( response, action ) {
+		var error = wp.updates.l10n.unknownError,
+			errorMessage;
+
+		// Make sure the response is a valid data object and not a Promise object.
+		if ( _.isObject( response ) && ! _.isFunction( response.always ) ) {
+			return true;
+		}
+
+		if ( _.isString( response ) && '-1' === response ) {
+			error = wp.updates.l10n.nonceError;
+		} else if ( _.isString( response ) ) {
+			error = response;
+		} else if ( 'undefined' !== typeof response.readyState && 0 === response.readyState ) {
+			error = wp.updates.l10n.connectionError;
+		} else if ( _.isString( response.statusText ) ) {
+			error = response.statusText + ' ' + wp.updates.l10n.statusTextLink;
+		}
+
+		switch ( action ) {
+			case 'import':
+				errorMessage = wp.updates.l10n.importFailed;
+				break;
+		}
+
+		errorMessage = errorMessage.replace( '%s', error );
+
+		// Add admin notice.
+		wp.updates.addAdminNotice( {
+			id:        'unknown_error',
+			className: 'notice-error is-dismissible',
+			message:   _.unescape( errorMessage )
+		} );
+
+		// Change buttons of all running updates.
+		$( '.button.updating-message' )
+			.removeClass( 'updating-message' )
+			.removeAttr( 'aria-label' )
+			.text( wp.updates.l10n.updateFailedShort );
+
+		wp.a11y.speak( errorMessage, 'assertive' );
+
+		return false;
 	};
 
 	/**
