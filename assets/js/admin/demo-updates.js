@@ -131,7 +131,7 @@
 
 		wp.a11y.speak( errorMessage, 'assertive' );
 
-		$document.trigger( 'wp-demo-install-error', response );
+		$document.trigger( 'wp-demo-import-error', response );
 	};
 
 	/**
