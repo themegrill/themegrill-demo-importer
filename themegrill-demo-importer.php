@@ -125,6 +125,7 @@ final class ThemeGrill_Demo_Importer {
 	 */
 	private function includes() {
 		include_once( dirname( __FILE__ ) . '/includes/class-demo-importer.php' );
+		include_once( dirname( __FILE__ ) . '/includes/functions-demo-update.php' );
 	}
 
 	/**

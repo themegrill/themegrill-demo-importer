@@ -1,68 +1,87 @@
 /**
- * Styling begins.
+ * demo-importer.scss
+ * General ThemeGrill Demo Importer admin styles.
  */
-.appearance_page_demo-importer .wp-filter {
-	padding: 0 20px;
 
-	.filter-links li > a:focus {
-		box-shadow: none;
+/**
+ * Imports
+ */
+@import 'bourbon';
+
+/**
+ * Styling begins
+ */
+.appearance_page_demo-importer {
+	.demo-importer {
+		h1 {
+			margin-bottom: 15px;
+		}
+
+		.wp-filter-search {
+			position: relative;
+			top: -2px;
+			left: 20px;
+			margin: 0;
+			width: 280px;
+			font-size: 16px;
+			font-weight: 300;
+			line-height: 1.5;
+		}
+	}
+
+	.demo-installer {
+		.wp-filter {
+			padding: 0 20px;
+
+			.filter-links li > a:focus {
+				box-shadow: none;
+			}
+		}
+
+		.welcome-panel {
+			margin: 0;
+		}
 	}
 }
 
-.theme-browser .theme .theme-actions span.spinner {
-	display: none;
-}
+table.plugins-list-table {
+	margin-bottom: 1em;
 
-.theme-browser .theme .theme-actions.imported,
-.theme-browser .theme .theme-actions.importing {
-	opacity: 1;
-}
-
-.theme-browser .theme .theme-actions.imported .button,
-.theme-browser .theme .theme-actions.importing .button,
-.theme-browser .theme:not( .active ) .theme-actions .preview {
-	display: none;
-	visibility: hidden;
-}
-
-.theme-browser .theme:not( .active ) .theme-actions.imported .preview {
-	display: block;
-	visibility: visible;
-}
-
-.theme-browser .theme .theme-actions.importing span.spinner.is-active {
-	width: auto;
-	display: block;
-	font-size: 12px;
-	padding-right: 25px;
-	background-position: right center;
-}
-
-@media only screen and (max-width: 780px) {
-	.theme-browser .theme .theme-actions.imported {
-		opacity: 0;
+	tr:nth-child( 2n ) {
+		td {
+			background: #fcfcfc;
+		}
 	}
-}
 
-/* Position admin messages */
-.theme .notice,
-.theme .notice.is-dismissible {
-	left: 0;
-	margin: 0;
-	position: absolute;
-	right: 0;
-	top: 0;
-}
+	th {
+		padding: 9px;
+		font-weight: 600;
+	}
 
-.theme .notice-success p::before {
-	color: #79ba49;
-	content: '\f147';
-	margin-right: 6px;
-	vertical-align: top;
-	display: inline-block;
-	font: normal 20px/1 'dashicons';
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
+	td {
+		padding: 9px;
+		font-size: 1.1em;
+
+		mark {
+			background: transparent none;
+		}
+
+		mark.yes {
+			color: #7ad03a;
+		}
+
+		mark.no {
+			color: #999;
+		}
+
+		mark.error {
+			color: #a00;
+		}
+	}
+
+	.plugin-status {
+		text-align: center;
+	}
 }
 
 /**

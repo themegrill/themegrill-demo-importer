@@ -44,11 +44,11 @@ class TG_Demo_Installer_Skin extends WP_Upgrader_Skin {
 		$from = isset( $_GET['from'] ) ? wp_unslash( $_GET['from'] ) : 'demos';
 
 		if ( 'web' == $this->type ) {
-			$install_actions['demos_page'] = '<a href="' . admin_url( 'themes.php?page=demo-importer&tab=uploaded' ) . '" target="_parent">' . __( 'Return to Demo Importer', 'themegrill-demo-importer' ) . '</a>';
+			$install_actions['demos_page'] = '<a href="' . admin_url( 'themes.php?page=demo-importer&browse=uploads' ) . '" target="_parent">' . __( 'Return to Demo Importer', 'themegrill-demo-importer' ) . '</a>';
 		} elseif ( 'upload' == $this->type && 'demos' == $from ) {
-			$install_actions['demos_page'] = '<a href="' . admin_url( 'themes.php?page=demo-importer&tab=uploaded' ) . '">' . __( 'Return to Demo Importer', 'themegrill-demo-importer' ) . '</a>';
+			$install_actions['demos_page'] = '<a href="' . admin_url( 'themes.php?page=demo-importer&browse=uploads' ) . '">' . __( 'Return to Demo Importer', 'themegrill-demo-importer' ) . '</a>';
 		} else {
-			$install_actions['demos_page'] = '<a href="' . admin_url( 'themes.php?page=demo-importer&tab=uploaded' ) . '" target="_parent">' . __( 'Return to Demos page', 'themegrill-demo-importer' ) . '</a>';
+			$install_actions['demos_page'] = '<a href="' . admin_url( 'themes.php?page=demo-importer&browse=uploads' ) . '" target="_parent">' . __( 'Return to Demos page', 'themegrill-demo-importer' ) . '</a>';
 		}
 
 		/**

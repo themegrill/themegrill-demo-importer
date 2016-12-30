@@ -31,6 +31,12 @@ class TG_Demo_Importer {
 	public $demo_packages;
 
 	/**
+	 * Demo installer.
+	 * @var bool
+	 */
+	public $demo_install = true;
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
@@ -39,17 +45,13 @@ class TG_Demo_Importer {
 
 		// Add Demo Importer menu.
 		if ( apply_filters( 'themegrill_show_demo_importer_page', true ) ) {
-			add_action( 'admin_menu', array( $this, 'demo_importer_menu' ) );
+			add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
+			add_action( 'admin_head', array( $this, 'add_menu_classes' ) );
 		}
 
-		// Add Demo Importer filterable content.
-		add_action( 'themegrill_demo_importer_welcome', array( $this, 'welcome_panel' ) );
-		add_action( 'themegrill_demo_importer_uploaded', array( $this, 'output_uploaded' ) );
-		add_action( 'themegrill_demo_importer_previews', array( $this, 'output_previews' ) );
-
-		// AJAX Events to dismiss notice and import demo data.
-		add_action( 'wp_ajax_tg_dismiss_notice', array( $this, 'dismissible_notice' ) );
-		add_action( 'wp_ajax_tg_import_demo_data', array( $this, 'import_demo_data' ) );
+		// AJAX Events to import demo and dismiss notice.
+		add_action( 'wp_ajax_import-demo', array( $this, 'ajax_import_demo' ) );
+		add_action( 'wp_ajax_dismiss-notice', array( $this, 'ajax_dismiss_notice' ) );
 
 		// Update custom nav menu items and siteorigin panel data.
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_nav_menu_items' ) );
@@ -131,9 +133,30 @@ class TG_Demo_Importer {
 	/**
 	 * Add menu item.
 	 */
-	public function demo_importer_menu() {
+	public function add_admin_menu() {
 		$page = add_theme_page( __( 'Demo Importer', 'themegrill-demo-importer' ), __( 'Demo Importer', 'themegrill-demo-importer' ), 'switch_themes', 'demo-importer', array( $this, 'demo_importer' ) );
 		add_action( 'admin_print_styles-' . $page, array( $this, 'enqueue_styles' ) );
+	}
+
+	/**
+	 * Adds the class to the menu.
+	 */
+	public function add_menu_classes() {
+		global $submenu;
+
+		if ( isset( $submenu['themes.php'] ) ) {
+			$submenu_class = $this->demo_install ? 'demo-installer hide-if-no-js' : 'demo-importer';
+
+			// Add menu classes if user has access.
+			if ( apply_filters( 'themegrill_demo_importer_include_class_in_menu', true ) ) {
+				foreach ( $submenu['themes.php'] as $order => $menu_item ) {
+					if ( 0 === strpos( $menu_item[0], _x( 'Demo Importer', 'Admin menu name', 'themegrill-demo-importer' ) ) ) {
+						$submenu['themes.php'][ $order ][4] = empty( $menu_item[4] ) ? $submenu_class : $menu_item[4] . ' ' . $submenu_class;
+						break;
+					}
+				}
+			}
+		}
 	}
 
 	/**
@@ -143,55 +166,222 @@ class TG_Demo_Importer {
 		$suffix      = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 		$assets_path = tg_get_demo_importer_assets_path();
 
+		// Enqueue Styles
+		wp_enqueue_style( 'tg-demo-importer', $assets_path . 'css/demo-importer.css', array() );
+
 		// Register Scripts
 		wp_register_script( 'jquery-tiptip', $assets_path . 'js/jquery-tiptip/jquery.tipTip' . $suffix . '.js', array( 'jquery' ), '1.3', true );
+		wp_register_script( 'tg-demo-updates', $assets_path . 'js/admin/demo-updates' . $suffix . '.js', array( 'jquery', 'updates' ), '1.1.0', true );
+		wp_localize_script( 'tg-demo-updates', '_demoUpdatesSettings', array(
+			'ajax_nonce' => wp_create_nonce( 'demo-updates' ),
+			'l10n'       => array(
+				'importing'             => __( 'Importing...', 'themegrill-demo-importer' ),
+				'demoImportingLabel'    => _x( 'Importing %s...', 'demo', 'themegrill-demo-importer' ), // no ellipsis
+				'importingMsg'          => __( 'Importing... please wait.', 'themegrill-demo-importer' ),
+				'importedMsg'           => __( 'Import completed successfully.', 'themegrill-demo-importer' ),
+				'importFailedShort'     => __( 'Import Failed!', 'themegrill-demo-importer' ),
+				'importFailed'          => __( 'Import failed: %s', 'themegrill-demo-importer' ),
+				'demoImportedLabel'     => _x( '%s imported!', 'demo', 'themegrill-demo-importer' ),
+				'demoImportFailedLabel' => _x( '%s import failed', 'demo', 'themegrill-demo-importer' ),
+				'livePreview'           => __( 'Live Preview', 'themegrill-demo-importer' ),
+				'livePreviewLabel'      => _x( 'Live Preview %s', 'demo', 'themegrill-demo-importer' ),
+				'imported'              => __( 'Imported!', 'themegrill-demo-importer' ),
+				'statusTextLink'        => '<a href="https://docs.themegrill.com/knowledgebase/demo-import-process-failed/" target="_blank">' . __( 'Try this solution!', 'themegrill-demo-importer' ) . '</a>',
+			)
+		) );
 
 		// Enqueue Scripts
-		wp_enqueue_style( 'tg-demo-importer', $assets_path . 'css/demo-importer.css', array() );
-		wp_enqueue_script( 'tg-demo-importer', $assets_path . 'js/admin/demo-importer' . $suffix . '.js', array( 'jquery', 'jquery-tiptip' ), '1.0.0' );
-
-		wp_localize_script( 'tg-demo-importer', 'demo_importer_params', array(
-			'ajax_url'               => admin_url( 'admin-ajax.php' ),
-			'import_demo_data_nonce' => wp_create_nonce( 'import-demo-data' ),
-			'i18n_import_data_error' => esc_js( __( 'Importing Failed. Try again!', 'themegrill-demo-importer' ) ),
-			'i18n_import_dummy_data' => esc_js( __( 'Importing demo content will replicate the live demo and overwrites your current customizer, widgets and other settings. It might take few minutes to complete the demo import. Are you sure you want to import this demo?', 'themegrill-demo-importer' ) ),
+		wp_enqueue_script( 'tg-demo-importer', $assets_path . 'js/admin/demo-importer' . $suffix . '.js', array( 'jquery', 'jquery-tiptip', 'wp-backbone', 'wp-a11y', 'tg-demo-updates' ), '1.1.0', true );
+		wp_localize_script( 'tg-demo-importer', 'demoImporterLocalizeScript', array(
+			'demos'    => $this->is_preview() ? $this->prepare_previews_for_js( $this->demo_packages ) : $this->prepare_demos_for_js( $this->demo_config ),
+			'settings' => array(
+				'isPreview'     => $this->is_preview(),
+				'isInstall'     => $this->demo_install,
+				'canInstall'    => current_user_can( 'upload_files' ),
+				'installURI'    => current_user_can( 'upload_files' ) ? self_admin_url( 'themes.php?page=demo-importer&browse=preview' ) : null,
+				'confirmDelete' => __( "Are you sure you want to delete this demo?\n\nClick 'Cancel' to go back, 'OK' to confirm the delete.", 'themegrill-demo-importer' ),
+				'confirmImport' => __( 'Importing demo content will replicate the live demo and overwrites your current customizer, widgets and other settings. It might take few minutes to complete the demo import. Are you sure you want to import this demo?', 'themegrill-demo-importer' ),
+				'ajaxUrl'       => admin_url( 'admin-ajax.php' ),
+				'adminUrl'      => parse_url( self_admin_url(), PHP_URL_PATH ),
+			),
+			'l10n' => array(
+				'addNew'            => __( 'Add New Demo', 'themegrill-demo-importer' ),
+				'search'            => __( 'Search Demos', 'themegrill-demo-importer' ),
+				'searchPlaceholder' => __( 'Search demos...', 'themegrill-demo-importer' ), // placeholder (no ellipsis)
+				'demosFound'        => __( 'Number of Demos found: %d', 'themegrill-demo-importer' ),
+				'noDemosFound'      => __( 'No demos found. Try a different search.', 'themegrill-demo-importer' ),
+			),
+			'installedDemos' => array_keys( $this->demo_config ),
 		) );
+	}
+
+	/**
+	 * Check for preview filter.
+	 * @return bool
+	 */
+	public function is_preview() {
+		if ( $this->demo_install && isset( $_GET['browse'] ) ) {
+			return 'preview' === $_GET['browse'] ? true : false;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Prepare previews for JavaScript.
+	 */
+	private function prepare_previews_for_js( $demos = null ) {
+		$prepared_demos   = array();
+		$current_template = get_option( 'template' );
+		$demo_assets_path = tg_get_demo_importer_assets_path();
+		$demo_imported_id = get_option( 'themegrill_demo_imported_id' );
+
+		/**
+		 * Filters demo data before it is prepared for JavaScript.
+		 *
+		 * @param array      $prepared_demos   An associative array of demo data. Default empty array.
+		 * @param null|array $demos            An array of demo config to prepare, if any.
+		 * @param string     $demo_imported_id The current demo imported id.
+		 */
+		$prepared_demos = (array) apply_filters( 'themegrill_demo_importer_pre_prepare_demos_for_js', array(), $demos, $demo_imported_id );
+
+		if ( ! empty( $prepared_demos ) ) {
+			return $prepared_demos;
+		}
+
+		if ( ! empty( $demos ) ) {
+			foreach ( $demos as $demo_id => $demo_data ) {
+				$author       = isset( $demo_data['author'] ) ? $demo_data['author'] : __( 'ThemeGrill', 'themegrill-demo-importer' );
+				$download_url = isset( $demo_data['download'] ) ? $demo_data['download'] : "https://github.com/themegrill/themegrill-demo-pack/raw/master/packages/{$current_template}/{$demo_id}.zip";
+
+				// Check if demo is installed.
+				$installed = false;
+				if ( in_array( $demo_id, array_keys( $this->demo_config ) ) ) {
+					$installed = true;
+				}
+
+				// Prepare all demos.
+				$prepared_demos[ $demo_id ] = array(
+					'id'              => $demo_id,
+					'name'            => $demo_data['name'],
+					'author'          => $author,
+					'installed'       => $installed,
+					'screenshot'      => "{$demo_assets_path}images/{$current_template}/{$demo_id}.jpg",
+					'description'     => isset( $demo_data['description'] ) ? $demo_data['description'] : '',
+					'actions'         => array(
+						'preview_url'  => $demo_data['preview'],
+						'download_url' => $download_url,
+					),
+				);
+			}
+		}
+
+		/**
+		 * Filters the demos prepared for JavaScript.
+		 *
+		 * Could be useful for changing the order, which is by name by default.
+		 *
+		 * @param array $prepared_demos Array of demos.
+		 */
+		$prepared_demos = apply_filters( 'themegrill_demo_importer_prepare_demos_for_js', $prepared_demos );
+		$prepared_demos = array_values( $prepared_demos );
+		return array_filter( $prepared_demos );
+	}
+
+	/**
+	 * Prepare demos for JavaScript.
+	 *
+	 * @param  array $demos Demo config array.
+	 * @return array An associative array of demo data, sorted by name.
+	 */
+	private function prepare_demos_for_js( $demos = null ) {
+		$prepared_demos   = array();
+		$current_template = get_option( 'template' );
+		$demo_imported_id = get_option( 'themegrill_demo_imported_id' );
+
+		/**
+		 * Filters demo data before it is prepared for JavaScript.
+		 *
+		 * @param array      $prepared_demos   An associative array of demo data. Default empty array.
+		 * @param null|array $demos            An array of demo config to prepare, if any.
+		 * @param string     $demo_imported_id The current demo imported id.
+		 */
+		$prepared_demos = (array) apply_filters( 'themegrill_demo_importer_pre_prepare_demos_for_js', array(), $demos, $demo_imported_id );
+
+		if ( ! empty( $prepared_demos ) ) {
+			return $prepared_demos;
+		}
+
+		// Make sure the imported demo is listed first.
+		if ( isset( $demos[ $demo_imported_id ] ) ) {
+			$prepared_demos[ $demo_imported_id ] = array();
+		}
+
+		if ( ! empty( $demos ) ) {
+			foreach ( $demos as $demo_id => $demo_data ) {
+				$demo_notices = array();
+				$encoded_slug = urlencode( $demo_id );
+				$plugins_list = isset( $demo_data['plugins_list'] ) ? $demo_data['plugins_list'] : array();
+
+				// Plugins status.
+				foreach ( $plugins_list as $plugin => $plugin_data ) {
+					$plugins_list[ $plugin ]['is_active'] = is_plugin_active( $plugin_data['slug'] );
+				}
+
+				// Add demo notices.
+				if ( isset( $demo_data['template'] ) && $current_template !== $demo_data['template'] ) {
+					$demo_notices['required_theme'] = true;
+				} elseif ( wp_list_filter( $plugins_list, array( 'required' => true, 'is_active' => false ) ) ) {
+					$demo_notices['required_plugins'] = true;
+				}
+
+				// Prepare all demos.
+				$prepared_demos[ $demo_id ] = array(
+					'id'              => $demo_id,
+					'name'            => $demo_data['name'],
+					'theme'           => $demo_data['theme'],
+					'package'         => $demo_data['demo_pack'],
+					'screenshot'      => $this->import_file_url( $demo_id, 'screenshot.jpg' ),
+					'description'     => isset( $demo_data['description'] ) ? $demo_data['description'] : '',
+					'author'          => isset( $demo_data['author'] ) ? $demo_data['author'] : __( 'ThemeGrill', 'themegrill-demo-importer' ),
+					'authorAndUri'    => '<a href="http://themegrill.com" target="_blank">ThemeGrill</a>',
+					'version'         => isset( $demo_data['version'] ) ? $demo_data['version'] : '1.1.0',
+					'active'          => $demo_id === $demo_imported_id,
+					'hasNotice'       => $demo_notices,
+					'plugins'         => $plugins_list,
+					'actions'         => array(
+						'preview'  => home_url( '/' ),
+						'demo_url' => $demo_data['demo_url'],
+						'delete'   => current_user_can( 'upload_files' ) ? wp_nonce_url( admin_url( 'themes.php?page=demo-importer&browse=uploads&action=delete&amp;demo_pack=' . urlencode( $demo_id ) ), 'delete-demo_' . $demo_id ) : null,
+					),
+				);
+			}
+		}
+
+		/**
+		 * Filters the demos prepared for JavaScript.
+		 *
+		 * Could be useful for changing the order, which is by name by default.
+		 *
+		 * @param array $prepared_demos Array of demos.
+		 */
+		$prepared_demos = apply_filters( 'themegrill_demo_importer_prepare_demos_for_js', $prepared_demos );
+		$prepared_demos = array_values( $prepared_demos );
+		return array_filter( $prepared_demos );
 	}
 
 	/**
 	 * Demo Importer page output.
 	 */
 	public function demo_importer() {
-		global $current_tab;
-
-		$current_tab = empty( $_GET['tab'] ) ? 'welcome' : sanitize_title( $_GET['tab'] );
+		$demos = $this->prepare_demos_for_js( $this->demo_config );
 
 		if ( isset( $_GET['action'] ) && 'upload-demo' === $_GET['action'] ) {
 			$this->upload_demo_pack();
 		} else {
-			include_once( dirname( __FILE__ ) . '/includes/admin/views/html-admin-page-importer.php' );
+			$suffix = $this->demo_install ? 'installer' : 'importer';
+			include_once( dirname( __FILE__ ) . "/includes/admin/views/html-admin-page-{$suffix}.php" );
 		}
-	}
-
-	/**
-	 * Output welcome panel page.
-	 */
-	public function welcome_panel() {
-		include_once( dirname( __FILE__ ) . '/includes/admin/views/html-admin-page-importer-welcome.php' );
-	}
-
-	/**
-	 * Output demo uploaded page.
-	 */
-	public function output_uploaded() {
-		include_once( dirname( __FILE__ ) . '/includes/admin/views/html-admin-page-importer-uploaded.php' );
-	}
-
-	/**
-	 * Output demo previews page.
-	 */
-	public function output_previews() {
-		include_once( dirname( __FILE__ ) . '/includes/admin/views/html-admin-page-importer-previews.php' );
 	}
 
 	/**
@@ -226,9 +416,9 @@ class TG_Demo_Importer {
 	}
 
 	/**
-	 * AJAX Dismissible notice.
+	 * Ajax handler for dismissing notice.
 	 */
-	public function dismissible_notice() {
+	public function ajax_dismiss_notice() {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			die( -1 );
 		}
@@ -243,52 +433,65 @@ class TG_Demo_Importer {
 	}
 
 	/**
-	 * AJAX Import demo/dummy data.
+	 * Ajax handler for importing a demo.
 	 */
-	public function import_demo_data() {
-		ob_start();
+	public function ajax_import_demo() {
+		check_ajax_referer( 'updates' );
 
-		check_ajax_referer( 'import-demo-data', 'security' );
+		if ( empty( $_POST['slug'] ) ) {
+			wp_send_json_error( array(
+				'slug'         => '',
+				'errorCode'    => 'no_demo_specified',
+				'errorMessage' => __( 'No demo specified.', 'themegrill-demo-importer' ),
+			) );
+		}
+
+		$slug = sanitize_key( wp_unslash( $_POST['slug'] ) );
+
+		$status = array(
+			'import' => 'demo',
+			'slug'   => $slug,
+		);
 
 		if ( ! defined( 'WP_LOAD_IMPORTERS' ) ) {
 			define( 'WP_LOAD_IMPORTERS', true );
 		}
 
 		if ( ! current_user_can( 'manage_options' ) ) {
-			die( -1 );
+			$status['errorMessage'] = __( 'Sorry, you are not allowed to import.', 'themegrill-demo-importer' );
+			wp_send_json_error( $status );
 		}
 
-		$demo_id   = sanitize_text_field( stripslashes( $_POST['demo_id'] ) );
-		$demo_data = isset( $this->demo_config[ $demo_id ] ) ? $this->demo_config[ $demo_id ] : array();
+		$demo_data = isset( $this->demo_config[ $slug ] ) ? $this->demo_config[ $slug ] : array();
 
 		do_action( 'themegrill_ajax_before_demo_import' );
 
 		if ( ! empty( $demo_data ) ) {
-			$this->import_dummy_xml( $demo_id, $demo_data );
-			$this->import_core_options( $demo_id, $demo_data );
-			$this->import_customizer_data( $demo_id, $demo_data );
-			$this->import_widget_settings( $demo_id, $demo_data );
+			$this->import_dummy_xml( $slug, $demo_data, $status );
+			$this->import_core_options( $slug, $demo_data );
+			$this->import_customizer_data( $slug, $demo_data, $status );
+			$this->import_widget_settings( $slug, $demo_data, $status );
 
-			update_option( 'themegrill_demo_imported_id', $demo_id );
+			// Update imported demo ID.
+			update_option( 'themegrill_demo_imported_id', $slug );
 
-			do_action( 'themegrill_ajax_demo_imported', $demo_id, $demo_data );
-
-			wp_send_json_success( array(
-				'demo_id' => $demo_id,
-				'message' => __( 'Successfully Imported', 'themegrill-demo-importer' ),
-			) );
+			do_action( 'themegrill_ajax_demo_imported', $slug, $demo_data );
 		}
 
-		die();
+		$status['demoName']   = $demo_data['name'];
+		$status['previewUrl'] = get_home_url( '/' );
+
+		wp_send_json_success( $status );
 	}
 
 	/**
 	 * Import dummy content from a XML file.
 	 * @param  string $demo_id
 	 * @param  array  $demo_data
+	 * @param  array  $status
 	 * @return bool
 	 */
-	public function import_dummy_xml( $demo_id, $demo_data ) {
+	public function import_dummy_xml( $demo_id, $demo_data, $status ) {
 		$import_file = $this->import_file_path( $demo_id, 'dummy-data.xml' );
 
 		// Load Importer API
@@ -320,8 +523,8 @@ class TG_Demo_Importer {
 
 			flush_rewrite_rules();
 		} else {
-			wp_send_json_error( array( 'message' => __( 'The XML file containing the dummy content is not available.', 'themegrill-demo-importer' ) ) );
-			exit;
+			$status['errorMessage'] = __( 'The XML file dummy content is missing.', 'themegrill-demo-importer' );
+			wp_send_json_error( $status );
 		}
 
 		return true;
@@ -370,9 +573,10 @@ class TG_Demo_Importer {
 	 * Import customizer data from a DAT file.
 	 * @param  string $demo_id
 	 * @param  array  $demo_data
+	 * @param  array  $status
 	 * @return bool
 	 */
-	public function import_customizer_data( $demo_id, $demo_data ) {
+	public function import_customizer_data( $demo_id, $demo_data, $status ) {
 		$import_file = $this->import_file_path( $demo_id, 'dummy-customizer.dat' );
 
 		if ( is_file( $import_file ) ) {
@@ -381,6 +585,9 @@ class TG_Demo_Importer {
 			if ( is_wp_error( $results ) ) {
 				return false;
 			}
+		} else {
+			$status['errorMessage'] = __( 'The DAT file customizer data is missing.', 'themegrill-demo-importer' );
+			wp_send_json_error( $status );
 		}
 
 		return true;
@@ -390,9 +597,10 @@ class TG_Demo_Importer {
 	 * Import widgets settings from WIE or JSON file.
 	 * @param  string $demo_id
 	 * @param  array  $demo_data
+	 * @param  array  $status
 	 * @return bool
 	 */
-	public function import_widget_settings( $demo_id, $demo_data ) {
+	public function import_widget_settings( $demo_id, $demo_data, $status ) {
 		$import_file = $this->import_file_path( $demo_id, 'dummy-widgets.wie' );
 
 		if ( is_file( $import_file ) ) {
@@ -401,6 +609,9 @@ class TG_Demo_Importer {
 			if ( is_wp_error( $results ) ) {
 				return false;
 			}
+		} else {
+			$status['errorMessage'] = __( 'The WIE file widget content is missing.', 'themegrill-demo-importer' );
+			wp_send_json_error( $status );
 		}
 
 		return true;
