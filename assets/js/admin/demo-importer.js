@@ -353,13 +353,6 @@ demos.view.Demo = wp.Backbone.View.extend({
 			}
 		} );
 
-		// Handle a demo queue job.
-		$( document ).on( 'wp-updates-queue-job', function( event, job ) {
-			if ( 'import-demo' === job.action ) {
-				wp.updates.importDemo( job.data );
-			}
-		} );
-
 		wp.updates.importDemo( {
 			slug: $target.data( 'slug' )
 		} );
@@ -556,13 +549,6 @@ demos.view.Details = wp.Backbone.View.extend({
 				_collection.remove( _this.model );
 				_collection.trigger( 'demos:update' );
 			} );
-		} );
-
-		// Handle a demo queue job.
-		$( document ).on( 'wp-updates-queue-job', function( event, job ) {
-			if ( 'delete-demo' === job.action ) {
-				wp.updates.deleteDemo( job.data );
-			}
 		} );
 
 		wp.updates.deleteDemo( {

@@ -281,6 +281,23 @@
 
 		job = wp.updates.queue.shift();
 
+		job = wp.updates.queue.shift();
+
+		// Handle a queue job.
+		switch ( job.action ) {
+			case 'import-demo':
+				wp.updates.importDemo( job.data );
+				break;
+
+			case 'delete-demo':
+				wp.updates.deleteDemo( job.data );
+				break;
+
+			default:
+				break;
+
+		}
+
 		// Handle a queue job.
 		$document.trigger( 'wp-updates-queue-job', job );
 	};
