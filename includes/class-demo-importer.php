@@ -34,7 +34,7 @@ class TG_Demo_Importer {
 	 * Demo installer.
 	 * @var bool
 	 */
-	public $demo_install = true;
+	public $demo_installer = true;
 
 	/**
 	 * Constructor.
@@ -66,8 +66,9 @@ class TG_Demo_Importer {
 	 * Demo importer setup.
 	 */
 	public function setup() {
-		$this->demo_config   = apply_filters( 'themegrill_demo_importer_config', array() );
-		$this->demo_packages = apply_filters( 'themegrill_demo_importer_packages', array() );
+		$this->demo_config    = apply_filters( 'themegrill_demo_importer_config', array() );
+		$this->demo_packages  = apply_filters( 'themegrill_demo_importer_packages', array() );
+		$this->demo_installer = apply_filters( 'themegrill_demo_importer_installer', true );
 	}
 
 	/**
@@ -145,7 +146,7 @@ class TG_Demo_Importer {
 		global $submenu;
 
 		if ( isset( $submenu['themes.php'] ) ) {
-			$submenu_class = $this->demo_install ? 'demo-installer hide-if-no-js' : 'demo-importer';
+			$submenu_class = $this->demo_installer ? 'demo-installer hide-if-no-js' : 'demo-importer';
 
 			// Add menu classes if user has access.
 			if ( apply_filters( 'themegrill_demo_importer_include_class_in_menu', true ) ) {
@@ -195,7 +196,7 @@ class TG_Demo_Importer {
 			'demos'    => $this->is_preview() ? $this->prepare_previews_for_js( $this->demo_packages ) : $this->prepare_demos_for_js( $this->demo_config ),
 			'settings' => array(
 				'isPreview'     => $this->is_preview(),
-				'isInstall'     => $this->demo_install,
+				'isInstall'     => $this->demo_installer,
 				'canInstall'    => current_user_can( 'upload_files' ),
 				'installURI'    => current_user_can( 'upload_files' ) ? self_admin_url( 'themes.php?page=demo-importer&browse=preview' ) : null,
 				'confirmDelete' => __( "Are you sure you want to delete this demo?\n\nClick 'Cancel' to go back, 'OK' to confirm the delete.", 'themegrill-demo-importer' ),
@@ -219,7 +220,7 @@ class TG_Demo_Importer {
 	 * @return bool
 	 */
 	public function is_preview() {
-		if ( $this->demo_install && isset( $_GET['browse'] ) ) {
+		if ( $this->demo_installer && isset( $_GET['browse'] ) ) {
 			return 'preview' === $_GET['browse'] ? true : false;
 		}
 
@@ -320,6 +321,7 @@ class TG_Demo_Importer {
 			foreach ( $demos as $demo_id => $demo_data ) {
 				$demo_notices = array();
 				$encoded_slug = urlencode( $demo_id );
+				$demo_package = isset( $demo_data['demo_pack'] ) ? $demo_data['demo_pack'] : false;
 				$plugins_list = isset( $demo_data['plugins_list'] ) ? $demo_data['plugins_list'] : array();
 
 				// Plugins status.
@@ -339,7 +341,7 @@ class TG_Demo_Importer {
 					'id'              => $demo_id,
 					'name'            => $demo_data['name'],
 					'theme'           => $demo_data['theme'],
-					'package'         => $demo_data['demo_pack'],
+					'package'         => $demo_package,
 					'screenshot'      => $this->import_file_url( $demo_id, 'screenshot.jpg' ),
 					'description'     => isset( $demo_data['description'] ) ? $demo_data['description'] : '',
 					'author'          => isset( $demo_data['author'] ) ? $demo_data['author'] : __( 'ThemeGrill', 'themegrill-demo-importer' ),
@@ -378,7 +380,7 @@ class TG_Demo_Importer {
 		if ( isset( $_GET['action'] ) && 'upload-demo' === $_GET['action'] ) {
 			$this->upload_demo_pack();
 		} else {
-			$suffix = $this->demo_install ? 'installer' : 'importer';
+			$suffix = $this->demo_installer ? 'installer' : 'importer';
 			include_once( dirname( __FILE__ ) . "/includes/admin/views/html-admin-page-{$suffix}.php" );
 		}
 	}

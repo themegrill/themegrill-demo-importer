@@ -44,12 +44,18 @@ final class ThemeGrill_Demo_Importer {
 		// Check with ThemeGrill theme is installed.
 		if ( in_array( get_option( 'template' ), $this->get_core_supported_themes() ) ) {
 			$this->includes();
-			$this->demo_includes();
 
 			// Hooks.
 			add_filter( 'themegrill_demo_importer_assets_path', array( $this, 'plugin_assets_path' ) );
 			add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), array( $this, 'plugin_action_links' ) );
 			add_filter( 'plugin_row_meta', array( $this, 'plugin_row_meta' ), 10, 2 );
+
+			// Installer view.
+			if ( false !== strpos( get_option( 'template' ), '-pro' ) ) {
+				add_filter( 'themegrill_demo_importer_installer', '__return_false' );
+			} else {
+				$this->demo_package_includes();
+			}
 		} else {
 			add_action( 'admin_notices', array( $this, 'theme_support_missing_notice' ) );
 		}
@@ -117,7 +123,15 @@ final class ThemeGrill_Demo_Importer {
 	 * @return array
 	 */
 	private function get_core_supported_themes() {
-		return array( 'spacious', 'colormag', 'flash' );
+		$pro_themes  = array();
+		$core_themes = array( 'spacious', 'colormag', 'flash', 'estore' );
+
+		// Check for core themes pro version :)
+		foreach ( $core_themes as $core_theme ) {
+			$pro_themes[] = $core_theme . '-pro';
+		}
+
+		return array_merge( $core_themes, $pro_themes );
 	}
 
 	/**
@@ -129,9 +143,9 @@ final class ThemeGrill_Demo_Importer {
 	}
 
 	/**
-	 * Includes demo config.
+	 * Includes demo package config.
 	 */
-	private function demo_includes() {
+	private function demo_package_includes() {
 		$upload_dir = wp_upload_dir();
 
 		// Check the folder contains at least 1 valid demo config.
