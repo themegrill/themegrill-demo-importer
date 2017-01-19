@@ -52,6 +52,7 @@ final class ThemeGrill_Demo_Importer {
 
 			// Installer view.
 			if ( false !== strpos( get_option( 'template' ), '-pro' ) ) {
+				add_action( 'admin_init', array( $this, 'admin_redirects' ) );
 				add_filter( 'themegrill_demo_importer_installer', '__return_false' );
 			} else {
 				$this->demo_package_includes();
@@ -98,6 +99,24 @@ final class ThemeGrill_Demo_Importer {
 					fwrite( $file_handle, $file['content'] );
 					fclose( $file_handle );
 				}
+			}
+		}
+
+		// Redirect to demo importer page.
+		set_transient( '_demo_importer_activation_redirect', 1, 30 );
+	}
+
+	/**
+	 * Handle redirects to demo importer page after install and updates.
+	 */
+	public function admin_redirects() {
+		if ( get_transient( '_demo_importer_activation_redirect' ) ) {
+			delete_transient( '_demo_importer_activation_redirect' );
+
+			// If the user can import, send them to the demo importer page.
+			if ( ( ! empty( $_GET['page'] ) && ! in_array( $_GET['page'], array( 'demo-importer' ) ) ) || ! is_network_admin() || ! isset( $_GET['activate-multi'] ) ) {
+				wp_safe_redirect( admin_url( 'themes.php?page=demo-importer' ) );
+				exit;
 			}
 		}
 	}
