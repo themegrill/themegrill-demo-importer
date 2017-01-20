@@ -46,7 +46,6 @@ final class ThemeGrill_Demo_Importer {
 			$this->includes();
 
 			// Hooks.
-			add_action( 'admin_init', array( $this, 'admin_redirects' ) );
 			add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), array( $this, 'plugin_action_links' ) );
 			add_filter( 'plugin_row_meta', array( $this, 'plugin_row_meta' ), 10, 2 );
 		} else {
@@ -96,21 +95,6 @@ final class ThemeGrill_Demo_Importer {
 
 		// Redirect to demo importer page.
 		set_transient( '_tg_demo_importer_activation_redirect', 1, 30 );
-	}
-
-	/**
-	 * Handle redirects after install and updates.
-	 */
-	public function admin_redirects() {
-		if ( get_transient( '_tg_demo_importer_activation_redirect' ) ) {
-			delete_transient( '_tg_demo_importer_activation_redirect' );
-
-			// If the user can import, send them to the demo importer page.
-			if ( ( ! empty( $_GET['page'] ) && ! in_array( $_GET['page'], array( 'demo-importer' ) ) ) || ! is_network_admin() || ! isset( $_GET['activate-multi'] ) ) {
-				wp_safe_redirect( admin_url( 'themes.php?page=demo-importer' ) );
-				exit;
-			}
-		}
 	}
 
 	/**
