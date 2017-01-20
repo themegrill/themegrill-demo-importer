@@ -95,15 +95,15 @@ final class ThemeGrill_Demo_Importer {
 		}
 
 		// Redirect to demo importer page.
-		set_transient( '_demo_importer_activation_redirect', 1, 30 );
+		set_transient( '_tg_demo_importer_activation_redirect', 1, 30 );
 	}
 
 	/**
 	 * Handle redirects after install and updates.
 	 */
 	public function admin_redirects() {
-		if ( get_transient( '_demo_importer_activation_redirect' ) ) {
-			delete_transient( '_demo_importer_activation_redirect' );
+		if ( get_transient( '_tg_demo_importer_activation_redirect' ) ) {
+			delete_transient( '_tg_demo_importer_activation_redirect' );
 
 			// If the user can import, send them to the demo importer page.
 			if ( ( ! empty( $_GET['page'] ) && ! in_array( $_GET['page'], array( 'demo-importer' ) ) ) || ! is_network_admin() || ! isset( $_GET['activate-multi'] ) ) {
