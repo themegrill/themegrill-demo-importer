@@ -233,8 +233,8 @@ class TG_Demo_Importer {
 	private function prepare_previews_for_js( $demos = null ) {
 		$prepared_demos   = array();
 		$current_template = get_option( 'template' );
-		$demo_assets_path = tg_get_demo_importer_assets_path();
 		$demo_imported_id = get_option( 'themegrill_demo_imported_id' );
+		$demo_assets_path = ThemeGrill_Demo_Importer::plugin_url() . '/assets/';
 
 		/**
 		 * Filters demo data before it is prepared for JavaScript.
