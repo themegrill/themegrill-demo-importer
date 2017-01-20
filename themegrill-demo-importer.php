@@ -173,16 +173,8 @@ final class ThemeGrill_Demo_Importer {
 	 * Get the plugin url.
 	 * @return string
 	 */
-	public function plugin_url() {
+	public static function plugin_url() {
 		return untrailingslashit( plugins_url( '/', __FILE__ ) );
-	}
-
-	/**
-	 * Get the plugin assets path.
-	 * @return string
-	 */
-	public function plugin_assets_path() {
-		return trailingslashit( $this->plugin_url() . '/assets/' );
 	}
 
 	/**

@@ -165,7 +165,7 @@ class TG_Demo_Importer {
 	 */
 	public function enqueue_styles() {
 		$suffix      = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
-		$assets_path = tg_get_demo_importer_assets_path();
+		$assets_path = ThemeGrill_Demo_Importer::plugin_url() . '/assets/';
 
 		// Enqueue Styles
 		wp_enqueue_style( 'tg-demo-importer', $assets_path . 'css/demo-importer.css', array() );
