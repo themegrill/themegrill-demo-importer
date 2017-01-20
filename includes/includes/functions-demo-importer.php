@@ -38,18 +38,6 @@ if ( ! function_exists( 'tg_get_demo_file_path' ) ) {
 	}
 }
 
-if ( ! function_exists( 'tg_get_demo_importer_assets_path' ) ) {
-
-	/**
-	 * Get a demo importer assets path.
-	 *
-	 * @return string the demo data assets path.
-	 */
-	function tg_get_demo_importer_assets_path() {
-		return apply_filters( 'themegrill_demo_importer_assets_path', get_template_directory_uri() . '/inc/demo-importer/assets/' );
-	}
-}
-
 /**
  * Get an attachment ID from the filename.
  *
