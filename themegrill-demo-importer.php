@@ -46,17 +46,10 @@ final class ThemeGrill_Demo_Importer {
 			$this->includes();
 
 			// Hooks.
-			add_filter( 'themegrill_demo_importer_assets_path', array( $this, 'plugin_assets_path' ) );
+			add_action( 'admin_init', array( $this, 'admin_redirects' ) );
 			add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), array( $this, 'plugin_action_links' ) );
 			add_filter( 'plugin_row_meta', array( $this, 'plugin_row_meta' ), 10, 2 );
-
-			// Installer view.
-			if ( false !== strpos( get_option( 'template' ), '-pro' ) ) {
-				add_action( 'admin_init', array( $this, 'admin_redirects' ) );
-				add_filter( 'themegrill_demo_importer_installer', '__return_false' );
-			} else {
-				$this->demo_package_includes();
-			}
+			add_filter( 'themegrill_demo_importer_assets_path', array( $this, 'plugin_assets_path' ) );
 		} else {
 			add_action( 'admin_notices', array( $this, 'theme_support_missing_notice' ) );
 		}
@@ -107,7 +100,7 @@ final class ThemeGrill_Demo_Importer {
 	}
 
 	/**
-	 * Handle redirects to demo importer page after install and updates.
+	 * Handle redirects after install and updates.
 	 */
 	public function admin_redirects() {
 		if ( get_transient( '_demo_importer_activation_redirect' ) ) {
@@ -159,20 +152,18 @@ final class ThemeGrill_Demo_Importer {
 	private function includes() {
 		include_once( dirname( __FILE__ ) . '/includes/class-demo-importer.php' );
 		include_once( dirname( __FILE__ ) . '/includes/functions-demo-update.php' );
-	}
 
-	/**
-	 * Includes demo package config.
-	 */
-	private function demo_package_includes() {
-		$upload_dir = wp_upload_dir();
+		// Includes demo packages config.
+		if ( false === strpos( get_option( 'template' ), '-pro' ) ) {
+			$upload_dir = wp_upload_dir();
 
-		// Check the folder contains at least 1 valid demo config.
-		$files = glob( $upload_dir['basedir'] . '/tg-demo-pack/**/tg-demo-config.php' );
-		if ( $files ) {
-			foreach ( $files as $file ) {
-				if ( $file && is_readable( $file ) ) {
-					include_once( $file );
+			// Check the folder contains at least 1 valid demo config.
+			$files = glob( $upload_dir['basedir'] . '/tg-demo-pack/**/tg-demo-config.php' );
+			if ( $files ) {
+				foreach ( $files as $file ) {
+					if ( $file && is_readable( $file ) ) {
+						include_once( $file );
+					}
 				}
 			}
 		}
