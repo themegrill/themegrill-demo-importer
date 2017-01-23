@@ -3,7 +3,7 @@
  * Plugin Name: ThemeGrill Demo Importer
  * Plugin URI: http://themegrill.com/demo-importer/
  * Description: Description: Import your demo content, widgets and theme settings with one click for ThemeGrill official themes.
- * Version: 1.1.0
+ * Version: 1.2.0
  * Author: ThemeGrill
  * Author URI: http://themegrill.com
  * License: GPLv3 or later
