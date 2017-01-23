@@ -39,6 +39,11 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 
 == Changelog ==
 
+= 1.2.0 =
+* Tweak - Load scripts perfecly on demo importer appearance page.
+* Tweak - Set transient for redirecting to demo importer page after install or update.
+* Tweak - Introduced filter hook `themegrill_demo_importer_installer` to control demo view.
+
 = 1.1.0 =
 * Feature - Backbone views interface for demos and previews
 * Feature - Added download button for the preview not installed
