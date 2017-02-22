@@ -790,7 +790,7 @@ class TG_Demo_Importer {
                   if ( ! empty( $data_value['data_update']['grids_data'] ) ) {
                      foreach ( $data_value['data_update']['grids_data'] as $grid_id => $grid_data ) {
                         if ( ! empty( $grid_data['style'] ) && $instance_id === $grid_id ) {
-                           $level = isset( $grid_data['level'] ) ? $grid_data['level'] : int(0);
+                           $level = isset( $grid_data['level'] ) ? $grid_data['level'] : (int)0;
                            if( $level == $instance ) {
                               foreach ( $grid_data['style'] as $style_key => $style_value ) {
                                  if ( empty( $style_value ) ) {
@@ -845,7 +845,7 @@ class TG_Demo_Importer {
                            case 'dropdown_pages':
                               foreach ( $dropdown_data as $widget_id => $widget_data ) {
                                  if ( ! empty( $widget_data[ $instance_id ] ) && $widget_id == $instance_class ) {
-                                    $level = isset( $widget_data['level'] ) ? $widget_data['level'] : int(0);
+                                    $level = isset( $widget_data['level'] ) ? $widget_data['level'] : (int)0;
                                     if( $level == $instance ) {
                                        foreach ( $widget_data[ $instance_id ] as $widget_key => $widget_value ) {
                                           $page = get_page_by_title( $widget_value );
@@ -866,7 +866,7 @@ class TG_Demo_Importer {
 
                                  foreach ( $taxonomy_data as $widget_id => $widget_data ) {
                                     if ( ! empty( $widget_data[ $instance_id ] ) && $widget_id == $instance_class ) {
-                                       $level = isset( $widget_data['level'] ) ? $widget_data['level'] : int(0);
+                                       $level = isset( $widget_data['level'] ) ? $widget_data['level'] : (int)0;
                                        if( $level == $instance ) {
                                           foreach ( $widget_data[ $instance_id ] as $widget_key => $widget_value ) {
                                              $term = get_term_by( 'name', $widget_value, $taxonomy );
