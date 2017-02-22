@@ -780,129 +780,142 @@ class TG_Demo_Importer {
 		return $data;
 	}
 
+   public function siteorigin_recursive_update( $panels_data, $data_type, $data_value) {
+      static $instance = 0;
+      foreach ( $panels_data as $panel_type => $panel_data ) {
+         // Format the value based on panel type.
+         switch ( $panel_type ) {
+            case 'grids':
+               foreach ( $panel_data as $instance_id => $grid_instance ) {
+                  if ( ! empty( $data_value['data_update']['grids_data'] ) ) {
+                     foreach ( $data_value['data_update']['grids_data'] as $grid_id => $grid_data ) {
+                        if ( ! empty( $grid_data['style'] ) && $instance_id === $grid_id ) {
+                           $level = isset( $grid_data['level'] ) ? $grid_data['level'] : int(0);
+                           if( $level == $instance ) {
+                              foreach ( $grid_data['style'] as $style_key => $style_value ) {
+                                 if ( empty( $style_value ) ) {
+                                    continue;
+                                 }
+
+                                 // Format the value based on style key.
+                                 switch ( $style_key ) {
+                                    case 'background_image_attachment':
+                                       $attachment_id = tg_get_attachment_id( $style_value );
+
+                                       if ( 0 !== $attachment_id ) {
+                                          $grid_instance['style'][ $style_key ] = $attachment_id;
+                                       }
+                                    break;
+                                    default:
+                                       $grid_instance['style'][ $style_key ] = $style_value;
+                                    break;
+                                 }
+                              }
+                           }
+                        }
+                     }
+                  }
+
+                  // Update panel grids data.
+                  $panels_data['grids'][ $instance_id ] = $grid_instance;
+               }
+            break;
+
+            case 'widgets':
+               foreach ($panel_data as $instance_id => $widget_instance ) {
+                  if( isset( $widget_instance['panels_data']['widgets'] ) ) {
+                     $instance = $instance+1;
+                     $child_panels_data = $widget_instance['panels_data'];
+                     $panels_data[$instance_id]['panels_data'] = $this->siteorigin_recursive_update( $child_panels_data, $data_type, $data_value );
+                     $instance = $instance-1;
+                  }
+                  if ( isset( $widget_instance['nav_menu'] ) && isset( $widget_instance['title'] ) ) {
+                     $nav_menu = wp_get_nav_menu_object( $widget_instance['title'] );
+
+                     if ( is_object( $nav_menu ) && $nav_menu->term_id ) {
+                        $widget_instance['nav_menu'] = $nav_menu->term_id;
+                     }
+                  }elseif ( ! empty( $data_value['data_update']['widgets_data'] ) ) {
+                     $instance_class = $widget_instance['panels_info']['class'];
+                     foreach ( $data_value['data_update']['widgets_data'] as $dropdown_type => $dropdown_data ) {
+                        if ( ! in_array( $dropdown_type, array( 'dropdown_pages', 'dropdown_categories' ) ) ) {
+                           continue;
+                        }
+                        switch ( $dropdown_type ) {
+                           case 'dropdown_pages':
+                              foreach ( $dropdown_data as $widget_id => $widget_data ) {
+                                 if ( ! empty( $widget_data[ $instance_id ] ) && $widget_id == $instance_class ) {
+                                    $level = isset( $widget_data['level'] ) ? $widget_data['level'] : int(0);
+                                    if( $level == $instance ) {
+                                       foreach ( $widget_data[ $instance_id ] as $widget_key => $widget_value ) {
+                                          $page = get_page_by_title( $widget_value );
+
+                                          if ( is_object( $page ) && $page->ID ) {
+                                             $widget_instance[ $widget_key ] = $page->ID;
+                                          }
+                                       }
+                                    }
+                                 }
+                              }
+                           break;
+                           case 'dropdown_categories':
+                              foreach ( $dropdown_data as $taxonomy => $taxonomy_data ) {
+                                 if ( ! taxonomy_exists( $taxonomy ) ) {
+                                    continue;
+                                 }
+
+                                 foreach ( $taxonomy_data as $widget_id => $widget_data ) {
+                                    if ( ! empty( $widget_data[ $instance_id ] ) && $widget_id == $instance_class ) {
+                                       $level = isset( $widget_data['level'] ) ? $widget_data['level'] : int(0);
+                                       if( $level == $instance ) {
+                                          foreach ( $widget_data[ $instance_id ] as $widget_key => $widget_value ) {
+                                             $term = get_term_by( 'name', $widget_value, $taxonomy );
+
+                                             if ( is_object( $term ) && $term->term_id ) {
+                                                $widget_instance[ $widget_key ] = $term->term_id;
+                                             }
+                                          }
+                                       }
+                                    }
+                                 }
+                              }
+                           break;
+                        }
+                     }
+                  }
+                  $panels_data['widgets'][ $instance_id ] = $widget_instance;
+               }
+            break;
+         }
+      }
+      return $panels_data;
+   }
+
 	/**
-	 * Update siteorigin panel settings data.
-	 * @param string $demo_id
-	 * @param array  $demo_data
-	 */
-	public function update_siteorigin_data( $demo_id, $demo_data ) {
-		if ( ! empty( $demo_data['siteorigin_panels_data_update'] ) ) {
-			foreach ( $demo_data['siteorigin_panels_data_update'] as $data_type => $data_value ) {
-				if ( ! empty( $data_value['post_title'] ) ) {
-					$page = get_page_by_title( $data_value['post_title'] );
+    * Update siteorigin panel settings data.
+    * @param string $demo_id
+    * @param array  $demo_data
+    */
+   public function update_siteorigin_data( $demo_id, $demo_data ) {
+      if ( ! empty( $demo_data['siteorigin_panels_data_update'] ) ) {
+         foreach ( $demo_data['siteorigin_panels_data_update'] as $data_type => $data_value ) {
+            if ( ! empty( $data_value['post_title'] ) ) {
+               $page = get_page_by_title( $data_value['post_title'] );
 
-					if ( is_object( $page ) && $page->ID ) {
-						$panels_data = get_post_meta( $page->ID, 'panels_data', true );
+               if ( is_object( $page ) && $page->ID ) {
+                  $panels_data = get_post_meta( $page->ID, 'panels_data', true );
 
-						if ( ! empty( $panels_data ) ) {
-							foreach ( $panels_data as $panel_type => $panel_data ) {
-								if ( ! in_array( $panel_type, array( 'grids', 'widgets' ) ) ) {
-									continue;
-								}
+                  if ( ! empty( $panels_data ) ) {
+                     $panels_data = $this->siteorigin_recursive_update( $panels_data, $data_type, $data_value );
 
-								// Format the value based on panel type.
-								switch ( $panel_type ) {
-									case 'grids':
-										foreach ( $panel_data as $instance_id => $grid_instance ) {
-											if ( ! empty( $data_value['data_update']['grids_data'] ) ) {
-												foreach ( $data_value['data_update']['grids_data'] as $grid_id => $grid_data ) {
-													if ( ! empty( $grid_data['style'] ) && $instance_id === $grid_id ) {
-														foreach ( $grid_data['style'] as $style_key => $style_value ) {
-															if ( empty( $style_value ) ) {
-																continue;
-															}
-
-															// Format the value based on style key.
-															switch ( $style_key ) {
-																case 'background_image_attachment':
-																	$attachment_id = tg_get_attachment_id( $style_value );
-
-																	if ( 0 !== $attachment_id ) {
-																		$grid_instance['style'][ $style_key ] = $attachment_id;
-																	}
-																break;
-																default:
-																	$grid_instance['style'][ $style_key ] = $style_value;
-																break;
-															}
-														}
-													}
-												}
-											}
-
-											// Update panel grids data.
-											$panels_data['grids'][ $instance_id ] = $grid_instance;
-										}
-									break;
-									case 'widgets':
-										foreach ( $panel_data as $instance_id => $widget_instance ) {
-											if ( isset( $widget_instance['nav_menu'] ) && isset( $widget_instance['title'] ) ) {
-												$nav_menu = wp_get_nav_menu_object( $widget_instance['title'] );
-
-												if ( is_object( $nav_menu ) && $nav_menu->term_id ) {
-													$widget_instance['nav_menu'] = $nav_menu->term_id;
-												}
-											} elseif ( ! empty( $data_value['data_update']['widgets_data'] ) ) {
-												$instance_class = $widget_instance['panels_info']['class'];
-
-												foreach ( $data_value['data_update']['widgets_data'] as $dropdown_type => $dropdown_data ) {
-													if ( ! in_array( $dropdown_type, array( 'dropdown_pages', 'dropdown_categories' ) ) ) {
-														continue;
-													}
-
-													// Format the value based on dropdown type.
-													switch ( $dropdown_type ) {
-														case 'dropdown_pages':
-															foreach ( $dropdown_data as $widget_id => $widget_data ) {
-																if ( ! empty( $widget_data[ $instance_id ] ) && $widget_id == $instance_class ) {
-																	foreach ( $widget_data[ $instance_id ] as $widget_key => $widget_value ) {
-																		$page = get_page_by_title( $widget_value );
-
-																		if ( is_object( $page ) && $page->ID ) {
-																			$widget_instance[ $widget_key ] = $page->ID;
-																		}
-																	}
-																}
-															}
-														break;
-														case 'dropdown_categories':
-															foreach ( $dropdown_data as $taxonomy => $taxonomy_data ) {
-																if ( ! taxonomy_exists( $taxonomy ) ) {
-																	continue;
-																}
-
-																foreach ( $taxonomy_data as $widget_id => $widget_data ) {
-																	if ( ! empty( $widget_data[ $instance_id ] ) && $widget_id == $instance_class ) {
-																		foreach ( $widget_data[ $instance_id ] as $widget_key => $widget_value ) {
-																			$term = get_term_by( 'name', $widget_value, $taxonomy );
-
-																			if ( is_object( $term ) && $term->term_id ) {
-																				$widget_instance[ $widget_key ] = $term->term_id;
-																			}
-																		}
-																	}
-																}
-															}
-														break;
-													}
-												}
-											}
-
-											// Update panel widgets data.
-											$panels_data['widgets'][ $instance_id ] = $widget_instance;
-										}
-									break;
-								}
-							}
-						}
-
-						// Update siteorigin panels data.
-						update_post_meta( $page->ID, 'panels_data', $panels_data );
-					}
-				}
-			}
-		}
-	}
+                  }
+                  // Update siteorigin panels data.
+                  update_post_meta( $page->ID, 'panels_data', $panels_data );
+               }
+            }
+         }
+      }
+   }
 }
 
 new TG_Demo_Importer();
