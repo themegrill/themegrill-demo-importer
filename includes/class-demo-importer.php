@@ -828,6 +828,7 @@ class TG_Demo_Importer {
                      $child_panels_data = $widget_instance['panels_data'];
                      $panels_data[$instance_id]['panels_data'] = $this->siteorigin_recursive_update( $child_panels_data, $data_type, $data_value );
                      $instance = $instance-1;
+                     continue;
                   }
                   if ( isset( $widget_instance['nav_menu'] ) && isset( $widget_instance['title'] ) ) {
                      $nav_menu = wp_get_nav_menu_object( $widget_instance['title'] );
