@@ -826,7 +826,7 @@ class TG_Demo_Importer {
                   if( isset( $widget_instance['panels_data']['widgets'] ) ) {
                      $instance = $instance+1;
                      $child_panels_data = $widget_instance['panels_data'];
-                     $panels_data[$instance_id]['panels_data'] = $this->siteorigin_recursive_update( $child_panels_data, $data_type, $data_value );
+                     $panels_data['widgets'][$instance_id]['panels_data'] = $this->siteorigin_recursive_update( $child_panels_data, $data_type, $data_value );
                      $instance = $instance-1;
                      continue;
                   }
