@@ -333,7 +333,7 @@ demos.view.Demo = wp.Backbone.View.extend({
 		this.touchDrag = true;
 	},
 
-	importDemo: function() {
+	importDemo: function( event ) {
 		var _this = this,
 			$target = $( event.target );
 		event.preventDefault();
@@ -493,7 +493,7 @@ demos.view.Details = wp.Backbone.View.extend({
 		this.trigger( 'demo:collapse' );
 	},
 
-	importDemo: function() {
+	importDemo: function( event ) {
 		var _this = this,
 			$target = $( event.target );
 		event.preventDefault();
