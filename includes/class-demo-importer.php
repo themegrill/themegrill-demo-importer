@@ -780,6 +780,13 @@ class TG_Demo_Importer {
 		return $data;
 	}
 
+   /**
+    * Recursive function to address n level deep layoutbuilder data update.
+    * @param  array $panels_data
+    * @param  string $data_type
+    * @param  array $data_value
+    * @return array
+    */
    public function siteorigin_recursive_update( $panels_data, $data_type, $data_value) {
       static $instance = 0;
       foreach ( $panels_data as $panel_type => $panel_data ) {
