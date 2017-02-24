@@ -3,7 +3,7 @@ Contributors: ThemeGrill, shivapoudel
 Tags: themegrill, themes,  demo, importer, download
 Requires at least: 4.0
 Tested up to: 4.7
-Stable tag: 1.2.0
+Stable tag: 1.3.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -12,7 +12,7 @@ Import your demo content, widgets and theme settings with one click for ThemeGri
 
 Import your demo content, widgets and theme settings with one click for <a href="https://themegrill.com/themes/" target="_blank" rel="nofollow">ThemeGrill</a> official themes.
 
-Get free support at http://themegrill.com/support-forum/
+Get free support at https://themegrill.com/support-forum/
 
 == Installation ==
 
@@ -38,6 +38,10 @@ Bugs can be reported either in our support forum or preferably on the [GitHub re
 Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/themegrill-demo-importer/) :)
 
 == Changelog ==
+
+= 1.3.0 =
+* Tweak - Suppor data update for nested siteorigin nested layoutbuilder.
+* Fix - Import button not working on firefox.
 
 = 1.2.0 =
 * Tweak - Load scripts perfecly on demo importer appearance page.
