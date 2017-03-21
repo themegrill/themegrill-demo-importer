@@ -3,7 +3,7 @@ Contributors: ThemeGrill, shivapoudel
 Tags: themegrill, themes,  demo, importer, download
 Requires at least: 4.0
 Tested up to: 4.7
-Stable tag: 1.3.0
+Stable tag: 1.3.1
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -39,8 +39,11 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 
 == Changelog ==
 
+= 1.3.1 =
+* Tweak - Load screenshot from theme instead of plugin for themes with single demo.
+
 = 1.3.0 =
-* Tweak - Suppor data update for nested siteorigin nested layoutbuilder.
+* Tweak - Support data update for nested siteorigin layoutbuilder.
 * Fix - Import button not working on firefox.
 
 = 1.2.0 =

@@ -1,11 +1,11 @@
 <?php
 /**
  * Plugin Name: ThemeGrill Demo Importer
- * Plugin URI: http://themegrill.com/demo-importer/
+ * Plugin URI: https://themegrill.com/demo-importer/
  * Description: Description: Import your demo content, widgets and theme settings with one click for ThemeGrill official themes.
- * Version: 1.3.0
+ * Version: 1.3.1
  * Author: ThemeGrill
- * Author URI: http://themegrill.com
+ * Author URI: https://themegrill.com
  * License: GPLv3 or later
  * Text Domain: themegrill-demo-importer
  * Domain Path: /languages/
@@ -26,7 +26,7 @@ final class ThemeGrill_Demo_Importer {
 	 * Plugin version.
 	 * @var string
 	 */
-	const VERSION = '1.3.0';
+	const VERSION = '1.3.1';
 
 	/**
 	 * Instance of this class.
