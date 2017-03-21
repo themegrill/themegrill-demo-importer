@@ -160,6 +160,14 @@ final class ThemeGrill_Demo_Importer {
 		return untrailingslashit( plugins_url( '/', __FILE__ ) );
 	}
 
+   /**
+    * Get the plugin dir path.
+    * @return string
+    */
+   public static function plugin_dir_path() {
+      return untrailingslashit( plugin_dir_path( __FILE__ ) );
+   }
+
 	/**
 	 * Display action links in the Plugins list table.
 	 * @param  array $actions

@@ -99,6 +99,32 @@ class TG_Demo_Importer {
 
 		return trailingslashit( $working_dir ) . sanitize_file_name( $filename );
 	}
+   /**
+    * Get theme screenshot url to be used in demo importer preview
+    *
+    * @param  string $demo_id
+    * @param  string $demo_assets_path
+    * @param  string $current_template
+    * @return string
+    */
+   public function get_screenshot_url( $demo_id, $demo_assets_path, $current_template ) {
+      $dir = plugin_dir_path( __FILE__ );
+
+      //build screenshot url that reside inside the plugin
+      $screenshot_plugin_url = $demo_assets_path. 'images/' .$current_template. '/' .$demo_id. '.jpg';
+
+      //build screenshot path that reside inside the plugin
+      $screenshot_plugin_path = ThemeGrill_Demo_Importer::plugin_dir_path() . '/assets/images/' .$current_template. '/' .$demo_id. '.jpg';
+
+      if ( file_exists( $screenshot_plugin_path ) ) {
+         $screenshot_url = $screenshot_plugin_url;
+      } else {
+         $theme_data = wp_get_theme();
+         $screenshot_url = $theme_data->get_screenshot();
+      }
+      return $screenshot_url;
+
+   }
 
 	/**
 	 * Get the import file path.
@@ -272,7 +298,7 @@ class TG_Demo_Importer {
 					'name'            => $demo_data['name'],
 					'author'          => $author,
 					'installed'       => $installed,
-					'screenshot'      => "{$demo_assets_path}images/{$current_template}/{$demo_id}.jpg",
+               'screenshot'      => $this->get_screenshot_url( $demo_id, $demo_assets_path, $current_template ),
 					'description'     => isset( $demo_data['description'] ) ? $demo_data['description'] : '',
 					'actions'         => array(
 						'preview_url'  => $demo_data['preview'],
