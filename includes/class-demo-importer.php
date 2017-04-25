@@ -285,6 +285,7 @@ class TG_Demo_Importer {
 			foreach ( $demos as $demo_id => $demo_data ) {
 				$author       = isset( $demo_data['author'] ) ? $demo_data['author'] : __( 'ThemeGrill', 'themegrill-demo-importer' );
 				$download_url = isset( $demo_data['download'] ) ? $demo_data['download'] : "https://github.com/themegrill/themegrill-demo-pack/raw/master/packages/{$current_template}/{$demo_id}.zip";
+				$pro_link = isset( $demo_data['pro_link'] ) ? $demo_data['pro_link'] : '';
 
 				// Check if demo is installed.
 				$installed = false;
@@ -298,11 +299,12 @@ class TG_Demo_Importer {
 					'name'            => $demo_data['name'],
 					'author'          => $author,
 					'installed'       => $installed,
-               'screenshot'      => $this->get_screenshot_url( $demo_id, $demo_assets_path, $current_template ),
+					'screenshot'      => $this->get_screenshot_url( $demo_id, $demo_assets_path, $current_template ),
 					'description'     => isset( $demo_data['description'] ) ? $demo_data['description'] : '',
 					'actions'         => array(
 						'preview_url'  => $demo_data['preview'],
 						'download_url' => $download_url,
+						'pro_link'     => $pro_link
 					),
 				);
 			}
