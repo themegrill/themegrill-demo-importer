@@ -13,7 +13,7 @@ $previews = $this->prepare_previews_for_js( $this->demo_packages );
 <div class="theme-browser rendered">
 	<div class="themes wp-clearfix">
 		<?php foreach ( $previews as $demo ) : ?>
-			<div class="theme" tabindex="0">
+			<div class="theme<?php echo ( $demo['actions']['pro_link'] ) ? " premium-ribbon": ''; ?>" tabindex="0">
 				<a target="_blank" href="<?php echo esc_url( $demo['actions']['preview_url'] ); ?>">
 					<?php if ( $demo['screenshot'] ) : ?>
 						<div class="theme-screenshot">
