@@ -287,7 +287,7 @@ $demo_filter_links = apply_filters( 'themegrill_demo_importer_filter_links_array
 			/* translators: %s: Demo name */
 			$aria_label = sprintf( _x( 'Visit %s Theme Page', 'demo', 'themegrill-demo-importer' ), '{{ data.name }}' );
 			?>
-			<a class="button button-primary demo-pro-link" data-name="{{ data.name }}" href="{{ data.actions.pro_link }}" aria-label="<?php echo esc_attr( $aria_label ); ?>"><?php _e( 'Visit Theme Page', 'themegrill-demo-importer' ); ?></a>
+			<a class="button button-primary demo-pro-link" data-name="{{ data.name }}" href="{{ data.actions.pro_link }}" aria-label="<?php echo esc_attr( $aria_label ); ?>" target="_blank"><?php _e( 'Visit Theme Page', 'themegrill-demo-importer' ); ?></a>
 		<# } #>
 		<a class="button button-secondary demo-preview" target="_blank" href="{{{ data.actions.preview_url }}}"><?php _e( 'Preview', 'themegrill-demo-importer' ); ?></a>
 	</div>
