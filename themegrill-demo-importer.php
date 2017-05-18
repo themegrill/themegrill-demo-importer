@@ -119,7 +119,7 @@ final class ThemeGrill_Demo_Importer {
 	 */
 	private function get_core_supported_themes() {
 		$pro_themes  = array();
-		$core_themes = array( 'spacious', 'colormag', 'flash', 'estore', 'ample', 'accelerate', 'colornews', 'foodhunt', 'fitclub', 'radiate','freedom', 'himalayas', 'esteem', 'envince' );
+		$core_themes = array( 'spacious', 'colormag', 'flash', 'estore', 'ample', 'accelerate', 'colornews', 'foodhunt', 'fitclub', 'radiate','freedom', 'himalayas', 'esteem', 'envince', 'suffice' );
 
 		// Check for core themes pro version :)
 		foreach ( $core_themes as $core_theme ) {
