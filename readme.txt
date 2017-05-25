@@ -3,7 +3,7 @@ Contributors: ThemeGrill, shivapoudel
 Tags: themegrill, themes,  demo, importer, download
 Requires at least: 4.0
 Tested up to: 4.7
-Stable tag: 1.3.2
+Stable tag: 1.3.3
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -38,6 +38,9 @@ Bugs can be reported either in our support forum or preferably on the [GitHub re
 Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/themegrill-demo-importer/) :)
 
 == Changelog ==
+
+= 1.3.3 =
+* Tweak - Support demo import for suffice theme
 
 = 1.3.2 =
 * Tweak - Load screenshots for pro theme demos
