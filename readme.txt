@@ -14,6 +14,19 @@ Import your demo content, widgets and theme settings with one click for <a href=
 
 Get free support at https://themegrill.com/support-forum/
 
+= Demo Importer in action: =
+
+[youtube https://www.youtube.com/watch?v=kQlvX0FlSmo]
+
+= Requirements =
+
+* WordPress 4.5 or later.
+* [ThemeGrill Official themes](https://themegrill.com/wordpress-themes/).
+
+= Contribute =
+
+You can contribute to the source code in our [GitHub](https://github.com/themegrill/themegrill-demo-importer/) page.
+
 == Installation ==
 
 1. Install the plugin either via the WordPress.org plugin directory, or by uploading the files to your server (in the /wp-content/plugins/ directory).
