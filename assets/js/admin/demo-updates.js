@@ -281,8 +281,6 @@
 
 		job = wp.updates.queue.shift();
 
-		job = wp.updates.queue.shift();
-
 		// Handle a queue job.
 		switch ( job.action ) {
 			case 'import-demo':
@@ -295,7 +293,6 @@
 
 			default:
 				break;
-
 		}
 
 		// Handle a queue job.
