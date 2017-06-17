@@ -68,7 +68,7 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 == Changelog ==
 
 = 1.4.0 =
-* Feature - Support demo import for suffice theme.
+* Feature - Support RTL for Importer.
 
 [See changelog for all versions](https://raw.githubusercontent.com/themegrill/themegrill-demo-importer/master/CHANGELOG.txt).
 
