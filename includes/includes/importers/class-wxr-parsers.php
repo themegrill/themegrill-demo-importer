@@ -95,9 +95,9 @@ class TG_WXR_Parser_SimpleXML {
 
 		$namespaces = $xml->getDocNamespaces();
 		if ( ! isset( $namespaces['wp'] ) )
-			$namespaces['wp'] = 'http://wordpress.org/export/1.1/';
+			$namespaces['wp'] = 'https://wordpress.org/export/1.1/';
 		if ( ! isset( $namespaces['excerpt'] ) )
-			$namespaces['excerpt'] = 'http://wordpress.org/export/1.1/excerpt/';
+			$namespaces['excerpt'] = 'https://wordpress.org/export/1.1/excerpt/';
 
 		// grab authors
 		foreach ( $xml->xpath('/rss/channel/wp:author') as $author_arr ) {

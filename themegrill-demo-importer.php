@@ -190,8 +190,8 @@ final class ThemeGrill_Demo_Importer {
 	public function plugin_row_meta( $plugin_meta, $plugin_file ) {
 		if ( plugin_basename( __FILE__ ) == $plugin_file ) {
 			$new_plugin_meta = array(
-				'docs'    => '<a href="' . esc_url( apply_filters( 'themegrill_demo_importer_docs_url', 'http://themegrill.com/docs/themegrill-demo-importer/' ) ) . '" title="' . esc_attr( __( 'View Demo Importer Documentation', 'themegrill-demo-importer' ) ) . '">' . __( 'Docs', 'themegrill-demo-importer' ) . '</a>',
-				'support' => '<a href="' . esc_url( apply_filters( 'themegrill_demo_importer_support_url', 'http://themegrill.com/support-forum/' ) ) . '" title="' . esc_attr( __( 'Visit Free Customer Support Forum', 'themegrill-demo-importer' ) ) . '">' . __( 'Free Support', 'themegrill-demo-importer' ) . '</a>',
+				'docs'    => '<a href="' . esc_url( apply_filters( 'themegrill_demo_importer_docs_url', 'https://themegrill.com/docs/themegrill-demo-importer/' ) ) . '" title="' . esc_attr( __( 'View Demo Importer Documentation', 'themegrill-demo-importer' ) ) . '">' . __( 'Docs', 'themegrill-demo-importer' ) . '</a>',
+				'support' => '<a href="' . esc_url( apply_filters( 'themegrill_demo_importer_support_url', 'https://themegrill.com/support-forum/' ) ) . '" title="' . esc_attr( __( 'Visit Free Customer Support Forum', 'themegrill-demo-importer' ) ) . '">' . __( 'Free Support', 'themegrill-demo-importer' ) . '</a>',
 			);
 
 			return array_merge( $plugin_meta, $new_plugin_meta );
@@ -206,7 +206,7 @@ final class ThemeGrill_Demo_Importer {
 	 */
 	public function theme_support_missing_notice() {
 		if ( ! class_exists( 'TG_Demo_Importer' ) ) {
-			echo '<div class="error notice is-dismissible"><p><strong>' . __( 'ThemeGrill Demo Importer', 'themegrill-demo-importer' ) . '</strong> &#8211; ' . sprintf( __( 'This plugin requires %s by ThemeGrill to work.', 'themegrill-demo-importer' ), '<a href="http://www.themegrill.com/themes/" target="_blank">' . __( 'Official Theme', 'themegrill-demo-importer' ) . '</a>' ) . '</p></div>';
+			echo '<div class="error notice is-dismissible"><p><strong>' . __( 'ThemeGrill Demo Importer', 'themegrill-demo-importer' ) . '</strong> &#8211; ' . sprintf( __( 'This plugin requires %s by ThemeGrill to work.', 'themegrill-demo-importer' ), '<a href="https://themegrill.com/themes/" target="_blank">' . __( 'Official Theme', 'themegrill-demo-importer' ) . '</a>' ) . '</p></div>';
 		}
 	}
 }

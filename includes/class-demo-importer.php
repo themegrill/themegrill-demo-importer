@@ -378,7 +378,7 @@ class TG_Demo_Importer {
 					'screenshot'      => $this->import_file_url( $demo_id, 'screenshot.jpg' ),
 					'description'     => isset( $demo_data['description'] ) ? $demo_data['description'] : '',
 					'author'          => isset( $demo_data['author'] ) ? $demo_data['author'] : __( 'ThemeGrill', 'themegrill-demo-importer' ),
-					'authorAndUri'    => '<a href="http://themegrill.com" target="_blank">ThemeGrill</a>',
+					'authorAndUri'    => '<a href="https://themegrill.com" target="_blank">ThemeGrill</a>',
 					'version'         => isset( $demo_data['version'] ) ? $demo_data['version'] : '1.1.0',
 					'active'          => $demo_id === $demo_imported_id,
 					'hasNotice'       => $demo_notices,

@@ -1,7 +1,7 @@
 {
   "name": "themegrill/themegrill-demo-importer",
   "description": "Import your demo content, widgets and theme settings with one click for ThemeGrill official themes.",
-  "homepage": "http://themegrill.com/plugins/demo-importer/",
+  "homepage": "https://themegrill.com/plugins/demo-importer/",
   "type": "wordpress-plugin",
   "license": "GPL-3.0+",
   "require": {
