@@ -1,4 +1,4 @@
-# [ThemeGrill Demo Importer](https://themegrill.com/demo-importer/)
+# ThemeGrill Demo Importer
 
 Welcome to the ThemeGrill Demo Importer repository on GitHub. Here you can browse the source, look at open issues and keep track of development. We recommend all developers to follow the [ThemeGrill blog](https://themegrill.com/blog) to stay up to date about everything happening in the project. You can also [follow @ThemeGrill](https://twitter.com/ThemeGrill) on Twitter for the latest development updates.
 
@@ -18,8 +18,5 @@ This repository is not suitable for support. Please don't use our issue tracker 
 
 Support requests in issues on this repository will be closed on sight.
 
-## Contributing to WooCommerce
-If you have a patch or have stumbled upon an issue with WooCommerce core, you can contribute this back to the code. Please read our [contributor guidelines](https://github.com/woocommerce/woocommerce/blob/master/.github/CONTRIBUTING.md) for more information how you can do this.
-
-## Contributing new features to the WooCommerce REST API
-If you're like to add a feature to the next version of the REST API, contribute here: https://github.com/woocommerce/wc-api-dev
+## Contributing to ThemeGrill Demo Importer
+If you have a patch or have stumbled upon an issue with ThemeGrill Demo Importer core, you can contribute this back to the code. Please read our [contributor guidelines](https://github.com/themegrill/themegrill-demo-importer/blob/master/.github/CONTRIBUTING.md) for more information how you can do this.
