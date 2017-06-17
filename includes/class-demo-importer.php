@@ -191,10 +191,13 @@ class TG_Demo_Importer {
 		$suffix      = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 		$assets_path = ThemeGrill_Demo_Importer::plugin_url() . '/assets/';
 
-		// Register Styles.
+		// Register admin styles.
 		wp_register_style( 'tg-demo-importer', $assets_path . 'css/demo-importer.css', array() );
 
-		// Register Scripts.
+		// Add RTL support for admin styles.
+		wp_style_add_data( 'tg-demo-importer', 'rtl', 'replace' );
+
+		// Register admin scripts.
 		wp_register_script( 'jquery-tiptip', $assets_path . 'js/jquery-tiptip/jquery.tipTip' . $suffix . '.js', array( 'jquery' ), '1.3', true );
 		wp_register_script( 'tg-demo-updates', $assets_path . 'js/admin/demo-updates' . $suffix . '.js', array( 'jquery', 'updates' ), '1.1.0', true );
 		wp_register_script( 'tg-demo-importer', $assets_path . 'js/admin/demo-importer' . $suffix . '.js', array( 'jquery', 'jquery-tiptip', 'wp-backbone', 'wp-a11y', 'tg-demo-updates' ), '1.1.0', true );

@@ -73,6 +73,20 @@ module.exports = function( grunt ){
 			}
 		},
 
+		// Generate all RTL .css files
+		rtlcss: {
+			generate: {
+				expand: true,
+				cwd: '<%= dirs.css %>',
+				src: [
+					'*.css',
+					'!*-rtl.css'
+				],
+				dest: '<%= dirs.css %>/',
+				ext: '-rtl.css'
+			}
+		},
+
 		// Minify all .css files.
 		cssmin: {
 			minify: {
@@ -90,7 +104,7 @@ module.exports = function( grunt ){
 				files: [
 					'<%= dirs.css %>/*.scss'
 				],
-				tasks: ['sass', 'cssmin']
+				tasks: ['sass', 'rtlcss', 'cssmin']
 			},
 			js: {
 				files: [
@@ -230,6 +244,7 @@ module.exports = function( grunt ){
 	// Load NPM tasks to be used here
 	grunt.loadNpmTasks( 'grunt-sass' );
 	grunt.loadNpmTasks( 'grunt-phpcs' );
+	grunt.loadNpmTasks( 'grunt-rtlcss' );
 	grunt.loadNpmTasks( 'grunt-postcss' );
 	grunt.loadNpmTasks( 'grunt-stylelint' );
 	grunt.loadNpmTasks( 'grunt-wp-i18n' );
@@ -255,6 +270,7 @@ module.exports = function( grunt ){
 	grunt.registerTask( 'css', [
 		'stylelint',
 		'sass',
+		'rtlcss',
 		'postcss',
 		'cssmin'
 	]);
