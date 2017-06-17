@@ -3,11 +3,12 @@ Contributors: ThemeGrill, shivapoudel
 Tags: themegrill, themes,  demo, importer, download
 Requires at least: 4.0
 Tested up to: 4.8
-Stable tag: 1.3.3
+Stable tag: 1.4.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
 Import your demo content, widgets and theme settings with one click for ThemeGrill official themes.
+
 == Description ==
 
 Import your demo content, widgets and theme settings with one click for <a href="https://themegrill.com/themes/" target="_blank" rel="nofollow">ThemeGrill</a> official themes.
@@ -21,7 +22,7 @@ Get free support at https://themegrill.com/support-forum/
 = Requirements =
 
 * WordPress 4.5 or later.
-* [ThemeGrill Official themes](https://themegrill.com/wordpress-themes/).
+* [ThemeGrill Official Themes](https://themegrill.com/wordpress-themes/).
 
 = Contribute =
 
@@ -31,6 +32,20 @@ You can contribute to the source code in our [GitHub](https://github.com/themegr
 
 1. Install the plugin either via the WordPress.org plugin directory, or by uploading the files to your server (in the /wp-content/plugins/ directory).
 2. Activate the ThemeGrill Demo Importer plugin through the 'Plugins' menu in WordPress.
+
+= Automatic installation =
+
+Automatic installation is the easiest option as WordPress handles the file transfers itself and you don’t need to leave your web browser. To do an automatic install of ThemeGrill Demo Importer, log in to your WordPress dashboard, navigate to the Plugins menu and click Add New.
+
+In the search field type “ThemeGrill Demo Importer” and click Search Plugins. Once you’ve found our demo importer plugin you can view details about it such as the the point release, rating and description. Most importantly of course, you can install it by simply clicking “Install Now”.
+
+= Manual installation =
+
+The manual installation method involves downloading our demo importer plugin and uploading it to your webserver via your favourite FTP application. The WordPress codex contains [instructions on how to do this here](https://codex.wordpress.org/Managing_Plugins#Manual_Plugin_Installation).
+
+= Updating =
+
+Automatic updates should work like a charm; as always though, ensure you backup your site just in case.
 
 == Frequently Asked Questions ==
 
@@ -52,32 +67,12 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 
 == Changelog ==
 
-= 1.3.3 =
-* Tweak - Support demo import for suffice theme
+= 1.4.0 =
+* Feature - Support demo import for suffice theme.
 
-= 1.3.2 =
-* Tweak - Load screenshots for pro theme demos
+[See changelog for all versions](https://raw.githubusercontent.com/themegrill/themegrill-demo-importer/master/CHANGELOG.txt).
 
-= 1.3.1 =
-* Tweak - Load screenshot from theme instead of plugin for themes with single demo.
+== Upgrade Notice ==
 
-= 1.3.0 =
-* Tweak - Support data update for nested siteorigin layoutbuilder.
-* Fix - Import button not working on firefox.
-
-= 1.2.0 =
-* Tweak - Load scripts perfecly on demo importer appearance page.
-* Tweak - Set transient for redirecting to demo importer page after install or update.
-* Tweak - Introduced filter hook `themegrill_demo_importer_installer` to control demo view.
-
-= 1.1.0 =
-* Feature - Backbone views interface for demos and previews
-* Feature - Added download button for the preview not installed
-* Feature - Robust quick search view to change in demo interface
-* Feature - Detailed information in popup to showcase plugins, events, etc
-* Refactor - Replace old way to import demo with new `wp.updates` methods
-* Fix - Menu classes to hide admin menu if no JS using css class `hide-if-no-js`
-* Fix - Remove the old demo pack if found and to update the new demo packs
-
-= 1.0.0 =
-* Initial Public Release
+= 1.4.0 =
+1.4.0 is a major update. Make a full site backup, update your theme and extensions before upgrading.
