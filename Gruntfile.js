@@ -61,7 +61,6 @@ module.exports = function( grunt ){
 		sass: {
 			options: {
 				sourceMap: false,
-				includePaths: require( 'node-bourbon' ).includePaths
 			},
 			compile: {
 				files: [{
@@ -181,6 +180,26 @@ module.exports = function( grunt ){
 			}
 		},
 
+		// Autoprefixer.
+		postcss: {
+			options: {
+				processors: [
+					require( 'autoprefixer' )({
+						browsers: [
+							'> 0.1%',
+							'ie 8',
+							'ie 9'
+						]
+					})
+				]
+			},
+			dist: {
+				src: [
+					'<%= dirs.css %>/*.css'
+				]
+			}
+		},
+
 		// Compress files and folders.
 		compress: {
 			options: {
@@ -211,6 +230,7 @@ module.exports = function( grunt ){
 	// Load NPM tasks to be used here
 	grunt.loadNpmTasks( 'grunt-sass' );
 	grunt.loadNpmTasks( 'grunt-phpcs' );
+	grunt.loadNpmTasks( 'grunt-postcss' );
 	grunt.loadNpmTasks( 'grunt-stylelint' );
 	grunt.loadNpmTasks( 'grunt-wp-i18n' );
 	grunt.loadNpmTasks( 'grunt-checktextdomain' );
@@ -235,6 +255,7 @@ module.exports = function( grunt ){
 	grunt.registerTask( 'css', [
 		'stylelint',
 		'sass',
+		'postcss',
 		'cssmin'
 	]);
 
