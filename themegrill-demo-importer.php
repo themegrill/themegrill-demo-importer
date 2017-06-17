@@ -119,7 +119,7 @@ final class ThemeGrill_Demo_Importer {
 	 */
 	private function get_core_supported_themes() {
 		$pro_themes  = array();
-		$core_themes = array( 'spacious', 'colormag', 'flash', 'estore', 'ample', 'accelerate', 'colornews', 'foodhunt', 'fitclub', 'radiate','freedom', 'himalayas', 'esteem', 'envince', 'suffice', 'explore' );
+		$core_themes = array( 'spacious', 'colormag', 'flash', 'estore', 'ample', 'accelerate', 'colornews', 'foodhunt', 'fitclub', 'radiate', 'freedom', 'himalayas', 'esteem', 'envince', 'suffice', 'explore' );
 
 		// Check for core themes pro version :)
 		foreach ( $core_themes as $core_theme ) {
@@ -160,13 +160,13 @@ final class ThemeGrill_Demo_Importer {
 		return untrailingslashit( plugins_url( '/', __FILE__ ) );
 	}
 
-   /**
-    * Get the plugin dir path.
-    * @return string
-    */
-   public static function plugin_dir_path() {
-      return untrailingslashit( plugin_dir_path( __FILE__ ) );
-   }
+	/**
+	 * Get the plugin dir path.
+	 * @return string
+	 */
+	public static function plugin_dir_path() {
+		return untrailingslashit( plugin_dir_path( __FILE__ ) );
+	}
 
 	/**
 	 * Display action links in the Plugins list table.

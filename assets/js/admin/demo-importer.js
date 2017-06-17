@@ -258,6 +258,7 @@ demos.view.Demo = wp.Backbone.View.extend({
 
 	render: function() {
 		var data = this.model.toJSON();
+
 		// Render demos using the html template
 		this.$el.html( this.html( data ) ).attr({
 			tabindex: 0,
@@ -265,10 +266,10 @@ demos.view.Demo = wp.Backbone.View.extend({
 			'data-slug': data.id
 		});
 
-      //add ribbon class
-      if ( this.model.get( 'actions' ).pro_link ) {
-         this.$el.html( this.html( data ) ).addClass( 'premium-ribbon' );
-      }
+		// Append ribbon class
+		if ( this.model.get( 'actions' ).pro_link ) {
+			this.$el.html( this.html( data ) ).addClass( 'premium-ribbon' );
+		}
 
 		// Renders active demo styles
 		this.activeDemo();
