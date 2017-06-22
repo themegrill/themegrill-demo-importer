@@ -1,6 +1,6 @@
 <?php
 /**
- * Upgrader API: Plugin_Upgrader_Skin class
+ * Upgrader API: TG_Demo_Installer_Skin class
  *
  * Demo Installer Skin for the WordPress Demo Importer.
  *
