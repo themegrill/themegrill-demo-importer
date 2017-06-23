@@ -50,6 +50,11 @@ class TG_Demo_Importer {
 			add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 		}
 
+		// Help Tabs
+		if ( apply_filters( 'themegrill_demo_importer_enable_admin_help_tab', true ) ) {
+			add_action( 'current_screen', array( $this, 'add_help_tabs' ), 50 );
+		}
+
 		// AJAX Events to import demo and dismiss notice.
 		add_action( 'wp_ajax_import-demo', array( $this, 'ajax_import_demo' ) );
 		add_action( 'wp_ajax_dismiss-notice', array( $this, 'ajax_dismiss_notice' ) );
@@ -244,6 +249,77 @@ class TG_Demo_Importer {
 				'installedDemos' => array_keys( $this->demo_config ),
 			) );
 		}
+	}
+
+	/**
+	 * Add Contextual help tabs.
+	 */
+	public function add_help_tabs() {
+		$screen = get_current_screen();
+
+		if ( ! $screen || ! in_array( $screen->id, array( 'appearance_page_demo-importer' ) ) ) {
+			return;
+		}
+
+		$video_map = array(
+			'demo-importer' => array(
+				'title' => __( 'Importing Demo', 'themegrill-demo-importer' ),
+				'url'   => $this->demo_installer ? '//fast.wistia.net/embed/iframe/mz2l10u5f6.jsonp?' : '//fast.wistia.net/embed/iframe/qp1v19dwrh.jsonp?',
+			),
+		);
+
+		$page      = empty( $_GET['page'] ) ? '' : sanitize_title( $_GET['page'] );
+		$video_key = $page ? $page : $screen->id;
+
+		if ( isset( $video_map[ $video_key ] ) ) {
+			$screen->add_help_tab( array(
+				'id'        => 'themegrill_demo_importer_guided_tour_tab',
+				'title'     => __( 'Guided Tour', 'themegrill-demo-importer' ),
+				'content'   =>
+					'<h2>' . __( 'Guided Tour', 'themegrill-demo-importer' ) . ' &ndash; ' . esc_html( $video_map[ $video_key ]['title'] ) . '</h2>' .
+					'<div class="wistia_responsive_padding" style="padding:56.25% 0 0 0;position:relative;">
+					<div class="wistia_responsive_wrapper" style="height:100%;left:0;position:absolute;top:0;width:100%;">
+					<iframe src="' . esc_url( $video_map[ $video_key ]['url'] ) . 'seo=false&videoFoam=true" title="Wistia video player" allowtransparency="true" frameborder="0" scrolling="no" class="wistia_embed" name="wistia_embed" allowfullscreen mozallowfullscreen webkitallowfullscreen oallowfullscreen msallowfullscreen width="100%" height="100%"></iframe>
+					</div></div>
+					<script src="//fast.wistia.net/assets/external/E-v1.js" async></script>',
+			) );
+		}
+
+		$screen->add_help_tab( array(
+			'id'        => 'themegrill_demo_importer_support_tab',
+			'title'     => __( 'Help &amp; Support', 'themegrill-demo-importer' ),
+			'content'   =>
+				'<h2>' . __( 'Help &amp; Support', 'themegrill-demo-importer' ) . '</h2>' .
+				'<p>' . sprintf(
+					__( 'Should you need help understanding, using, or extending ThemeGrill Demo Importer, <a href="%s">please read our documentation</a>. You will find all kinds of resources including snippets, tutorials and much more.' , 'themegrill-demo-importer' ),
+					'https://themegrill.com/docs/themegrill-demo-importer/'
+				) . '</p>' .
+				'<p>' . sprintf(
+					__( 'For further assistance with ThemeGrill Demo Importer core you can use the <a href="%1$s">community forum</a>. If you need help with premium themes sold by ThemeGrill, please <a href="%2$s">use our free support forum</a>.', 'themegrill-demo-importer' ),
+					'https://wordpress.org/support/plugin/themegrill-demo-importer',
+					'https://themegrill.com/support-forum/'
+				) . '</p>' .
+				'<p><a href="' . 'https://wordpress.org/support/plugin/themegrill-demo-importer' . '" class="button button-primary">' . __( 'Community forum', 'themegrill-demo-importer' ) . '</a> <a href="' . 'https://themegrill.com/support-forum/' . '" class="button">' . __( 'ThemeGrill Support', 'themegrill-demo-importer' ) . '</a></p>',
+		) );
+
+		$screen->add_help_tab( array(
+			'id'        => 'themegrill_demo_importer_bugs_tab',
+			'title'     => __( 'Found a bug?', 'themegrill-demo-importer' ),
+			'content'   =>
+				'<h2>' . __( 'Found a bug?', 'themegrill-demo-importer' ) . '</h2>' .
+				'<p>' . sprintf( __( 'If you find a bug within ThemeGrill Demo Importer you can create a ticket via <a href="%1$s">Github issues</a>. Ensure you read the <a href="%2$s">contribution guide</a> prior to submitting your report. To help us solve your issue, please be as descriptive as possible.', 'themegrill-demo-importer' ), 'https://github.com/themegrill/themegrill-demo-importer/issues?state=open', 'https://github.com/themegrill/themegrill-demo-importer/blob/master/.github/CONTRIBUTING.md' ) . '</p>' .
+				'<p><a href="' . 'https://github.com/themegrill/themegrill-demo-importer/issues?state=open' . '" class="button button-primary">' . __( 'Report a bug', 'woocommerce' ) . '</a></p>',
+
+		) );
+
+		$screen->set_help_sidebar(
+			'<p><strong>' . __( 'For more information:', 'axiscomposer' ) . '</strong></p>' .
+			'<p><a href="' . 'https://themegrill.com/demo-importer/' . '" target="_blank">' . __( 'About Demo Importer', 'themegrill-demo-importer' ) . '</a></p>' .
+			'<p><a href="' . 'https://wordpress.org/plugins/themegrill-demo-importer/' . '" target="_blank">' . __( 'WordPress.org project', 'themegrill-demo-importer' ) . '</a></p>' .
+			'<p><a href="' . 'https://github.com/themegrill/themegrill-demo-importer' . '" target="_blank">' . __( 'Github project', 'themegrill-demo-importer' ) . '</a></p>' .
+			'<p><a href="' . 'https://themegrill.com/wordpress-themes/' . '" target="_blank">' . __( 'Official themes', 'themegrill-demo-importer' ) . '</a></p>' .
+			'<p><a href="' . 'https://themegrill.com/plugins/' . '" target="_blank">' . __( 'Official plugins', 'themegrill-demo-importer' ) . '</a></p>'
+		);
 	}
 
 	/**
