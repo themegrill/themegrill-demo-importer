@@ -45,7 +45,7 @@ class TG_Demo_Importer {
 
 		// Add Demo Importer menu.
 		if ( apply_filters( 'themegrill_show_demo_importer_page', true ) ) {
-			add_action( 'admin_menu', array( $this, 'add_admin_menu' ), 9 );
+			add_action( 'admin_menu', array( $this, 'admin_menu' ), 9 );
 			add_action( 'admin_head', array( $this, 'add_menu_classes' ) );
 			add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 		}
@@ -157,7 +157,7 @@ class TG_Demo_Importer {
 	/**
 	 * Add menu item.
 	 */
-	public function add_admin_menu() {
+	public function admin_menu() {
 		add_theme_page( __( 'Demo Importer', 'themegrill-demo-importer' ), __( 'Demo Importer', 'themegrill-demo-importer' ), 'switch_themes', 'demo-importer', array( $this, 'demo_importer' ) );
 	}
 
