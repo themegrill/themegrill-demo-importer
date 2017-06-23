@@ -45,7 +45,7 @@ class TG_Demo_Importer {
 
 		// Add Demo Importer menu.
 		if ( apply_filters( 'themegrill_show_demo_importer_page', true ) ) {
-			add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
+			add_action( 'admin_menu', array( $this, 'add_admin_menu' ), 9 );
 			add_action( 'admin_head', array( $this, 'add_menu_classes' ) );
 			add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 		}
