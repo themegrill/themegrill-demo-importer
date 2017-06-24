@@ -145,7 +145,6 @@ add_action( 'wp_ajax_delete-demo', 'tg_ajax_delete_demo_pack', 1 );
 /**
  * Remove a demo.
  *
- *
  * @global WP_Filesystem_Base $wp_filesystem Subclass
  *
  * @param  string $demo_pack  Demo pack to delete completely.
@@ -154,10 +153,6 @@ add_action( 'wp_ajax_delete-demo', 'tg_ajax_delete_demo_pack', 1 );
  */
 function tg_delete_demo_pack( $demo_pack, $redirect = '' ) {
 	global $wp_filesystem;
-
-	$upload_dir       = wp_upload_dir();
-	$demo_packs       = $upload_dir['basedir'] . '/tg-demo-pack/';
-	$demo_imported_id = get_option( 'themegrill_demo_imported_id' );
 
 	if ( empty( $demo_pack ) ) {
 		return false;
@@ -204,9 +199,9 @@ function tg_delete_demo_pack( $demo_pack, $redirect = '' ) {
 	}
 
 	// Get the base demo folder.
-	$demos_dir = $wp_filesystem->find_folder( $demo_packs );
+	$demos_dir = $wp_filesystem->find_folder( TGDM_DEMO_DIR );
 	if ( empty( $demos_dir ) ) {
-		return new WP_Error( 'fs_no_themes_dir', __( 'Unable to locate ThemeGrill demo pack directory.', 'themegrill-demo-importer' ) );
+		return new WP_Error( 'fs_no_demos_dir', __( 'Unable to locate ThemeGrill demo pack directory.', 'themegrill-demo-importer' ) );
 	}
 
 	$demos_dir = trailingslashit( $demos_dir );
