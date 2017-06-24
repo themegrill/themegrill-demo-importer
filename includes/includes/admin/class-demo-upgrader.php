@@ -80,7 +80,7 @@ class TG_Demo_Upgrader extends WP_Upgrader {
 
 		$this->run( array(
 			'package' => $package,
-			'destination' => untrailingslashit( TGDM_PACK_DIR ),
+			'destination' => TGDM_DEMO_DIR,
 			'clear_destination' => true, // Do overwrite files.
 			'protect_destination' => true,
 			'clear_working' => true,
