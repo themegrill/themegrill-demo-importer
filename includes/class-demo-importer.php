@@ -134,7 +134,7 @@ class TG_Demo_Importer {
 	 */
 	public function get_screenshot_url( $demo_id, $demo_assets_path, $current_template ) {
 		$screenshot_plugin_url  = $demo_assets_path . 'images/' . $current_template . '/' . $demo_id . '.jpg';
-		$screenshot_plugin_path = ThemeGrill_Demo_Importer::plugin_dir_path() . '/assets/images/' . $current_template . '/' . $demo_id . '.jpg';
+		$screenshot_plugin_path = TGDM()->plugin_dir_path() . '/assets/images/' . $current_template . '/' . $demo_id . '.jpg';
 
 		if ( file_exists( $screenshot_plugin_path ) ) {
 			$screenshot_url = $screenshot_plugin_url;
@@ -194,7 +194,7 @@ class TG_Demo_Importer {
 		$screen      = get_current_screen();
 		$screen_id   = $screen ? $screen->id : '';
 		$suffix      = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
-		$assets_path = ThemeGrill_Demo_Importer::plugin_url() . '/assets/';
+		$assets_path = TGDM()->plugin_url() . '/assets/';
 
 		// Register admin styles.
 		wp_register_style( 'tg-demo-importer', $assets_path . 'css/demo-importer.css', array(), TGDM_VERSION );
@@ -341,7 +341,7 @@ class TG_Demo_Importer {
 		$prepared_demos   = array();
 		$current_template = get_option( 'template' );
 		$demo_imported_id = get_option( 'themegrill_demo_imported_id' );
-		$demo_assets_path = ThemeGrill_Demo_Importer::plugin_url() . '/assets/';
+		$demo_assets_path = TGDM()->plugin_url() . '/assets/';
 
 		/**
 		 * Filters demo data before it is prepared for JavaScript.

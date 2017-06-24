@@ -204,7 +204,7 @@ final class ThemeGrill_Demo_Importer {
 	 * Get the plugin url.
 	 * @return string
 	 */
-	public static function plugin_url() {
+	public function plugin_url() {
 		return untrailingslashit( plugins_url( '/', __FILE__ ) );
 	}
 
@@ -212,7 +212,7 @@ final class ThemeGrill_Demo_Importer {
 	 * Get the plugin dir path.
 	 * @return string
 	 */
-	public static function plugin_dir_path() {
+	public function plugin_dir_path() {
 		return untrailingslashit( plugin_dir_path( __FILE__ ) );
 	}
 
