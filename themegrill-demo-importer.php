@@ -253,9 +253,7 @@ final class ThemeGrill_Demo_Importer {
 	 * @return string
 	 */
 	public function theme_support_missing_notice() {
-		if ( ! class_exists( 'TG_Demo_Importer' ) ) {
-			echo '<div class="error notice is-dismissible"><p><strong>' . __( 'ThemeGrill Demo Importer', 'themegrill-demo-importer' ) . '</strong> &#8211; ' . sprintf( __( 'This plugin requires %s by ThemeGrill to work.', 'themegrill-demo-importer' ), '<a href="https://themegrill.com/themes/" target="_blank">' . __( 'Official Theme', 'themegrill-demo-importer' ) . '</a>' ) . '</p></div>';
-		}
+		echo '<div class="error notice is-dismissible"><p><strong>' . __( 'ThemeGrill Demo Importer', 'themegrill-demo-importer' ) . '</strong> &#8211; ' . sprintf( __( 'This plugin requires %s by ThemeGrill to work.', 'themegrill-demo-importer' ), '<a href="https://themegrill.com/themes/" target="_blank">' . __( 'Official Theme', 'themegrill-demo-importer' ) . '</a>' ) . '</p></div>';
 	}
 }
 
