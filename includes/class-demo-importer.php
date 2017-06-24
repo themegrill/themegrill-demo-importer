@@ -264,7 +264,7 @@ class TG_Demo_Importer {
 		$video_map = array(
 			'demo-importer' => array(
 				'title' => __( 'Importing Demo', 'themegrill-demo-importer' ),
-				'url'   => $this->demo_installer ? '//fast.wistia.net/embed/iframe/mz2l10u5f6.jsonp?' : '//fast.wistia.net/embed/iframe/qp1v19dwrh.jsonp?',
+				'url'   => $this->demo_installer ? '//fast.wistia.net/embed/iframe/u5srp1ndqy.jsonp?' : '//fast.wistia.net/embed/iframe/ctdquor9uh.jsonp?',
 			),
 		);
 
