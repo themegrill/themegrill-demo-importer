@@ -83,6 +83,7 @@ final class ThemeGrill_Demo_Importer {
 		$this->define( 'TGDM_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 		$this->define( 'TGDM_VERSION', $this->version );
 		$this->define( 'TGDM_DEMO_DIR', $upload_dir['basedir'] . '/tg-demo-pack/' );
+		$this->define( 'TGDM_DEMO_URL', $upload_dir['baseurl'] . '/tg-demo-pack/' );
 	}
 
 	/**

@@ -98,8 +98,7 @@ class TG_Demo_Importer {
 
 		// If enabled demo pack, load from upload dir.
 		if ( $this->is_enabled_demo_pack( $demo_dir ) ) {
-			$upload_dir  = wp_upload_dir();
-			$working_dir = $upload_dir['baseurl'] . '/tg-demo-pack/' . $demo_dir;
+			$working_dir = TGDM_DEMO_URL . $demo_dir;
 		}
 
 		return trailingslashit( $working_dir ) . sanitize_file_name( $filename );
@@ -117,8 +116,7 @@ class TG_Demo_Importer {
 
 		// If enabled demo pack, load from upload dir.
 		if ( $this->is_enabled_demo_pack( $demo_dir ) ) {
-			$upload_dir  = wp_upload_dir();
-			$working_dir = $upload_dir['basedir'] . '/tg-demo-pack/' . $demo_dir . '/dummy-data';
+			$working_dir = TGDM_DEMO_DIR . $demo_dir . '/dummy-data';
 		}
 
 		return trailingslashit( $working_dir ) . sanitize_file_name( $filename );
