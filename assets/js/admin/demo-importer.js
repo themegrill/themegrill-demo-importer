@@ -1224,6 +1224,13 @@ $( document ).ready( function() {
 
 		return false;
 	} );
+
+	// Load videos when help button is clicked.
+	$( '#contextual-help-link' ).on( 'click', function() {
+		var frame = $( '#tab-panel-themegrill_demo_importer_guided_tour_tab iframe' );
+
+		frame.attr( 'src', frame.data( 'src' ) );
+	});
 });
 
 })( jQuery );
