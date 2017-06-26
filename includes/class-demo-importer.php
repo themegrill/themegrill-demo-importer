@@ -259,30 +259,6 @@ class TG_Demo_Importer {
 			return;
 		}
 
-		$video_map = array(
-			'demo-importer' => array(
-				'title' => __( 'Importing Demo', 'themegrill-demo-importer' ),
-				'url'   => $this->demo_installer ? '//fast.wistia.net/embed/iframe/u5srp1ndqy.jsonp?' : '//fast.wistia.net/embed/iframe/ctdquor9uh.jsonp?',
-			),
-		);
-
-		$page      = empty( $_GET['page'] ) ? '' : sanitize_title( $_GET['page'] );
-		$video_key = $page ? $page : $screen->id;
-
-		if ( isset( $video_map[ $video_key ] ) ) {
-			$screen->add_help_tab( array(
-				'id'        => 'themegrill_demo_importer_guided_tour_tab',
-				'title'     => __( 'Guided Tour', 'themegrill-demo-importer' ),
-				'content'   =>
-					'<h2>' . __( 'Guided Tour', 'themegrill-demo-importer' ) . ' &ndash; ' . esc_html( $video_map[ $video_key ]['title'] ) . '</h2>' .
-					'<div class="wistia_responsive_padding" style="padding:56.25% 0 0 0;position:relative;">
-					<div class="wistia_responsive_wrapper" style="height:100%;left:0;position:absolute;top:0;width:100%;">
-					<iframe src="' . esc_url( $video_map[ $video_key ]['url'] ) . 'seo=false&videoFoam=true" title="Wistia video player" allowtransparency="true" frameborder="0" scrolling="no" class="wistia_embed" name="wistia_embed" allowfullscreen mozallowfullscreen webkitallowfullscreen oallowfullscreen msallowfullscreen width="100%" height="100%"></iframe>
-					</div></div>
-					<script src="//fast.wistia.net/assets/external/E-v1.js" async></script>',
-			) );
-		}
-
 		$screen->add_help_tab( array(
 			'id'        => 'themegrill_demo_importer_support_tab',
 			'title'     => __( 'Help &amp; Support', 'themegrill-demo-importer' ),

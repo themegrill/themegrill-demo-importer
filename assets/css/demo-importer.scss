@@ -35,6 +35,31 @@
 
 		.welcome-panel {
 			margin: 0;
+			background: #e9eff3;
+			border: 10px solid #fff;
+			box-shadow: none;
+
+			.welcome-panel-content {
+				width: 45%;
+				float: left;
+
+				.welcome-panel-column {
+					width: 100%;
+
+					ul {
+						padding-left: 10px;
+					}
+				}
+			}
+
+			.welcome-panel-iframe-video {
+				float: right;
+
+				iframe {
+					margin: 0 10px 15px;
+					border: 5px solid #dadada;
+				}
+			}
 		}
 
 		.premium-ribbon {

@@ -82,6 +82,9 @@ $demo_filter_links = apply_filters( 'themegrill_demo_importer_filter_links_array
 					</div>
 				</div>
 			</div>
+			<div class="welcome-panel-iframe-video">
+				<iframe width="560" height="315" src="<?php echo esc_url( 'https://www.youtube.com/embed/kQlvX0FlSmo?rel=0&amp;showinfo=0' ); ?>" allowtransparency="true" frameborder="0" scrolling="no" allowfullscreen mozallowfullscreen webkitallowfullscreen oallowfullscreen msallowfullscreen></iframe>
+			</div>
 		</div>
 	<?php else : ?>
 		<h2 class="screen-reader-text hide-if-no-js"><?php _e( 'Available demos list', 'themegrill-demo-importer' ); ?></h2>
