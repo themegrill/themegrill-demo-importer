@@ -122,15 +122,20 @@ module.exports = function( grunt ){
 
 		// Generate POT files.
 		makepot: {
+			options: {
+				type: 'wp-plugin',
+				domainPath: 'languages',
+				potHeaders: {
+					'report-msgid-bugs-to': 'themegrill@gmail.com',
+					'language-team': 'LANGUAGE <EMAIL@ADDRESS>'
+				}
+			},
 			dist: {
 				options: {
-					type: 'wp-plugin',
-					domainPath: 'languages',
 					potFilename: 'themegrill-demo-importer.pot',
-					potHeaders: {
-						'report-msgid-bugs-to': 'themegrill@gmail.com',
-						'language-team': 'LANGUAGE <EMAIL@ADDRESS>'
-					}
+					exclude: [
+						'vendor/.*'
+					]
 				}
 			}
 		},
