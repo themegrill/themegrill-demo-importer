@@ -123,19 +123,20 @@ class TG_Demo_Importer {
 	}
 
 	/**
-	 * Get theme screenshot url to be used in demo importer preview
+	 * Get the demo preview screenshot URL.
 	 *
-	 * @param  string $demo_id
-	 * @param  string $demo_assets_path
+	 * @param  string $demo_dir
 	 * @param  string $current_template
-	 * @return string
+	 * @return string the demo preview screenshot URL.
 	 */
-	public function get_screenshot_url( $demo_id, $demo_assets_path, $current_template ) {
-		$screenshot_plugin_url  = $demo_assets_path . 'images/' . $current_template . '/' . $demo_id . '.jpg';
-		$screenshot_plugin_path = TGDM()->plugin_dir_path() . '/assets/images/' . $current_template . '/' . $demo_id . '.jpg';
+	public function get_screenshot_url( $demo_dir, $current_template ) {
+		$screenshot_theme_path  = get_template_directory() . '/images/demo/' . $demo_dir . '.jpg';
+		$screenshot_plugin_path = TGDM()->plugin_path() . '/assets/images/' . $current_template . '/' . $demo_dir . '.jpg';
 
-		if ( file_exists( $screenshot_plugin_path ) ) {
-			$screenshot_url = $screenshot_plugin_url;
+		if ( file_exists( $screenshot_theme_path ) ) {
+			$screenshot_url = get_template_directory_uri() . '/images/demo/' . $demo_dir . '.jpg';
+		} elseif ( file_exists( $screenshot_plugin_path ) ) {
+			$screenshot_url = TGDM()->plugin_url() . '/assets/images/' . $current_template . '/' . $demo_dir . '.jpg';
 		} else {
 			$theme_data = wp_get_theme();
 			$screenshot_url = $theme_data->get_screenshot();
@@ -339,7 +340,6 @@ class TG_Demo_Importer {
 		$prepared_demos   = array();
 		$current_template = get_option( 'template' );
 		$demo_imported_id = get_option( 'themegrill_demo_imported_id' );
-		$demo_assets_path = TGDM()->plugin_url() . '/assets/';
 
 		/**
 		 * Filters demo data before it is prepared for JavaScript.
@@ -372,7 +372,7 @@ class TG_Demo_Importer {
 					'name'            => $demo_data['name'],
 					'author'          => $author,
 					'installed'       => $installed,
-					'screenshot'      => $this->get_screenshot_url( $demo_id, $demo_assets_path, $current_template ),
+					'screenshot'      => $this->get_screenshot_url( $demo_id, $current_template ),
 					'description'     => isset( $demo_data['description'] ) ? $demo_data['description'] : '',
 					'actions'         => array(
 						'pro_link'     => $pro_link,

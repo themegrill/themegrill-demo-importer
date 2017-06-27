@@ -210,10 +210,10 @@ final class ThemeGrill_Demo_Importer {
 	}
 
 	/**
-	 * Get the plugin dir path.
+	 * Get the plugin path.
 	 * @return string
 	 */
-	public function plugin_dir_path() {
+	public function plugin_path() {
 		return untrailingslashit( plugin_dir_path( __FILE__ ) );
 	}
 
