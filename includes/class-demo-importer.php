@@ -130,13 +130,13 @@ class TG_Demo_Importer {
 	 * @return string the demo preview screenshot URL.
 	 */
 	public function get_screenshot_url( $demo_dir, $current_template ) {
-		$screenshot_theme_path  = get_template_directory() . '/images/demo/' . $demo_dir . '.jpg';
-		$screenshot_plugin_path = TGDM()->plugin_path() . '/assets/images/' . $current_template . '/' . $demo_dir . '.jpg';
+		$screenshot_theme_path  = get_template_directory() . "/images/demo/{$demo_dir}.jpg";
+		$screenshot_plugin_path = TGDM()->plugin_path() . "/assets/images/{$current_template}/{$demo_dir}.jpg";
 
 		if ( file_exists( $screenshot_theme_path ) ) {
-			$screenshot_url = get_template_directory_uri() . '/images/demo/' . $demo_dir . '.jpg';
+			$screenshot_url = get_template_directory_uri() . "/images/demo/{$demo_dir}.jpg";
 		} elseif ( file_exists( $screenshot_plugin_path ) ) {
-			$screenshot_url = TGDM()->plugin_url() . '/assets/images/' . $current_template . '/' . $demo_dir . '.jpg';
+			$screenshot_url = TGDM()->plugin_url() . "/assets/images/{$current_template}/{$demo_dir}.jpg";
 		} else {
 			$theme_data = wp_get_theme();
 			$screenshot_url = $theme_data->get_screenshot();
