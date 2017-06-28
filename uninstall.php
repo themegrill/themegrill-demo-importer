@@ -7,7 +7,7 @@
  * @author   ThemeGrill
  * @category Core
  * @package  Importer/Unistaller
- * @version  1.4.0
+ * @version  1.3.4
  */
 
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
