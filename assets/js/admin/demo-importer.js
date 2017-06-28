@@ -86,7 +86,7 @@ demos.view.Appearance = wp.Backbone.View.extend({
 	},
 
 	// Defines search element container
-	searchContainer: $( '#wpbody h1:first' ),
+	searchContainer: $( '.search-form' ),
 
 	// Search input and view
 	// for current demo collection
@@ -266,16 +266,16 @@ demos.view.Demo = wp.Backbone.View.extend({
 			'data-slug': data.id
 		});
 
-		// Append ribbon class
-		if ( this.model.get( 'actions' ).pro_link ) {
-			this.$el.html( this.html( data ) ).addClass( 'premium-ribbon' );
-		}
-
 		// Renders active demo styles
 		this.activeDemo();
 
 		if ( this.model.get( 'displayAuthor' ) ) {
 			this.$el.addClass( 'display-author' );
+		}
+
+		// Append ribbon class
+		if ( this.model.get( 'actions' ).pro_link ) {
+			this.$el.html( this.html( data ) ).addClass( 'premium-ribbon' );
 		}
 	},
 
@@ -1070,10 +1070,6 @@ demos.view.Installer = demos.view.Appearance.extend({
 		this.view.render();
 		this.$el.find( '.theme-browser' ).append( this.view.el ).addClass( 'rendered' );
 	},
-
-	// Overwrite search container class to append search
-	// in new location
-	searchContainer: $( '.wp-filter .search-form' ),
 
 	/*
 	 * When users press the "Upload Theme" button, show the upload form in place.
