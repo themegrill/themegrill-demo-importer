@@ -307,12 +307,12 @@ class TG_Demo_Importer {
 			'content'   =>
 				'<h2>' . __( 'Found a bug?', 'themegrill-demo-importer' ) . '</h2>' .
 				'<p>' . sprintf( __( 'If you find a bug within ThemeGrill Demo Importer you can create a ticket via <a href="%1$s">Github issues</a>. Ensure you read the <a href="%2$s">contribution guide</a> prior to submitting your report. To help us solve your issue, please be as descriptive as possible.', 'themegrill-demo-importer' ), 'https://github.com/themegrill/themegrill-demo-importer/issues?state=open', 'https://github.com/themegrill/themegrill-demo-importer/blob/master/.github/CONTRIBUTING.md' ) . '</p>' .
-				'<p><a href="' . 'https://github.com/themegrill/themegrill-demo-importer/issues?state=open' . '" class="button button-primary">' . __( 'Report a bug', 'woocommerce' ) . '</a></p>',
+				'<p><a href="' . 'https://github.com/themegrill/themegrill-demo-importer/issues?state=open' . '" class="button button-primary">' . __( 'Report a bug', 'themegrill-demo-importer' ) . '</a></p>',
 
 		) );
 
 		$screen->set_help_sidebar(
-			'<p><strong>' . __( 'For more information:', 'axiscomposer' ) . '</strong></p>' .
+			'<p><strong>' . __( 'For more information:', 'themegrill-demo-importer' ) . '</strong></p>' .
 			'<p><a href="' . 'https://themegrill.com/demo-importer/' . '" target="_blank">' . __( 'About Demo Importer', 'themegrill-demo-importer' ) . '</a></p>' .
 			'<p><a href="' . 'https://wordpress.org/plugins/themegrill-demo-importer/' . '" target="_blank">' . __( 'WordPress.org project', 'themegrill-demo-importer' ) . '</a></p>' .
 			'<p><a href="' . 'https://github.com/themegrill/themegrill-demo-importer' . '" target="_blank">' . __( 'Github project', 'themegrill-demo-importer' ) . '</a></p>' .
