@@ -85,7 +85,7 @@ $demo_filter_links = apply_filters( 'themegrill_demo_importer_filter_links_array
 				</div>
 			</div>
 			<div class="welcome-panel-iframe-video">
-				<iframe width="560" height="315" src="<?php echo esc_url( 'https://www.youtube.com/embed/kQlvX0FlSmo?rel=0&amp;showinfo=0' ); ?>" allowtransparency="true" frameborder="0" scrolling="no" allowfullscreen mozallowfullscreen webkitallowfullscreen oallowfullscreen msallowfullscreen></iframe>
+				<iframe width="560" height="315" src="<?php echo esc_url( 'https://www.youtube.com/embed/rhiybsv3vUU?rel=0&amp;showinfo=0' ); ?>" allowtransparency="true" frameborder="0" scrolling="no" allowfullscreen mozallowfullscreen webkitallowfullscreen oallowfullscreen msallowfullscreen></iframe>
 			</div>
 		</div>
 	<?php else : ?>
