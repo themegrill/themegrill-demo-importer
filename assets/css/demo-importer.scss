@@ -58,7 +58,7 @@
 
 			.welcome-panel-iframe-video {
 				float: right;
-
+				
 				iframe {
 					margin: 0 10px 15px;
 					border: 5px solid #dadada;
@@ -220,3 +220,17 @@ img.tips {
 	margin-right: -6px;
 }
 */
+
+@media screen and (max-width: 500px) {
+	.appearance_page_demo-importer {
+		.demo-installer {
+			.welcome-panel {
+				.welcome-panel-content,
+				.welcome-panel-iframe-video {
+					float: none;
+					width: 100%;
+				}
+			}
+		}
+	}
+}
