@@ -13,13 +13,13 @@ $demo_imported_id = get_option( 'themegrill_demo_imported_id' );
 <div class="wrap demo-importer">
 	<h1 class="wp-heading-inline"><?php esc_html_e( 'Demo Importer', 'themegrill-demo-importer' ); ?>
 		<span class="title-count demo-count"><?php echo count( $this->demo_config ); ?></span>
-
-		<?php if ( apply_filters( 'themegrill_demo_importer_new_demos', false ) ) : ?>
-			<a href="<?php echo esc_url( 'https://themegrill.com/upcoming-new-demos' ); ?>" class="page-title-action" target="_blank"><?php esc_html_e( 'New Demos', 'themegrill-demo-importer' ); ?></a>
-		<?php endif; ?>
-
-		<form class="search-form"></form>
 	</h1>
+
+	<?php if ( apply_filters( 'themegrill_demo_importer_new_demos', false ) ) : ?>
+		<a href="<?php echo esc_url( 'https://themegrill.com/upcoming-new-demos' ); ?>" class="page-title-action" target="_blank"><?php esc_html_e( 'New Demos', 'themegrill-demo-importer' ); ?></a>
+	<?php endif; ?>
+
+	<form class="search-form"></form>
 
 	<hr class="wp-header-end">
 
