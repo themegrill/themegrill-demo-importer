@@ -142,10 +142,6 @@ final class ThemeGrill_Demo_Importer {
 		include_once( TGDM_ABSPATH . 'includes/class-demo-importer.php' );
 		include_once( TGDM_ABSPATH . 'includes/functions-demo-update.php' );
 
-		if ( defined( 'WP_CLI' ) && WP_CLI ) {
- 			include_once( TGDM_ABSPATH . 'includes/class-demo-importer-cli.php' );
- 		}
-
 		// Include valid demo packages config.
 		if ( false === strpos( get_option( 'template' ), '-pro' ) ) {
 			$files = glob( TGDM_DEMO_DIR . '**/tg-demo-config.php' );
