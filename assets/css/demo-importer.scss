@@ -58,10 +58,20 @@
 
 			.welcome-panel-iframe-video {
 				float: right;
+				width: 50%;
 				
-				iframe {
-					margin: 0 10px 15px;
-					border: 5px solid #dadada;
+				.welcome-panel-iframe-video-inner {
+					position: relative;
+					padding-bottom: 56.25%; /* 16:9 */
+					height: 0;
+
+					iframe {
+						position: absolute;
+						top: 0;
+						left: 0;
+						width: 100%;
+						height: 100%;
+					}
 				}
 			}
 		}
