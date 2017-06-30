@@ -248,15 +248,13 @@
 				break;
 		}
 
-		// Messages are escaped, remove HTML tags to make them more readable.
-		error = error.replace( /<[\/a-z][^<>]*>/gi, '' );
 		errorMessage = errorMessage.replace( '%s', error );
 
 		// Add admin notice.
 		wp.updates.addAdminNotice( {
 			id:        'unknown_error',
 			className: 'notice-error is-dismissible',
-			message:   _.escape( errorMessage )
+			message:   _.unescape( errorMessage )
 		} );
 
 		// Change buttons of all running updates.
