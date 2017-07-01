@@ -1,6 +1,6 @@
 <?php
 /**
- * Admin View: Notice - WordPress Reset
+ * Admin View: Notice - Reset Wizard
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
