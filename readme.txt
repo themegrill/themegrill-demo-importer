@@ -17,7 +17,7 @@ Get free support at https://themegrill.com/support-forum/
 
 = Demo Importer in action: =
 
-[youtube https://www.youtube.com/watch?v=kQlvX0FlSmo]
+[youtube https://www.youtube.com/watch?v=rhiybsv3vUU]
 
 = Requirements =
 
