@@ -10,7 +10,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 global $current_filter;
 
 $current_filter    = empty( $_GET['browse'] ) ? 'welcome' : sanitize_title( $_GET['browse'] );
-$demo_imported_id  = get_option( 'themegrill_demo_imported_id' );
 $demo_filter_links = apply_filters( 'themegrill_demo_importer_filter_links_array', array(
 	'welcome' => __( 'Welcome', 'themegrill-demo-importer' ),
 	'uploads' => __( 'Installed Demos', 'themegrill-demo-importer' ),
@@ -27,11 +26,6 @@ $demo_filter_links = apply_filters( 'themegrill_demo_importer_filter_links_array
 
 	<hr class="wp-header-end">
 
-	<?php if ( ! get_option( 'themegrill_demo_imported_notice_dismiss' ) && in_array( $demo_imported_id, array_keys( $this->demo_config ) ) ) : ?>
-		<div id="message" class="notice notice-info is-dismissible" data-notice_id="demo-importer">
-			<p><?php printf( __( '<strong>Notice</strong> &#8211; If you want to completely remove a demo installation after importing it, you can use a plugin like %1$sWordPress Reset%2$s.', 'themegrill-demo-importer' ), '<a target="_blank" href="' . esc_url( 'https://wordpress.org/plugins/wordpress-reset/' ) . '">', '</a>' ); ?></p>
-		</div>
-	<?php endif; ?>
 	<div class="error hide-if-js">
 		<p><?php _e( 'The Demo Importer screen requires JavaScript.', 'themegrill-demo-importer' ); ?></p>
 	</div>
