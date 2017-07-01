@@ -59,11 +59,13 @@
 			.welcome-panel-iframe-video {
 				float: right;
 				width: 50%;
-				
+
 				.welcome-panel-iframe-video-inner {
 					position: relative;
-					padding-bottom: 56.25%; /* 16:9 */
 					height: 0;
+					margin: 0 10px 15px;
+					padding-bottom: 56.25%; /* 16:9 */
+					border: 5px solid #dadada;
 
 					iframe {
 						position: absolute;
@@ -231,6 +233,9 @@ img.tips {
 }
 */
 
+/**
+ * Optimisation for screens 500px and smaller
+ */
 @media screen and (max-width: 500px) {
 	.appearance_page_demo-importer {
 		.demo-installer {
