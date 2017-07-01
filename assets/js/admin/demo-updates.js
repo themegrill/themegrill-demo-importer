@@ -18,41 +18,6 @@
 	wp.updates.l10n = _.extend( wp.updates.l10n, settings.l10n || {} );
 
 	/**
-	 * Adds or updates an admin notice.
-	 *
-	 * @since 4.6.0
-	 *
-	 * @param {object}  data
-	 * @param {*=}      data.selector      Optional. Selector of an element to be replaced with the admin notice.
-	 * @param {string=} data.id            Optional. Unique id that will be used as the notice's id attribute.
-	 * @param {string=} data.className     Optional. Class names that will be used in the admin notice.
-	 * @param {string=} data.message       Optional. The message displayed in the notice.
-	 * @param {number=} data.successes     Optional. The amount of successful operations.
-	 * @param {number=} data.errors        Optional. The amount of failed operations.
-	 * @param {Array=}  data.errorMessages Optional. Error messages of failed operations.
-	 *
-	 */
-	wp.updates.addAdminNotice = function( data ) {
-		var $notice = $( data.selector ), $adminNotice;
-
-		delete data.selector;
-		$adminNotice = wp.updates.adminNotice( data );
-
-		// Check if this admin notice already exists.
-		if ( ! $notice.length ) {
-			$notice = $( '#' + data.id );
-		}
-
-		if ( $notice.length ) {
-			$notice.replaceWith( $adminNotice );
-		} else {
-			$( '.wrap' ).find( '.wp-header-end' ).before( $adminNotice );
-		}
-
-		$document.trigger( 'wp-updates-notice-added' );
-	};
-
-	/**
 	 * Sends an Ajax request to the server to import a demo.
 	 *
 	 * @param {object}             args
