@@ -55,8 +55,8 @@ class TG_Demo_Importer {
 			add_action( 'current_screen', array( $this, 'add_help_tabs' ), 50 );
 		}
 
-		// WordPress Reset Notice.
-		add_action( 'admin_notices', array( $this, 'reset_notice' ) );
+		// Reset Wizard Notice.
+		add_action( 'admin_notices', array( $this, 'reset_wizard_notice' ) );
 
 		// AJAX Events to import demo and dismiss notice.
 		add_action( 'wp_ajax_import-demo', array( $this, 'ajax_import_demo' ) );
@@ -325,13 +325,13 @@ class TG_Demo_Importer {
 	}
 
 	/**
-	 * WordPress Reset Notice.
+	 * Reset wizard notice.
 	 */
-	public function reset_notice() {
+	public function reset_wizard_notice() {
 		$demo_imported_id = get_option( 'themegrill_demo_imported_id' );
 
 		if ( ! get_option( 'themegrill_demo_imported_notice_dismiss' ) && in_array( $demo_imported_id, array_keys( $this->demo_config ) ) ) {
-			include_once( dirname( __FILE__ ) . '/includes/admin/views/html-notice-wordpress-reset.php' );
+			include_once( dirname( __FILE__ ) . '/includes/admin/views/html-notice-reset-wizard.php' );
 		}
 	}
 
