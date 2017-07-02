@@ -1221,6 +1221,11 @@ $( document ).ready( function() {
 		return false;
 	} );
 
+	// Confirm WordPress reset wizard.
+	$( '.themegrill-reset-wordpress' ).on( 'click', function() {
+		return window.confirm( demos.data.settings.confirmReset );
+	});
+
 	// Load videos when help button is clicked.
 	$( '#contextual-help-link' ).on( 'click', function() {
 		var frame = $( '#tab-panel-themegrill_demo_importer_guided_tour_tab iframe' );
