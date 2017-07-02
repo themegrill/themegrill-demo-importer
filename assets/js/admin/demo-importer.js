@@ -1203,22 +1203,15 @@ $( document ).ready( function() {
 		demos.Run.init();
 	}
 
-	// Dismissible notice.
-	$( '.notice.is-dismissible' ).on( 'click', '.notice-dismiss', function( event ) {
+	// Rating footer.
+	$( '.themegrill-demo-importer-rating-link' ).on( 'click', function() {
 		var $this_el = $( this );
 
-		event.preventDefault();
-
-		if ( $this_el.parent().attr( 'id' ) === 'undefined' ) {
-			return;
-		}
-
 		$.post( demos.data.settings.ajaxUrl, {
-			action: 'dismiss-notice',
-			notice_id: $this_el.parent().data( 'notice_id' )
+			action: 'footer-text-rated'
 		});
 
-		return false;
+		$this_el.parent().text( $this_el.data( 'rated' ) );
 	} );
 
 	// Confirm WordPress reset wizard.

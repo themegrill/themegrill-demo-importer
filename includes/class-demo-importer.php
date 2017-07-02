@@ -48,6 +48,7 @@ class TG_Demo_Importer {
 			add_action( 'admin_menu', array( $this, 'admin_menu' ), 9 );
 			add_action( 'admin_head', array( $this, 'add_menu_classes' ) );
 			add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+			add_filter( 'admin_footer_text', array( $this, 'admin_footer_text' ), 1 );
 		}
 
 		// Help Tabs.
@@ -60,8 +61,9 @@ class TG_Demo_Importer {
 		add_action( 'admin_init', array( $this, 'reset_wizard_actions' ) );
 		add_action( 'admin_notices', array( $this, 'reset_wizard_notice' ) );
 
-		// AJAX Events to import demo.
+		// AJAX Events to import demo and update rating footer.
 		add_action( 'wp_ajax_import-demo', array( $this, 'ajax_import_demo' ) );
+		add_action( 'wp_ajax_footer-text-rated', array( $this, 'ajax_footer_text_rated' ) );
 
 		// Update custom nav menu items and siteorigin panel data.
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_nav_menu_items' ) );
@@ -253,6 +255,31 @@ class TG_Demo_Importer {
 				'installedDemos' => array_keys( $this->demo_config ),
 			) );
 		}
+	}
+
+	/**
+	 * Change the admin footer text.
+	 * @param  string $footer_text
+	 * @return string
+	 */
+	public function admin_footer_text( $footer_text ) {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return $footer_text;
+		}
+
+		$current_screen = get_current_screen();
+
+		// Check to make sure we're on a ThemeGrill Demo Importer admin page.
+		if ( isset( $current_screen->id ) && apply_filters( 'themegrill_demo_importer_display_admin_footer_text', in_array( $current_screen->id, array( 'appearance_page_demo-importer' ) ) ) ) {
+			// Change the footer text.
+			if ( ! get_option( 'themegrill_demo_importer_admin_footer_text_rated' ) ) {
+				$footer_text = sprintf( __( 'If you like <strong>ThemeGrill Demo Importer</strong> please leave us a %s&#9733;&#9733;&#9733;&#9733;&#9733;%s rating. A huge thanks in advance!', 'themegrill-demo-importer' ), '<a href="https://wordpress.org/support/plugin/themegrill-demo-importer/reviews?rate=5#new-post" target="_blank" class="themegrill-demo-importer-rating-link" data-rated="' . esc_attr__( 'Thanks :)', 'themegrill-demo-importer' ) . '">', '</a>' );
+			} else {
+				$footer_text = __( 'Thank you for importing with ThemeGrill Demo Importer.', 'themegrill-demo-importer' );
+			}
+		}
+
+		return $footer_text;
 	}
 
 	/**
@@ -656,6 +683,18 @@ class TG_Demo_Importer {
 		$status['previewUrl'] = get_home_url( '/' );
 
 		wp_send_json_success( $status );
+	}
+
+	/**
+	 * Triggered when clicking the rating footer.
+	 */
+	public function ajax_footer_text_rated() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			die( -1 );
+		}
+
+		update_option( 'themegrill_demo_importer_admin_footer_text_rated', 1 );
+		die();
 	}
 
 	/**
