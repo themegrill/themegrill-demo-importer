@@ -48,7 +48,6 @@ class TG_Demo_Importer {
 			add_action( 'admin_menu', array( $this, 'admin_menu' ), 9 );
 			add_action( 'admin_head', array( $this, 'add_menu_classes' ) );
 			add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
-			add_filter( 'admin_footer_text', array( $this, 'admin_footer_text' ), 1 );
 		}
 
 		// Help Tabs.
@@ -60,6 +59,9 @@ class TG_Demo_Importer {
 		add_action( 'wp_loaded', array( $this, 'hide_reset_notice' ) );
 		add_action( 'admin_init', array( $this, 'reset_wizard_actions' ) );
 		add_action( 'admin_notices', array( $this, 'reset_wizard_notice' ) );
+
+		// Footer rating text.
+		add_filter( 'admin_footer_text', array( $this, 'admin_footer_text' ), 1 );
 
 		// AJAX Events to import demo and update rating footer.
 		add_action( 'wp_ajax_import-demo', array( $this, 'ajax_import_demo' ) );
