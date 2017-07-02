@@ -231,7 +231,7 @@ class TG_Demo_Importer {
 				),
 			) );
 			wp_localize_script( 'tg-demo-importer', 'demoImporterLocalizeScript', array(
-				'demos'    => $this->is_preview() ? $this->prepare_previews_for_js( $this->demo_packages ) : $this->prepare_demos_for_js( $this->demo_config ),
+				'demos'    => $this->prepare_demos_for_js( $this->is_preview() ? $this->demo_packages : $this->demo_config ),
 				'settings' => array(
 					'isPreview'     => $this->is_preview(),
 					'isInstall'     => $this->demo_installer,
@@ -455,68 +455,6 @@ class TG_Demo_Importer {
 	}
 
 	/**
-	 * Prepare previews for JavaScript.
-	 */
-	private function prepare_previews_for_js( $demos = null ) {
-		$prepared_demos   = array();
-		$current_template = get_option( 'template' );
-		$demo_imported_id = get_option( 'themegrill_demo_imported_id' );
-
-		/**
-		 * Filters demo data before it is prepared for JavaScript.
-		 *
-		 * @param array      $prepared_demos   An associative array of demo data. Default empty array.
-		 * @param null|array $demos            An array of demo config to prepare, if any.
-		 * @param string     $demo_imported_id The current demo imported id.
-		 */
-		$prepared_demos = (array) apply_filters( 'themegrill_demo_importer_pre_prepare_demos_for_js', array(), $demos, $demo_imported_id );
-
-		if ( ! empty( $prepared_demos ) ) {
-			return $prepared_demos;
-		}
-
-		if ( ! empty( $demos ) ) {
-			foreach ( $demos as $demo_id => $demo_data ) {
-				$author       = isset( $demo_data['author'] ) ? $demo_data['author'] : __( 'ThemeGrill', 'themegrill-demo-importer' );
-				$pro_link     = isset( $demo_data['pro_link'] ) ? $demo_data['pro_link'] : '';
-				$download_url = isset( $demo_data['download'] ) ? $demo_data['download'] : "https://github.com/themegrill/themegrill-demo-pack/raw/master/packages/{$current_template}/{$demo_id}.zip";
-
-				// Check if demo is installed.
-				$installed = false;
-				if ( in_array( $demo_id, array_keys( $this->demo_config ) ) ) {
-					$installed = true;
-				}
-
-				// Prepare all demos.
-				$prepared_demos[ $demo_id ] = array(
-					'id'              => $demo_id,
-					'name'            => $demo_data['name'],
-					'author'          => $author,
-					'installed'       => $installed,
-					'screenshot'      => $this->get_screenshot_url( $demo_id, $current_template ),
-					'description'     => isset( $demo_data['description'] ) ? $demo_data['description'] : '',
-					'actions'         => array(
-						'pro_link'     => $pro_link,
-						'preview_url'  => $demo_data['preview'],
-						'download_url' => $download_url,
-					),
-				);
-			}
-		}
-
-		/**
-		 * Filters the demos prepared for JavaScript.
-		 *
-		 * Could be useful for changing the order, which is by name by default.
-		 *
-		 * @param array $prepared_demos Array of demos.
-		 */
-		$prepared_demos = apply_filters( 'themegrill_demo_importer_prepare_demos_for_js', $prepared_demos );
-		$prepared_demos = array_values( $prepared_demos );
-		return array_filter( $prepared_demos );
-	}
-
-	/**
 	 * Prepare demos for JavaScript.
 	 *
 	 * @param  array $demos Demo config array.
@@ -541,7 +479,7 @@ class TG_Demo_Importer {
 		}
 
 		// Make sure the imported demo is listed first.
-		if ( isset( $demos[ $demo_imported_id ] ) ) {
+		if ( ! $this->is_preview() && isset( $demos[ $demo_imported_id ] ) ) {
 			$prepared_demos[ $demo_imported_id ] = array();
 		}
 
@@ -549,6 +487,8 @@ class TG_Demo_Importer {
 			foreach ( $demos as $demo_id => $demo_data ) {
 				$demo_notices = array();
 				$encoded_slug = urlencode( $demo_id );
+				$premium_link = isset( $demo_data['pro_link'] ) ? $demo_data['pro_link'] : '';
+				$download_url = isset( $demo_data['download'] ) ? $demo_data['download'] : "https://github.com/themegrill/themegrill-demo-pack/raw/master/packages/{$current_template}/{$demo_id}.zip";
 				$demo_package = isset( $demo_data['demo_pack'] ) ? $demo_data['demo_pack'] : false;
 				$plugins_list = isset( $demo_data['plugins_list'] ) ? $demo_data['plugins_list'] : array();
 
@@ -564,26 +504,48 @@ class TG_Demo_Importer {
 					$demo_notices['required_plugins'] = true;
 				}
 
+				// Check if demo is installed.
+				$installed = false;
+				if ( in_array( $demo_id, array_keys( $this->demo_config ) ) ) {
+					$installed = true;
+				}
+
 				// Prepare all demos.
-				$prepared_demos[ $demo_id ] = array(
-					'id'              => $demo_id,
-					'name'            => $demo_data['name'],
-					'theme'           => $demo_data['theme'],
-					'package'         => $demo_package,
-					'screenshot'      => $this->import_file_url( $demo_id, 'screenshot.jpg' ),
-					'description'     => isset( $demo_data['description'] ) ? $demo_data['description'] : '',
-					'author'          => isset( $demo_data['author'] ) ? $demo_data['author'] : __( 'ThemeGrill', 'themegrill-demo-importer' ),
-					'authorAndUri'    => '<a href="https://themegrill.com" target="_blank">ThemeGrill</a>',
-					'version'         => isset( $demo_data['version'] ) ? $demo_data['version'] : '1.1.0',
-					'active'          => $demo_id === $demo_imported_id,
-					'hasNotice'       => $demo_notices,
-					'plugins'         => $plugins_list,
-					'actions'         => array(
-						'preview'  => home_url( '/' ),
-						'demo_url' => $demo_data['demo_url'],
-						'delete'   => current_user_can( 'upload_files' ) ? wp_nonce_url( admin_url( 'themes.php?page=demo-importer&browse=uploads&action=delete&amp;demo_pack=' . urlencode( $demo_id ) ), 'delete-demo_' . $demo_id ) : null,
-					),
-				);
+				if ( $this->is_preview() ) {
+					$prepared_demos[ $demo_id ] = array(
+						'id'              => $demo_id,
+						'name'            => $demo_data['name'],
+						'installed'       => $installed,
+						'screenshot'      => $this->get_screenshot_url( $demo_id, $current_template ),
+						'description'     => isset( $demo_data['description'] ) ? $demo_data['description'] : '',
+						'author'          => isset( $demo_data['author'] ) ? $demo_data['author'] : __( 'ThemeGrill', 'themegrill-demo-importer' ),
+						'actions'         => array(
+							'pro_link'     => $premium_link,
+							'preview_url'  => $demo_data['preview'],
+							'download_url' => $download_url,
+						),
+					);
+				} else {
+					$prepared_demos[ $demo_id ] = array(
+						'id'              => $demo_id,
+						'name'            => $demo_data['name'],
+						'theme'           => $demo_data['theme'],
+						'package'         => $demo_package,
+						'screenshot'      => $this->import_file_url( $demo_id, 'screenshot.jpg' ),
+						'description'     => isset( $demo_data['description'] ) ? $demo_data['description'] : '',
+						'author'          => isset( $demo_data['author'] ) ? $demo_data['author'] : __( 'ThemeGrill', 'themegrill-demo-importer' ),
+						'authorAndUri'    => '<a href="https://themegrill.com" target="_blank">ThemeGrill</a>',
+						'version'         => isset( $demo_data['version'] ) ? $demo_data['version'] : '1.1.0',
+						'active'          => $demo_id === $demo_imported_id,
+						'hasNotice'       => $demo_notices,
+						'plugins'         => $plugins_list,
+						'actions'         => array(
+							'preview'  => home_url( '/' ),
+							'demo_url' => $demo_data['demo_url'],
+							'delete'   => current_user_can( 'upload_files' ) ? wp_nonce_url( admin_url( 'themes.php?page=demo-importer&browse=uploads&action=delete&amp;demo_pack=' . urlencode( $demo_id ) ), 'delete-demo_' . $demo_id ) : null,
+						),
+					);
+				}
 			}
 		}
 
@@ -603,7 +565,7 @@ class TG_Demo_Importer {
 	 * Demo Importer page output.
 	 */
 	public function demo_importer() {
-		$demos = $this->prepare_demos_for_js( $this->demo_config );
+		$demos = $this->prepare_demos_for_js( $this->is_preview() ? $this->demo_packages : $this->demo_config );
 
 		if ( isset( $_GET['action'] ) && 'upload-demo' === $_GET['action'] ) {
 			$this->upload_demo_pack();
