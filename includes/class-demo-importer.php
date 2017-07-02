@@ -415,14 +415,14 @@ class TG_Demo_Importer {
 				update_user_option( $user_id, 'default_password_nag', false, true );
 			}
 
-			$default = wp_get_theme( $template );
-			if ( $default->exists() ) {
+			// Switch current theme.
+			$current_theme = wp_get_theme( $template );
+			if ( $current_theme->exists() ) {
 				switch_theme( $template );
 			}
 
-			activate_plugin( plugin_basename( TGDM_PLUGIN_FILE ) );
-
-			$activate_required_plugins = apply_filters( 'themegrill_demo_importer_' . $template . '_required_plugins', array() );
+			// Activate required plugins.
+			$activate_required_plugins = (array) apply_filters( 'themegrill_demo_importer_' . $template . '_required_plugins', array( TGDM_PLUGIN_BASENAME ) );
 			if ( ! empty( $activate_required_plugins ) ) {
 				foreach ( $activate_required_plugins as $plugin ) {
 					$plugin = plugin_basename( $plugin );
@@ -430,6 +430,8 @@ class TG_Demo_Importer {
 						activate_plugin( $plugin );
 					}
 				}
+			} else {
+				activate_plugin( TGDM_PLUGIN_BASENAME );
 			}
 
 			wp_clear_auth_cookie();
