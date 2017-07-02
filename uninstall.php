@@ -23,5 +23,5 @@ global $wpdb;
  */
 if ( defined( 'TGDM_REMOVE_ALL_DATA' ) && true === TGDM_REMOVE_ALL_DATA ) {
 	// Delete options.
-	$wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE 'themegrill_demo_imported\_%';" );
+	$wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE 'themegrill_demo_importer\_%';" );
 }

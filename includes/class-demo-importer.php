@@ -369,15 +369,15 @@ class TG_Demo_Importer {
 	 */
 	public function reset_wizard_notice() {
 		$screen              = get_current_screen();
-		$demo_imported_id    = get_option( 'themegrill_demo_imported_id' );
-		$demo_notice_dismiss = get_option( 'themegrill_demo_imported_notice_dismiss' );
+		$demo_activated_id   = get_option( 'themegrill_demo_importer_activated_id' );
+		$demo_notice_dismiss = get_option( 'themegrill_demo_importer_reset_notice' );
 
 		if ( ! $screen || ! in_array( $screen->id, array( 'appearance_page_demo-importer' ) ) ) {
 			return;
 		}
 
 		// Output reset wizard notice.
-		if ( ! $demo_notice_dismiss && in_array( $demo_imported_id, array_keys( $this->demo_config ) ) ) {
+		if ( ! $demo_notice_dismiss && in_array( $demo_activated_id, array_keys( $this->demo_config ) ) ) {
 			include_once( dirname( __FILE__ ) . '/includes/admin/views/html-notice-reset-wizard.php' );
 		} elseif ( isset( $_GET['reset'] ) && 'true' === $_GET['reset'] ) {
 			include_once( dirname( __FILE__ ) . '/includes/admin/views/html-notice-reset-wizard-success.php' );
@@ -400,7 +400,7 @@ class TG_Demo_Importer {
 			$hide_notice = sanitize_text_field( $_GET['themegrill-demo-importer-hide-notice'] );
 
 			if ( ! empty( $hide_notice ) && 'reset_notice' == $hide_notice ) {
-				update_option( 'themegrill_demo_imported_notice_dismiss', 1 );
+				update_option( 'themegrill_demo_importer_reset_notice', 1 );
 			}
 		}
 	}
@@ -490,26 +490,26 @@ class TG_Demo_Importer {
 	 * @return array An associative array of demo data, sorted by name.
 	 */
 	private function prepare_demos_for_js( $demos = null ) {
-		$prepared_demos   = array();
-		$current_template = get_option( 'template' );
-		$demo_imported_id = get_option( 'themegrill_demo_imported_id' );
+		$prepared_demos    = array();
+		$current_template  = get_option( 'template' );
+		$demo_activated_id = get_option( 'themegrill_demo_importer_activated_id' );
 
 		/**
 		 * Filters demo data before it is prepared for JavaScript.
 		 *
-		 * @param array      $prepared_demos   An associative array of demo data. Default empty array.
-		 * @param null|array $demos            An array of demo config to prepare, if any.
-		 * @param string     $demo_imported_id The current demo imported id.
+		 * @param array      $prepared_demos    An associative array of demo data. Default empty array.
+		 * @param null|array $demos             An array of demo config to prepare, if any.
+		 * @param string     $demo_activated_id The current demo activated id.
 		 */
-		$prepared_demos = (array) apply_filters( 'themegrill_demo_importer_pre_prepare_demos_for_js', array(), $demos, $demo_imported_id );
+		$prepared_demos = (array) apply_filters( 'themegrill_demo_importer_pre_prepare_demos_for_js', array(), $demos, $demo_activated_id );
 
 		if ( ! empty( $prepared_demos ) ) {
 			return $prepared_demos;
 		}
 
 		// Make sure the imported demo is listed first.
-		if ( ! $this->is_preview() && isset( $demos[ $demo_imported_id ] ) ) {
-			$prepared_demos[ $demo_imported_id ] = array();
+		if ( ! $this->is_preview() && isset( $demos[ $demo_activated_id ] ) ) {
+			$prepared_demos[ $demo_activated_id ] = array();
 		}
 
 		if ( ! empty( $demos ) ) {
@@ -565,7 +565,7 @@ class TG_Demo_Importer {
 						'author'          => isset( $demo_data['author'] ) ? $demo_data['author'] : __( 'ThemeGrill', 'themegrill-demo-importer' ),
 						'authorAndUri'    => '<a href="https://themegrill.com" target="_blank">ThemeGrill</a>',
 						'version'         => isset( $demo_data['version'] ) ? $demo_data['version'] : '1.1.0',
-						'active'          => $demo_id === $demo_imported_id,
+						'active'          => $demo_id === $demo_activated_id,
 						'hasNotice'       => $demo_notices,
 						'plugins'         => $plugins_list,
 						'actions'         => array(
@@ -676,7 +676,7 @@ class TG_Demo_Importer {
 			$this->import_widget_settings( $slug, $demo_data, $status );
 
 			// Update imported demo ID.
-			update_option( 'themegrill_demo_imported_id', $slug );
+			update_option( 'themegrill_demo_importer_activated_id', $slug );
 
 			do_action( 'themegrill_ajax_demo_imported', $slug, $demo_data );
 		}
