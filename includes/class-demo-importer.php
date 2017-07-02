@@ -55,12 +55,12 @@ class TG_Demo_Importer {
 			add_action( 'current_screen', array( $this, 'add_help_tabs' ), 50 );
 		}
 
-		// Reset Wizard Notice.
+		// Reset Wizard.
+		add_action( 'wp_loaded', array( $this, 'hide_reset_notice' ) );
 		add_action( 'admin_notices', array( $this, 'reset_wizard_notice' ) );
 
-		// AJAX Events to import demo and dismiss notice.
+		// AJAX Events to import demo.
 		add_action( 'wp_ajax_import-demo', array( $this, 'ajax_import_demo' ) );
-		add_action( 'wp_ajax_dismiss-notice', array( $this, 'ajax_dismiss_notice' ) );
 
 		// Update custom nav menu items and siteorigin panel data.
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_nav_menu_items' ) );
@@ -336,6 +336,27 @@ class TG_Demo_Importer {
 	}
 
 	/**
+	 * Hide a notice if the GET variable is set.
+	 */
+	public function hide_reset_notice() {
+		if ( isset( $_GET['themegrill-demo-importer-hide-notice'] ) && isset( $_GET['_themegrill_demo_importer_notice_nonce'] ) ) {
+			if ( ! wp_verify_nonce( $_GET['_themegrill_demo_importer_notice_nonce'], 'themegrill_demo_importer_hide_notice_nonce' ) ) {
+				wp_die( __( 'Action failed. Please refresh the page and retry.', 'themegrill-demo-importer' ) );
+			}
+
+			if ( ! current_user_can( 'manage_options' ) ) {
+				wp_die( __( 'Cheatin&#8217; huh?', 'themegrill-demo-importer' ) );
+			}
+
+			$hide_notice = sanitize_text_field( $_GET['themegrill-demo-importer-hide-notice'] );
+
+			if ( ! empty( $hide_notice ) && 'reset_notice' == $hide_notice ) {
+				update_option( 'themegrill_demo_imported_notice_dismiss', 1 );
+			}
+		}
+	}
+
+	/**
 	 * Check for preview filter.
 	 * @return bool
 	 */
@@ -535,23 +556,6 @@ class TG_Demo_Importer {
 		if ( $result || is_wp_error( $result ) ) {
 			$file_upload->cleanup();
 		}
-	}
-
-	/**
-	 * Ajax handler for dismissing notice.
-	 */
-	public function ajax_dismiss_notice() {
-		if ( ! current_user_can( 'manage_options' ) ) {
-			die( -1 );
-		}
-
-		$notice_id = sanitize_text_field( stripslashes( $_POST['notice_id'] ) );
-
-		if ( ! empty( $notice_id ) && 'demo-importer' == $notice_id ) {
-			update_option( 'themegrill_demo_imported_notice_dismiss', 1 );
-		}
-
-		die();
 	}
 
 	/**
