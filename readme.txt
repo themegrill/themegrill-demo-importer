@@ -69,9 +69,11 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 
 = 1.3.4 =
 * Feature - Support RTL for Importer.
-* Fixed - Undefined queue job action.
+* Feature - Reset wizard for clean up.
+* Fixed - Undefined queue job update action.
 * Fixed - Use of `wp-heading-inline` core class.
 * Tweak - Use of defined constant for demo packs.
 * Tweak - Uninstall data with a defined constant.
+* Tweak - Fallback screenshot for flash demo preview.
 
 [See changelog for all versions](https://raw.githubusercontent.com/themegrill/themegrill-demo-importer/master/CHANGELOG.txt).
