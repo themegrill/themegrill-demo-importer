@@ -21,7 +21,7 @@ $demo_filter_links = apply_filters( 'themegrill_demo_importer_filter_links_array
 	<h1 class="wp-heading-inline"><?php esc_html_e( 'Demo Importer', 'themegrill-demo-importer' ); ?></h1>
 
 	<?php if ( current_user_can( 'upload_files' ) ) : ?>
-		<button type="button" class="upload-view-toggle page-title-action hide-if-no-js tg-demo-upload" aria-expanded="false"><?php _e( 'Upload Demo', 'themegrill-demo-importer' ); ?></button>
+		<button type="button" class="upload-view-toggle page-title-action hide-if-no-js" aria-expanded="false"><?php _e( 'Upload Demo', 'themegrill-demo-importer' ); ?></button>
 	<?php endif; ?>
 
 	<hr class="wp-header-end">
