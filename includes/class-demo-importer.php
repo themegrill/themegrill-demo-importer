@@ -414,10 +414,11 @@ class TG_Demo_Importer {
 		if ( ! empty( $_GET['do_reset_wordpress'] ) ) {
 			require_once( ABSPATH . '/wp-admin/includes/upgrade.php' );
 
-			$template    = get_option( 'template' );
-			$blogname    = get_option( 'blogname' );
-			$admin_email = get_option( 'admin_email' );
-			$blog_public = get_option( 'blog_public' );
+			$template     = get_option( 'template' );
+			$blogname     = get_option( 'blogname' );
+			$admin_email  = get_option( 'admin_email' );
+			$blog_public  = get_option( 'blog_public' );
+			$footer_rated = get_option( 'themegrill_demo_importer_admin_footer_text_rated' );
 
 			if ( $current_user->user_login != 'admin' ) {
 				$user = get_user_by( 'login', 'admin' );
@@ -442,6 +443,11 @@ class TG_Demo_Importer {
 			$default_password_nag = get_user_option( 'default_password_nag', $user_id );
 			if ( $default_password_nag ) {
 				update_user_option( $user_id, 'default_password_nag', false, true );
+			}
+
+			// Update footer text.
+			if ( $footer_rated ) {
+				update_option( 'themegrill_demo_importer_admin_footer_text_rated', $footer_rated );
 			}
 
 			// Switch current theme.
