@@ -434,16 +434,16 @@ class TG_Demo_Importer {
 				$wpdb->query( "DROP TABLE IF EXISTS $table" );
 			}
 
+			// Installs the site.
 			$result = wp_install( $blogname, $user->user_login, $user->user_email, $blog_public );
-			extract( $result, EXTR_SKIP );
 
-			$query = $wpdb->prepare( "UPDATE $wpdb->users SET user_pass = %s, user_activation_key = '' WHERE ID = %d", $user->user_pass, $user_id );
-			$wpdb->query( $query );
+			// Updates the user password with a old one.
+			$wpdb->update( $wpdb->users, array( 'user_pass' => $user->user_pass, 'user_activation_key' => '' ), array( 'ID' => $result['user_id'] ) );
 
 			// Set up the Password change nag.
-			$default_password_nag = get_user_option( 'default_password_nag', $user_id );
+			$default_password_nag = get_user_option( 'default_password_nag', $result['user_id'] );
 			if ( $default_password_nag ) {
-				update_user_option( $user_id, 'default_password_nag', false, true );
+				update_user_option( $result['user_id'], 'default_password_nag', false, true );
 			}
 
 			// Update footer text.
@@ -472,7 +472,7 @@ class TG_Demo_Importer {
 
 			// Update the cookies.
 			wp_clear_auth_cookie();
-			wp_set_auth_cookie( $user_id );
+			wp_set_auth_cookie( $result['user_id'] );
 
 			// Redirect to demo importer page to display reset success notice.
 			wp_safe_redirect( admin_url( 'themes.php?page=demo-importer&reset=true' ) );
