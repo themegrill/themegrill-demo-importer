@@ -428,10 +428,10 @@ class TG_Demo_Importer {
 				$user = $current_user;
 			}
 
-			$prefix = str_replace( '_', '\_', $wpdb->prefix );
-			$tables = $wpdb->get_col( "SHOW TABLES LIKE '{$prefix}%'" );
-			foreach ( $tables as $table ) {
-				$wpdb->query( "DROP TABLE $table" );
+			// Drop tables.
+			$drop_tables = $wpdb->get_col( sprintf( "SHOW TABLES LIKE '%s%%'", str_replace( '_', '\_', $wpdb->prefix ) ) );
+			foreach ( $drop_tables as $table ) {
+				$wpdb->query( "DROP TABLE IF EXISTS $table" );
 			}
 
 			$result = wp_install( $blogname, $user->user_login, $user->user_email, $blog_public );
@@ -440,6 +440,7 @@ class TG_Demo_Importer {
 			$query = $wpdb->prepare( "UPDATE $wpdb->users SET user_pass = %s, user_activation_key = '' WHERE ID = %d", $user->user_pass, $user_id );
 			$wpdb->query( $query );
 
+			// Set up the Password change nag.
 			$default_password_nag = get_user_option( 'default_password_nag', $user_id );
 			if ( $default_password_nag ) {
 				update_user_option( $user_id, 'default_password_nag', false, true );
@@ -469,9 +470,11 @@ class TG_Demo_Importer {
 				activate_plugin( TGDM_PLUGIN_BASENAME );
 			}
 
+			// Update the cookies.
 			wp_clear_auth_cookie();
 			wp_set_auth_cookie( $user_id );
 
+			// Redirect to demo importer page to display reset success notice.
 			wp_safe_redirect( admin_url( 'themes.php?page=demo-importer&reset=true' ) );
 			exit();
 		}
