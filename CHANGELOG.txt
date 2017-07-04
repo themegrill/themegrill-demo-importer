@@ -1,5 +1,14 @@
 == Changelog ==
 
+= 1.3.4 03/07/2017 =
+* Feature - Support RTL for Importer.
+* Feature - Reset wizard for clean up.
+* Fixed - Undefined queue job update action.
+* Fixed - Use of `wp-heading-inline` core class.
+* Tweak - Use of defined constant for demo packs.
+* Tweak - Uninstall data with a defined constant.
+* Tweak - Fallback screenshot for flash demo preview.
+
 = 1.3.3 =
 * Tweak - Support demo import for suffice theme.
 

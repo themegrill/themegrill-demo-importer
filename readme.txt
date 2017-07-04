@@ -3,7 +3,7 @@ Contributors: ThemeGrill, shivapoudel
 Tags: themegrill, themes,  demo, importer, download
 Requires at least: 4.0
 Tested up to: 4.8
-Stable tag: 1.3.4
+Stable tag: 1.4.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -67,13 +67,11 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 
 == Changelog ==
 
-= 1.3.4 =
-* Feature - Support RTL for Importer.
-* Feature - Reset wizard for clean up.
-* Fixed - Undefined queue job update action.
-* Fixed - Use of `wp-heading-inline` core class.
-* Tweak - Use of defined constant for demo packs.
-* Tweak - Uninstall data with a defined constant.
-* Tweak - Fallback screenshot for flash demo preview.
+= 1.4.0 - TBD =
 
 [See changelog for all versions](https://raw.githubusercontent.com/themegrill/themegrill-demo-importer/master/CHANGELOG.txt).
+
+== Upgrade Notice ==
+
+= 1.4.0 =
+1.4.0 is a major update. Make a full site backup, update your theme and extensions before upgrading.
