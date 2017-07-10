@@ -21,12 +21,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 						<div class="theme-screenshot blank"></div>
 					<?php endif; ?>
 					<span class="more-details"><?php _e( 'Demo Preview', 'themegrill-demo-importer' ); ?></span>
+					<?php if ( $demo['actions']['pro_link'] ) : ?>
+						<span class="premium-ribbon"><span><?php _e( 'Pro', 'themegrill-demo-importer' ); ?></span></span>
+					<?php endif; ?>
 				</a>
-				<?php if ( $demo['actions']['pro_link'] ) : ?>
-					<div class="premium-ribbon">
-						<span class="pro-banner"><?php _e( 'Pro', 'themegrill-demo-importer' ); ?></span>
-					</div>
-				<?php endif; ?>
 				<div class="theme-author"><?php
 					/* translators: %s: Demo author name */
 					printf( __( 'By %s', 'themegrill-demo-importer' ), $demo['author'] );
