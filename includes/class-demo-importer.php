@@ -523,8 +523,9 @@ class TG_Demo_Importer {
 
 		if ( ! empty( $demos ) ) {
 			foreach ( $demos as $demo_id => $demo_data ) {
-				$demo_notices = array();
-				$encoded_slug = urlencode( $demo_id );
+				$author       = isset( $demo_data['author'] ) ? $demo_data['author'] : __( 'ThemeGrill', 'themegrill-demo-importer' );
+				$version      = isset( $demo_data['version'] ) ? $demo_data['version'] : TGDM_VERSION;
+				$description  = isset( $demo_data['description'] ) ? $demo_data['description'] : '';
 				$premium_link = isset( $demo_data['pro_link'] ) ? $demo_data['pro_link'] : '';
 				$download_url = isset( $demo_data['download'] ) ? $demo_data['download'] : "https://github.com/themegrill/themegrill-demo-pack/raw/master/packages/{$current_template}/{$demo_id}.zip";
 				$demo_package = isset( $demo_data['demo_pack'] ) ? $demo_data['demo_pack'] : false;
@@ -536,6 +537,7 @@ class TG_Demo_Importer {
 				}
 
 				// Add demo notices.
+				$demo_notices = array();
 				if ( isset( $demo_data['template'] ) && $current_template !== $demo_data['template'] ) {
 					$demo_notices['required_theme'] = true;
 				} elseif ( wp_list_filter( $plugins_list, array( 'required' => true, 'is_active' => false ) ) ) {
@@ -555,8 +557,8 @@ class TG_Demo_Importer {
 						'name'            => $demo_data['name'],
 						'installed'       => $installed,
 						'screenshot'      => $this->get_screenshot_url( $demo_id, $current_template ),
-						'description'     => isset( $demo_data['description'] ) ? $demo_data['description'] : '',
-						'author'          => isset( $demo_data['author'] ) ? $demo_data['author'] : __( 'ThemeGrill', 'themegrill-demo-importer' ),
+						'description'     => $description,
+						'author'          => $author,
 						'actions'         => array(
 							'pro_link'     => $premium_link,
 							'preview_url'  => $demo_data['preview'],
@@ -570,10 +572,10 @@ class TG_Demo_Importer {
 						'theme'           => $demo_data['theme'],
 						'package'         => $demo_package,
 						'screenshot'      => $this->import_file_url( $demo_id, 'screenshot.jpg' ),
-						'description'     => isset( $demo_data['description'] ) ? $demo_data['description'] : '',
-						'author'          => isset( $demo_data['author'] ) ? $demo_data['author'] : __( 'ThemeGrill', 'themegrill-demo-importer' ),
+						'description'     => $description,
+						'author'          => $author,
 						'authorAndUri'    => '<a href="https://themegrill.com" target="_blank">ThemeGrill</a>',
-						'version'         => isset( $demo_data['version'] ) ? $demo_data['version'] : '1.1.0',
+						'version'         => $version,
 						'active'          => $demo_id === $demo_activated_id,
 						'hasNotice'       => $demo_notices,
 						'plugins'         => $plugins_list,
