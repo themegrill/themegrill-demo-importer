@@ -35,8 +35,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 						$aria_label = sprintf( _x( 'Download %s', 'demo', 'themegrill-demo-importer' ), esc_attr( $demo['name'] ) );
 						?>
 						<a class="button button-primary demo-download" data-name="<?php echo esc_attr( $demo['name'] ); ?>" href="<?php echo esc_url( $demo['actions']['download_url'] ); ?>" aria-label="<?php echo esc_attr( $aria_label ); ?>"><?php _e( 'Download', 'themegrill-demo-importer' ); ?></a>
-					<?php endif; ?>
-					<?php if ( $demo['actions']['pro_link'] ) : ?>
+					<?php elseif ( $demo['actions']['pro_link'] ) : ?>
 						<?php
 						/* translators: %s: Demo name */
 						$aria_label = sprintf( _x( 'View %s Pro', 'demo', 'themegrill-demo-importer' ), esc_attr( $demo['name'] ) );

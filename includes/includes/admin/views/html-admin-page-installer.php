@@ -282,8 +282,7 @@ $demo_filter_links = apply_filters( 'themegrill_demo_importer_filter_links_array
 			$aria_label = sprintf( _x( 'Download %s', 'demo', 'themegrill-demo-importer' ), '{{ data.name }}' );
 			?>
 			<a class="button button-primary demo-download" data-name="{{ data.name }}" href="{{ data.actions.download_url }}" aria-label="<?php echo esc_attr( $aria_label ); ?>"><?php _e( 'Download', 'themegrill-demo-importer' ); ?></a>
-		<# } #>
-		<# if ( data.actions.pro_link ) { #>
+		<# } else if ( data.actions.pro_link ) { #>
 			<?php
 			/* translators: %s: Demo name */
 			$aria_label = sprintf( _x( 'View %s Pro', 'demo', 'themegrill-demo-importer' ), '{{ data.name }}' );
