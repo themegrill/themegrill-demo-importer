@@ -297,12 +297,11 @@ class TG_Demo_Importer {
 		$video_map = array(
 			'demo-importer' => array(
 				'title' => __( 'Importing Demo', 'themegrill-demo-importer' ),
-				'url'   => '//fast.wistia.net/embed/iframe/ctdquor9uh.jsonp?',
+				'id'    => 'ctdquor9uh',
 			),
 		);
 
-		$page      = empty( $_GET['page'] ) ? '' : sanitize_title( $_GET['page'] );
-		$video_key = $page ? $page : $screen->id;
+		$video_key = empty( $_GET['page'] ) ? $screen->id : sanitize_title( $_GET['page'] );
 
 		if ( ! $this->demo_installer && isset( $video_map[ $video_key ] ) ) {
 			$screen->add_help_tab( array(
@@ -310,11 +309,9 @@ class TG_Demo_Importer {
 				'title'     => __( 'Guided Tour', 'themegrill-demo-importer' ),
 				'content'   =>
 					'<h2>' . __( 'Guided Tour', 'themegrill-demo-importer' ) . ' &ndash; ' . esc_html( $video_map[ $video_key ]['title'] ) . '</h2>' .
-					'<div class="wistia_responsive_padding" style="padding:56.25% 0 0 0;position:relative;">
-					<div class="wistia_responsive_wrapper" style="height:100%;left:0;position:absolute;top:0;width:100%;">
-					<iframe src="' . esc_url( $video_map[ $video_key ]['url'] ) . 'seo=false&videoFoam=true" title="Wistia video player" allowtransparency="true" frameborder="0" scrolling="no" class="wistia_embed" name="wistia_embed" allowfullscreen mozallowfullscreen webkitallowfullscreen oallowfullscreen msallowfullscreen width="100%" height="100%"></iframe>
-					</div></div>
-					<script src="//fast.wistia.net/assets/external/E-v1.js" async></script>',
+					'<script src="//fast.wistia.net/assets/external/E-v1.js" aync></script>
+					<div class="wistia_embed wistia_async_' . esc_attr( $video_map[ $video_key ]['id'] ) . ' videoFoam=true seo=false" style="width:640px;height:360px;">&nbsp;</div>
+				',
 			) );
 		}
 
@@ -561,18 +558,18 @@ class TG_Demo_Importer {
 					);
 				} else {
 					$prepared_demos[ $demo_id ] = array(
-						'id'              => $demo_id,
-						'name'            => $demo_data['name'],
-						'theme'           => $demo_data['theme'],
-						'package'         => $demo_package,
-						'screenshot'      => $this->import_file_url( $demo_id, 'screenshot.jpg' ),
-						'description'     => $description,
-						'author'          => $author,
-						'authorAndUri'    => '<a href="https://themegrill.com" target="_blank">ThemeGrill</a>',
-						'version'         => $version,
-						'active'          => $demo_id === $demo_activated_id,
-						'hasNotice'       => $demo_notices,
-						'plugins'         => $plugins_list,
+						'id'               => $demo_id,
+						'name'             => $demo_data['name'],
+						'theme'            => $demo_data['theme'],
+						'package'          => $demo_package,
+						'screenshot'       => $this->import_file_url( $demo_id, 'screenshot.jpg' ),
+						'description'      => $description,
+						'author'           => $author,
+						'authorAndUri'     => '<a href="https://themegrill.com" target="_blank">ThemeGrill</a>',
+						'version'          => $version,
+						'active'           => $demo_id === $demo_activated_id,
+						'hasNotice'        => $demo_notices,
+						'plugins'          => $plugins_list,
 						'actions'         => array(
 							'preview'  => home_url( '/' ),
 							'demo_url' => $demo_data['demo_url'],
