@@ -103,7 +103,7 @@ table.plugins-list-table {
 	margin-bottom: 1em;
 
 	tr:nth-child( 2n ) {
-		td {
+		th, td {
 			background: #fcfcfc;
 		}
 	}
@@ -136,6 +136,10 @@ table.plugins-list-table {
 
 	.plugin-status {
 		text-align: center;
+	}
+
+	.plugin-install {
+		float: right;
 	}
 }
 
