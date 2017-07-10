@@ -269,6 +269,11 @@ $demo_filter_links = apply_filters( 'themegrill_demo_importer_filter_links_array
 		<# } #>
 		<span class="more-details"><?php _e( 'Demo Preview', 'themegrill-demo-importer' ); ?></span>
 	</a>
+	<# if ( data.actions.pro_link ) { #>
+		<div class="premium-ribbon">
+			<span class="pro-banner"><?php _e( 'Pro', 'themegrill-demo-importer' ); ?></span>
+		</div>
+	<# } #>
 	<div class="theme-author"><?php
 		/* translators: %s: Demo author name */
 		printf( __( 'By %s', 'themegrill-demo-importer' ), '{{{ data.author }}}' );

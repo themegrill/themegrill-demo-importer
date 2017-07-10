@@ -272,11 +272,6 @@ demos.view.Demo = wp.Backbone.View.extend({
 		if ( this.model.get( 'displayAuthor' ) ) {
 			this.$el.addClass( 'display-author' );
 		}
-
-		// Append ribbon class
-		if ( this.model.get( 'actions' ).pro_link ) {
-			this.$el.html( this.html( data ) ).addClass( 'premium-ribbon' );
-		}
 	},
 
 	// Adds a class to the currently active demo

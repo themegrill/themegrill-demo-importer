@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 <div class="theme-browser rendered">
 	<div class="themes wp-clearfix">
 		<?php foreach ( $demos as $demo ) : ?>
-			<div class="theme<?php echo ( $demo['actions']['pro_link'] ) ? " premium-ribbon": ''; ?>" tabindex="0">
+			<div class="theme" tabindex="0">
 				<a target="_blank" href="<?php echo esc_url( $demo['actions']['preview_url'] ); ?>">
 					<?php if ( $demo['screenshot'] ) : ?>
 						<div class="theme-screenshot">
@@ -22,6 +22,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<?php endif; ?>
 					<span class="more-details"><?php _e( 'Demo Preview', 'themegrill-demo-importer' ); ?></span>
 				</a>
+				<?php if ( $demo['actions']['pro_link'] ) : ?>
+					<div class="premium-ribbon">
+						<span class="pro-banner"><?php _e( 'Pro', 'themegrill-demo-importer' ); ?></span>
+					</div>
+				<?php endif; ?>
 				<div class="theme-author"><?php
 					/* translators: %s: Demo author name */
 					printf( __( 'By %s', 'themegrill-demo-importer' ), $demo['author'] );
