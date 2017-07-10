@@ -275,7 +275,7 @@ class TG_Demo_Importer {
 		if ( isset( $current_screen->id ) && apply_filters( 'themegrill_demo_importer_display_admin_footer_text', in_array( $current_screen->id, array( 'appearance_page_demo-importer' ) ) ) ) {
 			// Change the footer text.
 			if ( ! get_option( 'themegrill_demo_importer_admin_footer_text_rated' ) ) {
-				$footer_text = sprintf( __( 'If you like <strong>ThemeGrill Demo Importer</strong> please leave us a %s&#9733;&#9733;&#9733;&#9733;&#9733;%s rating. A huge thanks in advance!', 'themegrill-demo-importer' ), '<a href="https://wordpress.org/support/plugin/themegrill-demo-importer/reviews?rate=5#new-post" target="_blank" class="themegrill-demo-importer-rating-link" data-rated="' . esc_attr__( 'Thanks :)', 'themegrill-demo-importer' ) . '">', '</a>' );
+				$footer_text = sprintf( __( 'If you like <strong>ThemeGrill Demo Importer</strong> please leave us a %1$s&#9733;&#9733;&#9733;&#9733;&#9733;%2$s rating. A huge thanks in advance!', 'themegrill-demo-importer' ), '<a href="https://wordpress.org/support/plugin/themegrill-demo-importer/reviews?rate=5#new-post" target="_blank" class="themegrill-demo-importer-rating-link" data-rated="' . esc_attr__( 'Thanks :)', 'themegrill-demo-importer' ) . '">', '</a>' );
 			} else {
 				$footer_text = __( 'Thank you for importing with ThemeGrill Demo Importer.', 'themegrill-demo-importer' );
 			}
@@ -420,7 +420,7 @@ class TG_Demo_Importer {
 			$blog_public  = get_option( 'blog_public' );
 			$footer_rated = get_option( 'themegrill_demo_importer_admin_footer_text_rated' );
 
-			if ( $current_user->user_login != 'admin' ) {
+			if ( 'admin' != $current_user->user_login ) {
 				$user = get_user_by( 'login', 'admin' );
 			}
 
