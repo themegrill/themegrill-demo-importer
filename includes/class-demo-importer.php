@@ -544,18 +544,12 @@ class TG_Demo_Importer {
 					$demo_notices['required_plugins'] = true;
 				}
 
-				// Check if demo is installed.
-				$installed = false;
-				if ( in_array( $demo_id, array_keys( $this->demo_config ) ) ) {
-					$installed = true;
-				}
-
 				// Prepare all demos.
 				if ( $this->is_preview() ) {
 					$prepared_demos[ $demo_id ] = array(
 						'id'              => $demo_id,
 						'name'            => $demo_data['name'],
-						'installed'       => $installed,
+						'installed'       => in_array( $demo_id, array_keys( $this->demo_config ) ),
 						'screenshot'      => $this->get_screenshot_url( $demo_id, $current_template ),
 						'description'     => $description,
 						'author'          => $author,
