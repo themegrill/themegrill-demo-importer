@@ -196,10 +196,10 @@ module.exports = function( grunt ){
 			},
 			dist: {
 				src:  [
-					'**/*.php',                       // Include all files
-					'!node_modules/**',               // Exclude node_modules/
-					'!vendor/**',                     // Exclude vendor/
-					'!includes/includes/importers/**' // Exclude vendor/
+					'**/*.php',                                 // Include all files
+					'!node_modules/**',                         // Exclude node_modules/
+					'!vendor/**',                               // Exclude vendor/
+					'!includes/importers/wordpress-importer/**' // Exclude wordpress-importer/
 				]
 			}
 		},
@@ -222,32 +222,6 @@ module.exports = function( grunt ){
 					'<%= dirs.css %>/*.css'
 				]
 			}
-		},
-
-		// Compress files and folders.
-		compress: {
-			options: {
-				archive: 'themegrill-demo-importer.zip'
-			},
-			files: {
-				src: [
-					'**',
-					'!.*',
-					'!*.md',
-					'!*.zip',
-					'!.*/**',
-					'!sass/**',
-					'!vendor/**',
-					'!Gruntfile.js',
-					'!package.json',
-					'!composer.json',
-					'!composer.lock',
-					'!node_modules/**',
-					'!phpcs.ruleset.xml'
-				],
-				dest: 'themegrill-demo-importer',
-				expand: true
-			}
 		}
 	});
 
@@ -263,7 +237,6 @@ module.exports = function( grunt ){
 	grunt.loadNpmTasks( 'grunt-contrib-uglify' );
 	grunt.loadNpmTasks( 'grunt-contrib-cssmin' );
 	grunt.loadNpmTasks( 'grunt-contrib-watch' );
-	grunt.loadNpmTasks( 'grunt-contrib-compress' );
 
 	// Register tasks
 	grunt.registerTask( 'default', [
@@ -287,10 +260,5 @@ module.exports = function( grunt ){
 	grunt.registerTask( 'dev', [
 		'default',
 		'makepot'
-	]);
-
-	grunt.registerTask( 'zip', [
-		'dev',
-		'compress'
 	]);
 };

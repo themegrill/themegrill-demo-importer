@@ -89,9 +89,8 @@ class TG_Demo_Importer {
 	 * Include required core files.
 	 */
 	public function includes() {
-		include_once( dirname( __FILE__ ) . '/includes/functions-demo-importer.php' );
-		include_once( dirname( __FILE__ ) . '/includes/class-customizer-importer.php' );
-		include_once( dirname( __FILE__ ) . '/includes/class-widget-importer.php' );
+		include_once( dirname( __FILE__ ) . '/importers/class-widget-importer.php' );
+		include_once( dirname( __FILE__ ) . '/importers/class-customizer-importer.php' );
 	}
 
 	/**
@@ -375,9 +374,9 @@ class TG_Demo_Importer {
 
 		// Output reset wizard notice.
 		if ( ! $demo_notice_dismiss && in_array( $demo_activated_id, array_keys( $this->demo_config ) ) ) {
-			include_once( dirname( __FILE__ ) . '/includes/admin/views/html-notice-reset-wizard.php' );
+			include_once( dirname( __FILE__ ) . '/admin/views/html-notice-reset-wizard.php' );
 		} elseif ( isset( $_GET['reset'] ) && 'true' === $_GET['reset'] ) {
-			include_once( dirname( __FILE__ ) . '/includes/admin/views/html-notice-reset-wizard-success.php' );
+			include_once( dirname( __FILE__ ) . '/admin/views/html-notice-reset-wizard-success.php' );
 		}
 	}
 
@@ -602,7 +601,7 @@ class TG_Demo_Importer {
 			$this->upload_demo_pack();
 		} else {
 			$suffix = $this->demo_installer ? 'installer' : 'importer';
-			include_once( dirname( __FILE__ ) . "/includes/admin/views/html-admin-page-{$suffix}.php" );
+			include_once( dirname( __FILE__ ) . "/admin/views/html-admin-page-{$suffix}.php" );
 		}
 	}
 
@@ -626,8 +625,8 @@ class TG_Demo_Importer {
 		$type  = 'upload'; // Install demo type, From Web or an Upload.
 
 		// Demo Upgrader Class.
-		include_once( dirname( __FILE__ ) . '/includes/admin/class-demo-upgrader.php' );
-		include_once( dirname( __FILE__ ) . '/includes/admin/class-demo-installer-skin.php' );
+		include_once( dirname( __FILE__ ) . '/admin/class-demo-upgrader.php' );
+		include_once( dirname( __FILE__ ) . '/admin/class-demo-installer-skin.php' );
 
 		$upgrader = new TG_Demo_Upgrader( new TG_Demo_Installer_Skin( compact( 'type', 'title', 'nonce', 'url' ) ) );
 		$result = $upgrader->install( $file_upload->package );
@@ -723,7 +722,7 @@ class TG_Demo_Importer {
 		}
 
 		// Include WXR Importer.
-		require dirname( __FILE__ ) . '/includes/importers/class-wxr-importer.php';
+		require( dirname( __FILE__ ) . '/importers/wordpress-importer/class-wxr-importer.php' );
 
 		do_action( 'themegrill_ajax_before_dummy_xml_import', $demo_data, $demo_id );
 

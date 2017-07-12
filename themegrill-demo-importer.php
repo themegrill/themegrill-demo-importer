@@ -141,6 +141,7 @@ final class ThemeGrill_Demo_Importer {
 	private function includes() {
 		include_once( TGDM_ABSPATH . 'includes/class-demo-importer.php' );
 		include_once( TGDM_ABSPATH . 'includes/functions-demo-update.php' );
+		include_once( TGDM_ABSPATH . 'includes/functions-demo-importer.php' );
 
 		// Include valid demo packages config.
 		if ( false === strpos( get_option( 'template' ), '-pro' ) ) {
