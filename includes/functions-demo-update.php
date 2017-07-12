@@ -2,7 +2,7 @@
 /**
  * Demo Importer Updates.
  *
- * Backward compatibility for demo configs.
+ * Backward compatibility for demo importer configs and options.
  *
  * @author   ThemeGrill
  * @category Admin

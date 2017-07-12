@@ -12,6 +12,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+// Include core functions (available in both admin and frontend).
+include_once( TGDM_ABSPATH . 'includes/functions-demo-update.php' );
+
 if ( ! function_exists( 'tg_get_demo_file_url' ) ) {
 
 	/**
