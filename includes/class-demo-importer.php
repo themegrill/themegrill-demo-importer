@@ -123,29 +123,6 @@ class TG_Demo_Importer {
 	}
 
 	/**
-	 * Get the demo preview screenshot URL.
-	 *
-	 * @param  string $demo_dir
-	 * @param  string $current_template
-	 * @return string the demo preview screenshot URL.
-	 */
-	public function get_screenshot_url( $demo_dir, $current_template ) {
-		$screenshot_theme_path  = get_template_directory() . "/images/demo/{$demo_dir}.jpg";
-		$screenshot_plugin_path = TGDM()->plugin_path() . "/assets/images/{$current_template}/{$demo_dir}.jpg";
-
-		if ( file_exists( $screenshot_theme_path ) ) {
-			$screenshot_url = get_template_directory_uri() . "/images/demo/{$demo_dir}.jpg";
-		} elseif ( file_exists( $screenshot_plugin_path ) ) {
-			$screenshot_url = TGDM()->plugin_url() . "/assets/images/{$current_template}/{$demo_dir}.jpg";
-		} else {
-			$theme_data = wp_get_theme();
-			$screenshot_url = $theme_data->get_screenshot();
-		}
-
-		return $screenshot_url;
-	}
-
-	/**
 	 * Check if demo pack is enabled.
 	 * @param  array $demo_id
 	 * @return bool
@@ -527,7 +504,7 @@ class TG_Demo_Importer {
 						'id'              => $demo_id,
 						'name'            => $demo_data['name'],
 						'installed'       => in_array( $demo_id, array_keys( $this->demo_config ) ),
-						'screenshot'      => $this->get_screenshot_url( $demo_id, $current_template ),
+						'screenshot'      => tg_get_demo_preview_screenshot_url( $demo_id, $current_template ),
 						'description'     => $description,
 						'author'          => $author,
 						'actions'         => array(
