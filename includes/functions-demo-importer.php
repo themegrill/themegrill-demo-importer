@@ -15,43 +15,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 // Include core functions (available in both admin and frontend).
 include_once( TGDM_ABSPATH . 'includes/functions-demo-update.php' );
 
-if ( ! function_exists( 'tg_get_demo_file_url' ) ) {
-
-	/**
-	 * Get a demo file URL.
-	 *
-	 * @param  string $demo_dir demo dir.
-	 * @return string the demo data file URL.
-	 */
-	function tg_get_demo_file_url( $demo_dir ) {
-		return apply_filters( 'themegrill_demo_file_url', get_template_directory_uri() . '/inc/demo-data/' . $demo_dir, $demo_dir );
-	}
-}
-
-if ( ! function_exists( 'tg_get_demo_file_path' ) ) {
-
-	/**
-	 * Get a demo file path.
-	 *
-	 * @param  string $demo_dir demo dir.
-	 * @return string the demo data file path.
-	 */
-	function tg_get_demo_file_path( $demo_dir ) {
-		return apply_filters( 'themegrill_demo_file_path', get_template_directory() . '/inc/demo-data/' . $demo_dir . '/dummy-data', $demo_dir );
-	}
-}
-
-if ( ! function_exists( 'tg_demo_installer_enabled' ) ) {
-
-	/**
-	 * Is demo installer enabled?
-	 * @return bool
-	 */
-	function tg_demo_installer_enabled() {
-		return apply_filters( 'themegrill_demo_importer_installer', true );
-	}
-}
-
 /**
  * Get an attachment ID from the filename.
  *
@@ -227,6 +190,17 @@ function tg_delete_demo_pack( $demo_pack, $redirect = '' ) {
 	}
 
 	return true;
+}
+
+if ( ! function_exists( 'tg_demo_installer_enabled' ) ) {
+
+	/**
+	 * Is demo installer enabled?
+	 * @return bool
+	 */
+	function tg_demo_installer_enabled() {
+		return apply_filters( 'themegrill_demo_importer_installer', true );
+	}
 }
 
 /**

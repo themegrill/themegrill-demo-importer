@@ -74,8 +74,8 @@ class TG_Demo_Importer {
 	 * Demo importer setup.
 	 */
 	public function setup() {
-		$this->demo_config    = apply_filters( 'themegrill_demo_importer_config', array() );
-		$this->demo_packages  = apply_filters( 'themegrill_demo_importer_packages', array() );
+		$this->demo_config   = apply_filters( 'themegrill_demo_importer_config', array() );
+		$this->demo_packages = apply_filters( 'themegrill_demo_importer_packages', array() );
 	}
 
 	/**

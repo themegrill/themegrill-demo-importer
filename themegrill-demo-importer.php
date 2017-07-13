@@ -112,6 +112,7 @@ final class ThemeGrill_Demo_Importer {
 		if ( in_array( get_option( 'template' ), $this->get_core_supported_themes() ) ) {
 			$this->includes();
 
+			add_action( 'after_setup_theme', array( $this, 'include_template_functions' ), 11 );
 			add_filter( 'plugin_action_links_' . TGDM_PLUGIN_BASENAME, array( $this, 'plugin_action_links' ) );
 			add_filter( 'plugin_row_meta', array( $this, 'plugin_row_meta' ), 10, 2 );
 		} else {
@@ -153,6 +154,13 @@ final class ThemeGrill_Demo_Importer {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Template Functions - This makes them pluggable by plugins and themes.
+	 */
+	public function include_template_functions() {
+		include_once( TGDM_ABSPATH . 'includes/functions-demo-template.php' );
 	}
 
 	/**
