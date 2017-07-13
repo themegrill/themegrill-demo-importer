@@ -227,9 +227,9 @@ class TG_Demo_Importer {
 				),
 			) );
 			wp_localize_script( 'tg-demo-importer', 'demoImporterLocalizeScript', array(
-				'demos'    => $this->prepare_demos_for_js( $this->is_preview() ? $this->demo_packages : $this->demo_config ),
+				'demos'    => $this->prepare_demos_for_js( tg_demo_installer_preview() ? $this->demo_packages : $this->demo_config ),
 				'settings' => array(
-					'isPreview'     => $this->is_preview(),
+					'isPreview'     => tg_demo_installer_preview(),
 					'isInstall'     => tg_demo_installer_enabled(),
 					'canInstall'    => current_user_can( 'upload_files' ),
 					'installURI'    => current_user_can( 'upload_files' ) ? self_admin_url( 'themes.php?page=demo-importer&browse=preview' ) : null,
@@ -470,18 +470,6 @@ class TG_Demo_Importer {
 	}
 
 	/**
-	 * Check for preview filter.
-	 * @return bool
-	 */
-	public function is_preview() {
-		if ( tg_demo_installer_enabled() && isset( $_GET['browse'] ) ) {
-			return 'preview' === $_GET['browse'] ? true : false;
-		}
-
-		return false;
-	}
-
-	/**
 	 * Prepare demos for JavaScript.
 	 *
 	 * @param  array $demos Demo config array.
@@ -506,7 +494,7 @@ class TG_Demo_Importer {
 		}
 
 		// Make sure the imported demo is listed first.
-		if ( ! $this->is_preview() && isset( $demos[ $demo_activated_id ] ) ) {
+		if ( ! tg_demo_installer_preview() && isset( $demos[ $demo_activated_id ] ) ) {
 			$prepared_demos[ $demo_activated_id ] = array();
 		}
 
@@ -534,7 +522,7 @@ class TG_Demo_Importer {
 				}
 
 				// Prepare all demos.
-				if ( $this->is_preview() ) {
+				if ( tg_demo_installer_preview() ) {
 					$prepared_demos[ $demo_id ] = array(
 						'id'              => $demo_id,
 						'name'            => $demo_data['name'],
@@ -588,7 +576,7 @@ class TG_Demo_Importer {
 	 * Demo Importer page output.
 	 */
 	public function demo_importer() {
-		$demos = $this->prepare_demos_for_js( $this->is_preview() ? $this->demo_packages : $this->demo_config );
+		$demos = $this->prepare_demos_for_js( tg_demo_installer_preview() ? $this->demo_packages : $this->demo_config );
 
 		if ( isset( $_GET['action'] ) && 'upload-demo' === $_GET['action'] ) {
 			$this->upload_demo_pack();

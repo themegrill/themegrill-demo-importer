@@ -203,6 +203,21 @@ if ( ! function_exists( 'tg_demo_installer_enabled' ) ) {
 	}
 }
 
+if ( ! function_exists( 'tg_demo_installer_preview' ) ) {
+
+	/**
+	 * Is demo installer preview filter?
+	 * @return bool
+	 */
+	function tg_demo_installer_preview() {
+		if ( tg_demo_installer_enabled() && isset( $_GET['browse'] ) ) {
+			return 'preview' === $_GET['browse'] ? true : false;
+		}
+
+		return false;
+	}
+}
+
 /**
  * Clear data before demo import AJAX action.
  *
