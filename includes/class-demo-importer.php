@@ -31,12 +31,6 @@ class TG_Demo_Importer {
 	public $demo_packages;
 
 	/**
-	 * Demo installer.
-	 * @var bool
-	 */
-	public $demo_installer = true;
-
-	/**
 	 * Constructor.
 	 */
 	public function __construct() {
@@ -82,7 +76,6 @@ class TG_Demo_Importer {
 	public function setup() {
 		$this->demo_config    = apply_filters( 'themegrill_demo_importer_config', array() );
 		$this->demo_packages  = apply_filters( 'themegrill_demo_importer_packages', array() );
-		$this->demo_installer = apply_filters( 'themegrill_demo_importer_installer', true );
 	}
 
 	/**
@@ -179,7 +172,7 @@ class TG_Demo_Importer {
 		global $submenu;
 
 		if ( isset( $submenu['themes.php'] ) ) {
-			$submenu_class = $this->demo_installer ? 'demo-installer hide-if-no-js' : 'demo-importer';
+			$submenu_class = tg_demo_installer_enabled() ? 'demo-installer hide-if-no-js' : 'demo-importer';
 
 			// Add menu classes if user has access.
 			if ( apply_filters( 'themegrill_demo_importer_include_class_in_menu', true ) ) {
@@ -237,7 +230,7 @@ class TG_Demo_Importer {
 				'demos'    => $this->prepare_demos_for_js( $this->is_preview() ? $this->demo_packages : $this->demo_config ),
 				'settings' => array(
 					'isPreview'     => $this->is_preview(),
-					'isInstall'     => $this->demo_installer,
+					'isInstall'     => tg_demo_installer_enabled(),
 					'canInstall'    => current_user_can( 'upload_files' ),
 					'installURI'    => current_user_can( 'upload_files' ) ? self_admin_url( 'themes.php?page=demo-importer&browse=preview' ) : null,
 					'confirmReset'  => __( 'It is strongly recommended that you backup your database before proceeding. Are you sure you wish to run the reset wizard now?', 'themegrill-demo-importer' ),
@@ -302,7 +295,7 @@ class TG_Demo_Importer {
 
 		$video_key = empty( $_GET['page'] ) ? $screen->id : sanitize_title( $_GET['page'] );
 
-		if ( ! $this->demo_installer && isset( $video_map[ $video_key ] ) ) {
+		if ( ! tg_demo_installer_enabled() && isset( $video_map[ $video_key ] ) ) {
 			$screen->add_help_tab( array(
 				'id'        => 'themegrill_demo_importer_guided_tour_tab',
 				'title'     => __( 'Guided Tour', 'themegrill-demo-importer' ),
@@ -481,7 +474,7 @@ class TG_Demo_Importer {
 	 * @return bool
 	 */
 	public function is_preview() {
-		if ( $this->demo_installer && isset( $_GET['browse'] ) ) {
+		if ( tg_demo_installer_enabled() && isset( $_GET['browse'] ) ) {
 			return 'preview' === $_GET['browse'] ? true : false;
 		}
 
@@ -600,7 +593,7 @@ class TG_Demo_Importer {
 		if ( isset( $_GET['action'] ) && 'upload-demo' === $_GET['action'] ) {
 			$this->upload_demo_pack();
 		} else {
-			$suffix = $this->demo_installer ? 'installer' : 'importer';
+			$suffix = tg_demo_installer_enabled() ? 'installer' : 'importer';
 			include_once( dirname( __FILE__ ) . "/admin/views/html-admin-page-{$suffix}.php" );
 		}
 	}

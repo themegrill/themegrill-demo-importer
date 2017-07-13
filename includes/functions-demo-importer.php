@@ -41,6 +41,17 @@ if ( ! function_exists( 'tg_get_demo_file_path' ) ) {
 	}
 }
 
+if ( ! function_exists( 'tg_demo_installer_enabled' ) ) {
+
+	/**
+	 * Is demo installer enabled?
+	 * @return bool
+	 */
+	function tg_demo_installer_enabled() {
+		return apply_filters( 'themegrill_demo_importer_installer', true );
+	}
+}
+
 /**
  * Get an attachment ID from the filename.
  *
