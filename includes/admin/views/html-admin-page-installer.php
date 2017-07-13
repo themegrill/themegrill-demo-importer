@@ -186,12 +186,12 @@ $demo_filter_links = apply_filters( 'themegrill_demo_importer_filter_links_array
 				<table class="plugins-list-table widefat">
 					<thead>
 						<tr>
-							<th class="plugin-name"><?php esc_html_e( 'Plugin Name', 'themegrill-demo-importer' ); ?></th>
-							<th class="plugin-type"><?php esc_html_e( 'Type', 'themegrill-demo-importer' ); ?></th>
-							<th class="plugin-status"><?php esc_html_e( 'Status', 'themegrill-demo-importer' ); ?></th>
+							<th scope="col" class="plugin-name"><?php esc_html_e( 'Plugin Name', 'themegrill-demo-importer' ); ?></th>
+							<th scope="col" class="plugin-type"><?php esc_html_e( 'Type', 'themegrill-demo-importer' ); ?></th>
+							<th scope="col" class="plugin-status"><?php esc_html_e( 'Status', 'themegrill-demo-importer' ); ?></th>
 						</tr>
 					</thead>
-					<tbody>
+					<tbody id="the-list">
 						<# if ( ! _.isEmpty( data.plugins ) ) { #>
 							<# _.each( data.plugins, function( plugin, slug ) { #>
 								<tr>
@@ -199,7 +199,7 @@ $demo_filter_links = apply_filters( 'themegrill_demo_importer_filter_links_array
 										<# if ( plugin.link ) { #>
 											<a href="{{{ plugin.link }}}" target="_blank">{{{ plugin.name }}}</a>
 										<# } else { #>
-											<a href="<?php echo esc_url( admin_url( 'plugin-install.php?tab=search&type=term&s=' ) ); ?>{{ slug }}" target="_blank">{{ plugin.name }}</a>
+											<a href="<?php printf( esc_url( 'https://wordpress.org/plugins/%s' ), '{{ slug }}' ); ?>" target="_blank">{{ plugin.name }}</a>
 										<# } #>
 									</td>
 									<td class="plugin-type">
