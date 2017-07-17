@@ -125,12 +125,12 @@ final class ThemeGrill_Demo_Importer {
 	 * @return array
 	 */
 	private function get_core_supported_themes() {
-		$core_themes = array( 'spacious', 'colormag', 'flash', 'estore', 'ample', 'accelerate', 'colornews', 'foodhunt', 'fitclub', 'radiate', 'freedom', 'himalayas', 'esteem', 'envince', 'suffice', 'explore' );
+		$core_themes = array( 'spacious', 'colormag', 'flash', 'estore', 'ample', 'accelerate', 'colornews', 'foodhunt', 'fitclub', 'radiate', 'freedom', 'himalayas', 'esteem', 'envince', 'suffice', 'explore', 'masonic' );
 
 		// Check for core themes pro version :)
-		$pro_themes  = array_diff( $core_themes, array( 'explore', 'masonic' ) );
+		$pro_themes = array_diff( $core_themes, array( 'explore', 'masonic' ) );
 		if ( ! empty( $pro_themes ) ) {
-			$pro_themes = preg_filter( '/$/', '-pro', $pro_themes );
+			$pro_themes = preg_replace( '/$/', '-pro', $pro_themes );
 		}
 
 		return array_merge( $core_themes, $pro_themes );
