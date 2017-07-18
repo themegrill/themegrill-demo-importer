@@ -424,16 +424,12 @@ class TG_Demo_Importer {
 			}
 
 			// Activate required plugins.
-			$activate_required_plugins = (array) apply_filters( 'themegrill_demo_importer_' . $template . '_required_plugins', array( TGDM_PLUGIN_BASENAME ) );
-			if ( ! empty( $activate_required_plugins ) ) {
-				foreach ( $activate_required_plugins as $plugin ) {
-					$plugin = plugin_basename( $plugin );
-					if ( ! is_wp_error( validate_plugin( $plugin ) ) ) {
-						activate_plugin( $plugin );
-					}
+			$required_plugins = (array) apply_filters( 'themegrill_demo_importer_' . $template . '_required_plugins', array() );
+			if ( is_array( $required_plugins ) ) {
+				if ( ! in_array( TGDM_PLUGIN_BASENAME, $required_plugins ) ) {
+					$required_plugins = array_merge( $required_plugins, array( TGDM_PLUGIN_BASENAME ) );
 				}
-			} else {
-				activate_plugin( TGDM_PLUGIN_BASENAME );
+				activate_plugins( $required_plugins, '', is_network_admin(), true );
 			}
 
 			// Update the cookies.
