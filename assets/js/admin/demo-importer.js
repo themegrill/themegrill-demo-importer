@@ -582,7 +582,7 @@ demos.view.Details = wp.Backbone.View.extend({
 			var $itemRow = $( '[data-slug="' + response.slug + '"]' ),
 				$bulkActionNotice, itemName;
 
-			if ( 'wp-' + response.install + '-install-success' === event.type ) {
+			if ( 'wp-' + response.install + '-bulk-install-success' === event.type ) {
 				success++;
 			} else {
 				itemName = response.pluginName ? response.pluginName : $itemRow.find( '.plugin-name' ).text();
