@@ -252,9 +252,9 @@ $demo_filter_links = apply_filters( 'themegrill_demo_importer_filter_links_array
 						</tbody>
 						<tfoot>
 							<tr>
-								<th scope="col" class="manage-column plugin-actions" colspan="4">
-									<a href="#" class="button button-primary plugins-install"><?php _e( 'Install Plugins', 'themegrill-demo-importer' ); ?></a>
-									<?php submit_button( __( 'Activate Plugins', 'themegrill-demo-importer' ), 'action plugins-activate', 'bulk_action', false, array( 'id' => 'bulk_action' ) ); ?>
+								<th scope="col" class="manage-column plugin-actions<# if ( ! data.pluginActions['install'] ) { #> installed<# } #>" colspan="4">
+									<a href="#" class="button button-primary plugins-install"<# if ( ! data.pluginActions['install'] ) { #> disabled<# } #>><?php _e( 'Install Plugins', 'themegrill-demo-importer' ); ?></a>
+									<input type="submit" name="bulk_action" id="bulk_action" class="button plugins-activate" value="<?php esc_attr_e( __( 'Activate Plugins', 'themegrill-demo-importer' ) ); ?>"<# if ( ! data.pluginActions['activate'] ) { #> disabled<# } #>>
 								</th>
 							</tr>
 						</tfoot>

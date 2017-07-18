@@ -172,8 +172,18 @@ table.plugins-list-table {
 		}
 
 		.plugins-activate {
-			margin-right: 8px;
+			display: none;
 			transform: none;
+		}
+
+		&.installed {
+			.plugins-install {
+				display: none;
+			}
+
+			.plugins-activate {
+				display: block;
+			}
 		}
 	}
 }
