@@ -109,24 +109,6 @@
 table.plugins-list-table {
 	margin-bottom: 1em;
 
-	tr:nth-child( 2n ) {
-		th, td {
-			background: #f9f9f9;
-		}
-	}
-
-	thead {
-		th {
-			padding: 9px;
-			font-weight: 400;
-		}
-	}
-
-	td {
-		padding: 9px;
-		font-size: 1.1em;
-	}
-
 	.plugin-status {
 		text-align: center;
 
@@ -166,13 +148,6 @@ table.plugins-list-table {
 			&::before {
 				content: '\f534';
 			}
-
-			&.updated-message {
-				&::before {
-					color: #7ad03a;
-					content: '\f147';
-				}
-			}
 		}
 
 		.updating-message {
@@ -184,9 +159,15 @@ table.plugins-list-table {
 		}
 	}
 
-	.plugins-actions {
-		.plugins-install {
+	.plugin-actions {
+		.plugins-install,
+		.plugins-activate {
 			float: right;
+		}
+
+		.plugins-activate {
+			margin-right: 8px;
+			transform: none;
 		}
 	}
 }

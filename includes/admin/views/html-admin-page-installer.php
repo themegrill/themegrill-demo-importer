@@ -183,76 +183,83 @@ $demo_filter_links = apply_filters( 'themegrill_demo_importer_filter_links_array
 
 				<h3 class="plugins-info"><?php _e( 'Plugins Information', 'themegrill-demo-importer' ); ?></h3>
 
-				<table class="plugins-list-table widefat">
-					<thead>
-						<tr>
-							<td id="cb" class="manage-column check-column">
-								<label class="screen-reader-text" for="cb-select-all-1"><?php esc_html_e( 'Select All', 'themegrill-demo-importer' ); ?></label>
-								<input id="cb-select-all-1" type="checkbox">
-							</td>
-							<th scope="col" class="manage-column plugin-name"><?php esc_html_e( 'Plugin Name', 'themegrill-demo-importer' ); ?></th>
-							<th scope="col" class="plugin-type"><?php esc_html_e( 'Type', 'themegrill-demo-importer' ); ?></th>
-							<th scope="col" class="manage-column plugin-status"><?php esc_html_e( 'Status', 'themegrill-demo-importer' ); ?></th>
-						</tr>
-					</thead>
-					<tbody id="the-list">
-						<# if ( ! _.isEmpty( data.plugins ) ) { #>
-							<# _.each( data.plugins, function( plugin, slug ) { #>
-								<# var checkboxIdPrefix = _.uniqueId( 'checkbox_' ) #>
-								<tr class="plugin<# if ( ! plugin.is_install ) { #> install<# } #><# if ( plugin.required ) { #> wp-locked<# } #>" data-slug="{{ slug }}" data-plugin="{{ plugin.slug }}" data-name="{{ plugin.name }}">
-									<th scope="row" class="check-column">
-										<label class="screen-reader-text" for="{{ checkboxIdPrefix }}"><?php printf( __( 'Select %s', 'themegrill-demo-importer' ), '{{ plugin.name }}' ); ?></label>
-										<input type="checkbox" name="checked[]" value="{{ plugin.slug }}" id="{{ checkboxIdPrefix }}">
-										<div class="locked-indicator">
-											<span class="locked-indicator-icon" aria-hidden="true"></span>
-											<span class="screen-reader-text"><?php
-											printf(
-												/* translators: %s: plugin name */
-												__( '&#8220;%s&#8221; is required', 'themegrill-demo-importer' ),
-												'{{ plugin.name }}'
-											);
-											?></span>
-										</div>
-									</th>
-									<td class="plugin-name">
-										<# if ( plugin.link ) { #>
-											<a href="{{{ plugin.link }}}" target="_blank">{{{ plugin.name }}}</a>
-										<# } else { #>
-											<a href="<?php printf( esc_url( 'https://wordpress.org/plugins/%s' ), '{{ slug }}' ); ?>" target="_blank">{{ plugin.name }}</a>
-										<# } #>
-									</td>
-									<td class="plugin-type">
-										<# if ( plugin.required ) { #>
-											<abbr class="required"><?php esc_html_e( 'Required', 'themegrill-demo-importer' ); ?></abbr>
-										<# } else { #>
-											<abbr class="recommended"><?php esc_html_e( 'Recommended', 'themegrill-demo-importer' ); ?></abbr>
-										<# } #>
-									</td>
-									<td class="plugin-status">
-										<# if ( plugin.is_active && plugin.is_install ) { #>
-											<span class="active"><?php esc_html_e( 'Active', 'themegrill-demo-importer' ); ?></span>
-										<# } else if ( plugin.is_install ) { #>
-											<span class="activate-now"><?php esc_html_e( 'Activate', 'themegrill-demo-importer' ); ?></span>
-										<# } else { #>
-											<span class="install-now"><?php esc_html_e( 'Install Now', 'themegrill-demo-importer' ); ?></span>
-										<# } #>
-									</td>
-								</tr>
-							<# }); #>
-						<# } else { #>
+				<form method="post" id="bulk-action-form">
+					<?php wp_nonce_field( 'bulk-plugins-activate' ); ?>
+					<table class="plugins-list-table widefat striped">
+						<thead>
 							<tr>
-								<td class="plugins-list-table-blank-state" colspan="4"><p><?php _e( 'No plugins are needed to import this demo.', 'themegrill-demo-importer' ); ?></p></td>
+								<td id="cb" class="manage-column check-column">
+									<label class="screen-reader-text" for="cb-select-all-1"><?php esc_html_e( 'Select All', 'themegrill-demo-importer' ); ?></label>
+									<input id="cb-select-all-1" type="checkbox">
+								</td>
+								<th scope="col" class="manage-column plugin-name"><?php esc_html_e( 'Plugin Name', 'themegrill-demo-importer' ); ?></th>
+								<th scope="col" class="plugin-type"><?php esc_html_e( 'Type', 'themegrill-demo-importer' ); ?></th>
+								<th scope="col" class="manage-column plugin-status"><?php esc_html_e( 'Status', 'themegrill-demo-importer' ); ?></th>
 							</tr>
-						<# } #>
-					</tbody>
-					<tfoot>
-						<tr>
-							<th scope="col" class="manage-column plugins-actions" colspan="4">
-								<a href="#" class="button button-primary plugins-install"<# if ( ! data.pluginsInstaller ) { #> disabled="disabled"<# } #>><?php _e( 'Install Plugins', 'themegrill-demo-importer' ); ?></a>
-							</th>
-						</tr>
-					</tfoot>
-				</table>
+						</thead>
+						<tbody id="the-list">
+							<# if ( ! _.isEmpty( data.plugins ) ) { #>
+								<# _.each( data.plugins, function( plugin, slug ) { #>
+									<# var checkboxIdPrefix = _.uniqueId( 'checkbox_' ) #>
+									<tr class="plugin<# if ( ! plugin.is_install ) { #> install<# } #><# if ( plugin.required ) { #> wp-locked<# } #>" data-slug="{{ slug }}" data-plugin="{{ plugin.slug }}" data-name="{{ plugin.name }}">
+										<th scope="row" class="check-column">
+											<label class="screen-reader-text" for="{{ checkboxIdPrefix }}"><?php printf( __( 'Select %s', 'themegrill-demo-importer' ), '{{ plugin.name }}' ); ?></label>
+											<# if ( plugin.required ) { #>
+												<input type="hidden" name="required[]" value="{{ plugin.slug }}">
+											<# } #>
+											<input type="checkbox" name="checked[]" value="{{ plugin.slug }}" id="{{ checkboxIdPrefix }}">
+											<div class="locked-indicator">
+												<span class="locked-indicator-icon" aria-hidden="true"></span>
+												<span class="screen-reader-text"><?php
+												printf(
+													/* translators: %s: plugin name */
+													__( '&#8220;%s&#8221; is required', 'themegrill-demo-importer' ),
+													'{{ plugin.name }}'
+												);
+												?></span>
+											</div>
+										</th>
+										<td class="plugin-name">
+											<# if ( plugin.link ) { #>
+												<a href="{{{ plugin.link }}}" target="_blank">{{{ plugin.name }}}</a>
+											<# } else { #>
+												<a href="<?php printf( esc_url( 'https://wordpress.org/plugins/%s' ), '{{ slug }}' ); ?>" target="_blank">{{ plugin.name }}</a>
+											<# } #>
+										</td>
+										<td class="plugin-type">
+											<# if ( plugin.required ) { #>
+												<abbr class="required"><?php esc_html_e( 'Required', 'themegrill-demo-importer' ); ?></abbr>
+											<# } else { #>
+												<abbr class="recommended"><?php esc_html_e( 'Recommended', 'themegrill-demo-importer' ); ?></abbr>
+											<# } #>
+										</td>
+										<td class="plugin-status">
+											<# if ( plugin.is_active && plugin.is_install ) { #>
+												<span class="active"><?php esc_html_e( 'Active', 'themegrill-demo-importer' ); ?></span>
+											<# } else if ( plugin.is_install ) { #>
+												<span class="activate-now"><?php esc_html_e( 'Activate', 'themegrill-demo-importer' ); ?></span>
+											<# } else { #>
+												<span class="install-now"><?php esc_html_e( 'Install Now', 'themegrill-demo-importer' ); ?></span>
+											<# } #>
+										</td>
+									</tr>
+								<# }); #>
+							<# } else { #>
+								<tr>
+									<td class="plugins-list-table-blank-state" colspan="4"><p><?php _e( 'No plugins are needed to import this demo.', 'themegrill-demo-importer' ); ?></p></td>
+								</tr>
+							<# } #>
+						</tbody>
+						<tfoot>
+							<tr>
+								<th scope="col" class="manage-column plugin-actions" colspan="4">
+									<a href="#" class="button button-primary plugins-install"><?php _e( 'Install Plugins', 'themegrill-demo-importer' ); ?></a>
+									<?php submit_button( __( 'Activate Plugins', 'themegrill-demo-importer' ), 'action plugins-activate', 'bulk_action', false, array( 'id' => 'bulk_action' ) ); ?>
+								</th>
+							</tr>
+						</tfoot>
+					</table>
+				</form>
 
 				<# if ( data.tags ) { #>
 					<p class="theme-tags"><span><?php _e( 'Tags:', 'themegrill-demo-importer' ); ?></span> {{{ data.tags }}}</p>

@@ -54,6 +54,9 @@ class TG_Demo_Importer {
 		add_action( 'admin_init', array( $this, 'reset_wizard_actions' ) );
 		add_action( 'admin_notices', array( $this, 'reset_wizard_notice' ) );
 
+		// Activate plugins.
+		add_action( 'admin_init', array( $this, 'activate_bulk_plugin' ) );
+
 		// Footer rating text.
 		add_filter( 'admin_footer_text', array( $this, 'admin_footer_text' ), 1 );
 
@@ -213,7 +216,7 @@ class TG_Demo_Importer {
 					'confirmReset'   => __( 'It is strongly recommended that you backup your database before proceeding. Are you sure you wish to run the reset wizard now?', 'themegrill-demo-importer' ),
 					'confirmDelete'  => __( "Are you sure you want to delete this demo?\n\nClick 'Cancel' to go back, 'OK' to confirm the delete.", 'themegrill-demo-importer' ),
 					'confirmImport'  => __( 'Importing demo content will replicate the live demo and overwrites your current customizer, widgets and other settings. It might take few minutes to complete the demo import. Are you sure you want to import this demo?', 'themegrill-demo-importer' ),
-					'confirmInstall' => __( "Are you sure you want to install plugins?\n\nClick 'Cancel' to go back, 'OK' to confirm the install.", 'themegrill-demo-importer' ),
+					'confirmInstall' => __( 'Are you sure you want to install the selected plugins and their data?', 'themegrill-demo-importer' ),
 					'ajaxUrl'        => admin_url( 'admin-ajax.php' ),
 					'adminUrl'       => parse_url( self_admin_url(), PHP_URL_PATH ),
 				),
@@ -425,16 +428,12 @@ class TG_Demo_Importer {
 			}
 
 			// Activate required plugins.
-			$activate_required_plugins = (array) apply_filters( 'themegrill_demo_importer_' . $template . '_required_plugins', array( TGDM_PLUGIN_BASENAME ) );
-			if ( ! empty( $activate_required_plugins ) ) {
-				foreach ( $activate_required_plugins as $plugin ) {
-					$plugin = plugin_basename( $plugin );
-					if ( ! is_wp_error( validate_plugin( $plugin ) ) ) {
-						activate_plugin( $plugin );
-					}
+			$required_plugins = (array) apply_filters( 'themegrill_demo_importer_' . $template . '_required_plugins', array() );
+			if ( is_array( $required_plugins ) ) {
+				if ( ! in_array( TGDM_PLUGIN_BASENAME, $required_plugins ) ) {
+					$required_plugins = array_merge( $required_plugins, array( TGDM_PLUGIN_BASENAME ) );
 				}
-			} else {
-				activate_plugin( TGDM_PLUGIN_BASENAME );
+				activate_plugins( $required_plugins, '', is_network_admin(), true );
 			}
 
 			// Update the cookies.
@@ -444,6 +443,43 @@ class TG_Demo_Importer {
 			// Redirect to demo importer page to display reset success notice.
 			wp_safe_redirect( admin_url( 'themes.php?page=demo-importer&reset=true' ) );
 			exit();
+		}
+	}
+
+	/**
+	 * Bulk plugin activation action.
+	 */
+	public function activate_bulk_plugin() {
+		if ( ! empty( $_REQUEST['bulk_action'] ) ) {
+			if ( ! current_user_can( 'activate_plugins' ) ) {
+				wp_die( __( 'Sorry, you are not allowed to activate plugins for this site.', 'themegrill-demo-importer' ) );
+			}
+
+			check_admin_referer( 'bulk-plugins-activate' );
+
+			$plugins  = isset( $_POST['checked'] ) ? (array) $_POST['checked'] : array();
+			$required = isset( $_POST['required'] ) ? (array) $_POST['required'] : array();
+
+			// Allow Required plugins.
+			$plugins = array_merge( $required, $plugins );
+
+			if ( is_network_admin() ) {
+				foreach ( $plugins as $i => $plugin ) {
+					// Only activate plugins which are not already network activated.
+					if ( is_plugin_active_for_network( $plugin ) ) {
+						unset( $plugins[ $i ] );
+					}
+				}
+			} else {
+				foreach ( $plugins as $i => $plugin ) {
+					// Only activate plugins which are not already active and are not network-only when on Multisite.
+					if ( is_plugin_active( $plugin ) || ( is_multisite() && is_network_only_plugin( $plugin ) ) ) {
+						unset( $plugins[ $i ] );
+					}
+				}
+			}
+
+			activate_plugins( $plugins, '', is_network_admin() );
 		}
 	}
 
@@ -492,10 +528,12 @@ class TG_Demo_Importer {
 					$plugins_list[ $plugin ]['is_install'] = _tg_is_plugin_installed( $plugin );
 				}
 
-				// Plugin installer.
-				$plugins_installer = false;
-				if ( wp_list_filter( $plugins_list, array( 'is_active' => false ) ) ) {
-					$plugins_installer = true;
+				// Plugin actions.
+				$plugin_actions = array();
+				if ( wp_list_filter( $plugins_list, array( 'is_install' => false ) ) ) {
+					$plugin_actions['install'] = true;
+				} elseif ( wp_list_filter( $plugins_list, array( 'is_active' => false ) ) ) {
+					$plugin_actions['activate'] = true;
 				}
 
 				// Add demo notices.
@@ -523,19 +561,19 @@ class TG_Demo_Importer {
 					);
 				} else {
 					$prepared_demos[ $demo_id ] = array(
-						'id'               => $demo_id,
-						'name'             => $demo_data['name'],
-						'theme'            => $demo_data['theme'],
-						'package'          => $demo_package,
-						'screenshot'       => $this->import_file_url( $demo_id, 'screenshot.jpg' ),
-						'description'      => $description,
-						'author'           => $author,
-						'authorAndUri'     => '<a href="https://themegrill.com" target="_blank">ThemeGrill</a>',
-						'version'          => $version,
-						'active'           => $demo_id === $demo_activated_id,
-						'hasNotice'        => $demo_notices,
-						'plugins'          => $plugins_list,
-						'pluginsInstaller' => $plugins_installer,
+						'id'              => $demo_id,
+						'name'            => $demo_data['name'],
+						'theme'           => $demo_data['theme'],
+						'package'         => $demo_package,
+						'screenshot'      => $this->import_file_url( $demo_id, 'screenshot.jpg' ),
+						'description'     => $description,
+						'author'          => $author,
+						'authorAndUri'    => '<a href="https://themegrill.com" target="_blank">ThemeGrill</a>',
+						'version'         => $version,
+						'active'          => $demo_id === $demo_activated_id,
+						'hasNotice'       => $demo_notices,
+						'plugins'         => $plugins_list,
+						'pluginActions'   => $plugin_actions,
 						'actions'         => array(
 							'preview'  => home_url( '/' ),
 							'demo_url' => $demo_data['demo_url'],
