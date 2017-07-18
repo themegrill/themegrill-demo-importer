@@ -177,7 +177,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 									<input id="cb-select-all-1" type="checkbox">
 								</td>
 								<th scope="col" class="manage-column plugin-name"><?php esc_html_e( 'Plugin Name', 'themegrill-demo-importer' ); ?></th>
-								<th scope="col" class="plugin-type"><?php esc_html_e( 'Type', 'themegrill-demo-importer' ); ?></th>
+								<th scope="col" class="manage-column plugin-type"><?php esc_html_e( 'Type', 'themegrill-demo-importer' ); ?></th>
 								<th scope="col" class="manage-column plugin-status"><?php esc_html_e( 'Status', 'themegrill-demo-importer' ); ?></th>
 							</tr>
 						</thead>
