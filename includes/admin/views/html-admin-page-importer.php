@@ -213,7 +213,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 										<# } #>
 									</td>
 									<td class="plugin-status">
-										<# if ( plugin.is_active ) { #>
+										<# if ( plugin.is_active && plugin.is_install ) { #>
 											<span class="active"><?php esc_html_e( 'Active', 'themegrill-demo-importer' ); ?></span>
 										<# } else if ( plugin.is_install ) { #>
 											<span class="activate-now"><?php esc_html_e( 'Activate', 'themegrill-demo-importer' ); ?></span>

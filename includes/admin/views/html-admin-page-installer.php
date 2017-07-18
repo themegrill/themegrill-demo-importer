@@ -229,7 +229,7 @@ $demo_filter_links = apply_filters( 'themegrill_demo_importer_filter_links_array
 										<# } #>
 									</td>
 									<td class="plugin-status">
-										<# if ( plugin.is_active ) { #>
+										<# if ( plugin.is_active && plugin.is_install ) { #>
 											<span class="active"><?php esc_html_e( 'Active', 'themegrill-demo-importer' ); ?></span>
 										<# } else if ( plugin.is_install ) { #>
 											<span class="activate-now"><?php esc_html_e( 'Activate', 'themegrill-demo-importer' ); ?></span>

@@ -108,7 +108,7 @@
 
 		$document.trigger( 'wp-demo-import-success', response );
 
-		$message = $card.find( '.button-primary' )
+		$message = $card.find( '.button-primary:not(.plugins-install)' )
 			.removeClass( 'updating-message' )
 			.addClass( 'updated-message disabled' )
 			.attr( 'aria-label', wp.updates.l10n.demoImportedLabel.replace( '%s', response.demoName ) )
@@ -252,7 +252,7 @@
 	};
 
 	/**
-	 * Sends an Ajax request to the server to install the plugins.
+	 * Sends an Ajax request to the server to install a plugin.
 	 *
 	 * @param {object}                    args         Arguments.
 	 * @param {string}                    args.slug    Plugin identifier in the WordPress.org Plugin repository.
@@ -281,7 +281,7 @@
 
 		wp.a11y.speak( wp.updates.l10n.installingMsg, 'polite' );
 
-		$document.trigger( 'wp-plugin-installing', args );
+		$document.trigger( 'wp-plugin-bulk-installing', args );
 
 		return wp.updates.ajax( 'install-plugin', args );
 	};
@@ -307,7 +307,7 @@
 
 		wp.a11y.speak( wp.updates.l10n.installedMsg, 'polite' );
 
-		$document.trigger( 'wp-plugin-install-success', response );
+		$document.trigger( 'wp-plugin-bulk-install-success', response );
 	};
 
 	/**
@@ -343,7 +343,7 @@
 
 		wp.a11y.speak( errorMessage, 'assertive' );
 
-		$document.trigger( 'wp-plugin-install-error', response );
+		$document.trigger( 'wp-plugin-bulk-install-error', response );
 	};
 
 	/**
@@ -437,117 +437,5 @@
 		// Handle a queue job.
 		$document.trigger( 'wp-updates-queue-job', job );
 	};
-
-	$( function() {
-
-		/**
-		 * Bulk action handler for plugins installation.
-		 *
-		 * @param {Event} event Event interface.
-		 */
-		$document.on( 'click', 'a.plugins-install', function( event ) {
-			var itemsSelected = $document.find( '.wp-locked input[name="checked[]"], input[name="checked[]"]:checked' ),
-				success       = 0,
-				error         = 0,
-				errorMessages = [];
-
-			// Remove previous error messages, if any.
-			$( '.theme-info .update-message' ).remove();
-
-			// Bail if there were no items selected.
-			if ( ! itemsSelected.length ) {
-				event.preventDefault();
-				$( '.theme-about' ).animate( { scrollTop: 0 } );
-				$( '.theme-info .plugins-info' ).after( wp.updates.adminNotice( {
-					id:        'no-items-selected',
-					className: 'update-message notice-error notice-alt',
-					message:   wp.updates.l10n.noItemsSelected
-				} ) );
-			}
-
-			wp.updates.maybeRequestFilesystemCredentials( event );
-
-			event.preventDefault();
-
-			// Un-check the bulk checkboxes.
-			$document.find( '.manage-column [type="checkbox"]' ).prop( 'checked', false );
-
-			$document.trigger( 'wp-plugin-bulk-install', itemsSelected );
-
-			// Find all the checkboxes which have been checked.
-			itemsSelected.each( function( index, element ) {
-				var $checkbox = $( element ),
-					$itemRow  = $checkbox.parents( 'tr' );
-
-				// Only add install-able items to the update queue.
-				if ( ! $itemRow.hasClass( 'install' ) || $itemRow.find( 'notice-error' ).length ) {
-
-					// Un-check the box.
-					$checkbox.prop( 'checked', false );
-					return;
-				}
-
-				// Add it to the queue.
-				wp.updates.queue.push( {
-					action: 'install-plugin',
-					data:   {
-						slug: $itemRow.data( 'slug' )
-					}
-				} );
-			} );
-
-			// Display bulk notification for install of plugin.
-			$document.on( 'wp-plugin-install-success wp-plugin-install-error', function( event, response ) {
-				var $itemRow = $( '[data-slug="' + response.slug + '"]' ),
-					$bulkActionNotice, itemName;
-
-				if ( 'wp-' + response.install + '-install-success' === event.type ) {
-					success++;
-				} else {
-					itemName = response.pluginName ? response.pluginName : $itemRow.find( '.plugin-name' ).text();
-
-					error++;
-					errorMessages.push( itemName + ': ' + response.errorMessage );
-				}
-
-				$itemRow.find( 'input[name="checked[]"]:checked' ).prop( 'checked', false );
-
-				wp.updates.adminNotice = wp.template( 'wp-bulk-installs-admin-notice' );
-
-				// Remove previous error messages, if any.
-				$( '.theme-info .bulk-action-notice' ).remove();
-
-				$( '.theme-info .plugins-info' ).after( wp.updates.adminNotice( {
-					id:            'bulk-action-notice',
-					className:     'bulk-action-notice notice-alt',
-					successes:     success,
-					errors:        error,
-					errorMessages: errorMessages,
-					type:          response.install
-				} ) );
-
-				$bulkActionNotice = $( '#bulk-action-notice' ).on( 'click', 'button', function() {
-					// $( this ) is the clicked button, no need to get it again.
-					$( this )
-						.toggleClass( 'bulk-action-errors-collapsed' )
-						.attr( 'aria-expanded', ! $( this ).hasClass( 'bulk-action-errors-collapsed' ) );
-					// Show the errors list.
-					$bulkActionNotice.find( '.bulk-action-errors' ).toggleClass( 'hidden' );
-				} );
-
-				if ( error > 0 && ! wp.updates.queue.length ) {
-					$( '.theme-about' ).animate( { scrollTop: 0 } );
-				}
-			} );
-
-			// Reset admin notice template after #bulk-action-notice was added.
-			$document.on( 'wp-updates-notice-added', function() {
-				wp.updates.adminNotice = wp.template( 'wp-updates-admin-notice' );
-			} );
-
-			// Check the queue, now that the event handlers have been added.
-			wp.updates.queueChecker();
-		} );
-	} );
 
 })( jQuery, window.wp, window._demoUpdatesSettings );
