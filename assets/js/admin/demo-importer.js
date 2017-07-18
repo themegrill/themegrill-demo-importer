@@ -550,6 +550,11 @@ demos.view.Details = wp.Backbone.View.extend({
 
 		event.preventDefault();
 
+		// Confirmation dialog for installing bulk plugins.
+		if ( ! window.confirm( wp.demos.data.settings.confirmInstall ) ) {
+			return;
+		}
+
 		// Un-check the bulk checkboxes.
 		$( document ).find( '.manage-column [type="checkbox"]' ).prop( 'checked', false );
 
