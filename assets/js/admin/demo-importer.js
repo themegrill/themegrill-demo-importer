@@ -633,12 +633,12 @@ demos.view.Details = wp.Backbone.View.extend({
 
 			if ( ! wp.updates.queue.length ) {
 				$target
-					.removeClass( 'updating-message' ).addClass( 'updated-message disabled' )
+					.removeClass( 'updating-message' ).addClass( 'updated-message button-disabled' )
 					.text( wp.updates.l10n.pluginInstalled );
 				wp.a11y.speak( wp.updates.l10n.installedMsg, 'polite' );
 
 				if ( ! error ) {
-					$( '.plugin-actions' ).addClass( 'installed' ).find( '.plugins-activate' ).removeAttr( 'disabled' );
+					$( '.plugins-activate' ).removeAttr( 'disabled' );
 				}
 			}
 
