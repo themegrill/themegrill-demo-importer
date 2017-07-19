@@ -163,20 +163,14 @@ table.plugins-list-table {
 		.plugins-install,
 		.plugins-activate {
 			float: right;
-		}
-
-		.plugins-activate {
-			display: none;
 			transform: none;
 		}
 
-		&.installed {
-			.plugins-install {
-				display: none;
-			}
+		.plugins-install {
+			margin-left: 8px;
 
-			.plugins-activate {
-				display: block;
+			&.disabled {
+				display: none;
 			}
 		}
 	}
