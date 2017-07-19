@@ -527,7 +527,7 @@ demos.view.Details = wp.Backbone.View.extend({
 	},
 
 	installPlugin: function( event ) {
-		var itemsSelected = $( document ).find( '.wp-locked input[name="checked[]"], input[name="checked[]"]:checked' ),
+		var itemsSelected = $( document ).find( 'input[name="required[]"], input[name="checked[]"]:checked' ),
 			$target       = $( event.target ),
 			success       = 0,
 			error         = 0,
