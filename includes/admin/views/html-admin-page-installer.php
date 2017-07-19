@@ -245,8 +245,8 @@ $demo_filter_links = apply_filters( 'themegrill_demo_importer_filter_links_array
 									</tr>
 								<# }); #>
 							<# } else { #>
-								<tr>
-									<td class="plugins-list-table-blank-state" colspan="4"><p><?php _e( 'No plugins are needed to import this demo.', 'themegrill-demo-importer' ); ?></p></td>
+								<tr class="no-items">
+									<td class="colspanchange" colspan="4"><?php _e( 'No plugins are needed to import this demo.', 'themegrill-demo-importer' ); ?></td>
 								</tr>
 							<# } #>
 						</tbody>
