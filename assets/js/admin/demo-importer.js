@@ -528,9 +528,16 @@ demos.view.Details = wp.Backbone.View.extend({
 
 	installPlugin: function( event ) {
 		var itemsSelected = $( document ).find( '.wp-locked input[name="checked[]"], input[name="checked[]"]:checked' ),
+			$target       = $( event.target ),
 			success       = 0,
 			error         = 0,
 			errorMessages = [];
+
+		event.preventDefault();
+
+		if ( $target.hasClass( 'updating-message' ) ) {
+			return;
+		}
 
 		// Remove previous error messages, if any.
 		$( '.theme-info .update-message' ).remove();
@@ -547,8 +554,6 @@ demos.view.Details = wp.Backbone.View.extend({
 		}
 
 		wp.updates.maybeRequestFilesystemCredentials( event );
-
-		event.preventDefault();
 
 		// Confirmation dialog for installing bulk plugins.
 		if ( ! window.confirm( wp.demos.data.settings.confirmInstall ) ) {
@@ -572,6 +577,11 @@ demos.view.Details = wp.Backbone.View.extend({
 				$checkbox.prop( 'checked', false );
 				return;
 			}
+
+			$target
+				.addClass( 'updating-message' )
+				.text( wp.updates.l10n.installing );
+			wp.a11y.speak( wp.updates.l10n.installingMsg, 'polite' );
 
 			// Add it to the queue.
 			wp.updates.queue.push( {
@@ -621,7 +631,23 @@ demos.view.Details = wp.Backbone.View.extend({
 				$bulkActionNotice.find( '.bulk-action-errors' ).toggleClass( 'hidden' );
 			} );
 
+			if ( ! wp.updates.queue.length ) {
+				$target
+					.removeClass( 'updating-message' ).addClass( 'updated-message disabled' )
+					.text( wp.updates.l10n.pluginInstalled );
+				wp.a11y.speak( wp.updates.l10n.installedMsg, 'polite' );
+
+				if ( ! error ) {
+					$( '.plugin-actions' ).addClass( 'installed' ).find( '.plugins-activate' ).removeAttr( 'disabled' );
+				}
+			}
+
 			if ( error > 0 && ! wp.updates.queue.length ) {
+				$target
+					.removeClass( 'updated-message updating-message' ).addClass( 'button-disabled' )
+					.text( wp.updates.l10n.installFailedShort );
+				wp.a11y.speak( wp.updates.l10n.installedMsg, 'polite' );
+
 				$( '.theme-about' ).animate( { scrollTop: 0 } );
 			}
 		} );
