@@ -185,23 +185,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 							<# if ( ! _.isEmpty( data.plugins ) ) { #>
 								<# _.each( data.plugins, function( plugin, slug ) { #>
 									<# var checkboxIdPrefix = _.uniqueId( 'checkbox_' ) #>
-									<tr class="plugin<# if ( ! plugin.is_install ) { #> install<# } #><# if ( plugin.required ) { #> wp-locked<# } #>" data-slug="{{ slug }}" data-plugin="{{ plugin.slug }}" data-name="{{ plugin.name }}">
+									<tr class="plugin<# if ( ! plugin.is_install ) { #> install<# } #>" data-slug="{{ slug }}" data-plugin="{{ plugin.slug }}" data-name="{{ plugin.name }}">
 										<th scope="row" class="check-column">
 											<label class="screen-reader-text" for="{{ checkboxIdPrefix }}"><?php printf( __( 'Select %s', 'themegrill-demo-importer' ), '{{ plugin.name }}' ); ?></label>
+											<input type="checkbox" name="checked[]" value="{{ plugin.slug }}" id="{{ checkboxIdPrefix }}"<# if ( plugin.required ) { #> disabled="disabled"<# } #>>
 											<# if ( plugin.required ) { #>
-												<input type="hidden" name="required_plugins[]" value="{{ plugin.slug }}">
+												<input type="hidden" name="required[]" value="{{ plugin.slug }}">
 											<# } #>
-											<input type="checkbox" name="checked[]" value="{{ plugin.slug }}" id="{{ checkboxIdPrefix }}">
-											<div class="locked-indicator">
-												<span class="locked-indicator-icon" aria-hidden="true"></span>
-												<span class="screen-reader-text"><?php
-												printf(
-													/* translators: %s: plugin name */
-													__( '&#8220;%s&#8221; is required', 'themegrill-demo-importer' ),
-													'{{ plugin.name }}'
-												);
-												?></span>
-											</div>
 										</th>
 										<td class="plugin-name">
 											<# if ( plugin.link ) { #>
