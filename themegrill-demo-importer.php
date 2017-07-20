@@ -79,8 +79,8 @@ final class ThemeGrill_Demo_Importer {
 		$upload_dir = wp_upload_dir();
 
 		$this->define( 'TGDM_PLUGIN_FILE', __FILE__ );
-		$this->define( 'TGDM_ABSPATH', dirname( __FILE__ ) . '/' );
-		$this->define( 'TGDM_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
+		$this->define( 'TGDM_ABSPATH', dirname( TGDM_PLUGIN_FILE ) . '/' );
+		$this->define( 'TGDM_PLUGIN_BASENAME', plugin_basename( TGDM_PLUGIN_FILE ) );
 		$this->define( 'TGDM_VERSION', $this->version );
 		$this->define( 'TGDM_DEMO_DIR', $upload_dir['basedir'] . '/tg-demo-pack/' );
 		$this->define( 'TGDM_DEMO_URL', $upload_dir['baseurl'] . '/tg-demo-pack/' );
@@ -106,7 +106,7 @@ final class ThemeGrill_Demo_Importer {
 		add_action( 'init', array( $this, 'load_plugin_textdomain' ) );
 
 		// Register activation hook.
-		register_activation_hook( __FILE__, array( $this, 'install' ) );
+		register_activation_hook( TGDM_PLUGIN_FILE, array( $this, 'install' ) );
 
 		// Check with ThemeGrill theme is installed.
 		if ( in_array( get_option( 'template' ), $this->get_core_supported_themes() ) ) {
@@ -206,7 +206,7 @@ final class ThemeGrill_Demo_Importer {
 		$locale = apply_filters( 'plugin_locale', get_locale(), 'themegrill-demo-importer' );
 
 		load_textdomain( 'themegrill-demo-importer', WP_LANG_DIR . '/themegrill-demo-importer/themegrill-demo-importer-' . $locale . '.mo' );
-		load_plugin_textdomain( 'themegrill-demo-importer', false, plugin_basename( dirname( __FILE__ ) ) . '/languages' );
+		load_plugin_textdomain( 'themegrill-demo-importer', false, plugin_basename( dirname( TGDM_PLUGIN_FILE ) ) . '/languages' );
 	}
 
 	/**
@@ -214,7 +214,7 @@ final class ThemeGrill_Demo_Importer {
 	 * @return string
 	 */
 	public function plugin_url() {
-		return untrailingslashit( plugins_url( '/', __FILE__ ) );
+		return untrailingslashit( plugins_url( '/', TGDM_PLUGIN_FILE ) );
 	}
 
 	/**
@@ -222,7 +222,7 @@ final class ThemeGrill_Demo_Importer {
 	 * @return string
 	 */
 	public function plugin_path() {
-		return untrailingslashit( plugin_dir_path( __FILE__ ) );
+		return untrailingslashit( plugin_dir_path( TGDM_PLUGIN_FILE ) );
 	}
 
 	/**
