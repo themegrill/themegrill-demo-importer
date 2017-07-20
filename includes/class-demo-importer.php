@@ -54,9 +54,6 @@ class TG_Demo_Importer {
 		add_action( 'admin_init', array( $this, 'reset_wizard_actions' ) );
 		add_action( 'admin_notices', array( $this, 'reset_wizard_notice' ) );
 
-		// Activate plugins.
-		add_action( 'admin_init', array( $this, 'activate_bulk_plugin' ) );
-
 		// Footer rating text.
 		add_filter( 'admin_footer_text', array( $this, 'admin_footer_text' ), 1 );
 
@@ -447,39 +444,6 @@ class TG_Demo_Importer {
 	}
 
 	/**
-	 * Bulk plugin activation action.
-	 */
-	public function activate_bulk_plugin() {
-		if ( ! empty( $_REQUEST['bulk_action'] ) ) {
-			if ( ! current_user_can( 'activate_plugins' ) ) {
-				wp_die( __( 'Sorry, you are not allowed to activate plugins for this site.', 'themegrill-demo-importer' ) );
-			}
-
-			check_admin_referer( 'bulk-plugins-activate' );
-
-			$plugins = isset( $_POST['checked'] ) ? (array) $_POST['checked'] : array();
-
-			if ( is_network_admin() ) {
-				foreach ( $plugins as $i => $plugin ) {
-					// Only activate plugins which are not already network activated.
-					if ( is_plugin_active_for_network( $plugin ) ) {
-						unset( $plugins[ $i ] );
-					}
-				}
-			} else {
-				foreach ( $plugins as $i => $plugin ) {
-					// Only activate plugins which are not already active and are not network-only when on Multisite.
-					if ( is_plugin_active( $plugin ) || ( is_multisite() && is_network_only_plugin( $plugin ) ) ) {
-						unset( $plugins[ $i ] );
-					}
-				}
-			}
-
-			activate_plugins( $plugins, '', is_network_admin() );
-		}
-	}
-
-	/**
 	 * Prepare demos for JavaScript.
 	 *
 	 * @param  array $demos Demo config array.
@@ -520,8 +484,20 @@ class TG_Demo_Importer {
 
 				// Plugins status.
 				foreach ( $plugins_list as $plugin => $plugin_data ) {
-					$plugins_list[ $plugin ]['is_active']  = is_plugin_active( $plugin_data['slug'] );
-					$plugins_list[ $plugin ]['is_install'] = _tg_is_plugin_installed( $plugin );
+					$is_plugin_active = $is_plugin_installed = false;
+
+					if ( file_exists( WP_PLUGIN_DIR . '/' . $plugin ) ) {
+						// Looks like a plugin is installed, but not active.
+						$plugins = get_plugins( '/' . $plugin );
+						if ( ! empty( $plugins ) ) {
+							$is_plugin_active = true;
+						}
+					} elseif ( is_plugin_active( $plugin_data['slug'] ) ) {
+						$is_plugin_installed = true;
+					}
+
+					$plugins_list[ $plugin ]['is_active']  = $is_plugin_active;
+					$plugins_list[ $plugin ]['is_install'] = $is_plugin_installed;
 				}
 
 				// Add demo notices.

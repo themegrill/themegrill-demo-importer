@@ -61,6 +61,40 @@ function tg_get_attachment_id( $filename ) {
 }
 
 /**
+ * Bulk plugin activation action.
+ */
+function tg_activate_bulk_plugin() {
+	if ( ! empty( $_REQUEST['bulk_action'] ) ) {
+		if ( ! current_user_can( 'activate_plugins' ) ) {
+			wp_die( __( 'Sorry, you are not allowed to activate plugins for this site.', 'themegrill-demo-importer' ) );
+		}
+
+		check_admin_referer( 'bulk-plugins-activate' );
+
+		$plugins = isset( $_POST['checked'] ) ? (array) $_POST['checked'] : array();
+
+		if ( is_network_admin() ) {
+			foreach ( $plugins as $i => $plugin ) {
+				// Only activate plugins which are not already network activated.
+				if ( is_plugin_active_for_network( $plugin ) ) {
+					unset( $plugins[ $i ] );
+				}
+			}
+		} else {
+			foreach ( $plugins as $i => $plugin ) {
+				// Only activate plugins which are not already active and are not network-only when on Multisite.
+				if ( is_plugin_active( $plugin ) || ( is_multisite() && is_network_only_plugin( $plugin ) ) ) {
+					unset( $plugins[ $i ] );
+				}
+			}
+		}
+
+		activate_plugins( $plugins, '', is_network_admin() );
+	}
+}
+add_action( 'admin_init', 'tg_activate_bulk_plugin' );
+
+/**
  * Ajax handler for deleting a demo pack.
  * @see tg_delete_demo_pack()
  */
@@ -420,22 +454,4 @@ function tg_print_admin_notice_templates() {
 		</div>
 	</script>
 	<?php
-}
-
-/**
- * Check if a plugin is installed.
- *
- * @access private
- *
- * @param  string $plugin_slug The plugin slug.
- * @return bool
- */
-function _tg_is_plugin_installed( $plugin_slug ) {
-	if ( file_exists( WP_PLUGIN_DIR . '/' . $plugin_slug ) ) {
-		$plugins = get_plugins( '/' . $plugin_slug );
-		if ( ! empty( $plugins ) ) {
-			return true;
-		}
-	}
-	return false;
 }
