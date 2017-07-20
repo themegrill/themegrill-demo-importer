@@ -167,48 +167,73 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 				<h3 class="plugins-info"><?php _e( 'Plugins Information', 'themegrill-demo-importer' ); ?></h3>
 
-				<table class="plugins-list-table widefat">
-					<thead>
-						<tr>
-							<th scope="col" class="plugin-name"><?php esc_html_e( 'Plugin Name', 'themegrill-demo-importer' ); ?></th>
-							<th scope="col" class="plugin-type"><?php esc_html_e( 'Type', 'themegrill-demo-importer' ); ?></th>
-							<th scope="col" class="plugin-status"><?php esc_html_e( 'Status', 'themegrill-demo-importer' ); ?></th>
-						</tr>
-					</thead>
-					<tbody id="the-list">
-						<# if ( ! _.isEmpty( data.plugins ) ) { #>
-							<# _.each( data.plugins, function( plugin, slug ) { #>
-								<tr>
-									<td class="plugin-name">
-										<# if ( plugin.link ) { #>
-											<a href="{{{ plugin.link }}}" target="_blank">{{{ plugin.name }}}</a>
-										<# } else { #>
-											<a href="<?php printf( esc_url( 'https://wordpress.org/plugins/%s' ), '{{ slug }}' ); ?>" target="_blank">{{ plugin.name }}</a>
-										<# } #>
-									</td>
-									<td class="plugin-type">
-										<# if ( plugin.required ) { #>
-											<span class="required"><?php esc_html_e( 'Required', 'themegrill-demo-importer' ); ?></span>
-										<# } else { #>
-											<span class="recommended"><?php esc_html_e( 'Recommended', 'themegrill-demo-importer' ); ?></span>
-										<# } #>
-									</td>
-									<td class="plugin-status">
-										<# if ( plugin.is_active ) { #>
-											<mark class="yes"><span class="dashicons dashicons-yes"></span></mark>
-										<# } else { #>
-											<mark class="error"><span class="dashicons dashicons-no-alt"></span></mark>
-										<# } #>
-									</td>
-								</tr>
-							<# }); #>
-						<# } else { #>
+				<form method="post" id="bulk-action-form">
+					<?php wp_nonce_field( 'bulk-plugins-activate' ); ?>
+					<table class="plugins-list-table widefat striped">
+						<thead>
 							<tr>
-								<td class="plugins-list-table-blank-state" colspan="3"><p><?php _e( 'No plugins are needed to import this demo.', 'themegrill-demo-importer' ); ?></p></td>
+								<td id="cb" class="manage-column check-column">
+									<label class="screen-reader-text" for="cb-select-all-1"><?php esc_html_e( 'Select All', 'themegrill-demo-importer' ); ?></label>
+									<input id="cb-select-all-1" type="checkbox">
+								</td>
+								<th scope="col" class="manage-column plugin-name"><?php esc_html_e( 'Plugin Name', 'themegrill-demo-importer' ); ?></th>
+								<th scope="col" class="manage-column plugin-type"><?php esc_html_e( 'Type', 'themegrill-demo-importer' ); ?></th>
+								<th scope="col" class="manage-column plugin-status"><?php esc_html_e( 'Status', 'themegrill-demo-importer' ); ?></th>
 							</tr>
-						<# } #>
-					</tbody>
-				</table>
+						</thead>
+						<tbody id="the-list">
+							<# if ( ! _.isEmpty( data.plugins ) ) { #>
+								<# _.each( data.plugins, function( plugin, slug ) { #>
+									<# var checkboxIdPrefix = _.uniqueId( 'checkbox_' ) #>
+									<tr class="plugin<# if ( ! plugin.is_install ) { #> install<# } #>" data-slug="{{ slug }}" data-plugin="{{ plugin.slug }}" data-name="{{ plugin.name }}">
+										<th scope="row" class="check-column">
+											<label class="screen-reader-text" for="{{ checkboxIdPrefix }}"><?php printf( __( 'Select %s', 'themegrill-demo-importer' ), '{{ plugin.name }}' ); ?></label>
+											<input type="checkbox" name="checked[]" value="{{ plugin.slug }}" id="{{ checkboxIdPrefix }}"<# if ( plugin.required ) { #> data-checked="1" checked="checked" disabled="disabled"<# } #>>
+											<# if ( plugin.required ) { #>
+												<input type="hidden" name="checked[]" value="{{ plugin.slug }}">
+											<# } #>
+										</th>
+										<td class="plugin-name">
+											<# if ( plugin.link ) { #>
+												<a href="{{{ plugin.link }}}" target="_blank">{{{ plugin.name }}}</a>
+											<# } else { #>
+												<a href="<?php printf( esc_url( 'https://wordpress.org/plugins/%s' ), '{{ slug }}' ); ?>" target="_blank">{{ plugin.name }}</a>
+											<# } #>
+										</td>
+										<td class="plugin-type">
+											<# if ( plugin.required ) { #>
+												<abbr class="required"><?php esc_html_e( 'Required', 'themegrill-demo-importer' ); ?></abbr>
+											<# } else { #>
+												<abbr class="recommended"><?php esc_html_e( 'Recommended', 'themegrill-demo-importer' ); ?></abbr>
+											<# } #>
+										</td>
+										<td class="plugin-status">
+											<# if ( plugin.is_active && plugin.is_install ) { #>
+												<span class="active"><?php esc_html_e( 'Active', 'themegrill-demo-importer' ); ?></span>
+											<# } else if ( plugin.is_install ) { #>
+												<span class="activate-now"><?php esc_html_e( 'Activate', 'themegrill-demo-importer' ); ?></span>
+											<# } else { #>
+												<span class="install-now"><?php esc_html_e( 'Install Now', 'themegrill-demo-importer' ); ?></span>
+											<# } #>
+										</td>
+									</tr>
+								<# }); #>
+							<# } else { #>
+								<tr class="no-items">
+									<td class="colspanchange" colspan="4"><?php _e( 'No plugins are needed to import this demo.', 'themegrill-demo-importer' ); ?></td>
+								</tr>
+							<# } #>
+						</tbody>
+						<tfoot>
+							<tr>
+								<th scope="col" class="manage-column plugin-actions<# if ( ! data.pluginActions['install'] ) { #> installed<# } #>" colspan="4">
+									<a href="#" class="button button-primary plugins-install<# if ( ! data.pluginActions['install'] ) { #> disabled<# } #>"><?php _e( 'Install Plugins', 'themegrill-demo-importer' ); ?></a>
+									<input type="submit" name="bulk_action" id="bulk_action" class="button button-secondary plugins-activate" value="<?php esc_attr_e( __( 'Activate Plugins', 'themegrill-demo-importer' ) ); ?>"<# if ( ! data.pluginActions['activate'] ) { #> disabled<# } #>>
+								</th>
+							</tr>
+						</tfoot>
+					</table>
+				</form>
 
 				<# if ( data.tags ) { #>
 					<p class="theme-tags"><span><?php _e( 'Tags:', 'themegrill-demo-importer' ); ?></span> {{{ data.tags }}}</p>
@@ -245,3 +270,4 @@ if ( ! defined( 'ABSPATH' ) ) {
 <?php
 wp_print_request_filesystem_credentials_modal();
 wp_print_admin_notice_templates();
+tg_print_admin_notice_templates();

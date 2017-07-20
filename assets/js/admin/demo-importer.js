@@ -371,7 +371,8 @@ demos.view.Details = wp.Backbone.View.extend({
 		'click .delete-demo': 'deleteDemo',
 		'click .left': 'previousDemo',
 		'click .right': 'nextDemo',
-		'click .demo-import': 'importDemo'
+		'click .demo-import': 'importDemo',
+		'click .plugins-install': 'installPlugin'
 	},
 
 	// The HTML template for the theme overlay
@@ -523,6 +524,142 @@ demos.view.Details = wp.Backbone.View.extend({
 		wp.updates.importDemo( {
 			slug: $target.data( 'slug' )
 		} );
+	},
+
+	installPlugin: function( event ) {
+		var itemsSelected = $( document ).find( 'input[name="required[]"], input[name="checked[]"]:checked' ),
+			$target       = $( event.target ),
+			success       = 0,
+			error         = 0,
+			errorMessages = [];
+
+		event.preventDefault();
+
+		if ( $target.hasClass( 'disabled' ) || $target.hasClass( 'updating-message' ) ) {
+			return;
+		}
+
+		// Remove previous error messages, if any.
+		$( '.theme-info .update-message' ).remove();
+
+		// Bail if there were no items selected.
+		if ( ! itemsSelected.length ) {
+			event.preventDefault();
+			$( '.theme-about' ).animate( { scrollTop: 0 } );
+			$( '.theme-info .plugins-info' ).after( wp.updates.adminNotice( {
+				id:        'no-items-selected',
+				className: 'update-message notice-error notice-alt',
+				message:   wp.updates.l10n.noItemsSelected
+			} ) );
+		}
+
+		wp.updates.maybeRequestFilesystemCredentials( event );
+
+		// Confirmation dialog for installing bulk plugins.
+		if ( ! window.confirm( wp.demos.data.settings.confirmInstall ) ) {
+			return;
+		}
+
+		// Un-check the bulk checkboxes.
+		$( document ).find( '.manage-column [type="checkbox"]' ).prop( 'checked', false );
+
+		$( document ).trigger( 'wp-plugin-bulk-install', itemsSelected );
+
+		// Find all the checkboxes which have been checked.
+		itemsSelected.each( function( index, element ) {
+			var $checkbox = $( element ),
+				$itemRow  = $checkbox.parents( 'tr' );
+
+			// Only add install-able items to the update queue.
+			if ( ! $itemRow.hasClass( 'install' ) || $itemRow.find( 'notice-error' ).length ) {
+
+				// Un-check the box.
+				$checkbox.filter( ':not(:disabled)' ).prop( 'checked', false );
+				return;
+			} else {
+				$target
+					.addClass( 'updating-message' )
+					.text( wp.updates.l10n.installing );
+
+				wp.a11y.speak( wp.updates.l10n.installingMsg, 'polite' );
+			}
+
+			// Add it to the queue.
+			wp.updates.queue.push( {
+				action: 'install-plugin',
+				data:   {
+					slug: $itemRow.data( 'slug' )
+				}
+			} );
+		} );
+
+		// Display bulk notification for install of plugin.
+		$( document ).on( 'wp-plugin-bulk-install-success wp-plugin-bulk-install-error', function( event, response ) {
+			var $itemRow = $( '[data-slug="' + response.slug + '"]' ),
+				$bulkActionNotice, itemName;
+
+			if ( 'wp-' + response.install + '-bulk-install-success' === event.type ) {
+				success++;
+			} else {
+				itemName = response.pluginName ? response.pluginName : $itemRow.find( '.plugin-name' ).text();
+
+				error++;
+				errorMessages.push( itemName + ': ' + response.errorMessage );
+			}
+
+			$itemRow.find( 'input[name="checked[]"]:checked' ).filter( ':not(:disabled)' ).prop( 'checked', false );
+
+			wp.updates.adminNotice = wp.template( 'wp-bulk-installs-admin-notice' );
+
+			// Remove previous error messages, if any.
+			$( '.theme-info .bulk-action-notice' ).remove();
+
+			$( '.theme-info .plugins-info' ).after( wp.updates.adminNotice( {
+				id:            'bulk-action-notice',
+				className:     'bulk-action-notice notice-alt',
+				successes:     success,
+				errors:        error,
+				errorMessages: errorMessages,
+				type:          response.install
+			} ) );
+
+			$bulkActionNotice = $( '#bulk-action-notice' ).on( 'click', 'button', function() {
+				// $( this ) is the clicked button, no need to get it again.
+				$( this )
+					.toggleClass( 'bulk-action-errors-collapsed' )
+					.attr( 'aria-expanded', ! $( this ).hasClass( 'bulk-action-errors-collapsed' ) );
+				// Show the errors list.
+				$bulkActionNotice.find( '.bulk-action-errors' ).toggleClass( 'hidden' );
+			} );
+
+			if ( ! wp.updates.queue.length ) {
+				if ( error > 0 ) {
+					$target
+						.removeClass( 'updating-message' ).addClass( 'disabled' )
+						.text( wp.updates.l10n.installFailedShort );
+
+					wp.a11y.speak( wp.updates.l10n.installedMsg, 'polite' );
+
+					$( '.theme-about' ).animate( { scrollTop: 0 } );
+				} else {
+					$target
+						.removeClass( 'updating-message' ).addClass( 'disabled' )
+						.text( wp.updates.l10n.pluginInstalled );
+
+					wp.a11y.speak( wp.updates.l10n.installedMsg, 'polite' );
+
+					$( '.plugins-activate' ).removeAttr( 'disabled' );
+				}
+			}
+		} );
+
+		// Reset admin notice template after #bulk-action-notice was added.
+		$( document ).on( 'wp-updates-notice-added', function() {
+			wp.updates.adminNotice = wp.template( 'wp-updates-admin-notice' );
+		} );
+
+		// Check the queue, now that the event handlers have been added.
+		wp.updates.queueChecker();
 	},
 
 	deleteDemo: function( event ) {
@@ -1219,6 +1356,30 @@ $( document ).ready( function() {
 		var frame = $( '#tab-panel-themegrill_demo_importer_guided_tour_tab iframe' );
 
 		frame.attr( 'src', frame.data( 'src' ) );
+	});
+
+	// Make disabled checkbox always checked through data-checked.
+	$( document.body ).on( 'click', 'thead .check-column :checkbox', function( event ) {
+		var $this = $( this ),
+			$table = $this.closest( 'table' ),
+			controlChecked = $this.prop( 'checked' ),
+			toggle = event.shiftKey || $this.data( 'wp-toggle' );
+
+		$table.children( 'tbody' ).filter( ':visible' )
+			.children().children( '.check-column' ).find( ':checkbox' )
+			.prop( 'checked', function() {
+				if ( $( this ).is( ':hidden,:disabled' ) ) {
+					return $( this ).data( 'checked' ) ? true : false;
+				}
+
+				if ( toggle ) {
+					return ! $( this ).prop( 'checked' );
+				} else if ( controlChecked ) {
+					return true;
+				}
+
+				return false;
+			});
 	});
 });
 

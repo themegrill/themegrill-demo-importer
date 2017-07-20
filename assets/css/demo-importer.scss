@@ -109,44 +109,66 @@
 table.plugins-list-table {
 	margin-bottom: 1em;
 
-	tr:nth-child( 2n ) {
-		th, td {
-			background: #fcfcfc;
-		}
-	}
-
-	th {
-		padding: 9px;
-		font-weight: 600;
-	}
-
-	td {
-		padding: 9px;
-		font-size: 1.1em;
-
-		mark {
-			background: transparent none;
-		}
-
-		mark.yes {
-			color: #7ad03a;
-		}
-
-		mark.no {
-			color: #999;
-		}
-
-		mark.error {
-			color: #a00;
-		}
-	}
-
 	.plugin-status {
 		text-align: center;
+
+		span {
+			width: 20px;
+			height: 20px;
+			visibility: hidden;
+			vertical-align: top;
+			display: inline-block;
+
+			&::before {
+				visibility: visible;
+				display: inline-block;
+				font: normal 20px/1 'dashicons';
+				transition: color 0.1s ease-in 0;
+				-webkit-font-smoothing: antialiased;
+				-moz-osx-font-smoothing: grayscale;
+			}
+		}
+
+		.active {
+			&::before {
+				color: #7ad03a;
+				content: '\f147';
+			}
+		}
+
+		.install-now,
+		.activate-now {
+			&::before {
+				color: #a00;
+				content: '\f153';
+			}
+		}
+
+		.activate-now {
+			&::before {
+				content: '\f534';
+			}
+		}
+
+		.updating-message {
+			&::before {
+				color: #f56e28;
+				content: '\f463';
+				animation: rotation 2s infinite linear;
+			}
+		}
 	}
 
-	.plugins-install {
-		float: right;
+	.plugin-actions {
+		.plugins-install,
+		.plugins-activate {
+			float: right;
+			transform: none;
+		}
+
+		.plugins-install {
+			margin-left: 8px;
+		}
 	}
 }
 

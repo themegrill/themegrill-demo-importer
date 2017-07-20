@@ -108,7 +108,7 @@
 
 		$document.trigger( 'wp-demo-import-success', response );
 
-		$message = $card.find( '.button-primary' )
+		$message = $card.find( '.button-primary:not(.plugins-install)' )
 			.removeClass( 'updating-message' )
 			.addClass( 'updated-message disabled' )
 			.attr( 'aria-label', wp.updates.l10n.demoImportedLabel.replace( '%s', response.demoName ) )
@@ -252,6 +252,101 @@
 	};
 
 	/**
+	 * Sends an Ajax request to the server to install a plugin.
+	 *
+	 * @param {object}                    args         Arguments.
+	 * @param {string}                    args.slug    Plugin identifier in the WordPress.org Plugin repository.
+	 * @param {bulkInstallPluginSuccess=} args.success Optional. Success callback. Default: wp.updates.bulkInstallPluginSuccess
+	 * @param {bulkInstallPluginError=}   args.error   Optional. Error callback. Default: wp.updates.bulkInstallPluginError
+	 * @return {$.promise} A jQuery promise that represents the request,
+	 *                     decorated with an abort() method.
+	 */
+	wp.updates.bulkInstallPlugin = function( args ) {
+		var $pluginRow = $( 'tr[data-slug="' + args.slug + '"]' ),
+			$message   = $pluginRow.find( '.plugin-status span' );
+
+		args = _.extend( {
+			success: wp.updates.bulkInstallPluginSuccess,
+			error: wp.updates.bulkInstallPluginError
+		}, args );
+
+		if ( $message.html() !== wp.updates.l10n.installing ) {
+			$message.data( 'originaltext', $message.html() );
+		}
+
+		$message
+			.addClass( 'updating-message' )
+			.attr( 'aria-label', wp.updates.l10n.pluginInstallingLabel.replace( '%s', $pluginRow.data( 'name' ) ) )
+			.text( wp.updates.l10n.installing );
+
+		wp.a11y.speak( wp.updates.l10n.installingMsg, 'polite' );
+
+		$document.trigger( 'wp-plugin-bulk-installing', args );
+
+		return wp.updates.ajax( 'install-plugin', args );
+	};
+
+	/**
+	 * Updates the UI appropriately after a successful plugin install.
+	 *
+	 * @typedef {object} installPluginSuccess
+	 * @param {object} response             Response from the server.
+	 * @param {string} response.slug        Slug of the installed plugin.
+	 * @param {string} response.pluginName  Name of the installed plugin.
+	 * @param {string} response.activateUrl URL to activate the just installed plugin.
+	 */
+	wp.updates.bulkInstallPluginSuccess = function( response ) {
+		var $pluginRow     = $( 'tr[data-slug="' + response.slug + '"]' ).removeClass( 'install' ).addClass( 'installed' ),
+			$updateMessage = $pluginRow.find( '.plugin-status span' );
+
+		$updateMessage
+			.removeClass( 'updating-message install-now' )
+			.addClass( 'updated-message activate-now' )
+			.attr( 'aria-label', wp.updates.l10n.pluginInstalledLabel.replace( '%s', response.pluginName ) )
+			.text( wp.updates.l10n.pluginInstalled );
+
+		wp.a11y.speak( wp.updates.l10n.installedMsg, 'polite' );
+
+		$document.trigger( 'wp-plugin-bulk-install-success', response );
+	};
+
+	/**
+	 * Updates the UI appropriately after a failed plugin install.
+	 *
+	 * @typedef {object} installPluginError
+	 * @param {object}  response              Response from the server.
+	 * @param {string}  response.slug         Slug of the plugin to be installed.
+	 * @param {string=} response.pluginName   Optional. Name of the plugin to be installed.
+	 * @param {string}  response.errorCode    Error code for the error that occurred.
+	 * @param {string}  response.errorMessage The error that occurred.
+	 */
+	wp.updates.bulkInstallPluginError = function( response ) {
+		var $pluginRow     = $( 'tr[data-slug="' + response.slug + '"]' ),
+			$updateMessage = $pluginRow.find( '.plugin-status span' ),
+			errorMessage;
+
+		if ( ! wp.updates.isValidResponse( response, 'install' ) ) {
+			return;
+		}
+
+		if ( wp.updates.maybeHandleCredentialError( response, 'install-plugin' ) ) {
+			return;
+		}
+
+		errorMessage = wp.updates.l10n.installFailed.replace( '%s', response.errorMessage );
+
+		$updateMessage
+			.removeClass( 'updating-message' )
+			.addClass( 'updated-message' )
+			.attr( 'aria-label', wp.updates.l10n.pluginInstallFailedLabel.replace( '%s', $pluginRow.data( 'name' ) ) )
+			.text( wp.updates.l10n.installFailedShort );
+
+		wp.a11y.speak( errorMessage, 'assertive' );
+
+		$document.trigger( 'wp-plugin-bulk-install-error', response );
+	};
+
+	/**
 	 * Validates an AJAX response to ensure it's a proper object.
 	 *
 	 * If the response deems to be invalid, an admin notice is being displayed.
@@ -329,6 +424,10 @@
 
 			case 'delete-demo':
 				wp.updates.deleteDemo( job.data );
+				break;
+
+			case 'install-plugin':
+				wp.updates.bulkInstallPlugin( job.data );
 				break;
 
 			default:

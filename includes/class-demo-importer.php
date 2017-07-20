@@ -206,15 +206,16 @@ class TG_Demo_Importer {
 			wp_localize_script( 'tg-demo-importer', 'demoImporterLocalizeScript', array(
 				'demos'    => $this->prepare_demos_for_js( tg_demo_installer_preview() ? $this->demo_packages : $this->demo_config ),
 				'settings' => array(
-					'isPreview'     => tg_demo_installer_preview(),
-					'isInstall'     => tg_demo_installer_enabled(),
-					'canInstall'    => current_user_can( 'upload_files' ),
-					'installURI'    => current_user_can( 'upload_files' ) ? self_admin_url( 'themes.php?page=demo-importer&browse=preview' ) : null,
-					'confirmReset'  => __( 'It is strongly recommended that you backup your database before proceeding. Are you sure you wish to run the reset wizard now?', 'themegrill-demo-importer' ),
-					'confirmDelete' => __( "Are you sure you want to delete this demo?\n\nClick 'Cancel' to go back, 'OK' to confirm the delete.", 'themegrill-demo-importer' ),
-					'confirmImport' => __( 'Importing demo content will replicate the live demo and overwrites your current customizer, widgets and other settings. It might take few minutes to complete the demo import. Are you sure you want to import this demo?', 'themegrill-demo-importer' ),
-					'ajaxUrl'       => admin_url( 'admin-ajax.php' ),
-					'adminUrl'      => parse_url( self_admin_url(), PHP_URL_PATH ),
+					'isPreview'      => tg_demo_installer_preview(),
+					'isInstall'      => tg_demo_installer_enabled(),
+					'canInstall'     => current_user_can( 'upload_files' ),
+					'installURI'     => current_user_can( 'upload_files' ) ? self_admin_url( 'themes.php?page=demo-importer&browse=preview' ) : null,
+					'confirmReset'   => __( 'It is strongly recommended that you backup your database before proceeding. Are you sure you wish to run the reset wizard now?', 'themegrill-demo-importer' ),
+					'confirmDelete'  => __( "Are you sure you want to delete this demo?\n\nClick 'Cancel' to go back, 'OK' to confirm the delete.", 'themegrill-demo-importer' ),
+					'confirmImport'  => __( 'Importing demo content will replicate the live demo and overwrites your current customizer, widgets and other settings. It might take few minutes to complete the demo import. Are you sure you want to import this demo?', 'themegrill-demo-importer' ),
+					'confirmInstall' => __( 'Are you sure you want to install the selected plugins and their data?', 'themegrill-demo-importer' ),
+					'ajaxUrl'        => admin_url( 'admin-ajax.php' ),
+					'adminUrl'       => parse_url( self_admin_url(), PHP_URL_PATH ),
 				),
 				'l10n' => array(
 					'addNew'            => __( 'Add New Demo', 'themegrill-demo-importer' ),
@@ -484,6 +485,16 @@ class TG_Demo_Importer {
 				// Plugins status.
 				foreach ( $plugins_list as $plugin => $plugin_data ) {
 					$plugins_list[ $plugin ]['is_active'] = is_plugin_active( $plugin_data['slug'] );
+
+					// Looks like a plugin is installed, but not active.
+					if ( file_exists( WP_PLUGIN_DIR . '/' . $plugin ) ) {
+						$plugins = get_plugins( '/' . $plugin );
+						if ( ! empty( $plugins ) ) {
+							$plugins_list[ $plugin ]['is_install'] = true;
+						}
+					} else {
+						$plugins_list[ $plugin ]['is_install'] = false;
+					}
 				}
 
 				// Add demo notices.
@@ -511,18 +522,22 @@ class TG_Demo_Importer {
 					);
 				} else {
 					$prepared_demos[ $demo_id ] = array(
-						'id'               => $demo_id,
-						'name'             => $demo_data['name'],
-						'theme'            => $demo_data['theme'],
-						'package'          => $demo_package,
-						'screenshot'       => $this->import_file_url( $demo_id, 'screenshot.jpg' ),
-						'description'      => $description,
-						'author'           => $author,
-						'authorAndUri'     => '<a href="https://themegrill.com" target="_blank">ThemeGrill</a>',
-						'version'          => $version,
-						'active'           => $demo_id === $demo_activated_id,
-						'hasNotice'        => $demo_notices,
-						'plugins'          => $plugins_list,
+						'id'              => $demo_id,
+						'name'            => $demo_data['name'],
+						'theme'           => $demo_data['theme'],
+						'package'         => $demo_package,
+						'screenshot'      => $this->import_file_url( $demo_id, 'screenshot.jpg' ),
+						'description'     => $description,
+						'author'          => $author,
+						'authorAndUri'    => '<a href="https://themegrill.com" target="_blank">ThemeGrill</a>',
+						'version'         => $version,
+						'active'          => $demo_id === $demo_activated_id,
+						'hasNotice'       => $demo_notices,
+						'plugins'         => $plugins_list,
+						'pluginActions'   => array(
+							'install'  => wp_list_filter( $plugins_list, array( 'is_install' => false ) ) ? true : false,
+							'activate' => wp_list_filter( $plugins_list, array( 'is_active' => false ) ) ? true : false,
+						),
 						'actions'         => array(
 							'preview'  => home_url( '/' ),
 							'demo_url' => $demo_data['demo_url'],
