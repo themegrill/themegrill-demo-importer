@@ -574,13 +574,12 @@ demos.view.Details = wp.Backbone.View.extend({
 			if ( ! $itemRow.hasClass( 'install' ) || $itemRow.find( 'notice-error' ).length ) {
 
 				// Un-check the box.
-				$checkbox.prop( 'checked', false );
+				$checkbox.filter( ':not(:disabled)' ).prop( 'checked', false );
 				return;
+			} else {
+				$target.addClass( 'updating-message' ).text( wp.updates.l10n.installing );
 			}
 
-			$target
-				.addClass( 'updating-message' )
-				.text( wp.updates.l10n.installing );
 			wp.a11y.speak( wp.updates.l10n.installingMsg, 'polite' );
 
 			// Add it to the queue.
