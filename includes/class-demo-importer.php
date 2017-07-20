@@ -484,20 +484,17 @@ class TG_Demo_Importer {
 
 				// Plugins status.
 				foreach ( $plugins_list as $plugin => $plugin_data ) {
-					$is_plugin_active = $is_plugin_installed = false;
+					$plugins_list[ $plugin ]['is_active'] = is_plugin_active( $plugin_data['slug'] );
 
+					// Looks like a plugin is installed, but not active.
 					if ( file_exists( WP_PLUGIN_DIR . '/' . $plugin ) ) {
-						// Looks like a plugin is installed, but not active.
 						$plugins = get_plugins( '/' . $plugin );
 						if ( ! empty( $plugins ) ) {
-							$is_plugin_active = true;
+							$plugins_list[ $plugin ]['is_install'] = true;
 						}
-					} elseif ( is_plugin_active( $plugin_data['slug'] ) ) {
-						$is_plugin_installed = true;
+					} else {
+						$plugins_list[ $plugin ]['is_install'] = false;
 					}
-
-					$plugins_list[ $plugin ]['is_active']  = $is_plugin_active;
-					$plugins_list[ $plugin ]['is_install'] = $is_plugin_installed;
 				}
 
 				// Add demo notices.
