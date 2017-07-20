@@ -535,7 +535,7 @@ demos.view.Details = wp.Backbone.View.extend({
 
 		event.preventDefault();
 
-		if ( $target.hasClass( 'updating-message' ) ) {
+		if ( $target.hasClass( 'disabled' ) || $target.hasClass( 'updating-message' ) ) {
 			return;
 		}
 
@@ -577,10 +577,12 @@ demos.view.Details = wp.Backbone.View.extend({
 				$checkbox.filter( ':not(:disabled)' ).prop( 'checked', false );
 				return;
 			} else {
-				$target.addClass( 'updating-message' ).text( wp.updates.l10n.installing );
-			}
+				$target
+					.addClass( 'updating-message' )
+					.text( wp.updates.l10n.installing );
 
-			wp.a11y.speak( wp.updates.l10n.installingMsg, 'polite' );
+				wp.a11y.speak( wp.updates.l10n.installingMsg, 'polite' );
+			}
 
 			// Add it to the queue.
 			wp.updates.queue.push( {
