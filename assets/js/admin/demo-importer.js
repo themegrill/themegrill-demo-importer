@@ -606,7 +606,7 @@ demos.view.Details = wp.Backbone.View.extend({
 				errorMessages.push( itemName + ': ' + response.errorMessage );
 			}
 
-			$itemRow.find( 'input[name="checked[]"]:checked' ).prop( 'checked', false );
+			$itemRow.find( 'input[name="checked[]"]:checked' ).filter( ':not(:disabled)' ).prop( 'checked', false );
 
 			wp.updates.adminNotice = wp.template( 'wp-bulk-installs-admin-notice' );
 
