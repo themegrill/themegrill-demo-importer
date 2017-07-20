@@ -633,23 +633,23 @@ demos.view.Details = wp.Backbone.View.extend({
 			} );
 
 			if ( ! wp.updates.queue.length ) {
-				$target
-					.removeClass( 'updating-message' ).addClass( 'updated-message button-disabled' )
-					.text( wp.updates.l10n.pluginInstalled );
-				wp.a11y.speak( wp.updates.l10n.installedMsg, 'polite' );
+				if ( error > 0 ) {
+					$target
+						.removeClass( 'updating-message' ).addClass( 'disabled' )
+						.text( wp.updates.l10n.installFailedShort );
 
-				if ( ! error ) {
+					wp.a11y.speak( wp.updates.l10n.installedMsg, 'polite' );
+
+					$( '.theme-about' ).animate( { scrollTop: 0 } );
+				} else {
+					$target
+						.removeClass( 'updating-message' ).addClass( 'disabled' )
+						.text( wp.updates.l10n.pluginInstalled );
+
+					wp.a11y.speak( wp.updates.l10n.installedMsg, 'polite' );
+
 					$( '.plugins-activate' ).removeAttr( 'disabled' );
 				}
-			}
-
-			if ( error > 0 && ! wp.updates.queue.length ) {
-				$target
-					.removeClass( 'updated-message updating-message' ).addClass( 'button-disabled' )
-					.text( wp.updates.l10n.installFailedShort );
-				wp.a11y.speak( wp.updates.l10n.installedMsg, 'polite' );
-
-				$( '.theme-about' ).animate( { scrollTop: 0 } );
 			}
 		} );
 
