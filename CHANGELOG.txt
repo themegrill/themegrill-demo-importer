@@ -1,5 +1,13 @@
 == Changelog ==
 
+= 1.4.0 - 20/07/2017 =
+* Feature - Plugin installer and activator mechinism.
+* Fix - Call to undefined function `preg_filter()`.
+* Dev - Improved file structure.
+* Dev - Introduced `tg_demo_installer_enabled()`.
+* Dev - Introduced `tg_demo_installer_preview()`.
+* Dev - Introduced `tg_demo_preview_screenshot_url()`.
+
 = 1.3.4 03/07/2017 =
 * Feature - Support RTL for Importer.
 * Feature - Reset wizard for clean up.

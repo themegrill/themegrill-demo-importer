@@ -67,8 +67,13 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 
 == Changelog ==
 
-= 1.4.0 - TBD =
+= 1.4.0 - 20/07/2017 =
+* Feature - Plugin installer and activator mechinism.
+* Fix - Call to undefined function `preg_filter()`.
 * Dev - Improved file structure.
+* Dev - Introduced `tg_demo_installer_enabled()`.
+* Dev - Introduced `tg_demo_installer_preview()`.
+* Dev - Introduced `tg_demo_preview_screenshot_url()`.
 
 [See changelog for all versions](https://raw.githubusercontent.com/themegrill/themegrill-demo-importer/master/CHANGELOG.txt).
 
