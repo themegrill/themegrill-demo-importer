@@ -1356,6 +1356,30 @@ $( document ).ready( function() {
 
 		frame.attr( 'src', frame.data( 'src' ) );
 	});
+
+	// Make checked and disabled checkbox always checked.
+	$( document.body ).on( 'click', 'thead .check-column :checkbox', function( event ) {
+		var $this = $( this ),
+			$table = $this.closest( 'table' ),
+			controlChecked = $this.prop( 'checked' ),
+			toggle = event.shiftKey || $this.data( 'wp-toggle' );
+
+		$table.children( 'tbody' ).filter( ':visible' )
+			.children().children( '.check-column' ).find( ':checkbox' )
+			.prop( 'checked', function() {
+				if ( $( this ).is( ':hidden,:disabled' ) ) {
+					return $( this ).data( 'checked' ) ? true : false;
+				}
+
+				if ( toggle ) {
+					return ! $( this ).prop( 'checked' );
+				} else if ( controlChecked ) {
+					return true;
+				}
+
+				return false;
+			});
+	});
 });
 
 })( jQuery );
