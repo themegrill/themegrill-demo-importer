@@ -1357,7 +1357,7 @@ $( document ).ready( function() {
 		frame.attr( 'src', frame.data( 'src' ) );
 	});
 
-	// Make checked and disabled checkbox always checked.
+	// Make disabled checkbox always checked through data-checked.
 	$( document.body ).on( 'click', 'thead .check-column :checkbox', function( event ) {
 		var $this = $( this ),
 			$table = $this.closest( 'table' ),
