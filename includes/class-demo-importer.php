@@ -457,11 +457,7 @@ class TG_Demo_Importer {
 
 			check_admin_referer( 'bulk-plugins-activate' );
 
-			$plugins  = isset( $_POST['checked'] ) ? (array) $_POST['checked'] : array();
-			$required = isset( $_POST['required'] ) ? (array) $_POST['required'] : array();
-
-			// Allow Required plugins.
-			$plugins = array_merge( $required, $plugins );
+			$plugins = isset( $_POST['checked'] ) ? (array) $_POST['checked'] : array();
 
 			if ( is_network_admin() ) {
 				foreach ( $plugins as $i => $plugin ) {

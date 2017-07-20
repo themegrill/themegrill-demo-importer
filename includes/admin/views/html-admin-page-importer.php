@@ -190,7 +190,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 											<label class="screen-reader-text" for="{{ checkboxIdPrefix }}"><?php printf( __( 'Select %s', 'themegrill-demo-importer' ), '{{ plugin.name }}' ); ?></label>
 											<input type="checkbox" name="checked[]" value="{{ plugin.slug }}" id="{{ checkboxIdPrefix }}"<# if ( plugin.required ) { #> data-checked="1" checked="checked" disabled="disabled"<# } #>>
 											<# if ( plugin.required ) { #>
-												<input type="hidden" name="required[]" value="{{ plugin.slug }}">
+												<input type="hidden" name="checked[]" value="{{ plugin.slug }}">
 											<# } #>
 										</th>
 										<td class="plugin-name">
