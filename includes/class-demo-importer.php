@@ -267,21 +267,19 @@ class TG_Demo_Importer {
 		$video_map = array(
 			'demo-importer' => array(
 				'title' => __( 'Importing Demo', 'themegrill-demo-importer' ),
-				'id'    => 'ctdquor9uh',
+				'id'    => 'Ou6_rgjw6is',
 			),
 		);
 
 		$video_key = empty( $_GET['page'] ) ? $screen->id : sanitize_title( $_GET['page'] );
 
 		if ( ! tg_demo_installer_enabled() && isset( $video_map[ $video_key ] ) ) {
+			$embed_code = str_replace( '?feature=oembed', '?feature=oembed&modestbranding=1&scolor=white', wp_oembed_get( 'https://www.youtube.com/watch?v=' . $video_map[ $video_key ]['id'] ) );
+
 			$screen->add_help_tab( array(
-				'id'        => 'themegrill_demo_importer_guided_tour_tab',
-				'title'     => __( 'Guided Tour', 'themegrill-demo-importer' ),
-				'content'   =>
-					'<h2>' . __( 'Guided Tour', 'themegrill-demo-importer' ) . ' &ndash; ' . esc_html( $video_map[ $video_key ]['title'] ) . '</h2>' .
-					'<script src="//fast.wistia.net/assets/external/E-v1.js" aync></script>
-					<div class="wistia_embed wistia_async_' . esc_attr( $video_map[ $video_key ]['id'] ) . ' videoFoam=true seo=false" style="width:640px;height:360px;">&nbsp;</div>
-				',
+				'id'      => 'themegrill_demo_importer_guided_tour_tab',
+				'title'   => __( 'Guided Tour', 'themegrill-demo-importer' ),
+				'content' => '<h2>' . __( 'Guided Tour', 'themegrill-demo-importer' ) . ' &ndash; ' . esc_html( $video_map[ $video_key ]['title'] ) . '</h2>' . $embed_code,
 			) );
 		}
 

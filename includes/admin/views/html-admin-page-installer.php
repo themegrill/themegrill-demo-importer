@@ -9,6 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 global $current_filter;
 
+$embed_code        = str_replace( '?feature=oembed', '?feature=oembed&modestbranding=1&scolor=white', wp_oembed_get( 'https://www.youtube.com/watch?v=rhiybsv3vUU', array( 'width' => '560px', 'height' => '315px' ) ) );
 $current_filter    = empty( $_GET['browse'] ) ? 'welcome' : sanitize_title( $_GET['browse'] );
 $demo_filter_links = apply_filters( 'themegrill_demo_importer_filter_links_array', array(
 	'welcome' => __( 'Welcome', 'themegrill-demo-importer' ),
@@ -80,7 +81,7 @@ $demo_filter_links = apply_filters( 'themegrill_demo_importer_filter_links_array
 			</div>
 			<div class="welcome-panel-iframe-video">
 				<div class="welcome-panel-iframe-video-inner">
-					<iframe width="560" height="315" src="<?php echo esc_url( 'https://www.youtube.com/embed/rhiybsv3vUU?rel=0&amp;showinfo=0' ); ?>" allowtransparency="true" frameborder="0" scrolling="no" allowfullscreen mozallowfullscreen webkitallowfullscreen oallowfullscreen msallowfullscreen></iframe>
+					<?php echo $embed_code; ?>
 				</div>
 			</div>
 		</div>
