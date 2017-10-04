@@ -76,7 +76,7 @@ final class ThemeGrill_Demo_Importer {
 	 * Define TGDM Constants.
 	 */
 	private function define_constants() {
-		$upload_dir = wp_upload_dir();
+		$upload_dir = wp_upload_dir( null, false );
 
 		$this->define( 'TGDM_PLUGIN_FILE', __FILE__ );
 		$this->define( 'TGDM_ABSPATH', dirname( TGDM_PLUGIN_FILE ) . '/' );
