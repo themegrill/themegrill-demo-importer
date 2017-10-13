@@ -274,7 +274,10 @@ class TG_Demo_Importer {
 		$video_key = empty( $_GET['page'] ) ? $screen->id : sanitize_title( $_GET['page'] );
 
 		if ( ! tg_demo_installer_enabled() && isset( $video_map[ $video_key ] ) ) {
-			$embed_code = str_replace( '?feature=oembed', '?feature=oembed&modestbranding=1&scolor=white', wp_oembed_get( 'https://www.youtube.com/watch?v=' . $video_map[ $video_key ]['id'] ) );
+			$embed_code = '
+				<a href="https://www.youtube.com/watch?v=' . esc_attr( $video_map[ $video_key ]['id'] ) . '" target="_blank" class="themegrill-demo-importer-guided-tour-embed" data-video_id="' . esc_attr( $video_map[ $video_key ]['id'] ) . '">
+					<img src="https://img.youtube.com/vi/' . esc_attr( $video_map[ $video_key ]['id'] ) . '/maxresdefault.jpg" width="560" height="315" />
+				</a>';
 
 			$screen->add_help_tab( array(
 				'id'      => 'themegrill_demo_importer_guided_tour_tab',
