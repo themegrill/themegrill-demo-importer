@@ -29,23 +29,26 @@ if ( ! defined( 'ABSPATH' ) ) {
 					/* translators: %s: Demo author name */
 					printf( __( 'By %s', 'themegrill-demo-importer' ), $demo['author'] );
 				?></div>
-				<h3 class="theme-name"><?php echo esc_html( $demo['name'] ); ?></h3>
 
-				<div class="theme-actions">
-					<?php if ( ! $demo['installed'] && ! $demo['actions']['pro_link'] ) : ?>
-						<?php
-						/* translators: %s: Demo name */
-						$aria_label = sprintf( _x( 'Download %s', 'demo', 'themegrill-demo-importer' ), esc_attr( $demo['name'] ) );
-						?>
-						<a class="button button-primary demo-download" data-name="<?php echo esc_attr( $demo['name'] ); ?>" href="<?php echo esc_url( $demo['actions']['download_url'] ); ?>" aria-label="<?php echo esc_attr( $aria_label ); ?>"><?php _e( 'Download', 'themegrill-demo-importer' ); ?></a>
-					<?php elseif ( $demo['actions']['pro_link'] ) : ?>
-						<?php
-						/* translators: %s: Demo name */
-						$aria_label = sprintf( _x( 'View %s Pro', 'demo', 'themegrill-demo-importer' ), esc_attr( $demo['name'] ) );
-						?>
-						<a class="button button-primary demo-premium" target="_blank" data-name="<?php echo esc_attr( $demo['name'] ); ?>" href="<?php echo esc_url( $demo['actions']['pro_link'] ); ?>" aria-label="<?php echo esc_attr( $aria_label ); ?>"><?php _e( 'View Pro', 'themegrill-demo-importer' ); ?></a>
-					<?php endif; ?>
-					<a class="button button-secondary demo-preview" target="_blank" href="<?php echo esc_url( $demo['actions']['preview_url'] ); ?>"><?php _e( 'Preview', 'themegrill-demo-importer' ); ?></a>
+				<div class="theme-id-container">
+					<h3 class="theme-name"><?php echo esc_html( $demo['name'] ); ?></h3>
+
+					<div class="theme-actions">
+						<?php if ( ! $demo['installed'] && ! $demo['actions']['pro_link'] ) : ?>
+							<?php
+							/* translators: %s: Demo name */
+							$aria_label = sprintf( _x( 'Download %s', 'demo', 'themegrill-demo-importer' ), esc_attr( $demo['name'] ) );
+							?>
+							<a class="button button-primary demo-download" data-name="<?php echo esc_attr( $demo['name'] ); ?>" href="<?php echo esc_url( $demo['actions']['download_url'] ); ?>" aria-label="<?php echo esc_attr( $aria_label ); ?>"><?php _e( 'Download', 'themegrill-demo-importer' ); ?></a>
+						<?php elseif ( $demo['actions']['pro_link'] ) : ?>
+							<?php
+							/* translators: %s: Demo name */
+							$aria_label = sprintf( _x( 'View %s Pro', 'demo', 'themegrill-demo-importer' ), esc_attr( $demo['name'] ) );
+							?>
+							<a class="button button-primary demo-premium" target="_blank" data-name="<?php echo esc_attr( $demo['name'] ); ?>" href="<?php echo esc_url( $demo['actions']['pro_link'] ); ?>" aria-label="<?php echo esc_attr( $aria_label ); ?>"><?php _e( 'View Pro', 'themegrill-demo-importer' ); ?></a>
+						<?php endif; ?>
+						<a class="button button-secondary demo-preview" target="_blank" href="<?php echo esc_url( $demo['actions']['preview_url'] ); ?>"><?php _e( 'Preview', 'themegrill-demo-importer' ); ?></a>
+					</div>
 				</div>
 
 				<?php if ( $demo['installed'] ) : ?>

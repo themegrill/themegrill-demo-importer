@@ -113,34 +113,36 @@ $demo_filter_links = apply_filters( 'themegrill_demo_importer_filter_links_array
 		printf( __( 'By %s', 'themegrill-demo-importer' ), '{{{ data.author }}}' );
 	?></div>
 
-	<# if ( data.active ) { #>
-		<h2 class="theme-name" id="{{ data.id }}-name"><?php
-			/* translators: %s: Demo name */
-			printf( __( '<span>Imported:</span> %s', 'themegrill-demo-importer' ), '{{{ data.name }}}' );
-		?></h2>
-	<# } else { #>
-		<h2 class="theme-name" id="{{ data.id }}-name">{{{ data.name }}}</h2>
-	<# } #>
-
-	<div class="theme-actions">
+	<div class="theme-id-container">
 		<# if ( data.active ) { #>
-			<a class="button button-primary live-preview" target="_blank" href="{{{ data.actions.preview }}}"><?php _e( 'Live Preview', 'themegrill-demo-importer' ); ?></a>
-		<# } else { #>
-			<# if ( ! _.isEmpty( data.hasNotice ) ) { #>
-				<# if ( data.hasNotice['required_theme'] ) { #>
-					<a class="button button-primary hide-if-no-js tips demo-import disabled" href="#" data-name="{{ data.name }}" data-slug="{{ data.id }}" data-tip="<?php echo esc_attr( sprintf( __( 'Required %s theme must be activated to import this demo.', 'themegrill-demo-importer' ), '{{{ data.theme }}}' ) ); ?>"><?php _e( 'Import', 'themegrill-demo-importer' ); ?></a>
-				<# } else if ( data.hasNotice['required_plugins'] ) { #>
-					<a class="button button-primary hide-if-no-js tips demo-import disabled" href="#" data-name="{{ data.name }}" data-slug="{{ data.id }}" data-tip="<?php echo esc_attr( 'Required Plugin must be activated to import this demo.', 'themegrill-demo-importer' ); ?>"><?php _e( 'Import', 'themegrill-demo-importer' ); ?></a>
-				<# } #>
-			<# } else { #>
-				<?php
+			<h2 class="theme-name" id="{{ data.id }}-name"><?php
 				/* translators: %s: Demo name */
-				$aria_label = sprintf( _x( 'Import %s', 'demo', 'themegrill-demo-importer' ), '{{ data.name }}' );
-				?>
-				<a class="button button-primary hide-if-no-js demo-import" href="#" data-name="{{ data.name }}" data-slug="{{ data.id }}" aria-label="<?php echo $aria_label; ?>"><?php _e( 'Import', 'themegrill-demo-importer' ); ?></a>
-			<# } #>
-			<a class="button button-secondary demo-preview" target="_blank" href="{{{ data.actions.demo_url }}}"><?php _e( 'Preview', 'themegrill-demo-importer' ); ?></a>
+				printf( __( '<span>Imported:</span> %s', 'themegrill-demo-importer' ), '{{{ data.name }}}' );
+			?></h2>
+		<# } else { #>
+			<h2 class="theme-name" id="{{ data.id }}-name">{{{ data.name }}}</h2>
 		<# } #>
+
+		<div class="theme-actions">
+			<# if ( data.active ) { #>
+				<a class="button button-primary live-preview" target="_blank" href="{{{ data.actions.preview }}}"><?php _e( 'Live Preview', 'themegrill-demo-importer' ); ?></a>
+			<# } else { #>
+				<# if ( ! _.isEmpty( data.hasNotice ) ) { #>
+					<# if ( data.hasNotice['required_theme'] ) { #>
+						<a class="button button-primary hide-if-no-js tips demo-import disabled" href="#" data-name="{{ data.name }}" data-slug="{{ data.id }}" data-tip="<?php echo esc_attr( sprintf( __( 'Required %s theme must be activated to import this demo.', 'themegrill-demo-importer' ), '{{{ data.theme }}}' ) ); ?>"><?php _e( 'Import', 'themegrill-demo-importer' ); ?></a>
+					<# } else if ( data.hasNotice['required_plugins'] ) { #>
+						<a class="button button-primary hide-if-no-js tips demo-import disabled" href="#" data-name="{{ data.name }}" data-slug="{{ data.id }}" data-tip="<?php echo esc_attr( 'Required Plugin must be activated to import this demo.', 'themegrill-demo-importer' ); ?>"><?php _e( 'Import', 'themegrill-demo-importer' ); ?></a>
+					<# } #>
+				<# } else { #>
+					<?php
+					/* translators: %s: Demo name */
+					$aria_label = sprintf( _x( 'Import %s', 'demo', 'themegrill-demo-importer' ), '{{ data.name }}' );
+					?>
+					<a class="button button-primary hide-if-no-js demo-import" href="#" data-name="{{ data.name }}" data-slug="{{ data.id }}" aria-label="<?php echo $aria_label; ?>"><?php _e( 'Import', 'themegrill-demo-importer' ); ?></a>
+				<# } #>
+				<a class="button button-secondary demo-preview" target="_blank" href="{{{ data.actions.demo_url }}}"><?php _e( 'Preview', 'themegrill-demo-importer' ); ?></a>
+			<# } #>
+		</div>
 	</div>
 
 	<# if ( data.imported ) { #>
