@@ -1,7 +1,7 @@
 === ThemeGrill Demo Importer ===
 Contributors: ThemeGrill, shivapoudel
 Tags: themegrill, themes,  demo, importer, download
-Requires at least: 4.0
+Requires at least: 4.7
 Tested up to: 4.9
 Stable tag: 1.4.0
 License: GPLv3 or later
@@ -21,7 +21,7 @@ Get free support at https://themegrill.com/support-forum/
 
 = Requirements =
 
-* WordPress 4.5 or later.
+* WordPress 4.7 or later.
 * [ThemeGrill Official Themes](https://themegrill.com/wordpress-themes/).
 
 = Contribute =
