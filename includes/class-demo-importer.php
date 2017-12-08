@@ -61,8 +61,9 @@ class TG_Demo_Importer {
 		add_action( 'wp_ajax_import-demo', array( $this, 'ajax_import_demo' ) );
 		add_action( 'wp_ajax_footer-text-rated', array( $this, 'ajax_footer_text_rated' ) );
 
-		// Update custom nav menu items and siteorigin panel data.
+		// Update custom nav menu items, elementor and siteorigin panel data.
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_nav_menu_items' ) );
+		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_elementor_data' ), 10, 2 );
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_siteorigin_data' ), 10, 2 );
 
 		// Update widget and customizer demo import settings data.
@@ -960,10 +961,105 @@ class TG_Demo_Importer {
 	}
 
 	/**
-	 * Recursive function to address n level deep layoutbuilder data update.
-	 * @param  array $panels_data
+	 * Recursive function to address n level deep elementor data update.
+	 *
+	 * @param  array  $elementor_data
 	 * @param  string $data_type
-	 * @param  array $data_value
+	 * @param  array  $data_value
+	 * @return array
+	 */
+	public function elementor_recursive_update( $elementor_data, $data_type, $data_value ) {
+		$elementor_data = json_decode( stripslashes( $elementor_data ), true );
+
+		// Recursively update elementor data.
+		foreach ( $elementor_data as $element_id => $element_data ) {
+			if ( ! empty( $element_data['elements' ] ) ) {
+				foreach ( $element_data['elements'] as $el_key => $el_data ) {
+					if ( ! empty( $el_data['elements'] ) ) {
+						foreach ( $el_data['elements'] as $el_child_key => $child_el_data ) {
+							if ( 'widget' === $child_el_data['elType'] ) {
+								$settings   = isset( $child_el_data['settings'] ) ? $child_el_data['settings'] : array();
+								$widgetType = isset( $child_el_data['widgetType'] ) ? $child_el_data['widgetType'] : '';
+
+								if ( isset( $settings['display_type'] ) && 'categories' === $settings['display_type'] ) {
+									$categories_selected = isset( $settings['categories_selected'] ) ? $settings['categories_selected'] : '';
+
+									if ( ! empty( $data_value['data_update'] ) ) {
+										foreach ( $data_value['data_update'] as $taxonomy => $taxonomy_data ) {
+											if ( ! taxonomy_exists( $taxonomy ) ) {
+												continue;
+											}
+
+											foreach ( $taxonomy_data as $widget_id => $widget_data ) {
+												if ( ! empty( $widget_data ) && $widget_id == $widgetType ) {
+													if ( is_array( $categories_selected ) ) {
+														foreach ( $categories_selected as $cat_key => $cat_id ) {
+															if ( isset( $widget_data[ $cat_id ] ) ) {
+																$term = get_term_by( 'name', $widget_data[ $cat_id ], $taxonomy );
+
+																if ( is_object( $term ) && $term->term_id ) {
+																	$categories_selected[ $cat_key ] = $term->term_id;
+																}
+															}
+														}
+													} elseif ( isset( $widget_data[ $categories_selected ] ) ) {
+														$term = get_term_by( 'name', $widget_data[ $categories_selected ], $taxonomy );
+
+														if ( is_object( $term ) && $term->term_id ) {
+															$categories_selected = $term->term_id;
+														}
+													}
+												}
+											}
+										}
+									}
+
+									// Update the elementor data.
+									$elementor_data[ $element_id ][ 'elements' ][ $el_key ]['elements'][ $el_child_key ]['settings']['categories_selected'] = $categories_selected;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		return wp_json_encode( $elementor_data );
+	}
+
+	/**
+	 * Update elementor settings data.
+	 *
+	 * @param string $demo_id Demo ID.
+	 * @param array  $demo_data Demo Data.
+	 */
+	public function update_elementor_data( $demo_id, $demo_data ) {
+		if ( ! empty( $demo_data['elementor_data_update'] ) ) {
+			foreach ( $demo_data['elementor_data_update'] as $data_type => $data_value ) {
+				if ( ! empty( $data_value['post_title'] ) ) {
+					$page = get_page_by_title( $data_value['post_title'] );
+
+					if ( is_object( $page ) && $page->ID ) {
+						$elementor_data = get_post_meta( $page->ID, '_elementor_data', true );
+
+						if ( ! empty( $elementor_data ) ) {
+							$elementor_data = $this->elementor_recursive_update( $elementor_data, $data_type, $data_value );
+						}
+
+						// Update elementor data.
+						update_post_meta( $page->ID, '_elementor_data', $elementor_data );
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Recursive function to address n level deep layoutbuilder data update.
+	 *
+	 * @param  array  $panels_data
+	 * @param  string $data_type
+	 * @param  array  $data_value
 	 * @return array
 	 */
 	public function siteorigin_recursive_update( $panels_data, $data_type, $data_value ) {
@@ -1044,7 +1140,7 @@ class TG_Demo_Importer {
 														$page = get_page_by_title( $widget_value );
 
 														if ( is_object( $page ) && $page->ID ) {
-														 $widget_instance[ $widget_key ] = $page->ID;
+															$widget_instance[ $widget_key ] = $page->ID;
 														}
 													}
 												}
@@ -1089,8 +1185,9 @@ class TG_Demo_Importer {
 
 	/**
 	 * Update siteorigin panel settings data.
-	 * @param string $demo_id
-	 * @param array  $demo_data
+	 *
+	 * @param string $demo_id Demo ID.
+	 * @param array  $demo_data Demo Data.
 	 */
 	public function update_siteorigin_data( $demo_id, $demo_data ) {
 		if ( ! empty( $demo_data['siteorigin_panels_data_update'] ) ) {
