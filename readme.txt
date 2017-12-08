@@ -67,7 +67,8 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 
 == Changelog ==
 
-= 1.4.1 - XX-12-2017 =
+= 1.4.1 - 08-12-2017 =
+* Feature - Compatiable with Elementor page builder.
 * Fix - Styling issue caused by missing `theme-id-container` container.
 
 [See changelog for all versions](https://raw.githubusercontent.com/themegrill/themegrill-demo-importer/master/CHANGELOG.txt).
