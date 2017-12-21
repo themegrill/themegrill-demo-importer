@@ -307,6 +307,7 @@ function tg_remove_theme_mods() {
  */
 if ( class_exists( 'WooCommerce' ) ) {
 	add_action( 'themegrill_ajax_demo_imported', 'tg_set_wc_pages' );
+	add_filter( 'woocommerce_enable_setup_wizard', '__return_false' );
 }
 
 /**
