@@ -15,6 +15,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 // Include core functions (available in both admin and frontend).
 include_once( TGDM_ABSPATH . 'includes/functions-demo-update.php' );
 
+// Remove WooCommerce setup wizard
+add_filter( 'woocommerce_enable_setup_wizard', '__return_false' );
+
 /**
  * Get an attachment ID from the filename.
  *
@@ -307,7 +310,6 @@ function tg_remove_theme_mods() {
  */
 if ( class_exists( 'WooCommerce' ) ) {
 	add_action( 'themegrill_ajax_demo_imported', 'tg_set_wc_pages' );
-	add_filter( 'woocommerce_enable_setup_wizard', '__return_false' );
 }
 
 /**
