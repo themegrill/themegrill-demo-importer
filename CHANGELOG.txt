@@ -1,5 +1,9 @@
 == Changelog ==
 
+= 1.4.1 - 08-12-2017 =
+* Feature - Compatiable with Elementor page builder.
+* Fix - Styling issue caused by missing `theme-id-container` container.
+
 = 1.4.0 - 20-07-2017 =
 * Feature - Plugin installer and activator mechinism.
 * Fix - Call to undefined function `preg_filter()`.
