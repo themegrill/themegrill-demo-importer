@@ -15,9 +15,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 // Include core functions (available in both admin and frontend).
 include_once( TGDM_ABSPATH . 'includes/functions-demo-update.php' );
 
-// Remove WooCommerce setup wizard
-add_filter( 'woocommerce_enable_setup_wizard', '__return_false' );
-
 /**
  * Get an attachment ID from the filename.
  *

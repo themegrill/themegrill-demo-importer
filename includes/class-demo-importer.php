@@ -57,6 +57,9 @@ class TG_Demo_Importer {
 		// Footer rating text.
 		add_filter( 'admin_footer_text', array( $this, 'admin_footer_text' ), 1 );
 
+		// Disable WooCommerce setup wizard.
+		add_filter( 'woocommerce_enable_setup_wizard', '__return_false', 1 );
+
 		// AJAX Events to import demo and update rating footer.
 		add_action( 'wp_ajax_import-demo', array( $this, 'ajax_import_demo' ) );
 		add_action( 'wp_ajax_footer-text-rated', array( $this, 'ajax_footer_text_rated' ) );
