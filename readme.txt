@@ -3,7 +3,7 @@ Contributors: ThemeGrill, shivapoudel
 Tags: themegrill, themes,  demo, importer, download
 Requires at least: 4.7
 Tested up to: 4.9
-Stable tag: 1.4.1
+Stable tag: 1.4.2
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -67,7 +67,7 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 
 == Changelog ==
 
-= 1.4.2 - XX-12-2017 =
+= 1.4.2 - 25-12-2017 =
 * Fix - Disable WooCommerce setup wizard for demo import.
 * Fix - Styling issue caused by missing `theme-id-container` container.
 
