@@ -305,23 +305,26 @@ $demo_filter_links = apply_filters( 'themegrill_demo_importer_filter_links_array
 		/* translators: %s: Demo author name */
 		printf( __( 'By %s', 'themegrill-demo-importer' ), '{{{ data.author }}}' );
 	?></div>
-	<h3 class="theme-name">{{ data.name }}</h3>
 
-	<div class="theme-actions">
-		<# if ( ! data.installed && ! data.actions.pro_link ) { #>
-			<?php
-			/* translators: %s: Demo name */
-			$aria_label = sprintf( _x( 'Download %s', 'demo', 'themegrill-demo-importer' ), '{{ data.name }}' );
-			?>
-			<a class="button button-primary demo-download" data-name="{{ data.name }}" href="{{ data.actions.download_url }}" aria-label="<?php echo esc_attr( $aria_label ); ?>"><?php _e( 'Download', 'themegrill-demo-importer' ); ?></a>
-		<# } else if ( data.actions.pro_link ) { #>
-			<?php
-			/* translators: %s: Demo name */
-			$aria_label = sprintf( _x( 'View %s Pro', 'demo', 'themegrill-demo-importer' ), '{{ data.name }}' );
-			?>
-			<a class="button button-primary demo-premium" target="_blank" data-name="{{ data.name }}" href="{{ data.actions.pro_link }}" aria-label="<?php echo esc_attr( $aria_label ); ?>"><?php _e( 'View Pro', 'themegrill-demo-importer' ); ?></a>
-		<# } #>
-		<a class="button button-secondary demo-preview" target="_blank" href="{{{ data.actions.preview_url }}}"><?php _e( 'Preview', 'themegrill-demo-importer' ); ?></a>
+	<div class="theme-id-container">
+		<h3 class="theme-name">{{ data.name }}</h3>
+
+		<div class="theme-actions">
+			<# if ( ! data.installed && ! data.actions.pro_link ) { #>
+				<?php
+				/* translators: %s: Demo name */
+				$aria_label = sprintf( _x( 'Download %s', 'demo', 'themegrill-demo-importer' ), '{{ data.name }}' );
+				?>
+				<a class="button button-primary demo-download" data-name="{{ data.name }}" href="{{ data.actions.download_url }}" aria-label="<?php echo esc_attr( $aria_label ); ?>"><?php _e( 'Download', 'themegrill-demo-importer' ); ?></a>
+			<# } else if ( data.actions.pro_link ) { #>
+				<?php
+				/* translators: %s: Demo name */
+				$aria_label = sprintf( _x( 'View %s Pro', 'demo', 'themegrill-demo-importer' ), '{{ data.name }}' );
+				?>
+				<a class="button button-primary demo-premium" target="_blank" data-name="{{ data.name }}" href="{{ data.actions.pro_link }}" aria-label="<?php echo esc_attr( $aria_label ); ?>"><?php _e( 'View Pro', 'themegrill-demo-importer' ); ?></a>
+			<# } #>
+			<a class="button button-secondary demo-preview" target="_blank" href="{{{ data.actions.preview_url }}}"><?php _e( 'Preview', 'themegrill-demo-importer' ); ?></a>
+		</div>
 	</div>
 
 	<# if ( data.installed ) { #>
