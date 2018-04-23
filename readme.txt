@@ -66,6 +66,8 @@ Bugs can be reported either in our support forum or preferably on the [GitHub re
 Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/themegrill-demo-importer/) :)
 
 == Changelog ==
+= 1.4.3 - 23-04-2018 =
+* Support - Cenote theme.
 
 = 1.4.2 - 25-12-2017 =
 * Fix - Disable WooCommerce setup wizard for demo import.
