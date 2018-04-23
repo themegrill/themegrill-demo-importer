@@ -26,7 +26,7 @@ if ( ! class_exists( 'ThemeGrill_Demo_Importer' ) ) :
 		 * Plugin version.
 		 * @var string
 		 */
-		public $version = '1.4.1';
+		public $version = '1.4.3';
 
 		/**
 		 * Instance of this class.
