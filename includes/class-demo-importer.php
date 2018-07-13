@@ -571,12 +571,7 @@ class TG_Demo_Importer {
 	public function demo_importer() {
 		$demos = $this->prepare_demos_for_js( tg_demo_installer_preview() ? $this->demo_packages : $this->demo_config );
 
-		if ( isset( $_GET['action'] ) && 'upload-demo' === $_GET['action'] ) {
-			$this->upload_demo_pack();
-		} else {
-			$suffix = tg_demo_installer_enabled() ? 'installer' : 'importer';
-			include_once( dirname( __FILE__ ) . "/admin/views/html-admin-page-{$suffix}.php" );
-		}
+		include_once( dirname( __FILE__ ) . "/admin/views/html-admin-page-importer.php" );
 	}
 
 	/**
