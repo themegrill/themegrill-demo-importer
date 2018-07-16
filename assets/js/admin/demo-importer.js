@@ -1335,22 +1335,6 @@ $( document ).ready( function() {
 		demos.Run.init();
 	}
 
-	// Load videos when help button is clicked or welcome page is viewed.
-	$( document.body ).on( 'themegrill_demo_importer_guided_tour_embed', function() {
-		$( '.themegrill-demo-importer-guided-tour-embed' ).each( function() {
-			var video_id = $( this ).data( 'video_id' );
-			$( this ).replaceWith( '<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/' + video_id + '" frameborder="0" allowfullscreen></iframe>' );
-		} );
-	} );
-
-	if ( demos.isInstall ) {
-		$( document.body ).trigger( 'themegrill_demo_importer_guided_tour_embed' );
-	} else {
-		$( '#contextual-help-link' ).on( 'click', function() {
-			$( document.body ).trigger( 'themegrill_demo_importer_guided_tour_embed' );
-		} );
-	}
-
 	// Rating footer.
 	$( '.themegrill-demo-importer-rating-link' ).on( 'click', function() {
 		var $this_el = $( this );
@@ -1366,6 +1350,14 @@ $( document ).ready( function() {
 	$( '.themegrill-reset-wordpress' ).on( 'click', function() {
 		return window.confirm( demos.data.settings.confirmReset );
 	});
+
+	// Load videos when help button is clicked.
+	$( '#contextual-help-link' ).on( 'click', function() {
+		$( '.themegrill-demo-importer-guided-tour-embed' ).each( function() {
+			var video_id = $( this ).data( 'video_id' );
+			$( this ).replaceWith( '<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/' + video_id + '" frameborder="0" allowfullscreen></iframe>' );
+		} );
+	} );
 
 	// Make disabled checkbox always checked through data-checked.
 	$( document.body ).on( 'click', 'thead .check-column :checkbox', function( event ) {
