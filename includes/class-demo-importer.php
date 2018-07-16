@@ -151,7 +151,7 @@ class TG_Demo_Importer {
 		global $submenu;
 
 		if ( isset( $submenu['themes.php'] ) ) {
-			$submenu_class = tg_demo_installer_enabled() ? 'demo-installer hide-if-no-js' : 'demo-importer';
+			$submenu_class = 'demo-importer hide-if-no-js';
 
 			// Add menu classes if user has access.
 			if ( apply_filters( 'themegrill_demo_importer_include_class_in_menu', true ) ) {
@@ -206,9 +206,8 @@ class TG_Demo_Importer {
 				),
 			) );
 			wp_localize_script( 'tg-demo-importer', 'demoImporterLocalizeScript', array(
-				'demos'    => $this->prepare_demos_for_js( tg_demo_installer_preview() ? $this->demo_packages : $this->demo_config ),
+				'demos'    => $this->prepare_demos_for_js( $this->demo_config ),
 				'settings' => array(
-					'isPreview'      => tg_demo_installer_preview(),
 					'isInstall'      => tg_demo_installer_enabled(),
 					'canInstall'     => current_user_can( 'upload_files' ),
 					'installURI'     => current_user_can( 'upload_files' ) ? self_admin_url( 'themes.php?page=demo-importer&browse=preview' ) : null,
@@ -472,7 +471,7 @@ class TG_Demo_Importer {
 		}
 
 		// Make sure the imported demo is listed first.
-		if ( ! tg_demo_installer_preview() && isset( $demos[ $demo_activated_id ] ) ) {
+		if ( isset( $demos[ $demo_activated_id ] ) ) {
 			$prepared_demos[ $demo_activated_id ] = array();
 		}
 

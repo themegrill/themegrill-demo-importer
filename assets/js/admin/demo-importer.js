@@ -1188,7 +1188,6 @@ demos.view.Installer = demos.view.Appearance.extend({
 	// Initial render method
 	render: function() {
 		this.search();
-		this.uploader();
 
 		// Setup the main demo view
 		// with the current demo collection
@@ -1201,21 +1200,6 @@ demos.view.Installer = demos.view.Appearance.extend({
 		this.$el.find( '.themes' ).remove();
 		this.view.render();
 		this.$el.find( '.theme-browser' ).append( this.view.el ).addClass( 'rendered' );
-	},
-
-	/*
-	 * When users press the "Upload Theme" button, show the upload form in place.
-	 */
-	uploader: function() {
-		var uploadViewToggle = $( '.upload-view-toggle' ),
-			$body = $( document.body );
-
-		uploadViewToggle.on( 'click', function() {
-			// Toggle the upload view.
-			$body.toggleClass( 'show-upload-view' );
-			// Toggle the `aria-expanded` button attribute.
-			uploadViewToggle.attr( 'aria-expanded', $body.hasClass( 'show-upload-view' ) );
-		});
 	},
 
 	clearSearch: function() {
