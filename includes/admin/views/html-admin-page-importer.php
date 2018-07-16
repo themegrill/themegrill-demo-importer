@@ -298,6 +298,51 @@ $demo_filter_links = apply_filters( 'themegrill_demo_importer_filter_links_array
 	</div>
 </script>
 
+<script id="tmpl-demo-preview" type="text/template">
+	<a target="_blank" href="{{{ data.actions.preview_url }}}">
+		<# if ( data.screenshot ) { #>
+			<div class="theme-screenshot">
+				<img src="{{ data.screenshot }}" alt="" />
+			</div>
+		<# } else { #>
+			<div class="theme-screenshot blank"></div>
+		<# } #>
+		<span class="more-details"><?php _e( 'Demo Preview', 'themegrill-demo-importer' ); ?></span>
+		<# if ( data.actions.pro_link ) { #>
+			<span class="premium-ribbon"><span><?php _e( 'Pro', 'themegrill-demo-importer' ); ?></span></span>
+		<# } #>
+	</a>
+	<div class="theme-author"><?php
+		/* translators: %s: Demo author name */
+		printf( __( 'By %s', 'themegrill-demo-importer' ), '{{{ data.author }}}' );
+	?></div>
+
+	<div class="theme-id-container">
+		<h3 class="theme-name">{{ data.name }}</h3>
+
+		<div class="theme-actions">
+			<# if ( ! data.installed && ! data.actions.pro_link ) { #>
+				<?php
+				/* translators: %s: Demo name */
+				$aria_label = sprintf( _x( 'Download %s', 'demo', 'themegrill-demo-importer' ), '{{ data.name }}' );
+				?>
+				<a class="button button-primary demo-download" data-name="{{ data.name }}" href="{{ data.actions.download_url }}" aria-label="<?php echo esc_attr( $aria_label ); ?>"><?php _e( 'Download', 'themegrill-demo-importer' ); ?></a>
+			<# } else if ( data.actions.pro_link ) { #>
+				<?php
+				/* translators: %s: Demo name */
+				$aria_label = sprintf( _x( 'View %s Pro', 'demo', 'themegrill-demo-importer' ), '{{ data.name }}' );
+				?>
+				<a class="button button-primary demo-premium" target="_blank" data-name="{{ data.name }}" href="{{ data.actions.pro_link }}" aria-label="<?php echo esc_attr( $aria_label ); ?>"><?php _e( 'View Pro', 'themegrill-demo-importer' ); ?></a>
+			<# } #>
+			<a class="button button-secondary demo-preview" target="_blank" href="{{{ data.actions.preview_url }}}"><?php _e( 'Preview', 'themegrill-demo-importer' ); ?></a>
+		</div>
+	</div>
+
+	<# if ( data.installed ) { #>
+		<div class="notice notice-success notice-alt"><p><?php _ex( 'Installed', 'demo', 'themegrill-demo-importer' ); ?></p></div>
+	<# } #>
+</script>
+
 <?php
 wp_print_request_filesystem_credentials_modal();
 wp_print_admin_notice_templates();
