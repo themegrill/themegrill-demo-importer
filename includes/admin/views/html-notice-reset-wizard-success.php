@@ -3,9 +3,7 @@
  * Admin View: Notice - Reset Wizard Success
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 $user = get_user_by( 'id', 1 );
 

@@ -2,16 +2,11 @@
 /**
  * ThemeGrill Demo Importer.
  *
- * @class    TG_Demo_Importer
- * @version  1.0.0
- * @package  Importer/Classes
- * @category Admin
- * @author   ThemeGrill
+ * @package Importer/Classes
+ * @version 1.0.0
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * TG_Demo_Importer Class.
@@ -20,12 +15,14 @@ class TG_Demo_Importer {
 
 	/**
 	 * Demo config.
+	 *
 	 * @var array
 	 */
 	public $demo_config;
 
 	/**
 	 * Demo packages.
+	 *
 	 * @var array
 	 */
 	public $demo_packages;
@@ -128,6 +125,7 @@ class TG_Demo_Importer {
 
 	/**
 	 * Check if demo pack is enabled.
+	 *
 	 * @param  array $demo_id
 	 * @return bool
 	 */
@@ -235,6 +233,7 @@ class TG_Demo_Importer {
 
 	/**
 	 * Change the admin footer text.
+	 *
 	 * @param  string $footer_text
 	 * @return string
 	 */
@@ -676,6 +675,7 @@ class TG_Demo_Importer {
 
 	/**
 	 * Import dummy content from a XML file.
+	 *
 	 * @param  string $demo_id
 	 * @param  array  $demo_data
 	 * @param  array  $status
@@ -722,6 +722,7 @@ class TG_Demo_Importer {
 
 	/**
 	 * Import site core options from its ID.
+	 *
 	 * @param  string $demo_id
 	 * @param  array  $demo_data
 	 * @return bool
@@ -761,6 +762,7 @@ class TG_Demo_Importer {
 
 	/**
 	 * Import customizer data from a DAT file.
+	 *
 	 * @param  string $demo_id
 	 * @param  array  $demo_data
 	 * @param  array  $status
@@ -785,6 +787,7 @@ class TG_Demo_Importer {
 
 	/**
 	 * Import widgets settings from WIE or JSON file.
+	 *
 	 * @param  string $demo_id
 	 * @param  array  $demo_data
 	 * @param  array  $status
@@ -838,6 +841,7 @@ class TG_Demo_Importer {
 
 	/**
 	 * Updates widgets settings data.
+	 *
 	 * @param  array  $widget
 	 * @param  string $widget_type
 	 * @param  int    $instance_id
@@ -900,6 +904,7 @@ class TG_Demo_Importer {
 
 	/**
 	 * Update customizer settings data.
+	 *
 	 * @param  array $data
 	 * @param  array $demo_data
 	 * @return array

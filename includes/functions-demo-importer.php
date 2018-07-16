@@ -2,18 +2,14 @@
 /**
  * Demo Importer Functions.
  *
- * @author   ThemeGrill
- * @category Admin
- * @package  Importer/Functions
- * @version  1.0.0
+ * @package Importer/Functions
+ * @version 1.0.0
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 // Include core functions (available in both admin and frontend).
-include_once( TGDM_ABSPATH . 'includes/functions-demo-update.php' );
+include_once TGDM_ABSPATH . 'includes/functions-demo-update.php';
 
 /**
  * Get an attachment ID from the filename.
@@ -96,6 +92,7 @@ add_action( 'admin_init', 'tg_activate_bulk_plugin' );
 
 /**
  * Ajax handler for deleting a demo pack.
+ *
  * @see tg_delete_demo_pack()
  */
 function tg_ajax_delete_demo_pack() {
@@ -230,6 +227,7 @@ if ( ! function_exists( 'tg_demo_installer_enabled' ) ) {
 
 	/**
 	 * Is demo installer enabled?
+	 *
 	 * @return bool
 	 */
 	function tg_demo_installer_enabled() {
@@ -241,6 +239,7 @@ if ( ! function_exists( 'tg_demo_installer_preview' ) ) {
 
 	/**
 	 * Is demo installer preview filter?
+	 *
 	 * @return bool
 	 */
 	function tg_demo_installer_preview() {
@@ -414,14 +413,14 @@ function tg_print_admin_notice_templates() {
 						<# if ( 'plugin' === data.type ) { #>
 							<?php
 							/* translators: %s: Number of plugins */
-							printf( __( '%s plugin successfully installed.' ), '{{ data.successes }}' );
+							printf( __( '%s plugin successfully installed.', 'themegrill-demo-importer' ), '{{ data.successes }}' );
 							?>
 						<# } #>
 					<# } else { #>
 						<# if ( 'plugin' === data.type ) { #>
 							<?php
 							/* translators: %s: Number of plugins */
-							printf( __( '%s plugins successfully installed.' ), '{{ data.successes }}' );
+							printf( __( '%s plugins successfully installed.', 'themegrill-demo-importer' ), '{{ data.successes }}' );
 							?>
 						<# } #>
 					<# } #>
@@ -431,15 +430,15 @@ function tg_print_admin_notice_templates() {
 						<# if ( 1 === data.errors ) { #>
 							<?php
 							/* translators: %s: Number of failed installs */
-							printf( __( '%s install failed.' ), '{{ data.errors }}' );
+							printf( __( '%s install failed.', 'themegrill-demo-importer' ), '{{ data.errors }}' );
 							?>
 						<# } else { #>
 							<?php
 							/* translators: %s: Number of failed installs */
-							printf( __( '%s installs failed.' ), '{{ data.errors }}' );
+							printf( __( '%s installs failed.', 'themegrill-demo-importer' ), '{{ data.errors }}' );
 							?>
 						<# } #>
-						<span class="screen-reader-text"><?php _e( 'Show more details' ); ?></span>
+						<span class="screen-reader-text"><?php _e( 'Show more details', 'themegrill-demo-importer' ); ?></span>
 						<span class="toggle-indicator" aria-hidden="true"></span>
 					</button>
 				<# } #>

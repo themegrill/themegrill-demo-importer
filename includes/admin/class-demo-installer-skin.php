@@ -4,12 +4,9 @@
  *
  * Demo Installer Skin for the WordPress Demo Importer.
  *
- * @class    TG_Demo_Installer_Skin
  * @extends  WP_Upgrader_Skin
- * @version  1.0.0
  * @package  Importer/Classes
- * @category Admin
- * @author   ThemeGrill
+ * @version  1.0.0
  */
 
 if ( ! defined( 'ABSPATH' ) ) {

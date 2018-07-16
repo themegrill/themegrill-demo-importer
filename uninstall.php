@@ -4,15 +4,11 @@
  *
  * Uninstalls the plugin and associated data.
  *
- * @author   ThemeGrill
- * @category Core
- * @package  Importer/Unistaller
- * @version  1.3.4
+ * @package Importer/Unistaller
+ * @version 1.3.4
  */
 
-if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
-	exit;
-}
+defined( 'WP_UNINSTALL_PLUGIN' ) || exit;
 
 global $wpdb;
 

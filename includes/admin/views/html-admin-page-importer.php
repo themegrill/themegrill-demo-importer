@@ -3,9 +3,7 @@
  * Admin View: Page - Importer
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 ?>
 <div class="wrap demo-importer">
