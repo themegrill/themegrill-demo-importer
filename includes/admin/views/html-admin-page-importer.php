@@ -7,22 +7,49 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+global $current_filter;
+
+$current_filter    = empty( $_GET['browse'] ) ? 'welcome' : sanitize_title( $_GET['browse'] );
+$demo_filter_links = apply_filters( 'themegrill_demo_importer_filter_links_array', array(
+	'welcome' => __( 'Welcome', 'themegrill-demo-importer' ),
+	'uploads' => __( 'Installed Demos', 'themegrill-demo-importer' ),
+	'preview' => __( 'Theme Demos', 'themegrill-demo-importer' ),
+) );
+
 ?>
 <div class="wrap demo-importer">
-	<h1 class="wp-heading-inline"><?php esc_html_e( 'Demo Importer', 'themegrill-demo-importer' ); ?>
-		<span class="title-count demo-count"><?php echo count( $this->demo_config ); ?></span>
-	</h1>
+	<h1 class="wp-heading-inline"><?php esc_html_e( 'Demo Importer', 'themegrill-demo-importer' ); ?></h1>
 
 	<?php if ( apply_filters( 'themegrill_demo_importer_new_demos', false ) ) : ?>
 		<a href="<?php echo esc_url( 'https://themegrill.com/upcoming-new-demos' ); ?>" class="page-title-action" target="_blank"><?php esc_html_e( 'New Demos', 'themegrill-demo-importer' ); ?></a>
 	<?php endif; ?>
 
-	<form class="search-form"></form>
-
 	<hr class="wp-header-end">
 
 	<div class="error hide-if-js">
 		<p><?php _e( 'The Demo Importer screen requires JavaScript.', 'themegrill-demo-importer' ); ?></p>
+	</div>
+
+	<h2 class="screen-reader-text hide-if-no-js"><?php _e( 'Filter demos list', 'themegrill-demo-importer' ); ?></h2>
+
+	<div class="wp-filter hide-if-no-js">
+		<div class="filter-count">
+			<span class="count theme-count demo-count"><?php echo 'preview' == $current_filter ? count( $this->demo_packages ) : count( $this->demo_config ); ?></span>
+		</div>
+
+		<ul class="filter-links">
+			<?php
+				foreach ( $demo_filter_links as $name => $label ) {
+					if ( ( empty( $this->demo_config ) && 'uploads' == $name ) || ( empty( $this->demo_packages ) && 'preview' == $name ) ) {
+						continue;
+					}
+					echo '<li><a href="' . admin_url( 'themes.php?page=demo-importer&browse=' . $name ) . '" class="demo-tab ' . ( $current_filter == $name ? 'current' : '' ) . '">' . $label . '</a></li>';
+				}
+				do_action( 'themegrill_demo_importer_filter_links' );
+			?>
+		</ul>
+
+		<div class="search-form"></div>
 	</div>
 
 	<div class="theme-browser">
