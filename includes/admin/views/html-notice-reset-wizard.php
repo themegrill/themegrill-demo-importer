@@ -3,9 +3,7 @@
  * Admin View: Notice - Reset Wizard
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 ?>
 <div id="message" class="updated themegrill-demo-importer-message">

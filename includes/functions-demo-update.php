@@ -4,15 +4,11 @@
  *
  * Backward compatibility for demo importer configs and options.
  *
- * @author   ThemeGrill
- * @category Admin
- * @package  Importer/Functions
- * @version  1.1.0
+ * @package Importer/Functions
+ * @version 1.1.0
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Update demo importer config.

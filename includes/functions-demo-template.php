@@ -4,15 +4,11 @@
  *
  * Functions for the templating system.
  *
- * @author   ThemeGrill
- * @category Admin
- * @package  Importer/Functions
- * @version  1.0.0
+ * @package Importer/Functions
+ * @version 1.0.0
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 if ( ! function_exists( 'tg_get_demo_file_url' ) ) {
 
