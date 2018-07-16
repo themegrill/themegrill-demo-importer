@@ -9,9 +9,7 @@ global $current_filter;
 
 $current_filter    = empty( $_GET['browse'] ) ? 'welcome' : sanitize_title( $_GET['browse'] );
 $demo_filter_links = apply_filters( 'themegrill_demo_importer_filter_links_array', array(
-	'welcome' => __( 'Welcome', 'themegrill-demo-importer' ),
-	'uploads' => __( 'Installed Demos', 'themegrill-demo-importer' ),
-	'preview' => __( 'Theme Demos', 'themegrill-demo-importer' ),
+	'preview' => __( 'All', 'themegrill-demo-importer' ),
 ) );
 
 ?>
