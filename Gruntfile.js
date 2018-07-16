@@ -64,10 +64,10 @@ module.exports = function( grunt ){
 
 		// Compile all .scss files.
 		sass: {
-			options: {
-				sourceMap: false
-			},
 			compile: {
+				options: {
+					sourceMap: 'none'
+				},
 				files: [{
 					expand: true,
 					cwd: '<%= dirs.css %>/',
@@ -126,7 +126,7 @@ module.exports = function( grunt ){
 				type: 'wp-plugin',
 				domainPath: 'languages',
 				potHeaders: {
-					'report-msgid-bugs-to': 'themegrill@gmail.com',
+					'report-msgid-bugs-to': 'https://github.com/themegrill/themegrill-demo-importer/issues',
 					'language-team': 'LANGUAGE <EMAIL@ADDRESS>'
 				}
 			},
@@ -240,9 +240,9 @@ module.exports = function( grunt ){
 
 	// Register tasks
 	grunt.registerTask( 'default', [
-		'jshint',
-		'uglify',
-		'css'
+		'js',
+		'css',
+		'i18n'
 	]);
 
 	grunt.registerTask( 'js', [
@@ -257,8 +257,13 @@ module.exports = function( grunt ){
 		'cssmin'
 	]);
 
+	// Only an alias to 'default' task.
 	grunt.registerTask( 'dev', [
-		'default',
+		'default'
+	]);
+
+	grunt.registerTask( 'i18n', [
+		'checktextdomain',
 		'makepot'
 	]);
 };

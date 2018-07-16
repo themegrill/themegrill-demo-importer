@@ -3,21 +3,41 @@
   "description": "Import your demo content, widgets and theme settings with one click for ThemeGrill official themes.",
   "homepage": "https://themegrill.com/plugins/demo-importer/",
   "type": "wordpress-plugin",
-  "license": "GPL-3.0+",
+  "license": "GPL-2.0+",
   "require": {
     "composer/installers": "~1.2"
   },
   "require-dev": {
     "squizlabs/php_codesniffer": "*",
-    "wp-coding-standards/wpcs": "*",
-    "simplyadmire/composer-plugins" : "@dev"
+    "wp-coding-standards/wpcs": "^0.14",
+    "wpeverest/wpeverest-git-hooks": "*",
+    "wpeverest/wpeverest-sniffs": "*",
+    "wimg/php-compatibility": "^8.0"
   },
   "scripts": {
+    "pre-update-cmd": [
+      "WPEverest\\GitHooks\\Hooks::preHooks"
+    ],
+    "pre-install-cmd": [
+      "WPEverest\\GitHooks\\Hooks::preHooks"
+    ],
     "post-install-cmd": [
-      "\"vendor/bin/phpcs\" --config-set installed_paths vendor/wp-coding-standards/wpcs"
+      "WPEverest\\GitHooks\\Hooks::postHooks"
     ],
     "post-update-cmd": [
-      "\"vendor/bin/phpcs\" --config-set installed_paths vendor/wp-coding-standards/wpcs"
+      "WPEverest\\GitHooks\\Hooks::postHooks"
+    ],
+    "phpcs": [
+      "phpcs -s -p"
+    ],
+    "phpcbf": [
+      "phpcbf -p"
     ]
+  },
+  "extra": {
+    "scripts-description": {
+      "phpcs": "Analyze code against the WordPress coding standard with PHP_CodeSniffer",
+      "phpcbf": "Fix coding standards warnings/errors automattically with PHP Code Beautifier"
+    }
   }
 }
