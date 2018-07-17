@@ -9,7 +9,12 @@ global $current_filter;
 
 $current_filter    = empty( $_GET['browse'] ) ? 'welcome' : sanitize_title( $_GET['browse'] );
 $demo_filter_links = apply_filters( 'themegrill_demo_importer_filter_links_array', array(
-	'preview' => __( 'All', 'themegrill-demo-importer' ),
+	'all'       => __( 'All', 'themegrill-demo-importer' ),
+	'blog'      => __( 'Blog', 'themegrill-demo-importer' ),
+	'business'  => __( 'Business', 'themegrill-demo-importer' ),
+	'ecommerce' => __( 'eCommerce', 'themegrill-demo-importer' ),
+	'free'      => __( 'Free', 'themegrill-demo-importer' ),
+	'others'    => __( 'Others', 'themegrill-demo-importer' ),
 ) );
 
 ?>
@@ -34,18 +39,21 @@ $demo_filter_links = apply_filters( 'themegrill_demo_importer_filter_links_array
 		</div>
 
 		<ul class="filter-links">
-			<?php
-				foreach ( $demo_filter_links as $name => $label ) {
-					if ( ( empty( $this->demo_config ) && 'uploads' == $name ) || ( empty( $this->demo_packages ) && 'preview' == $name ) ) {
-						continue;
-					}
-					echo '<li><a href="' . admin_url( 'themes.php?page=demo-importer&browse=' . $name ) . '" class="demo-tab ' . ( $current_filter == $name ? 'current' : '' ) . '">' . $label . '</a></li>';
-				}
-				do_action( 'themegrill_demo_importer_filter_links' );
-			?>
+			<?php foreach ( $demo_filter_links as $slug => $label ) : ?>
+				<li><a href="#" data-sort="<?php echo esc_attr( $slug ); ?>" class="demo-tab"><?php echo esc_html( $label ); ?></a></li>
+			<?php endforeach; ?>
 		</ul>
 
-		<div class="search-form"></div>
+		<button type="button" class="button drawer-toggle" aria-expanded="false"><?php _e( 'Page Builder' ); ?></button>
+
+		<form class="search-form"></form>
+
+		<div class="filter-drawer">
+			<div class="buttons">
+				<button type="button" class="apply-filters button"><?php _e( 'Apply Filters' ); ?><span></span></button>
+				<button type="button" class="clear-filters button" aria-label="<?php esc_attr_e( 'Clear current filters' ); ?>"><?php _e( 'Clear' ); ?></button>
+			</div>
+		</div>
 	</div>
 
 	<div class="theme-browser">
