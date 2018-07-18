@@ -12,9 +12,20 @@ $demo_filter_links = apply_filters( 'themegrill_demo_importer_filter_links_array
 	'all'       => __( 'All', 'themegrill-demo-importer' ),
 	'blog'      => __( 'Blog', 'themegrill-demo-importer' ),
 	'business'  => __( 'Business', 'themegrill-demo-importer' ),
+	'education' => __( 'Education', 'themegrill-demo-importer' ),
 	'ecommerce' => __( 'eCommerce', 'themegrill-demo-importer' ),
 	'free'      => __( 'Free', 'themegrill-demo-importer' ),
 	'others'    => __( 'Others', 'themegrill-demo-importer' ),
+) );
+
+$feature_lists = apply_filters( 'themegrill_demo_importer_feature_lists', array(
+	'pagebuilder' => array(
+		'name'  => __( 'Pagebuilder', 'themegrill-demo-importer' ),
+		'lists' => array(
+			'elementor'  => __( 'Elementor', 'themegrill-demo-importer' ),
+			'siteorigin' => __( 'SiteOrigin', 'themegrill-demo-importer' ),
+		)
+	)
 ) );
 
 ?>
@@ -44,14 +55,38 @@ $demo_filter_links = apply_filters( 'themegrill_demo_importer_filter_links_array
 			<?php endforeach; ?>
 		</ul>
 
-		<button type="button" class="button drawer-toggle" aria-expanded="false"><?php _e( 'Page Builder' ); ?></button>
+		<button type="button" class="button drawer-toggle" aria-expanded="false"><?php _e( 'Feature Filter' ); ?></button>
 
 		<form class="search-form"></form>
 
 		<div class="filter-drawer">
 			<div class="buttons">
-				<button type="button" class="apply-filters button"><?php _e( 'Apply Filters' ); ?><span></span></button>
-				<button type="button" class="clear-filters button" aria-label="<?php esc_attr_e( 'Clear current filters' ); ?>"><?php _e( 'Clear' ); ?></button>
+				<button type="button" class="apply-filters button"><?php _e( 'Apply Filters', 'themegrill-demo-importer' ); ?><span></span></button>
+				<button type="button" class="clear-filters button" aria-label="<?php esc_attr_e( 'Clear current filters', 'themegrill-demo-importer' ); ?>"><?php _e( 'Clear', 'themegrill-demo-importer' ); ?></button>
+			</div>
+			<?php
+			foreach ( $feature_lists as $feature_key => $features ) {
+				echo '<fieldset class="filter-group">';
+				$feature_name = esc_html( $features['name'] );
+				echo '<legend>' . $feature_name . '</legend>';
+				echo '<div class="filter-group-feature">';
+				foreach ( $features['lists'] as $feature => $feature_name ) {
+					$feature = esc_attr( $feature );
+					echo '<input type="checkbox" id="filter-id-' . $feature . '" value="' . $feature . '" /> ';
+					echo '<label for="filter-id-' . $feature . '">' . $feature_name . '</label>';
+				}
+				echo '</div>';
+				echo '</fieldset>';
+			}
+			?>
+			<div class="buttons">
+				<button type="button" class="apply-filters button"><?php _e( 'Apply Filters', 'themegrill-demo-importer' ); ?><span></span></button>
+				<button type="button" class="clear-filters button" aria-label="<?php esc_attr_e( 'Clear current filters', 'themegrill-demo-importer' ); ?>"><?php _e( 'Clear', 'themegrill-demo-importer' ); ?></button>
+			</div>
+			<div class="filtered-by">
+				<span><?php _e( 'Filtering by:', 'themegrill-demo-importer' ); ?></span>
+				<div class="tags"></div>
+				<button type="button" class="button-link edit-filters"><?php _e( 'Edit Filters', 'themegrill-demo-importer' ); ?></button>
 			</div>
 		</div>
 	</div>
