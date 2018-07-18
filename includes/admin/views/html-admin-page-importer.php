@@ -21,8 +21,8 @@ $demo_filter_links = apply_filters( 'themegrill_demo_importer_filter_links_array
 <div class="wrap demo-importer">
 	<h1 class="wp-heading-inline"><?php esc_html_e( 'Demo Importer', 'themegrill-demo-importer' ); ?></h1>
 
-	<?php if ( apply_filters( 'themegrill_demo_importer_new_demos', true ) ) : ?>
-		<a href="<?php echo esc_url( 'https://themegrill.com/upcoming-new-demos' ); ?>" class="page-title-action" target="_blank"><?php esc_html_e( 'New Demos', 'themegrill-demo-importer' ); ?></a>
+	<?php if ( apply_filters( 'themegrill_demo_importer_upcoming_demos', true ) ) : ?>
+		<a href="<?php echo esc_url( 'https://themegrill.com/upcoming-demos' ); ?>" class="page-title-action" target="_blank"><?php esc_html_e( 'Upcoming Demos', 'themegrill-demo-importer' ); ?></a>
 	<?php endif; ?>
 
 	<hr class="wp-header-end">
