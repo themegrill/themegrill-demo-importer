@@ -107,21 +107,22 @@ $feature_lists = apply_filters( 'themegrill_demo_importer_feature_lists', array(
 		<div class="theme-screenshot blank"></div>
 	<# } #>
 
-	<span class="more-details" id="{{ data.id }}-action"><?php _e( 'Demo Details', 'themegrill-demo-importer' ); ?></span>
-	<div class="theme-author"><?php
+	<# if ( data.actions.pro_link ) { #>
+		<span class="pro-banner">
+			<span class="ribbon"><?php _e( 'Pro', 'themegrill-demo-importer' ); ?></span>
+		</span>
+	<# } #>
+
+	<span class="more-details"><?php _ex( 'Details &amp; Preview', 'demo', 'themegrill-demo-importer' ); ?></span>
+	<div class="theme-author">
+		<?php
 		/* translators: %s: Demo author name */
 		printf( __( 'By %s', 'themegrill-demo-importer' ), '{{{ data.author }}}' );
-	?></div>
+		?>
+	</div>
 
 	<div class="theme-id-container">
-		<# if ( data.active ) { #>
-			<h2 class="theme-name" id="{{ data.id }}-name"><?php
-				/* translators: %s: Demo name */
-				printf( __( '<span>Imported:</span> %s', 'themegrill-demo-importer' ), '{{{ data.name }}}' );
-			?></h2>
-		<# } else { #>
-			<h2 class="theme-name" id="{{ data.id }}-name">{{{ data.name }}}</h2>
-		<# } #>
+		<h3 class="theme-name">{{ data.name }}</h3>
 
 		<div class="theme-actions">
 			<# if ( data.active ) { #>
