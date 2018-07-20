@@ -169,7 +169,7 @@ $feature_lists = apply_filters( 'themegrill_demo_importer_feature_lists', array(
 					<span class="theme-by">
 						<?php
 						/* translators: %s: Demo author name */
-						printf( __( 'By %s',  ), '{{ data.author }}' );
+						printf( __( 'By %s', 'themegrill-demo-importer' ), '{{ data.author }}' );
 						?>
 					</span>
 
@@ -186,7 +186,7 @@ $feature_lists = apply_filters( 'themegrill_demo_importer_feature_lists', array(
 						<# } #>
 						<div class="theme-version">
 							<?php
-							/* translators: %s: Theme version */
+							/* translators: %s: Demo version */
 							printf( __( 'Version: %s' ), '{{ data.version }}' );
 							?>
 						</div>
