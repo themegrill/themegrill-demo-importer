@@ -152,6 +152,61 @@ $feature_lists = apply_filters( 'themegrill_demo_importer_feature_lists', array(
 </script>
 
 <script id="tmpl-demo-preview" type="text/template">
+	<div class="wp-full-overlay-sidebar">
+		<div class="wp-full-overlay-header">
+			<button class="close-full-overlay"><span class="screen-reader-text"><?php _e( 'Close', 'themegrill-demo-importer' ); ?></span></button>
+			<button class="previous-theme"><span class="screen-reader-text"><?php _ex( 'Previous', 'Button label for a demo', 'themegrill-demo-importer' ); ?></span></button>
+			<button class="next-theme"><span class="screen-reader-text"><?php _ex( 'Next', 'Button label for a demo', 'themegrill-demo-importer' ); ?></span></button>
+			<# if ( data.installed ) { #>
+				<a class="button button-primary activate" href="{{ data.activate_url }}"><?php _e( 'Activate', 'themegrill-demo-importer' ); ?></a>
+			<# } else { #>
+				<a href="{{ data.install_url }}" class="button button-primary demo-install" data-name="{{ data.name }}" data-slug="{{ data.id }}"><?php _e( 'Import', 'themegrill-demo-importer' ); ?></a>
+			<# } #>
+		</div>
+		<div class="wp-full-overlay-sidebar-content">
+			<div class="install-theme-info">
+				<h3 class="theme-name">{{ data.name }}</h3>
+					<span class="theme-by">
+						<?php
+						/* translators: %s: Demo author name */
+						printf( __( 'By %s',  ), '{{ data.author }}' );
+						?>
+					</span>
+
+					<img class="theme-screenshot" src="{{ data.screenshot_url }}" alt="" />
+
+					<div class="theme-details">
+						<# if ( data.rating ) { #>
+							<div class="theme-rating">
+								{{{ data.stars }}}
+								<span class="num-ratings">({{ data.num_ratings }})</span>
+							</div>
+						<# } else { #>
+							<span class="no-rating"><?php _e( 'This theme has not been rated yet.' ); ?></span>
+						<# } #>
+						<div class="theme-version">
+							<?php
+							/* translators: %s: Theme version */
+							printf( __( 'Version: %s' ), '{{ data.version }}' );
+							?>
+						</div>
+						<div class="theme-description">{{{ data.description }}}</div>
+					</div>
+				</div>
+			</div>
+			<div class="wp-full-overlay-footer">
+				<button type="button" class="collapse-sidebar button" aria-expanded="true" aria-label="<?php esc_attr_e( 'Collapse Sidebar' ); ?>">
+					<span class="collapse-sidebar-arrow"></span>
+					<span class="collapse-sidebar-label"><?php _e( 'Collapse' ); ?></span>
+				</button>
+			</div>
+		</div>
+		<div class="wp-full-overlay-main">
+		<iframe src="{{ data.preview_url }}" title="<?php esc_attr_e( 'Preview' ); ?>"></iframe>
+	</div>
+</script>
+
+<script id="tmpl-demo-preview" type="text/template">
 	<a target="_blank" href="{{{ data.actions.preview_url }}}">
 		<# if ( data.screenshot ) { #>
 			<div class="theme-screenshot">
