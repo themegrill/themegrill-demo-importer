@@ -1,4 +1,4 @@
-/* global demoImporterLocalizeScript, confirm */
+/* global _demoImporterSettings */
 window.wp = window.wp || {};
 
 ( function( $ ) {
@@ -9,7 +9,7 @@ demos = wp.demos = wp.demos || {};
 
 // Store the demo data and settings for organized and quick access
 // demos.data.settings, demos.data.demos, demos.data.l10n
-demos.data = demoImporterLocalizeScript;
+demos.data = _demoImporterSettings;
 l10n = demos.data.l10n;
 
 // Shortcut for isPreview check

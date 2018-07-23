@@ -205,7 +205,7 @@ class TG_Demo_Importer {
 					'statusTextLink'        => '<a href="https://docs.themegrill.com/knowledgebase/demo-import-process-failed/" target="_blank">' . __( 'Try this solution!', 'themegrill-demo-importer' ) . '</a>',
 				),
 			) );
-			wp_localize_script( 'tg-demo-importer', 'demoImporterLocalizeScript', array(
+			wp_localize_script( 'tg-demo-importer', '_demoImporterSettings', array(
 				'demos'    => $this->prepare_demos_for_js( $this->demo_config ),
 				'settings' => array(
 					'isInstall'      => tg_demo_installer_enabled(),
