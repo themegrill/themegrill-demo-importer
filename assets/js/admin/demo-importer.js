@@ -1,4 +1,4 @@
-/* global demoImporterLocalizeScript */
+/* global demoImporterLocalizeScript, confirm */
 window.wp = window.wp || {};
 
 ( function( $ ) {
