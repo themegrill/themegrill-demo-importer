@@ -12,9 +12,6 @@ demos = wp.demos = wp.demos || {};
 demos.data = _demoImporterSettings;
 l10n = demos.data.l10n;
 
-// Shortcut for isPreview check
-demos.isPreview = !! demos.data.settings.isPreview;
-
 // Shortcut for isInstall check
 demos.isInstall = !! demos.data.settings.isInstall;
 
@@ -22,7 +19,7 @@ demos.isInstall = !! demos.data.settings.isInstall;
 _.extend( demos, { model: {}, view: {}, routes: {}, router: {}, template: wp.template });
 
 demos.Model = Backbone.Model.extend({
-	// Adds attributes to the default data coming through the .org demos api
+	// Adds attributes to the default data coming through the demos api
 	// Map `id` to `slug` for shared code
 	initialize: function() {
 		var description;
@@ -80,6 +77,8 @@ demos.view.Appearance = wp.Backbone.View.extend({
 		// Render search form.
 		this.search();
 
+		this.$el.removeClass( 'search-loading' );
+
 		// Render and append
 		this.view.render();
 		this.$el.empty().append( this.view.el ).addClass( 'rendered' );
@@ -103,12 +102,16 @@ demos.view.Appearance = wp.Backbone.View.extend({
 			collection: self.collection,
 			parent: this
 		});
+		self.SearchView = view;
 
 		// Render and append after screen title
 		view.render();
 		this.searchContainer
 			.append( $.parseHTML( '<label class="screen-reader-text" for="wp-filter-search-input">' + l10n.search + '</label>' ) )
-			.append( view.el );
+			.append( view.el )
+			.on( 'submit', function( event ) {
+				event.preventDefault();
+			});
 	},
 
 	// Checks when the user gets close to the bottom
@@ -122,7 +125,7 @@ demos.view.Appearance = wp.Backbone.View.extend({
 		threshold = Math.round( threshold * 0.9 );
 
 		if ( bottom > threshold ) {
-			this.trigger( 'demo:scroll' );
+			this.trigger( 'theme:scroll' );
 		}
 	},
 
@@ -224,7 +227,147 @@ demos.Collection = Backbone.Collection.extend({
 		collection = _( collection.first( 20 ) );
 
 		return collection;
-	}
+	},
+
+	count: false,
+
+	// Handles requests for more demos
+	// and caches results
+	//
+	// When we are missing a cache object we fire an apiCall()
+	// which triggers events of `query:success` or `query:fail`
+	query: function( request ) {
+		/**
+		 * @static
+		 * @type Array
+		 */
+		var queries = this.queries,
+			self = this,
+			query, isPaginated, count;
+
+		// Store current query request args
+		// for later use with the event `theme:end`
+		this.currentQuery.request = request;
+
+		// Search the query cache for matches.
+		query = _.find( queries, function( query ) {
+			return _.isEqual( query.request, request );
+		});
+
+		// If the request matches the stored currentQuery.request
+		// it means we have a paginated request.
+		isPaginated = _.has( request, 'page' );
+
+		// Reset the internal api page counter for non paginated queries.
+		if ( ! isPaginated ) {
+			this.currentQuery.page = 1;
+		}
+
+		// Otherwise, send a new API call and add it to the cache.
+		if ( ! query && ! isPaginated ) {
+			query = this.apiCall( request ).done( function( data ) {
+
+				// Update the collection with the queried data.
+				if ( data.demos ) {
+					self.reset( data.demos );
+					count = data.info.results;
+					// Store the results and the query request
+					queries.push( { demos: data.demos, request: request, total: count } );
+				}
+
+				// Trigger a collection refresh event
+				// and a `query:success` event with a `count` argument.
+				self.trigger( 'demos:update' );
+				self.trigger( 'query:success', count );
+
+				if ( data.demos && data.demos.length === 0 ) {
+					self.trigger( 'query:empty' );
+				}
+
+			}).fail( function() {
+				self.trigger( 'query:fail' );
+			});
+		} else {
+			// If it's a paginated request we need to fetch more demos...
+			if ( isPaginated ) {
+				return this.apiCall( request, isPaginated ).done( function( data ) {
+					// Add the new demos to the current collection
+					// @todo update counter
+					self.add( data.demos );
+					self.trigger( 'query:success' );
+
+					// We are done loading demos for now.
+					self.loadingDemos = false;
+
+				}).fail( function() {
+					self.trigger( 'query:fail' );
+				});
+			}
+
+			if ( query.demos.length === 0 ) {
+				self.trigger( 'query:empty' );
+			} else {
+				$( 'body' ).removeClass( 'no-results' );
+			}
+
+			// Only trigger an update event since we already have the themes
+			// on our cached object
+			if ( _.isNumber( query.total ) ) {
+				this.count = query.total;
+			}
+
+			this.reset( query.themes );
+			if ( ! query.total ) {
+				this.count = this.length;
+			}
+
+			this.trigger( 'demos:update' );
+			this.trigger( 'query:success', this.count );
+		}
+	},
+
+	// Local cache array for API queries
+	queries: [],
+
+	// Keep track of current query so we can handle pagination
+	currentQuery: {
+		page: 1,
+		request: {}
+	},
+
+	// Send request to api.wordpress.org/themes
+	apiCall: function( request, paginated ) {
+		return true;
+		return wp.ajax.send( 'query-themes', {
+			data: {
+				// Request data
+				request: _.extend({
+					per_page: 100,
+					fields: {
+						description: true,
+						tested: true,
+						requires: true,
+						rating: true,
+						downloaded: true,
+						downloadLink: true,
+						last_updated: true,
+						homepage: true,
+						num_ratings: true
+					}
+				}, request)
+			},
+
+			beforeSend: function() {
+				if ( ! paginated ) {
+					// Spin it
+					$( 'body' ).addClass( 'loading-content' ).removeClass( 'no-results' );
+				}
+			}
+		});
+	},
+
+	// Static status controller for when we are loading themes.
+	loadingDemos: false
 });
 
 // This is the view that controls each demo item
@@ -239,12 +382,12 @@ demos.view.Demo = wp.Backbone.View.extend({
 	state: 'grid',
 
 	// The HTML template for each element to be rendered
-	html: demos.template( demos.isPreview ? 'demo-preview' : 'demo' ),
+	html: demos.template( 'demo' ),
 
 	events: {
-		'click': 'expand',
-		'keydown': 'expand',
-		'touchend': 'expand',
+		'click': 'preview',
+		'keydown': 'preview',
+		'touchend': 'preview',
 		'keyup': 'addFocus',
 		'touchmove': 'preventExpand',
 		'click .demo-import': 'importDemo'
@@ -290,43 +433,120 @@ demos.view.Demo = wp.Backbone.View.extend({
 		$demoToFocus.addClass('focus');
 	},
 
-	// Single theme overlay screen
-	// It's shown when clicking a theme
-	expand: function( event ) {
-		var self = this;
-
-		// Prevent the modal.
-		if ( demos.isPreview ) {
-			return;
-		}
+	preview: function( event ) {
+		var self = this,
+			current, preview;
 
 		event = event || window.event;
-
-		// 'enter' and 'space' keys expand the details view when a theme is :focused
-		if ( event.type === 'keydown' && ( event.which !== 13 && event.which !== 32 ) ) {
-			return;
-		}
 
 		// Bail if the user scrolled on a touch device
 		if ( this.touchDrag === true ) {
 			return this.touchDrag = false;
 		}
 
-		// Prevent the modal from showing when the user clicks
-		// one of the direct action buttons
-		if ( $( event.target ).is( '.theme-actions a' ) ) {
+		// Allow direct link path to installing a theme.
+		if ( $( event.target ).not( '.install-theme-preview' ).parents( '.theme-actions' ).length ) {
 			return;
 		}
 
-		// Prevent the modal from showing when the user clicks one of the direct action buttons.
-		if ( $( event.target ).is( '.theme-actions a, .update-message, .button-link, .notice-dismiss' ) ) {
+		// 'enter' and 'space' keys expand the details view when a theme is :focused
+		if ( event.type === 'keydown' && ( event.which !== 13 && event.which !== 32 ) ) {
 			return;
 		}
 
-		// Set focused demo to current element
+		// pressing enter while focused on the buttons shouldn't open the preview
+		if ( event.type === 'keydown' && event.which !== 13 && $( ':focus' ).hasClass( 'button' ) ) {
+			return;
+		}
+
+		event.preventDefault();
+
+		event = event || window.event;
+
+		// Set focus to current demo.
 		demos.focusedDemo = this.$el;
 
-		this.trigger( 'demo:expand', self.model.cid );
+		// Construct a new Preview view.
+		demos.preview = preview = new demos.view.Preview({
+			model: this.model
+		});
+
+		// Render the view and append it.
+		preview.render();
+		this.setNavButtonsState();
+
+		// Hide previous/next navigation if there is only one theme
+		if ( this.model.collection.length === 1 ) {
+			preview.$el.addClass( 'no-navigation' );
+		} else {
+			preview.$el.removeClass( 'no-navigation' );
+		}
+
+		// Append preview
+		$( 'div.wrap' ).append( preview.el );
+
+		// Listen to our preview object
+		// for `theme:next` and `theme:previous` events.
+		this.listenTo( preview, 'theme:next', function() {
+
+			// Keep local track of current theme model.
+			current = self.model;
+
+			// If we have ventured away from current model update the current model position.
+			if ( ! _.isUndefined( self.current ) ) {
+				current = self.current;
+			}
+
+			// Get next theme model.
+			self.current = self.model.collection.at( self.model.collection.indexOf( current ) + 1 );
+
+			// If we have no more themes, bail.
+			if ( _.isUndefined( self.current ) ) {
+				self.options.parent.parent.trigger( 'theme:end' );
+				return self.current = current;
+			}
+
+			preview.model = self.current;
+
+			// Render and append.
+			preview.render();
+			this.setNavButtonsState();
+			$( '.next-theme' ).focus();
+		})
+		.listenTo( preview, 'theme:previous', function() {
+
+			// Keep track of current theme model.
+			current = self.model;
+
+			// Bail early if we are at the beginning of the collection
+			if ( self.model.collection.indexOf( self.current ) === 0 ) {
+				return;
+			}
+
+			// If we have ventured away from current model update the current model position.
+			if ( ! _.isUndefined( self.current ) ) {
+				current = self.current;
+			}
+
+			// Get previous theme model.
+			self.current = self.model.collection.at( self.model.collection.indexOf( current ) - 1 );
+
+			// If we have no more themes, bail.
+			if ( _.isUndefined( self.current ) ) {
+				return;
+			}
+
+			preview.model = self.current;
+
+			// Render and append.
+			preview.render();
+			this.setNavButtonsState();
+			$( '.previous-theme' ).focus();
+		});
+
+		this.listenTo( preview, 'preview:close', function() {
+			self.current = self.model;
+		});
 	},
 
 	preventExpand: function() {
@@ -820,7 +1040,7 @@ demos.view.Demos = wp.Backbone.View.extend({
 		// If the user doesn't have switch capabilities
 		// or there is only one demo in the collection
 		// render the detailed view of the active demo
-		if ( ! demos.isPreview && demos.data.demos.length === 1 ) {
+		if ( demos.data.demos.length === 1 ) {
 
 			// Constructs the view
 			this.singleDemo = new demos.view.Details({
@@ -1192,8 +1412,15 @@ demos.view.Installer = demos.view.Appearance.extend({
 
 	el: '#wpbody-content .wrap',
 
+	// Register events for sorting and filters in theme-navigation
+	events: {
+		'click .filter-links li > a': 'onSort'
+	},
+
 	// Initial render method
 	render: function() {
+		var self = this;
+
 		this.search();
 
 		// Setup the main demo view
@@ -1209,6 +1436,59 @@ demos.view.Installer = demos.view.Appearance.extend({
 		this.$el.find( '.theme-browser' ).append( this.view.el ).addClass( 'rendered' );
 	},
 
+	// Handles all the rendering of the public theme directory
+	browse: function( section ) {
+		// Create a new collection with the proper theme data
+		// for each section
+		this.collection.query( { browse: section } );
+	},
+
+	// Sorting navigation
+	onSort: function( event ) {
+		var $el = $( event.target ),
+			sort = $el.data( 'sort' );
+
+		event.preventDefault();
+
+		$( 'body' ).removeClass( 'filters-applied show-filters' );
+		$( '.drawer-toggle' ).attr( 'aria-expanded', 'false' );
+
+		// Bail if this is already active
+		if ( $el.hasClass( this.activeClass ) ) {
+			return;
+		}
+
+		this.sort( sort );
+
+		// Trigger a router.naviagte update
+		themes.router.navigate( themes.router.baseUrl( themes.router.browsePath + sort ) );
+	},
+
+	sort: function( sort ) {
+		this.clearSearch();
+
+		// Track sorting so we can restore the correct tab when closing preview.
+		demos.router.selectedTab = sort;
+
+		$( '.filter-links li > a, .theme-filter' )
+			.removeClass( this.activeClass )
+			.removeAttr( 'aria-current' );
+
+		$( '[data-sort="' + sort + '"]' )
+			.addClass( this.activeClass )
+			.attr( 'aria-current', 'page' );
+
+		if ( 'favorites' === sort ) {
+			$( 'body' ).addClass( 'show-favorites-form' );
+		} else {
+			$( 'body' ).removeClass( 'show-favorites-form' );
+		}
+
+		this.browse( sort );
+	},
+
+	activeClass: 'current',
+
 	clearSearch: function() {
 		$( '#wp-filter-search-input').val( '' );
 	}
@@ -1217,7 +1497,7 @@ demos.view.Installer = demos.view.Appearance.extend({
 demos.InstallerRouter = Backbone.Router.extend({
 
 	routes: {
-		'themes.php?page=demo-importer&demo=:slug': 'preview',
+		'themes.php?page=demo-importer&demo=:slug': 'demo',
 		'themes.php?page=demo-importer&browse=:sort': 'sort',
 		'themes.php?page=demo-importer&search=:query': 'search',
 		'themes.php?page=demo-importer': 'sort'
@@ -1268,19 +1548,39 @@ demos.RunInstaller = {
 	},
 
 	routes: function() {
-		var self = this;
-		// Bind to our global thx object
+		var self = this,
+			request = {};
+
+		// Bind to our global `wp.demos` object
 		// so that the object is available to sub-views
 		demos.router = new demos.InstallerRouter();
 
-		// Handles demo details route event
-		demos.router.on( 'route:demo', function( slug ) {
-			self.view.view.expand( slug );
-		});
+		// Handles `demo` route event
+		// Queries the API for the passed demo slug
+		demos.router.on( 'route:preview', function( slug ) {
 
-		demos.router.on( 'route:demos', function() {
-			self.demos.doSearch( '' );
-			self.view.trigger( 'demo:close' );
+			// Remove existing handlers.
+			if ( demos.preview ) {
+				demos.preview.undelegateEvents();
+				demos.preview.unbind();
+			}
+
+			// If the demo preview is active, set the current demo.
+			if ( self.view.view.demo && self.view.view.demo.preview ) {
+				self.view.view.demo.model = self.view.collection.findWhere( { 'slug': slug } );
+				self.view.view.demo.preview();
+			} else {
+
+				// Select the demo by slug.
+				request.demo = slug;
+				self.view.collection.query( request );
+				self.view.collection.trigger( 'update' );
+
+				// Open the theme preview.
+				self.view.collection.once( 'query:success', function() {
+					$( 'div[data-slug="' + slug + '"]' ).trigger( 'click' );
+				});
+			}
 		});
 
 		// Handles sorting / browsing routes
