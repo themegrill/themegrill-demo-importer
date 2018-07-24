@@ -523,7 +523,7 @@ class TG_Demo_Importer {
 					'name'            => $demo_data['name'],
 					'theme'           => $demo_data['theme'],
 					'preview_url'     => $demo_data['preview_url'],
-					'screenshot_url'  => $this->import_file_url( $demo_id, 'screenshot.jpg' ),
+					'screenshot_url'  => tg_get_demo_preview_screenshot_url( $demo_id, $current_template ),
 					'package'         => $demo_package,
 					'description'     => $description,
 					'author'          => $author,
