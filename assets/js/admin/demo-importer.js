@@ -448,7 +448,7 @@ demos.view.Demo = wp.Backbone.View.extend({
 		}
 
 		// Allow direct link path to installing a demo.
-		if ( $( event.target ).not( '.install-theme-preview' ).parents( '.theme-actions' ).length ) {
+		if ( $( event.target ).not( '.install-demo-preview' ).parents( '.theme-actions' ).length ) {
 			return;
 		}
 

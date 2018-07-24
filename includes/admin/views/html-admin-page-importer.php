@@ -115,7 +115,7 @@ $feature_lists      = apply_filters( 'themegrill_demo_importer_feature_lists', a
 		<div class="theme-screenshot blank"></div>
 	<# } #>
 
-	<# if ( data.actions.pro_link ) { #>
+	<# if ( data.is_pro ) { #>
 		<span class="pro-banner">
 			<span class="ribbon"><?php _e( 'Pro', 'themegrill-demo-importer' ); ?></span>
 		</span>
@@ -149,7 +149,7 @@ $feature_lists      = apply_filters( 'themegrill_demo_importer_feature_lists', a
 					?>
 					<a class="button button-primary hide-if-no-js demo-import" href="#" data-name="{{ data.name }}" data-slug="{{ data.id }}" aria-label="<?php echo $aria_label; ?>"><?php _e( 'Import', 'themegrill-demo-importer' ); ?></a>
 				<# } #>
-				<button class="button preview install-theme-preview demo-preview"><?php _e( 'Preview', 'themegrill-demo-importer' ); ?></button>
+				<button class="button preview install-demo-preview"><?php _e( 'Preview', 'themegrill-demo-importer' ); ?></button>
 			<# } #>
 		</div>
 	</div>

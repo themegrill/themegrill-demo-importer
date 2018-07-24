@@ -522,6 +522,7 @@ class TG_Demo_Importer {
 					'id'              => $demo_id,
 					'name'            => $demo_data['name'],
 					'theme'           => $demo_data['theme'],
+					'is_pro'          => $premium_link,
 					'preview_url'     => $demo_data['preview_url'],
 					'screenshot_url'  => tg_get_demo_preview_screenshot_url( $demo_id, $current_template ),
 					'package'         => $demo_package,
