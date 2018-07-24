@@ -107,9 +107,9 @@ $feature_lists      = apply_filters( 'themegrill_demo_importer_feature_lists', a
 </div>
 
 <script id="tmpl-demo" type="text/template">
-	<# if ( data.screenshot ) { #>
+	<# if ( data.screenshot_url ) { #>
 		<div class="theme-screenshot">
-			<img src="{{ data.screenshot }}" alt="" />
+			<img src="{{ data.screenshot_url }}" alt="" />
 		</div>
 	<# } else { #>
 		<div class="theme-screenshot blank"></div>
@@ -184,18 +184,10 @@ $feature_lists      = apply_filters( 'themegrill_demo_importer_feature_lists', a
 					<img class="theme-screenshot" src="{{ data.screenshot_url }}" alt="" />
 
 					<div class="theme-details">
-						<# if ( data.rating ) { #>
-							<div class="theme-rating">
-								{{{ data.stars }}}
-								<span class="num-ratings">({{ data.num_ratings }})</span>
-							</div>
-						<# } else { #>
-							<span class="no-rating"><?php _e( 'This theme has not been rated yet.' ); ?></span>
-						<# } #>
 						<div class="theme-version">
 							<?php
 							/* translators: %s: Demo version */
-							printf( __( 'Version: %s' ), '{{ data.version }}' );
+							printf( __( 'Version: %s' ), '{{ data.version }}', 'themegrill-demo-importer' );
 							?>
 						</div>
 						<div class="theme-description">{{{ data.description }}}</div>
@@ -232,7 +224,7 @@ $feature_lists      = apply_filters( 'themegrill_demo_importer_feature_lists', a
 			</div>
 		</div>
 		<div class="wp-full-overlay-main">
-			<iframe src="{{ data.preview }}" title="<?php esc_attr_e( 'Preview' ); ?>"></iframe>
+			<iframe src="{{ data.preview_url }}" title="<?php esc_attr_e( 'Preview' ); ?>"></iframe>
 		</div>
 	</div>
 </script>
