@@ -1320,7 +1320,7 @@ $( document ).ready( function() {
 
 	// Confirm WordPress reset wizard.
 	$( '.themegrill-reset-wordpress' ).on( 'click', function() {
-		return window.confirm( demos.data.settings.confirmReset );
+		return window.confirm( _demoImporterSettings.settings.confirmReset );
 	});
 
 	// Load videos when help button is clicked.
