@@ -337,7 +337,6 @@ demos.Collection = Backbone.Collection.extend({
 
 	// Send request to api.wordpress.org/themes
 	apiCall: function( request, paginated ) {
-		return true;
 		return wp.ajax.send( 'query-themes', {
 			data: {
 				// Request data
@@ -360,7 +359,7 @@ demos.Collection = Backbone.Collection.extend({
 			beforeSend: function() {
 				if ( ! paginated ) {
 					// Spin it
-					$( 'body' ).addClass( 'loading-content' ).removeClass( 'no-results' );
+					// $( 'body' ).addClass( 'loading-content' ).removeClass( 'no-results' );
 				}
 			}
 		});
@@ -433,6 +432,10 @@ demos.view.Demo = wp.Backbone.View.extend({
 		$demoToFocus.addClass('focus');
 	},
 
+	preventExpand: function() {
+		this.touchDrag = true;
+	},
+
 	preview: function( event ) {
 		var self = this,
 			current, preview;
@@ -444,12 +447,12 @@ demos.view.Demo = wp.Backbone.View.extend({
 			return this.touchDrag = false;
 		}
 
-		// Allow direct link path to installing a theme.
+		// Allow direct link path to installing a demo.
 		if ( $( event.target ).not( '.install-theme-preview' ).parents( '.theme-actions' ).length ) {
 			return;
 		}
 
-		// 'enter' and 'space' keys expand the details view when a theme is :focused
+		// 'enter' and 'space' keys expand the details view when a demo is :focused
 		if ( event.type === 'keydown' && ( event.which !== 13 && event.which !== 32 ) ) {
 			return;
 		}
@@ -475,7 +478,7 @@ demos.view.Demo = wp.Backbone.View.extend({
 		preview.render();
 		this.setNavButtonsState();
 
-		// Hide previous/next navigation if there is only one theme
+		// Hide previous/next navigation if there is only one demo
 		if ( this.model.collection.length === 1 ) {
 			preview.$el.addClass( 'no-navigation' );
 		} else {
@@ -486,10 +489,10 @@ demos.view.Demo = wp.Backbone.View.extend({
 		$( 'div.wrap' ).append( preview.el );
 
 		// Listen to our preview object
-		// for `theme:next` and `theme:previous` events.
-		this.listenTo( preview, 'theme:next', function() {
+		// for `demo:next` and `demo:previous` events.
+		this.listenTo( preview, 'demo:next', function() {
 
-			// Keep local track of current theme model.
+			// Keep local track of current demo model.
 			current = self.model;
 
 			// If we have ventured away from current model update the current model position.
@@ -497,12 +500,12 @@ demos.view.Demo = wp.Backbone.View.extend({
 				current = self.current;
 			}
 
-			// Get next theme model.
+			// Get next demo model.
 			self.current = self.model.collection.at( self.model.collection.indexOf( current ) + 1 );
 
 			// If we have no more themes, bail.
 			if ( _.isUndefined( self.current ) ) {
-				self.options.parent.parent.trigger( 'theme:end' );
+				self.options.parent.parent.trigger( 'demo:end' );
 				return self.current = current;
 			}
 
@@ -513,9 +516,9 @@ demos.view.Demo = wp.Backbone.View.extend({
 			this.setNavButtonsState();
 			$( '.next-theme' ).focus();
 		})
-		.listenTo( preview, 'theme:previous', function() {
+		.listenTo( preview, 'demo:previous', function() {
 
-			// Keep track of current theme model.
+			// Keep track of current demo model.
 			current = self.model;
 
 			// Bail early if we are at the beginning of the collection
@@ -549,8 +552,20 @@ demos.view.Demo = wp.Backbone.View.extend({
 		});
 	},
 
-	preventExpand: function() {
-		this.touchDrag = true;
+	// Handles .disabled classes for previous/next buttons in theme installer preview
+	setNavButtonsState: function() {
+		var $themeInstaller = $( '.theme-install-overlay' ),
+			current = _.isUndefined( this.current ) ? this.model : this.current;
+
+		// Disable previous at the zero position
+		if ( 0 === this.model.collection.indexOf( current ) ) {
+			$themeInstaller.find( '.previous-theme' ).addClass( 'disabled' );
+		}
+
+		// Disable next if the next model is undefined
+		if ( _.isUndefined( this.model.collection.at( this.model.collection.indexOf( current ) + 1 ) ) ) {
+			$themeInstaller.find( '.next-theme' ).addClass( 'disabled' );
+		}
 	},
 
 	importDemo: function( event ) {
@@ -938,6 +953,153 @@ demos.view.Details = wp.Backbone.View.extend({
 		if ( image.width && image.width <= 300 ) {
 			el.addClass( 'small-screenshot' );
 		}
+	}
+});
+
+// Theme Preview view
+// Set ups a modal overlay with the expanded theme data
+demos.view.Preview = demos.view.Details.extend({
+
+	className: 'wp-full-overlay expanded',
+	el: '.theme-install-overlay',
+
+	events: {
+		'click .close-full-overlay': 'close',
+		'click .collapse-sidebar': 'collapse',
+		'click .devices button': 'previewDevice',
+		'click .previous-theme': 'previousTheme',
+		'click .next-theme': 'nextTheme',
+		'keyup': 'keyEvent',
+		'click .theme-install': 'installTheme'
+	},
+
+	// The HTML template for the demo preview
+	html: demos.template( 'demo-preview' ),
+
+	render: function() {
+		var self = this,
+			currentPreviewDevice,
+			data = this.model.toJSON(),
+			$body = $( document.body );
+
+		$body.attr( 'aria-busy', 'true' );
+
+		this.$el.removeClass( 'iframe-ready' ).html( this.html( data ) );
+
+		currentPreviewDevice = this.$el.data( 'current-preview-device' );
+		if ( currentPreviewDevice ) {
+			self.tooglePreviewDeviceButtons( currentPreviewDevice );
+		}
+
+		demos.router.navigate( demos.router.baseUrl( demos.router.demoPath + this.model.get( 'id' ) ), { replace: false } );
+
+		this.$el.fadeIn( 200, function() {
+			$body.addClass( 'theme-installer-active full-overlay-active' );
+		});
+
+		this.$el.find( 'iframe' ).one( 'load', function() {
+			self.iframeLoaded();
+		});
+	},
+
+	iframeLoaded: function() {
+		this.$el.addClass( 'iframe-ready' );
+		$( document.body ).attr( 'aria-busy', 'false' );
+	},
+
+	close: function() {
+		this.$el.fadeOut( 200, function() {
+			$( 'body' ).removeClass( 'theme-installer-active full-overlay-active' );
+
+			// Return focus to the demo div
+			if ( demos.focusedTheme ) {
+				demos.focusedTheme.focus();
+			}
+		}).removeClass( 'iframe-ready' );
+
+		// Restore the previous browse tab if available.
+		if ( demos.router.selectedTab ) {
+			demos.router.navigate( demos.router.baseUrl( '&browse=' + demos.router.selectedTab ) );
+			demos.router.selectedTab = false;
+		} else {
+			demos.router.navigate( demos.router.baseUrl( '' ) );
+		}
+		this.trigger( 'preview:close' );
+		this.undelegateEvents();
+		this.unbind();
+		return false;
+	},
+
+	collapse: function( event ) {
+		var $button = $( event.currentTarget );
+		if ( 'true' === $button.attr( 'aria-expanded' ) ) {
+			$button.attr({ 'aria-expanded': 'false', 'aria-label': l10n.expandSidebar });
+		} else {
+			$button.attr({ 'aria-expanded': 'true', 'aria-label': l10n.collapseSidebar });
+		}
+
+		this.$el.toggleClass( 'collapsed' ).toggleClass( 'expanded' );
+		return false;
+	},
+
+	previewDevice: function( event ) {
+		var device = $( event.currentTarget ).data( 'device' );
+
+		this.$el
+			.removeClass( 'preview-desktop preview-tablet preview-mobile' )
+			.addClass( 'preview-' + device )
+			.data( 'current-preview-device', device );
+
+		this.tooglePreviewDeviceButtons( device );
+	},
+
+	tooglePreviewDeviceButtons: function( newDevice ) {
+		var $devices = $( '.wp-full-overlay-footer .devices' );
+
+		$devices.find( 'button' )
+			.removeClass( 'active' )
+			.attr( 'aria-pressed', false );
+
+		$devices.find( 'button.preview-' + newDevice )
+			.addClass( 'active' )
+			.attr( 'aria-pressed', true );
+	},
+
+	keyEvent: function( event ) {
+		// The escape key closes the preview
+		if ( event.keyCode === 27 ) {
+			this.undelegateEvents();
+			this.close();
+		}
+		// The right arrow key, next theme
+		if ( event.keyCode === 39 ) {
+			_.once( this.nextTheme() );
+		}
+
+		// The left arrow key, previous theme
+		if ( event.keyCode === 37 ) {
+			this.previousTheme();
+		}
+	},
+
+	installTheme: function( event ) {
+		var _this   = this,
+		    $target = $( event.target );
+		event.preventDefault();
+
+		if ( $target.hasClass( 'disabled' ) ) {
+			return;
+		}
+
+		wp.updates.maybeRequestFilesystemCredentials( event );
+
+		$( document ).on( 'wp-theme-install-success', function() {
+			_this.model.set( { 'installed': true } );
+		} );
+
+		wp.updates.installTheme( {
+			slug: $target.data( 'slug' )
+		} );
 	}
 });
 
