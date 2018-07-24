@@ -876,11 +876,6 @@ demos.view.Demos = wp.Backbone.View.extend({
 			self.listenTo( self.demo, 'demo:expand', self.expand, self );
 		});
 
-		// 'Add new demo' element shown at the end of the grid
-		if ( ! demos.isPreview && demos.isInstall && demos.data.settings.canInstall ) {
-			this.$el.append( '<div class="theme add-new-theme"><a href="' + demos.data.settings.installURI + '"><div class="theme-screenshot"><span></span></div><h2 class="theme-name">' + l10n.addNew + '</h2></a></div>' );
-		}
-
 		this.parent.page++;
 	},
 
