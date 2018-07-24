@@ -1623,7 +1623,7 @@ demos.view.Installer = demos.view.Appearance.extend({
 		this.sort( sort );
 
 		// Trigger a router.naviagte update
-		themes.router.navigate( themes.router.baseUrl( themes.router.browsePath + sort ) );
+		demos.router.navigate( demos.router.baseUrl( demos.router.browsePath + sort ) );
 	},
 
 	sort: function( sort ) {
