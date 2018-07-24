@@ -149,7 +149,7 @@ $feature_lists      = apply_filters( 'themegrill_demo_importer_feature_lists', a
 					?>
 					<a class="button button-primary hide-if-no-js demo-import" href="#" data-name="{{ data.name }}" data-slug="{{ data.id }}" aria-label="<?php echo $aria_label; ?>"><?php _e( 'Import', 'themegrill-demo-importer' ); ?></a>
 				<# } #>
-				<a class="button button-secondary demo-preview" target="_blank" href="{{{ data.actions.demo_url }}}"><?php _e( 'Preview', 'themegrill-demo-importer' ); ?></a>
+				<button class="button preview install-theme-preview demo-preview"><?php _e( 'Preview', 'themegrill-demo-importer' ); ?></button>
 			<# } #>
 		</div>
 	</div>

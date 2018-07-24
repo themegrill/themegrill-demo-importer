@@ -22,14 +22,14 @@ function tg_update_demo_importer_config( $demo_config ) {
 	if ( ! empty( $demo_config ) ) {
 		foreach ( $demo_config as $demo_id => $demo_data ) {
 
-			// Set demo preview URL, if not found.
-			if ( ! isset( $demo_data['preview_url'] ) ) {
-				$demo_config[ $demo_id ]['preview_url'] = $demo_data['demo_url'];
-			}
-
 			// Set theme name, if not found.
 			if ( ! isset( $demo_data['theme'] ) ) {
 				$demo_config[ $demo_id ]['theme'] = current( explode( ' ', $demo_data['name'] ) );
+			}
+
+			// Set demo preview URL, if not found.
+			if ( ! isset( $demo_data['preview_url'] ) ) {
+				$demo_config[ $demo_id ]['preview_url'] = isset( $demo_data['preview'] ) ? $demo_data['preview'] : $demo_data['demo_url'];
 			}
 
 			// BW Compat plugins list.
@@ -71,6 +71,7 @@ add_filter( 'themegrill_demo_importer_config', 'tg_update_demo_importer_config',
 
 /**
  * Update demo importer options.
+ *
  * @since 1.3.4
  */
 function tg_update_demo_importer_options() {
