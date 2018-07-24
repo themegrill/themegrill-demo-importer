@@ -522,6 +522,7 @@ class TG_Demo_Importer {
 					'id'              => $demo_id,
 					'name'            => $demo_data['name'],
 					'theme'           => $demo_data['theme'],
+					'preview'         => $demo_data['preview'],
 					'package'         => $demo_package,
 					'screenshot'      => $this->import_file_url( $demo_id, 'screenshot.jpg' ),
 					'description'     => $description,
@@ -537,7 +538,6 @@ class TG_Demo_Importer {
 					),
 					'actions'         => array(
 						'preview'  => home_url( '/' ),
-						'demo_url' => $demo_data['demo_url'],
 						'delete'   => current_user_can( 'upload_files' ) ? wp_nonce_url( admin_url( 'themes.php?page=demo-importer&browse=uploads&action=delete&amp;demo_pack=' . urlencode( $demo_id ) ), 'delete-demo_' . $demo_id ) : null,
 					),
 				);
@@ -560,9 +560,7 @@ class TG_Demo_Importer {
 	 * Demo Importer page output.
 	 */
 	public function demo_importer() {
-		$demos = $this->prepare_demos_for_js( $this->demo_config );
-
-		include_once( dirname( __FILE__ ) . "/admin/views/html-admin-page-importer.php" );
+		include_once dirname( __FILE__ ) . '/admin/views/html-admin-page-importer.php';
 	}
 
 	/**

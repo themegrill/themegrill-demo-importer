@@ -5,10 +5,19 @@
 
 defined( 'ABSPATH' ) || exit;
 
-global $current_filter;
-
-$current_filter    = empty( $_GET['browse'] ) ? 'welcome' : sanitize_title( $_GET['browse'] );
-$demo_filter_links = apply_filters( 'themegrill_demo_importer_filter_links_array', array(
+$previewable_devices = array(
+	'desktop' => array(
+		'label' => __( 'Enter desktop preview mode' ),
+		'default' => true,
+	),
+	'tablet' => array(
+		'label' => __( 'Enter tablet preview mode' ),
+	),
+	'mobile' => array(
+		'label' => __( 'Enter mobile preview mode' ),
+	),
+);
+$demo_filter_links   = apply_filters( 'themegrill_demo_importer_filter_links_array', array(
 	'all'       => __( 'All', 'themegrill-demo-importer' ),
 	'blog'      => __( 'Blog', 'themegrill-demo-importer' ),
 	'business'  => __( 'Business', 'themegrill-demo-importer' ),
@@ -17,8 +26,7 @@ $demo_filter_links = apply_filters( 'themegrill_demo_importer_filter_links_array
 	'free'      => __( 'Free', 'themegrill-demo-importer' ),
 	'others'    => __( 'Others', 'themegrill-demo-importer' ),
 ) );
-
-$feature_lists = apply_filters( 'themegrill_demo_importer_feature_lists', array(
+$feature_lists      = apply_filters( 'themegrill_demo_importer_feature_lists', array(
 	'pagebuilder' => array(
 		'name'  => __( 'Pagebuilder', 'themegrill-demo-importer' ),
 		'lists' => array(
@@ -46,7 +54,7 @@ $feature_lists = apply_filters( 'themegrill_demo_importer_feature_lists', array(
 
 	<div class="wp-filter hide-if-no-js">
 		<div class="filter-count">
-			<span class="count theme-count demo-count"><?php echo 'preview' == $current_filter ? count( $this->demo_packages ) : count( $this->demo_config ); ?></span>
+			<span class="count theme-count demo-count"><?php echo count( $this->demo_config ); ?></span>
 		</div>
 
 		<ul class="filter-links">
@@ -199,10 +207,33 @@ $feature_lists = apply_filters( 'themegrill_demo_importer_feature_lists', array(
 					<span class="collapse-sidebar-arrow"></span>
 					<span class="collapse-sidebar-label"><?php _e( 'Collapse' ); ?></span>
 				</button>
+
+				<?php if ( ! empty( $previewable_devices ) ) : ?>
+					<div class="devices-wrapper">
+						<div class="devices">
+							<?php foreach ( (array) $previewable_devices as $device => $settings ) : ?>
+								<?php
+								if ( empty( $settings['label'] ) ) {
+									continue;
+								}
+								$active = ! empty( $settings['default'] );
+								$class = 'preview-' . $device;
+								if ( $active ) {
+									$class .= ' active';
+								}
+								?>
+								<button type="button" class="<?php echo esc_attr( $class ); ?>" aria-pressed="<?php echo esc_attr( $active ) ?>" data-device="<?php echo esc_attr( $device ); ?>">
+									<span class="screen-reader-text"><?php echo esc_html( $settings['label'] ); ?></span>
+								</button>
+							<?php endforeach; ?>
+						</div>
+					</div>
+				<?php endif; ?>
 			</div>
 		</div>
 		<div class="wp-full-overlay-main">
-		<iframe src="{{ data.preview_url }}" title="<?php esc_attr_e( 'Preview' ); ?>"></iframe>
+			<iframe src="{{ data.preview }}" title="<?php esc_attr_e( 'Preview' ); ?>"></iframe>
+		</div>
 	</div>
 </script>
 

@@ -22,6 +22,11 @@ function tg_update_demo_importer_config( $demo_config ) {
 	if ( ! empty( $demo_config ) ) {
 		foreach ( $demo_config as $demo_id => $demo_data ) {
 
+			// Set theme preview, if not found.
+			if ( ! isset( $demo_data['preview'] ) ) {
+				$demo_config[ $demo_id ]['preview'] = $demo_data['demo_url'];
+			}
+
 			// Set theme name, if not found.
 			if ( ! isset( $demo_data['theme'] ) ) {
 				$demo_config[ $demo_id ]['theme'] = current( explode( ' ', $demo_data['name'] ) );
