@@ -219,11 +219,15 @@ class TG_Demo_Importer {
 					'adminUrl'       => parse_url( self_admin_url(), PHP_URL_PATH ),
 				),
 				'l10n' => array(
-					'addNew'            => __( 'Add New Demo', 'themegrill-demo-importer' ),
-					'search'            => __( 'Search Demos', 'themegrill-demo-importer' ),
-					'searchPlaceholder' => __( 'Search demos...', 'themegrill-demo-importer' ), // placeholder (no ellipsis)
-					'demosFound'        => __( 'Number of Demos found: %d', 'themegrill-demo-importer' ),
-					'noDemosFound'      => __( 'No demos found. Try a different search.', 'themegrill-demo-importer' ),
+					'addNew'              => __( 'Add New Demo', 'themegrill-demo-importer' ),
+					'search'              => __( 'Search Demos', 'themegrill-demo-importer' ),
+					'searchPlaceholder'   => __( 'Search demos...', 'themegrill-demo-importer' ), // placeholder (no ellipsis)
+					'demosFound'          => __( 'Number of Demos found: %d', 'themegrill-demo-importer' ),
+					'noDemosFound'        => __( 'No demos found. Try a different search.', 'themegrill-demo-importer' ),
+					'collapseSidebar'     => __( 'Collapse Sidebar', 'themegrill-demo-importer' ),
+					'expandSidebar'       => __( 'Expand Sidebar', 'themegrill-demo-importer' ),
+					/* translators: accessibility text */
+					'selectFeatureFilter' => __( 'Select one or more Demo features to filter by', 'themegrill-demo-importer' ),
 				),
 				'installedDemos' => array_keys( $this->demo_config ),
 			) );

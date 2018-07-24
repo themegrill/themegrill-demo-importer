@@ -1089,6 +1089,22 @@ demos.view.Search = wp.Backbone.View.extend({
 	}
 });
 
+/**
+ * Navigate router.
+ *
+ * @since 1.5.0
+ *
+ * @param {string} url - URL to navigate to.
+ * @param {object} state - State.
+ * @returns {void}
+ */
+function navigateRouter( url, state ) {
+	var router = this;
+	if ( Backbone.history._hasPushState ) {
+		Backbone.Router.prototype.navigate.call( router, url, state );
+	}
+}
+
 // Sets up the routes events for relevant url queries
 // Listens to [demo] and [search] params
 demos.Router = Backbone.Router.extend({
@@ -1116,11 +1132,7 @@ demos.Router = Backbone.Router.extend({
 		$( '.wp-filter-search' ).val( '' );
 	},
 
-	navigate: function() {
-		if ( Backbone.history._hasPushState ) {
-			Backbone.Router.prototype.navigate.apply( this, arguments );
-		}
-	}
+	navigate: navigateRouter
 });
 
 // Execute and setup the application
@@ -1237,11 +1249,7 @@ demos.InstallerRouter = Backbone.Router.extend({
 		$( '.wp-filter-search' ).val( '' );
 	},
 
-	navigate: function() {
-		if ( Backbone.history._hasPushState ) {
-			Backbone.Router.prototype.navigate.apply( this, arguments );
-		}
-	}
+	navigate: navigateRouter
 });
 
 demos.RunInstaller = {
@@ -1313,11 +1321,7 @@ demos.RunInstaller = {
 
 // Ready...
 $( document ).ready( function() {
-	if ( demos.isInstall ) {
-		demos.RunInstaller.init();
-	} else {
-		demos.Run.init();
-	}
+	demos.RunInstaller.init();
 
 	// Rating footer.
 	$( '.themegrill-demo-importer-rating-link' ).on( 'click', function() {
