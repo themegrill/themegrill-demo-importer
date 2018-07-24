@@ -202,7 +202,7 @@ $feature_lists = apply_filters( 'themegrill_demo_importer_feature_lists', array(
 			</div>
 		</div>
 		<div class="wp-full-overlay-main">
-		<iframe src="https://demo.themegrill.com/colormag/" title="<?php esc_attr_e( 'Preview' ); ?>"></iframe>
+		<iframe src="{{ data.preview_url }}" title="<?php esc_attr_e( 'Preview' ); ?>"></iframe>
 	</div>
 </script>
 
