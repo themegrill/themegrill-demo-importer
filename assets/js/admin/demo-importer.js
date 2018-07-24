@@ -1217,31 +1217,22 @@ demos.view.Installer = demos.view.Appearance.extend({
 demos.InstallerRouter = Backbone.Router.extend({
 
 	routes: {
-		'themes.php?page=demo-importer&browse=uploads&demo=:slug': 'demo',
-		'themes.php?page=demo-importer&browse=:sort&search=:query': 'search',
-		'themes.php?page=demo-importer&browse=:sort&s=:query': 'search',
-		'themes.php?page=demo-importer&browse=welcome': 'sort',
-		'themes.php?page=demo-importer&browse=:sort': 'demos',
+		'themes.php?page=demo-importer&demo=:slug': 'preview',
+		'themes.php?page=demo-importer&browse=:sort': 'sort',
+		'themes.php?page=demo-importer&search=:query': 'search',
 		'themes.php?page=demo-importer': 'sort'
 	},
 
-	browse: function() {
-		return demos.isPreview ? 'preview' : 'uploads';
-	},
-
 	baseUrl: function( url ) {
-		return 'themes.php?page=demo-importer&browse=' + this.browse() + url;
+		return 'themes.php?page=demo-importer' + url;
 	},
 
 	demoPath: '&demo=',
+	browsePath: '&browse=',
 	searchPath: '&search=',
 
-	search: function( sort, query ) {
-		$( '.wp-filter-search' ).val( query );
-	},
-
-	demos: function() {
-		$( '.wp-filter-search' ).val( '' );
+	search: function( query ) {
+		$( '.wp-filter-search' ).val( query.replace( /\+/g, ' ' ) );
 	},
 
 	navigate: navigateRouter
@@ -1294,10 +1285,17 @@ demos.RunInstaller = {
 
 		// Handles sorting / browsing routes
 		// Also handles the root URL triggering a sort request
-		// for `welcome`, the default view
+		// for `all`, the default view
 		demos.router.on( 'route:sort', function( sort ) {
-			if ( ! sort || 'welcome' === sort ) {
-				$( '.wp-filter-search' ).hide();
+			if ( ! sort ) {
+				sort = 'all';
+				demos.router.navigate( demos.router.baseUrl( '&browse=all' ), { replace: true } );
+			}
+			self.view.sort( sort );
+
+			// Close the preview if open.
+			if ( demos.preview ) {
+				demos.preview.close();
 			}
 		});
 
