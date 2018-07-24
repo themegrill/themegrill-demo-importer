@@ -251,7 +251,12 @@ class TG_Demo_Importer {
 		if ( isset( $current_screen->id ) && apply_filters( 'themegrill_demo_importer_display_admin_footer_text', in_array( $current_screen->id, array( 'appearance_page_demo-importer' ) ) ) ) {
 			// Change the footer text.
 			if ( ! get_option( 'themegrill_demo_importer_admin_footer_text_rated' ) ) {
-				$footer_text = sprintf( __( 'If you like <strong>ThemeGrill Demo Importer</strong> please leave us a %1$s&#9733;&#9733;&#9733;&#9733;&#9733;%2$s rating. A huge thanks in advance!', 'themegrill-demo-importer' ), '<a href="https://wordpress.org/support/plugin/themegrill-demo-importer/reviews?rate=5#new-post" target="_blank" class="themegrill-demo-importer-rating-link" data-rated="' . esc_attr__( 'Thanks :)', 'themegrill-demo-importer' ) . '">', '</a>' );
+				$footer_text = sprintf(
+					/* translators: 1: ThemeGrill Demo Importer 2: five stars */
+					__( 'If you like %1$s please leave us a %2$s rating. A huge thanks in advance!', 'themegrill-demo-importer' ),
+					sprintf( '<strong>%s</strong>', esc_html__( 'ThemeGrill Demo Importer', 'themegrill-demo-importer' ) ),
+					'<a href="https://wordpress.org/support/plugin/themegrill-demo-importer/reviews?rate=5#new-post" target="_blank" class="themegrill-demo-importer-rating-link" data-rated="' . esc_attr__( 'Thanks :)', 'themegrill-demo-importer' ) . '">&#9733;&#9733;&#9733;&#9733;&#9733;</a>'
+				);
 			} else {
 				$footer_text = __( 'Thank you for importing with ThemeGrill Demo Importer.', 'themegrill-demo-importer' );
 			}
@@ -648,11 +653,11 @@ class TG_Demo_Importer {
 	 */
 	public function ajax_footer_text_rated() {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			die( -1 );
+			wp_die( -1 );
 		}
 
 		update_option( 'themegrill_demo_importer_admin_footer_text_rated', 1 );
-		die();
+		wp_die();
 	}
 
 	/**

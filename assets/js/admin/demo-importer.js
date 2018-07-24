@@ -1318,17 +1318,6 @@ demos.RunInstaller = {
 $( document ).ready( function() {
 	demos.RunInstaller.init();
 
-	// Rating footer.
-	$( '.themegrill-demo-importer-rating-link' ).on( 'click', function() {
-		var $this_el = $( this );
-
-		$.post( demos.data.settings.ajaxUrl, {
-			action: 'footer-text-rated'
-		});
-
-		$this_el.parent().text( $this_el.data( 'rated' ) );
-	} );
-
 	// Confirm WordPress reset wizard.
 	$( '.themegrill-reset-wordpress' ).on( 'click', function() {
 		return window.confirm( demos.data.settings.confirmReset );
@@ -1340,6 +1329,17 @@ $( document ).ready( function() {
 			var video_id = $( this ).data( 'video_id' );
 			$( this ).replaceWith( '<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/' + video_id + '" frameborder="0" allowfullscreen></iframe>' );
 		} );
+	} );
+
+	// Change the footer text when rating link is clicked.
+	$( '.themegrill-demo-importer-rating-link' ).on( 'click', function() {
+		var $this_el = $( this );
+
+		$.post( demos.data.settings.ajaxUrl, {
+			action: 'footer-text-rated'
+		});
+
+		$this_el.parent().text( $this_el.data( 'rated' ) );
 	} );
 
 	// Make disabled checkbox always checked through data-checked.
