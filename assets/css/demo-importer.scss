@@ -16,6 +16,14 @@
 			}
 		}
 
+		.theme-browser {
+			.theme {
+				.theme-screenshot img {
+					object-fit: cover;
+				}
+			}
+		}
+
 		.install-theme-info {
 			.theme-screenshot {
 				width: 100%;
