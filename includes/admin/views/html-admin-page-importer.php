@@ -21,8 +21,6 @@ $demo_filter_links   = apply_filters( 'themegrill_demo_importer_filter_links_arr
 	'all'       => __( 'All', 'themegrill-demo-importer' ),
 	'blog'      => __( 'Blog', 'themegrill-demo-importer' ),
 	'business'  => __( 'Business', 'themegrill-demo-importer' ),
-	'education' => __( 'Education', 'themegrill-demo-importer' ),
-	'ecommerce' => __( 'eCommerce', 'themegrill-demo-importer' ),
 	'free'      => __( 'Free', 'themegrill-demo-importer' ),
 	'others'    => __( 'Others', 'themegrill-demo-importer' ),
 ) );
@@ -116,9 +114,7 @@ $feature_lists      = apply_filters( 'themegrill_demo_importer_feature_lists', a
 	<# } #>
 
 	<# if ( data.is_pro ) { #>
-		<span class="pro-banner">
-			<span class="ribbon"><?php _e( 'Pro', 'themegrill-demo-importer' ); ?></span>
-		</span>
+		<span class="pro-ribbon"><?php _e( 'Pro', 'themegrill-demo-importer' ); ?></span>
 	<# } #>
 
 	<span class="more-details"><?php _ex( 'Details &amp; Preview', 'demo', 'themegrill-demo-importer' ); ?></span>
