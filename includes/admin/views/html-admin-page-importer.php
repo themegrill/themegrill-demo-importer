@@ -114,7 +114,7 @@ $feature_lists      = apply_filters( 'themegrill_demo_importer_feature_lists', a
 	<# } #>
 
 	<# if ( data.is_pro ) { #>
-		<span class="pro-ribbon"><?php _e( 'Pro', 'themegrill-demo-importer' ); ?></span>
+		<span class="premium-demo-banner"><?php _e( 'Pro', 'themegrill-demo-importer' ); ?></span>
 	<# } #>
 
 	<span class="more-details"><?php _ex( 'Details &amp; Preview', 'demo', 'themegrill-demo-importer' ); ?></span>
