@@ -16,6 +16,14 @@
 			}
 		}
 
+		.theme-browser {
+			.theme {
+				.theme-screenshot img {
+					object-fit: cover;
+				}
+			}
+		}
+
 		.install-theme-info {
 			.theme-screenshot {
 				width: 100%;
@@ -24,31 +32,33 @@
 
 		.premium-demo-banner {
 			position: absolute;
-			top: 10px;
-			right: -16px;
+			top: 15px;
+			right:-16px;
 			color: #fff;
-			font-size: 13px;
+			padding: 0 15px;
 			font-weight: 600;
-			padding: 6px 15px;
-			text-align: center;
-			background: #069c64;
+			min-height: 30px;
+			line-height: 28px;
+			background: #228b9b;
 			text-transform: uppercase;
 
-			&::before {
-				content: "";
-				position: absolute;
-				bottom: 0;
-				left: -20px;
-				border: 15px solid #069c64;
-				border-left-color: transparent;
-			}
-
+			&::before,
 			&::after {
 				content: "";
 				position: absolute;
+			}
+
+			&::before {
+				left: -20px;
+				color: #fff;
+				border: 15px solid #228b9b;
+				border-left-color: transparent;
+			}
+
+			&::after{
 				top: 30px;
 				right: 0;
-				border: 8px solid darken( #069c64, 10% );
+				border: 8px solid darken( #228b9b, 10% );
 				border-right-color: transparent;
 				border-bottom-color: transparent;
 			}
