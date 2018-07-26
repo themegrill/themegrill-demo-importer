@@ -39,7 +39,7 @@
 			font-weight: 600;
 			min-height: 30px;
 			line-height: 28px;
-			background: #228b9b;
+			background: #5fbd0a;
 			text-transform: uppercase;
 
 			&::before,
@@ -51,14 +51,14 @@
 			&::before {
 				left: -15px;
 				color: #fff;
-				border: 15px solid #228b9b;
+				border: 15px solid #5fbd0a;
 				border-left-color: transparent;
 			}
 
 			&::after{
 				top: 30px;
 				right: 0;
-				border: 8px solid darken( #228b9b, 10% );
+				border: 8px solid #478d07;
 				border-right-color: transparent;
 				border-bottom-color: transparent;
 			}
