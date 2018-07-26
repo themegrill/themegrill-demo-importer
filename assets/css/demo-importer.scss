@@ -44,7 +44,7 @@
 
 			&::before,
 			&::after {
-				content: "";
+				content: '';
 				position: absolute;
 			}
 
@@ -55,7 +55,7 @@
 				border-left-color: transparent;
 			}
 
-			&::after{
+			&::after {
 				top: 30px;
 				right: 0;
 				border: 8px solid #478d07;
