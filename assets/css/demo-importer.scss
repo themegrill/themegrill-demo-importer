@@ -3,6 +3,21 @@
  * General ThemeGrill Demo Importer admin styles.
  */
 
+ /**
+ *keyframes
+ */
+
+ @-webkit-keyframes spin {
+	from {
+		-webkit-transform: rotate(0deg);
+		transform: rotate(0deg);
+	}
+	to {
+		-webkit-transform: rotate(360deg);
+		transform: rotate(360deg);
+	}
+ }
+
 /**
  * Styling begins
  */
@@ -24,8 +39,116 @@
 			}
 		}
 
+		.wp-full-overlay-sidebar-content {
+			bottom: 120px;
+
+			* {
+				box-sizing: border-box;
+			}
+		}
+
 		.install-theme-info {
+
+			.theme-name {
+
+				.pro-tag {
+					color: #fff;
+					font-size: 13px;
+					font-weight: 400;
+					margin-left: 5px;
+					padding: 0px 10px;
+					border-radius: 3px;
+					display: inline-block;
+					background: #67c016;
+				}
+			}
 			.theme-screenshot {
+				width: 100%;
+			}
+
+			.theme-details {
+				padding-bottom: 30px;
+				border-bottom: 1px solid #ddd;
+
+				.theme-version {
+					margin-top: 0;
+				}
+			}
+		}
+
+		.required-plugins {
+			padding-top: 10px;
+
+			.plugin-list {
+				border: 1px solid #ddd;
+				border-radius: 3px;
+
+				li {
+					padding: 10px;
+					margin-bottom: 0;
+					border-bottom: 1px solid #ddd;
+					display: flex;
+					align-items: center;
+					justify-content: space-between;
+
+					&:last-child {
+						border-bottom: none;
+					}
+				}
+			}
+
+			.circle-loader {
+				width: 20px;
+				height: 20px;
+				border-radius: 50%;
+				position: relative;
+				vertical-align: top;
+				display: inline-block;
+				border: 2px solid #bfbfbf;
+
+				&.circle-loading {
+					-webkit-animation: spin 700ms infinite linear;
+					border-left-color: #5cb85c;
+				}
+
+				&.circle-colored {
+					border-color: #5cb85c;
+					.checked {
+						display: block;
+					}
+				}
+
+				.checked {
+					display: none;
+
+					&::after {
+						opacity: 1;
+						height: 50%;
+						width: 25%;;
+						transform-origin: left top;
+						border-right: 2px solid #5cb85c;
+						border-top: 2px solid #5cb85c;
+						content: "";
+						left: 50%;
+						top: 50%;
+						position: absolute;
+						transform: scaleX(-1) rotate(135deg) translate(-58%, -40%);
+					}
+				}
+			}
+		}
+
+		.demo-import-button {
+			position: fixed;
+			bottom: 46px;
+			width: calc( 18% - 1px );
+			background: #fff;
+			min-width: 299px;
+			max-width: 599px;
+			padding: 15px 20px;
+			border-top: 1px solid #ddd;
+
+			.button {
 				width: 100%;
 			}
 		}

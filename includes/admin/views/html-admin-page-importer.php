@@ -169,27 +169,57 @@ $feature_lists      = apply_filters( 'themegrill_demo_importer_feature_lists', a
 		</div>
 		<div class="wp-full-overlay-sidebar-content">
 			<div class="install-theme-info">
-				<h3 class="theme-name">{{ data.name }}</h3>
-					<span class="theme-by">
+				<h3 class="theme-name">{{ data.name }}
+					<# if ( data.is_pro ) { #>
+						<span class="pro-tag"><?php _e( 'Pro', 'themegrill-demo-importer' ); ?></span>
+					<# } #>
+				</h3>
+				<span class="theme-by">
+					<?php
+					/* translators: %s: Demo author name */
+					printf( __( 'By %s', 'themegrill-demo-importer' ), '{{ data.author }}' );
+					?>
+				</span>
+
+				<img class="theme-screenshot" src="{{ data.screenshot_url }}" alt="" />
+
+				<div class="theme-details">
+					<div class="theme-version">
 						<?php
-						/* translators: %s: Demo author name */
-						printf( __( 'By %s', 'themegrill-demo-importer' ), '{{ data.author }}' );
+						/* translators: %s: Demo version */
+						printf( __( 'Version: %s' ), '{{ data.version }}', 'themegrill-demo-importer' );
 						?>
-					</span>
-
-					<img class="theme-screenshot" src="{{ data.screenshot_url }}" alt="" />
-
-					<div class="theme-details">
-						<div class="theme-version">
-							<?php
-							/* translators: %s: Demo version */
-							printf( __( 'Version: %s' ), '{{ data.version }}', 'themegrill-demo-importer' );
-							?>
-						</div>
-						<div class="theme-description">{{{ data.description }}}</div>
+					</div>
+					<div class="theme-description">{{{ data.description }}}
+					Quisque tempus augue vel eleifend iaculis. Sed posuere, nisl a aliquam hendrerit, tellus diam semper enim, ac consequat metus.
 					</div>
 				</div>
+				<div class="required-plugins">
+					<h3>Required Plugins</h3>
+					<p>Install some required plugins to import this demo.</p>
+					<ul class="plugin-list">
+						<li>
+							<span class="plugin-name">Everest Forms</span>
+							<div class="circle-loader"></div>
+						</li>
+						<li>
+							<span class="plugin-name">Elementor</span>
+							<div class="circle-loader circle-loading"></div>
+						</li>
+						<li>
+							<span class="plugin-name">Woocommerce</span>
+							<div class="circle-loader circle-colored">
+								<div class="checked"></div>
+							</div>
+						</li>
+					</ul>
+				</div>
 			</div>
+
+			<div class="demo-import-button">
+				<button class="button button-hero button-primary" href="#" data-import="disabled">Import Demo</button>
+			</div>
+		</div>
 			<div class="wp-full-overlay-footer">
 				<button type="button" class="collapse-sidebar button" aria-expanded="true" aria-label="<?php esc_attr_e( 'Collapse Sidebar' ); ?>">
 					<span class="collapse-sidebar-arrow"></span>
