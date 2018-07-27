@@ -21,13 +21,6 @@ class TG_Demo_Importer {
 	public $demo_config;
 
 	/**
-	 * Demo packages.
-	 *
-	 * @var array
-	 */
-	public $demo_packages;
-
-	/**
 	 * Constructor.
 	 */
 	public function __construct() {
@@ -75,8 +68,7 @@ class TG_Demo_Importer {
 	 * Demo importer setup.
 	 */
 	public function setup() {
-		$this->demo_config   = apply_filters( 'themegrill_demo_importer_config', array() );
-		$this->demo_packages = apply_filters( 'themegrill_demo_importer_packages', array() );
+		$this->demo_config = apply_filters( 'themegrill_demo_importer_config', array() );
 	}
 
 	/**
@@ -461,10 +453,14 @@ class TG_Demo_Importer {
 	 * @return array An associative array of demo data, sorted by name.
 	 */
 	private function prepare_demos_for_js() {
-		$prepared_demos      = array();
-		$current_template    = get_option( 'template' );
-		$demo_activated_id   = get_option( 'themegrill_demo_importer_activated_id' );
-		$available_demos     = tg_demo_installer_enabled() ? $this->demo_packages : $this->demo_config;
+		$prepared_demos    = array();
+		$current_template  = get_option( 'template' );
+		$demo_activated_id = get_option( 'themegrill_demo_importer_activated_id' );
+		$available_demos   = $this->demo_config;
+
+		if ( apply_filters( 'themegrill_demo_importer_installer', true ) ) {
+			$available_demos = apply_filters( 'themegrill_demo_importer_packages', array() );
+		}
 
 		/**
 		 * Filters demo data before it is prepared for JavaScript.

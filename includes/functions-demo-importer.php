@@ -223,18 +223,6 @@ function tg_delete_demo_pack( $demo_pack, $redirect = '' ) {
 	return true;
 }
 
-if ( ! function_exists( 'tg_demo_installer_enabled' ) ) {
-
-	/**
-	 * Is demo installer enabled?
-	 *
-	 * @return bool
-	 */
-	function tg_demo_installer_enabled() {
-		return apply_filters( 'themegrill_demo_importer_installer', true );
-	}
-}
-
 /**
  * Clear data before demo import AJAX action.
  *
