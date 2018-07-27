@@ -206,7 +206,7 @@ class TG_Demo_Importer {
 				),
 			) );
 			wp_localize_script( 'tg-demo-importer', '_demoImporterSettings', array(
-				'demos'    => $this->prepare_demos_for_js( $this->demo_config ),
+				'demos'    => $this->prepare_demos_for_js(),
 				'settings' => array(
 					'isInstall'      => apply_filters( 'themegrill_demo_importer_installer', true ),
 					'canInstall'     => current_user_can( 'upload_files' ),
@@ -458,34 +458,34 @@ class TG_Demo_Importer {
 	/**
 	 * Prepare demos for JavaScript.
 	 *
-	 * @param  array $demos Demo config array.
 	 * @return array An associative array of demo data, sorted by name.
 	 */
-	private function prepare_demos_for_js( $demos = null ) {
-		$prepared_demos    = array();
-		$current_template  = get_option( 'template' );
-		$demo_activated_id = get_option( 'themegrill_demo_importer_activated_id' );
+	private function prepare_demos_for_js() {
+		$prepared_demos      = array();
+		$current_template    = get_option( 'template' );
+		$demo_activated_id   = get_option( 'themegrill_demo_importer_activated_id' );
+		$available_demos     = tg_demo_installer_enabled() ? $this->demo_packages : $this->demo_config;
 
 		/**
 		 * Filters demo data before it is prepared for JavaScript.
 		 *
 		 * @param array      $prepared_demos    An associative array of demo data. Default empty array.
-		 * @param null|array $demos             An array of demo config to prepare, if any.
+		 * @param null|array $available_demos   An array of demo config to prepare, if any.
 		 * @param string     $demo_activated_id The current demo activated id.
 		 */
-		$prepared_demos = (array) apply_filters( 'themegrill_demo_importer_pre_prepare_demos_for_js', array(), $demos, $demo_activated_id );
+		$prepared_demos = (array) apply_filters( 'themegrill_demo_importer_pre_prepare_demos_for_js', array(), $available_demos, $demo_activated_id );
 
 		if ( ! empty( $prepared_demos ) ) {
 			return $prepared_demos;
 		}
 
 		// Make sure the imported demo is listed first.
-		if ( isset( $demos[ $demo_activated_id ] ) ) {
+		if ( isset( $available_demos[ $demo_activated_id ] ) ) {
 			$prepared_demos[ $demo_activated_id ] = array();
 		}
 
-		if ( ! empty( $demos ) ) {
-			foreach ( $demos as $demo_id => $demo_data ) {
+		if ( ! empty( $available_demos ) ) {
+			foreach ( $available_demos as $demo_id => $demo_data ) {
 				$author       = isset( $demo_data['author'] ) ? $demo_data['author'] : __( 'ThemeGrill', 'themegrill-demo-importer' );
 				$version      = isset( $demo_data['version'] ) ? $demo_data['version'] : TGDM_VERSION;
 				$description  = isset( $demo_data['description'] ) ? $demo_data['description'] : '';
