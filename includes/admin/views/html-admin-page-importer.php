@@ -20,6 +20,7 @@ $previewable_devices = array(
 $demo_filter_links   = apply_filters( 'themegrill_demo_importer_filter_links_array', array(
 	'all'       => __( 'All', 'themegrill-demo-importer' ),
 	'blog'      => __( 'Blog', 'themegrill-demo-importer' ),
+	'news'      => __( 'News', 'themegrill-demo-importer' ),
 	'business'  => __( 'Business', 'themegrill-demo-importer' ),
 	'free'      => __( 'Free', 'themegrill-demo-importer' ),
 	'others'    => __( 'Others', 'themegrill-demo-importer' ),

@@ -15,7 +15,7 @@ defined( 'ABSPATH' ) || exit;
  *
  * @since 1.1.0
  *
- * @param  array $demo_config
+ * @param  array $demo_config Demo config.
  * @return array
  */
 function tg_update_demo_importer_config( $demo_config ) {
@@ -68,6 +68,34 @@ function tg_update_demo_importer_config( $demo_config ) {
 	return $demo_config;
 }
 add_filter( 'themegrill_demo_importer_config', 'tg_update_demo_importer_config', 99 );
+
+/**
+ * Update demo importer packages.
+ *
+ * @since 1.5.0
+ *
+ * @param  array $packages Demo packages.
+ * @return array
+ */
+function tg_update_demo_importer_packages( $packages ) {
+	if ( ! empty( $packages ) ) {
+		foreach ( $packages as $package_id => $package_data ) {
+
+			// Set theme name, if not found.
+			if ( ! isset( $package_data['theme'] ) ) {
+				$packages[ $package_id ]['theme'] = current( explode( ' ', $package_data['name'] ) );
+			}
+
+			// Set demo preview URL, if not found.
+			if ( ! isset( $package_data['preview_url'] ) ) {
+				$packages[ $package_id ]['preview_url'] = $package_data['preview'];
+			}
+		}
+	}
+
+	return $packages;
+}
+add_filter( 'themegrill_demo_importer_packages', 'tg_update_demo_importer_packages', 99 );
 
 /**
  * Update demo importer options.
