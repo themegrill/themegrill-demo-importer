@@ -3,23 +3,13 @@
  * General ThemeGrill Demo Importer admin styles.
  */
 
- /**
- *keyframes
+/**
+ * Import.
  */
-
- @-webkit-keyframes spin {
-	from {
-		-webkit-transform: rotate(0deg);
-		transform: rotate(0deg);
-	}
-	to {
-		-webkit-transform: rotate(360deg);
-		transform: rotate(360deg);
-	}
- }
+@import 'animation';
 
 /**
- * Styling begins
+ * Styling begins.
  */
 .appearance_page_demo-importer {
 	.demo-importer {
@@ -99,8 +89,8 @@
 			}
 
 			.circle-loader {
-				width: 20px;
-				height: 20px;
+				width: 24px;
+				height: 24px;
 				border-radius: 50%;
 				position: relative;
 				vertical-align: top;
@@ -108,12 +98,13 @@
 				border: 2px solid #bfbfbf;
 
 				&.circle-loading {
-					-webkit-animation: spin 700ms infinite linear;
 					border-left-color: #5cb85c;
+					animation: spin .75s linear infinite;
 				}
 
 				&.circle-colored {
 					border-color: #5cb85c;
+
 					.checked {
 						display: block;
 					}
@@ -123,16 +114,16 @@
 					display: none;
 
 					&::after {
+						position: absolute;
+						left: 50%;
+						top: 50%;
 						opacity: 1;
+						content: "";
 						height: 50%;
-						width: 25%;;
+						width: 25%;
 						transform-origin: left top;
 						border-right: 2px solid #5cb85c;
 						border-top: 2px solid #5cb85c;
-						content: "";
-						left: 50%;
-						top: 50%;
-						position: absolute;
 						transform: scaleX(-1) rotate(135deg) translate(-58%, -40%);
 					}
 				}

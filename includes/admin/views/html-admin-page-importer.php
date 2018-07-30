@@ -191,9 +191,7 @@ $feature_lists      = apply_filters( 'themegrill_demo_importer_feature_lists', a
 						printf( __( 'Version: %s' ), '{{ data.version }}', 'themegrill-demo-importer' );
 						?>
 					</div>
-					<div class="theme-description">{{{ data.description }}}
-					Quisque tempus augue vel eleifend iaculis. Sed posuere, nisl a aliquam hendrerit, tellus diam semper enim, ac consequat metus.
-					</div>
+					<div class="theme-description">{{{ data.description }}}</div>
 				</div>
 				<div class="required-plugins">
 					<h3>Required Plugins</h3>
