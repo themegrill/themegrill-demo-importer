@@ -170,11 +170,13 @@ $feature_lists      = apply_filters( 'themegrill_demo_importer_feature_lists', a
 		</div>
 		<div class="wp-full-overlay-sidebar-content">
 			<div class="install-theme-info">
-				<h3 class="theme-name">{{ data.name }}
+				<h3 class="theme-name">
+					{{ data.name }}
 					<# if ( data.is_pro ) { #>
-						<span class="pro-tag"><?php _e( 'Pro', 'themegrill-demo-importer' ); ?></span>
+						<span class="premium-demo-tag"><?php _e( 'Pro', 'themegrill-demo-importer' ); ?></span>
 					<# } #>
 				</h3>
+
 				<span class="theme-by">
 					<?php
 					/* translators: %s: Demo author name */
@@ -193,9 +195,10 @@ $feature_lists      = apply_filters( 'themegrill_demo_importer_feature_lists', a
 					</div>
 					<div class="theme-description">{{{ data.description }}}</div>
 				</div>
+
 				<div class="required-plugins">
-					<h3>Required Plugins</h3>
-					<p>Install some required plugins to import this demo.</p>
+					<h3><?php _e( 'Required Plugins', 'themegrill-demo-importer' ); ?></h3>
+					<p><?php _e( 'Let\'s install required plugins to import this demo.', 'themegrill-demo-importer' ); ?></p>
 					<ul class="plugin-list">
 						<li>
 							<span class="plugin-name">Everest Forms</span>
@@ -214,43 +217,41 @@ $feature_lists      = apply_filters( 'themegrill_demo_importer_feature_lists', a
 					</ul>
 				</div>
 			</div>
-
-			<div class="demo-import-button">
-				<button class="button button-hero button-primary" href="#" data-import="disabled">Import Demo</button>
-			</div>
 		</div>
-			<div class="wp-full-overlay-footer">
-				<button type="button" class="collapse-sidebar button" aria-expanded="true" aria-label="<?php esc_attr_e( 'Collapse Sidebar' ); ?>">
-					<span class="collapse-sidebar-arrow"></span>
-					<span class="collapse-sidebar-label"><?php _e( 'Collapse' ); ?></span>
-				</button>
+		<div class="wp-full-overlay-footer">
+			<div class="demo-import-actions">
+				<button class="button button-hero button-primary demo-import" href="#" data-import="disabled"><?php _e( 'Import Demo', 'themegrill-demo-importer' ); ?></button>
+			</div>
+			<button type="button" class="collapse-sidebar button" aria-expanded="true" aria-label="<?php esc_attr_e( 'Collapse Sidebar' ); ?>">
+				<span class="collapse-sidebar-arrow"></span>
+				<span class="collapse-sidebar-label"><?php _e( 'Collapse' ); ?></span>
+			</button>
 
-				<?php if ( ! empty( $previewable_devices ) ) : ?>
-					<div class="devices-wrapper">
-						<div class="devices">
-							<?php foreach ( (array) $previewable_devices as $device => $settings ) : ?>
-								<?php
-								if ( empty( $settings['label'] ) ) {
-									continue;
-								}
-								$active = ! empty( $settings['default'] );
-								$class = 'preview-' . $device;
-								if ( $active ) {
-									$class .= ' active';
-								}
-								?>
-								<button type="button" class="<?php echo esc_attr( $class ); ?>" aria-pressed="<?php echo esc_attr( $active ) ?>" data-device="<?php echo esc_attr( $device ); ?>">
-									<span class="screen-reader-text"><?php echo esc_html( $settings['label'] ); ?></span>
-								</button>
-							<?php endforeach; ?>
-						</div>
+			<?php if ( ! empty( $previewable_devices ) ) : ?>
+				<div class="devices-wrapper">
+					<div class="devices">
+						<?php foreach ( (array) $previewable_devices as $device => $settings ) : ?>
+							<?php
+							if ( empty( $settings['label'] ) ) {
+								continue;
+							}
+							$active = ! empty( $settings['default'] );
+							$class = 'preview-' . $device;
+							if ( $active ) {
+								$class .= ' active';
+							}
+							?>
+							<button type="button" class="<?php echo esc_attr( $class ); ?>" aria-pressed="<?php echo esc_attr( $active ) ?>" data-device="<?php echo esc_attr( $device ); ?>">
+								<span class="screen-reader-text"><?php echo esc_html( $settings['label'] ); ?></span>
+							</button>
+						<?php endforeach; ?>
 					</div>
-				<?php endif; ?>
-			</div>
+				</div>
+			<?php endif; ?>
 		</div>
-		<div class="wp-full-overlay-main">
-			<iframe src="{{ data.preview_url }}" title="<?php esc_attr_e( 'Preview' ); ?>"></iframe>
-		</div>
+	</div>
+	<div class="wp-full-overlay-main">
+		<iframe src="{{ data.preview_url }}" title="<?php esc_attr_e( 'Preview' ); ?>"></iframe>
 	</div>
 </script>
 

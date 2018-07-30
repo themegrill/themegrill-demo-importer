@@ -23,6 +23,40 @@
 
 		.theme-browser {
 			.theme {
+				.premium-demo-banner {
+					position: absolute;
+					top: 15px;
+					right:-16px;
+					color: #fff;
+					padding: 0 20px;
+					font-weight: 600;
+					min-height: 30px;
+					line-height: 28px;
+					background: #5fbd0a;
+					text-transform: uppercase;
+
+					&::before,
+					&::after {
+						content: '';
+						position: absolute;
+					}
+
+					&::before {
+						left: -15px;
+						color: #fff;
+						border: 15px solid #5fbd0a;
+						border-left-color: transparent;
+					}
+
+					&::after {
+						top: 30px;
+						right: 0;
+						border: 8px solid #478d07;
+						border-right-color: transparent;
+						border-bottom-color: transparent;
+					}
+				}
+
 				.theme-screenshot img {
 					object-fit: cover;
 				}
@@ -35,13 +69,9 @@
 			* {
 				box-sizing: border-box;
 			}
-		}
 
-		.install-theme-info {
-
-			.theme-name {
-
-				.pro-tag {
+			.install-theme-info {
+				.premium-demo-tag {
 					color: #fff;
 					font-size: 13px;
 					font-weight: 400;
@@ -52,130 +82,92 @@
 					display: inline-block;
 					background: #67c016;
 				}
-			}
-			.theme-screenshot {
-				width: 100%;
-			}
 
-			.theme-details {
-				padding-bottom: 30px;
-				border-bottom: 1px solid #ddd;
-
-				.theme-version {
-					margin-top: 0;
+				.theme-screenshot {
+					width: 100%;
 				}
-			}
-		}
 
-		.required-plugins {
-			padding-top: 10px;
-
-			.plugin-list {
-				border: 1px solid #ddd;
-				margin-top: 20px;
-
-				li {
-					padding: 10px;
-					margin-bottom: 0;
+				.theme-details {
+					padding-bottom: 30px;
 					border-bottom: 1px solid #ddd;
-					display: flex;
-					align-items: center;
-					justify-content: space-between;
 
-					&:last-child {
-						border-bottom: none;
-					}
-				}
-			}
-
-			.circle-loader {
-				width: 24px;
-				height: 24px;
-				border-radius: 50%;
-				position: relative;
-				vertical-align: top;
-				display: inline-block;
-				border: 2px solid #bfbfbf;
-
-				&.circle-loading {
-					border-left-color: #5cb85c;
-					animation: spin .75s linear infinite;
-				}
-
-				&.circle-colored {
-					border-color: #5cb85c;
-
-					.checked {
-						display: block;
+					.theme-version {
+						margin-top: 0;
 					}
 				}
 
-				.checked {
-					display: none;
+				.required-plugins {
+					padding-top: 10px;
 
-					&::after {
-						position: absolute;
-						left: 50%;
-						top: 50%;
-						opacity: 1;
-						content: "";
-						height: 50%;
-						width: 25%;
-						transform-origin: left top;
-						border-right: 2px solid #5cb85c;
-						border-top: 2px solid #5cb85c;
-						transform: scaleX(-1) rotate(135deg) translate(-58%, -40%);
+					.plugin-list {
+						border: 1px solid #ddd;
+						margin-top: 20px;
+
+						li {
+							padding: 10px;
+							margin-bottom: 0;
+							border-bottom: 1px solid #ddd;
+							display: flex;
+							align-items: center;
+							justify-content: space-between;
+
+							&:last-child {
+								border-bottom: none;
+							}
+						}
+					}
+
+					.circle-loader {
+						width: 24px;
+						height: 24px;
+						border-radius: 50%;
+						position: relative;
+						vertical-align: top;
+						display: inline-block;
+						border: 2px solid #bfbfbf;
+
+						&.circle-loading {
+							border-left-color: #5cb85c;
+							animation: spin .75s linear infinite;
+						}
+
+						&.circle-colored {
+							border-color: #5cb85c;
+
+							.checked {
+								display: block;
+							}
+						}
+
+						.checked {
+							display: none;
+
+							&::after {
+								position: absolute;
+								left: 50%;
+								top: 50%;
+								opacity: 1;
+								content: "";
+								height: 50%;
+								width: 25%;
+								transform-origin: left top;
+								border-right: 2px solid #5cb85c;
+								border-top: 2px solid #5cb85c;
+								transform: scaleX(-1) rotate(135deg) translate(-58%, -40%);
+							}
+						}
 					}
 				}
 			}
 		}
 
-		.demo-import-button {
-			position: fixed;
-			bottom: 46px;
-			width: calc( 18% - 1px );
-			background: #fff;
-			min-width: 299px;
-			max-width: 599px;
-			padding: 15px 20px;
-			border-top: 1px solid #ddd;
+		.wp-full-overlay-footer {
+			height: 120px;
 
-			.button {
-				width: 100%;
-			}
-		}
-
-		.premium-demo-banner {
-			position: absolute;
-			top: 15px;
-			right:-16px;
-			color: #fff;
-			padding: 0 20px;
-			font-weight: 600;
-			min-height: 30px;
-			line-height: 28px;
-			background: #5fbd0a;
-			text-transform: uppercase;
-
-			&::before,
-			&::after {
-				content: '';
-				position: absolute;
-			}
-
-			&::before {
-				left: -15px;
-				color: #fff;
-				border: 15px solid #5fbd0a;
-				border-left-color: transparent;
-			}
-
-			&::after {
-				top: 30px;
-				right: 0;
-				border: 8px solid #478d07;
-				border-right-color: transparent;
-				border-bottom-color: transparent;
+			.demo-import-actions {
+				.button {
+					width: 100%;
+				}
 			}
 		}
 	}
