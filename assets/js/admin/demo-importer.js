@@ -967,10 +967,10 @@ demos.view.Preview = demos.view.Details.extend({
 		'click .close-full-overlay': 'close',
 		'click .collapse-sidebar': 'collapse',
 		'click .devices button': 'previewDevice',
-		'click .previous-theme': 'previousTheme',
-		'click .next-theme': 'nextTheme',
+		'click .previous-theme': 'previousDemo',
+		'click .next-theme': 'nextDemo',
 		'keyup': 'keyEvent',
-		'click .theme-install': 'installTheme'
+		'click .demo-import': 'importDemo'
 	},
 
 	// The HTML template for the demo preview
@@ -1073,16 +1073,16 @@ demos.view.Preview = demos.view.Details.extend({
 		}
 		// The right arrow key, next theme
 		if ( event.keyCode === 39 ) {
-			_.once( this.nextTheme() );
+			_.once( this.nextDemo() );
 		}
 
 		// The left arrow key, previous theme
 		if ( event.keyCode === 37 ) {
-			this.previousTheme();
+			this.previousDemo();
 		}
 	},
 
-	installTheme: function( event ) {
+	importDemo: function( event ) {
 		var _this   = this,
 		    $target = $( event.target );
 		event.preventDefault();
@@ -1092,14 +1092,6 @@ demos.view.Preview = demos.view.Details.extend({
 		}
 
 		wp.updates.maybeRequestFilesystemCredentials( event );
-
-		$( document ).on( 'wp-theme-install-success', function() {
-			_this.model.set( { 'installed': true } );
-		} );
-
-		wp.updates.installTheme( {
-			slug: $target.data( 'slug' )
-		} );
 	}
 });
 

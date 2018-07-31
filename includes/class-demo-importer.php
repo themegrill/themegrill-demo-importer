@@ -442,7 +442,6 @@ class TG_Demo_Importer {
 	public function ajax_query_demos() {
 		$config = wp_safe_remote_get( 'https://raw.githubusercontent.com/themegrill/themegrill-demo-pack/demo-configs/configs/' . get_option( 'template' ) . '.json' );
 
-
 		wp_send_json_success( array(
 		    'info' => array(
 		      'page'    => 1,
