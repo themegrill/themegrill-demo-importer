@@ -1649,7 +1649,12 @@ demos.view.Installer = demos.view.Appearance.extend({
 
 	// Register events for sorting and filters in demo-navigation
 	events: {
-		'click .filter-links li > a': 'onSort'
+		'click .filter-links li > a': 'onSort',
+		'click .drawer-toggle': 'moreFilters',
+		'click .filter-drawer .apply-filters': 'applyFilters',
+		'click .filter-group [type="checkbox"]': 'addFilter',
+		'click .filter-drawer .clear-filters': 'clearFilters',
+		'click .edit-filters': 'backToFilters'
 	},
 
 	// Initial render method
@@ -1745,7 +1750,7 @@ demos.view.Installer = demos.view.Appearance.extend({
 		// Track sorting so we can restore the correct tab when closing preview.
 		demos.router.selectedTab = sort;
 
-		$( '.filter-links li > a, .theme-filter' )
+		$( '.filter-links li > a' )
 			.removeClass( this.activeClass )
 			.removeAttr( 'aria-current' );
 
@@ -1756,7 +1761,111 @@ demos.view.Installer = demos.view.Appearance.extend({
 		this.browse( sort );
 	},
 
+	// Clicking on a checkbox to add another filter to the request
+	addFilter: function() {
+		this.filtersChecked();
+	},
+
+	// Applying filters triggers a tag request
+	applyFilters: function( event ) {
+		var name,
+			tags = this.filtersChecked(),
+			request = { tag: tags },
+			filteringBy = $( '.filtered-by .tags' );
+
+		if ( event ) {
+			event.preventDefault();
+		}
+
+		if ( ! tags ) {
+			wp.a11y.speak( l10n.selectFeatureFilter );
+			return;
+		}
+
+		$( 'body' ).addClass( 'filters-applied' );
+		$( '.filter-links li > a.current' )
+			.removeClass( 'current' )
+			.removeAttr( 'aria-current' );
+
+		filteringBy.empty();
+
+		_.each( tags, function( tag ) {
+			name = $( 'label[for="filter-id-' + tag + '"]' ).text();
+			filteringBy.append( '<span class="tag">' + name + '</span>' );
+		});
+
+		// Get the themes by sending Ajax POST request to api.wordpress.org/themes
+		// or searching the local cache
+		this.collection.query( request );
+	},
+
+	// Get the checked filters
+	// @return {array} of tags or false
+	filtersChecked: function() {
+		var items = $( '.filter-group' ).find( ':checkbox' ),
+			tags = [];
+
+		_.each( items.filter( ':checked' ), function( item ) {
+			tags.push( $( item ).prop( 'value' ) );
+		});
+
+		// When no filters are checked, restore initial state and return
+		if ( tags.length === 0 ) {
+			$( '.filter-drawer .apply-filters' ).find( 'span' ).text( '' );
+			$( '.filter-drawer .clear-filters' ).hide();
+			$( 'body' ).removeClass( 'filters-applied' );
+			return false;
+		}
+
+		$( '.filter-drawer .apply-filters' ).find( 'span' ).text( tags.length );
+		$( '.filter-drawer .clear-filters' ).css( 'display', 'inline-block' );
+
+		return tags;
+	},
+
 	activeClass: 'current',
+
+	// Toggle the full filters navigation
+	moreFilters: function( event ) {
+		var $body = $( 'body' ),
+			$toggleButton = $( '.drawer-toggle' );
+
+		event.preventDefault();
+
+		if ( $body.hasClass( 'filters-applied' ) ) {
+			return this.backToFilters();
+		}
+
+		this.clearSearch();
+
+		demos.router.navigate( demos.router.baseUrl( '' ) );
+		// Toggle the feature filters view.
+		$body.toggleClass( 'show-filters' );
+		// Toggle the `aria-expanded` button attribute.
+		$toggleButton.attr( 'aria-expanded', $body.hasClass( 'show-filters' ) );
+	},
+
+	// Clears all the checked filters
+	// @uses filtersChecked()
+	clearFilters: function( event ) {
+		var items = $( '.filter-group' ).find( ':checkbox' ),
+			self = this;
+
+		event.preventDefault();
+
+		_.each( items.filter( ':checked' ), function( item ) {
+			$( item ).prop( 'checked', false );
+			return self.filtersChecked();
+		});
+	},
+
+	backToFilters: function( event ) {
+		if ( event ) {
+			event.preventDefault();
+		}
+
+		$( 'body' ).removeClass( 'filters-applied' );
+	},
 
 	clearSearch: function() {
 		$( '#wp-filter-search-input').val( '' );

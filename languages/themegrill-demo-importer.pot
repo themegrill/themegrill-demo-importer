@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: ThemeGrill Demo Importer 1.4.3\n"
 "Report-Msgid-Bugs-To: "
 "https://github.com/themegrill/themegrill-demo-importer/issues\n"
-"POT-Creation-Date: 2018-07-31 08:49:03+00:00\n"
+"POT-Creation-Date: 2018-07-31 10:57:11+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -13,55 +13,6 @@ msgstr ""
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
 "X-Generator: grunt-wp-i18n1.0.2\n"
-
-#: includes/admin/class-demo-installer-skin.php:44
-#: includes/admin/class-demo-installer-skin.php:46
-msgid "Return to Demo Importer"
-msgstr ""
-
-#: includes/admin/class-demo-installer-skin.php:48
-msgid "Return to Demos page"
-msgstr ""
-
-#: includes/admin/class-demo-upgrader.php:40
-msgid "Install package not available."
-msgstr ""
-
-#: includes/admin/class-demo-upgrader.php:41
-msgid "Downloading install package from <span class=\"code\">%s</span>&#8230;"
-msgstr ""
-
-#: includes/admin/class-demo-upgrader.php:42
-msgid "Unpacking the package&#8230;"
-msgstr ""
-
-#: includes/admin/class-demo-upgrader.php:43
-msgid "Removing the old version of the demo&#8230;"
-msgstr ""
-
-#: includes/admin/class-demo-upgrader.php:44
-msgid "Could not remove the old demo."
-msgstr ""
-
-#: includes/admin/class-demo-upgrader.php:45
-msgid "Installing the demo&#8230;"
-msgstr ""
-
-#: includes/admin/class-demo-upgrader.php:46
-msgid "The demo contains no files."
-msgstr ""
-
-#: includes/admin/class-demo-upgrader.php:47
-msgid "Demo install failed."
-msgstr ""
-
-#: includes/admin/class-demo-upgrader.php:48
-msgid "Demo installed successfully."
-msgstr ""
-
-#: includes/admin/class-demo-upgrader.php:131
-msgid "No valid demos were found."
-msgstr ""
 
 #: includes/admin/views/html-admin-page-importer.php:10
 msgid "Enter desktop preview mode"
@@ -112,9 +63,7 @@ msgid "SiteOrigin"
 msgstr ""
 
 #: includes/admin/views/html-admin-page-importer.php:40
-#: includes/class-demo-importer.php:137
-#: includes/includes/admin/views/html-admin-page-installer.php:17
-#: themegrill-demo-importer.php:257
+#: includes/class-demo-importer.php:137 themegrill-demo-importer.php:257
 msgid "Demo Importer"
 msgstr ""
 
@@ -123,12 +72,10 @@ msgid "Upcoming Demos"
 msgstr ""
 
 #: includes/admin/views/html-admin-page-importer.php:49
-#: includes/includes/admin/views/html-admin-page-installer.php:28
 msgid "The Demo Importer screen requires JavaScript."
 msgstr ""
 
 #: includes/admin/views/html-admin-page-importer.php:52
-#: includes/includes/admin/views/html-admin-page-installer.php:41
 msgid "Filter demos list"
 msgstr ""
 
@@ -165,7 +112,6 @@ msgstr ""
 
 #: includes/admin/views/html-admin-page-importer.php:104
 #: includes/class-demo-importer.php:222
-#: includes/includes/admin/views/html-admin-page-installer.php:61
 msgid "No demos found. Try a different search."
 msgstr ""
 
@@ -176,24 +122,16 @@ msgstr ""
 
 #: includes/admin/views/html-admin-page-importer.php:125
 #: includes/admin/views/html-admin-page-importer.php:183
-#: includes/includes/admin/views/html-admin-page-installer.php:77
-#: includes/includes/admin/views/html-admin-page-installer.php:137
-#: includes/includes/admin/views/html-admin-page-installer.php:240
 #. translators: %s: Demo author name
 msgid "By %s"
 msgstr ""
 
 #: includes/admin/views/html-admin-page-importer.php:134
 #: includes/class-demo-importer.php:195
-#: includes/includes/admin/views/html-admin-page-installer.php:91
-#: includes/includes/admin/views/html-admin-page-installer.php:203
-#: includes/includes/admin/views/html-admin-page-installer.php:212
 msgid "Live Preview"
 msgstr ""
 
 #: includes/admin/views/html-admin-page-importer.php:138
-#: includes/includes/admin/views/html-admin-page-installer.php:95
-#: includes/includes/admin/views/html-admin-page-installer.php:142
 msgid "Required %s theme must be activated to import this demo."
 msgstr ""
 
@@ -201,18 +139,11 @@ msgstr ""
 #: includes/admin/views/html-admin-page-importer.php:140
 #: includes/admin/views/html-admin-page-importer.php:147
 #: includes/admin/views/html-admin-page-importer.php:168
-#: includes/includes/admin/views/html-admin-page-installer.php:95
-#: includes/includes/admin/views/html-admin-page-installer.php:97
-#: includes/includes/admin/views/html-admin-page-installer.php:104
-#: includes/includes/admin/views/html-admin-page-installer.php:214
 msgid "Import"
 msgstr ""
 
 #: includes/admin/views/html-admin-page-importer.php:149
 #: includes/admin/views/html-admin-page-importer.php:254
-#: includes/includes/admin/views/html-admin-page-installer.php:106
-#: includes/includes/admin/views/html-admin-page-installer.php:217
-#: includes/includes/admin/views/html-admin-page-installer.php:259
 msgid "Preview"
 msgstr ""
 
@@ -225,7 +156,6 @@ msgid "Activate"
 msgstr ""
 
 #: includes/admin/views/html-admin-page-importer.php:193
-#: includes/includes/admin/views/html-admin-page-installer.php:136
 #. translators: %s: Demo version
 msgid "Version: %s"
 msgstr ""
@@ -377,45 +307,37 @@ msgstr ""
 msgid "Thank you for importing with ThemeGrill Demo Importer."
 msgstr ""
 
-#: includes/class-demo-importer.php:276
-msgid "Importing Demo"
-msgstr ""
-
-#: includes/class-demo-importer.php:291 includes/class-demo-importer.php:292
-msgid "Guided Tour"
-msgstr ""
-
-#: includes/class-demo-importer.php:298 includes/class-demo-importer.php:300
+#: includes/class-demo-importer.php:276 includes/class-demo-importer.php:278
 msgid "Help &amp; Support"
 msgstr ""
 
-#: includes/class-demo-importer.php:302
+#: includes/class-demo-importer.php:280
 msgid ""
 "Should you need help understanding, using, or extending ThemeGrill Demo "
 "Importer, <a href=\"%s\">please read our documentation</a>. You will find "
 "all kinds of resources including snippets, tutorials and much more."
 msgstr ""
 
-#: includes/class-demo-importer.php:306
+#: includes/class-demo-importer.php:284
 msgid ""
 "For further assistance with ThemeGrill Demo Importer core you can use the "
 "<a href=\"%1$s\">community forum</a>. If you need help with premium themes "
 "sold by ThemeGrill, please <a href=\"%2$s\">use our free support forum</a>."
 msgstr ""
 
-#: includes/class-demo-importer.php:310
+#: includes/class-demo-importer.php:288
 msgid "Community forum"
 msgstr ""
 
-#: includes/class-demo-importer.php:310
+#: includes/class-demo-importer.php:288
 msgid "ThemeGrill Support"
 msgstr ""
 
-#: includes/class-demo-importer.php:315 includes/class-demo-importer.php:317
+#: includes/class-demo-importer.php:293 includes/class-demo-importer.php:295
 msgid "Found a bug?"
 msgstr ""
 
-#: includes/class-demo-importer.php:318
+#: includes/class-demo-importer.php:296
 msgid ""
 "If you find a bug within ThemeGrill Demo Importer you can create a ticket "
 "via <a href=\"%1$s\">Github issues</a>. Ensure you read the <a "
@@ -423,50 +345,50 @@ msgid ""
 "help us solve your issue, please be as descriptive as possible."
 msgstr ""
 
-#: includes/class-demo-importer.php:319
+#: includes/class-demo-importer.php:297
 msgid "Report a bug"
 msgstr ""
 
-#: includes/class-demo-importer.php:325 includes/class-demo-importer.php:327
-#: includes/class-demo-importer.php:329
+#: includes/class-demo-importer.php:303 includes/class-demo-importer.php:305
+#: includes/class-demo-importer.php:307
 msgid "Reset wizard"
 msgstr ""
 
-#: includes/class-demo-importer.php:328
+#: includes/class-demo-importer.php:306
 msgid ""
 "If you need to reset the WordPress back to default again, please click on "
 "the button below."
 msgstr ""
 
-#: includes/class-demo-importer.php:333
+#: includes/class-demo-importer.php:311
 msgid "For more information:"
 msgstr ""
 
-#: includes/class-demo-importer.php:334
+#: includes/class-demo-importer.php:312
 msgid "About Demo Importer"
 msgstr ""
 
-#: includes/class-demo-importer.php:335
+#: includes/class-demo-importer.php:313
 msgid "WordPress.org project"
 msgstr ""
 
-#: includes/class-demo-importer.php:336
+#: includes/class-demo-importer.php:314
 msgid "Github project"
 msgstr ""
 
-#: includes/class-demo-importer.php:337
+#: includes/class-demo-importer.php:315
 msgid "Official themes"
 msgstr ""
 
-#: includes/class-demo-importer.php:338
+#: includes/class-demo-importer.php:316
 msgid "Official plugins"
 msgstr ""
 
-#: includes/class-demo-importer.php:368
+#: includes/class-demo-importer.php:346
 msgid "Action failed. Please refresh the page and retry."
 msgstr ""
 
-#: includes/class-demo-importer.php:372 themegrill-demo-importer.php:55
+#: includes/class-demo-importer.php:350 themegrill-demo-importer.php:55
 #: themegrill-demo-importer.php:63
 msgid "Cheatin&#8217; huh?"
 msgstr ""
@@ -475,32 +397,24 @@ msgstr ""
 msgid "ThemeGrill"
 msgstr ""
 
-#: includes/class-demo-importer.php:574
-msgid "Sorry, you are not allowed to install demo on this site."
-msgstr ""
-
-#: includes/class-demo-importer.php:581
-msgid "Installing Demo from uploaded file: %s"
-msgstr ""
-
-#: includes/class-demo-importer.php:615
+#: includes/class-demo-importer.php:572
 #: includes/functions-demo-importer.php:105
 msgid "No demo specified."
 msgstr ""
 
-#: includes/class-demo-importer.php:631
+#: includes/class-demo-importer.php:588
 msgid "Sorry, you are not allowed to import."
 msgstr ""
 
-#: includes/class-demo-importer.php:709
+#: includes/class-demo-importer.php:666
 msgid "The XML file dummy content is missing."
 msgstr ""
 
-#: includes/class-demo-importer.php:774
+#: includes/class-demo-importer.php:731
 msgid "The DAT file customizer data is missing."
 msgstr ""
 
-#: includes/class-demo-importer.php:799
+#: includes/class-demo-importer.php:756
 msgid "The WIE file widget content is missing."
 msgstr ""
 
@@ -800,146 +714,6 @@ msgstr ""
 msgid "This does not appear to be a WXR file, missing/invalid WXR version number"
 msgstr ""
 
-#: includes/includes/admin/views/html-admin-page-installer.php:19
-msgid "Upload Demo"
-msgstr ""
-
-#: includes/includes/admin/views/html-admin-page-installer.php:24
-msgid ""
-"<strong>Notice</strong> &#8211; If you want to completely remove a demo "
-"installation after importing it, you can use a plugin like %1$sWordPress "
-"Reset%2$s."
-msgstr ""
-
-#: includes/includes/admin/views/html-admin-page-installer.php:32
-msgid ""
-"If you have a demo pack in a .zip format, you may install it by uploading "
-"it here."
-msgstr ""
-
-#: includes/includes/admin/views/html-admin-page-installer.php:35
-msgid "Demo zip file"
-msgstr ""
-
-#: includes/includes/admin/views/html-admin-page-installer.php:37
-msgid "Install Now"
-msgstr ""
-
-#: includes/includes/admin/views/html-admin-page-installer.php:57
-msgid "Available demos list"
-msgstr ""
-
-#: includes/includes/admin/views/html-admin-page-installer.php:74
-msgid "Demo Details"
-msgstr ""
-
-#: includes/includes/admin/views/html-admin-page-installer.php:83
-#. translators: %s: Demo name
-msgid "<span>Imported:</span> %s"
-msgstr ""
-
-#: includes/includes/admin/views/html-admin-page-installer.php:119
-msgid "Show previous demo"
-msgstr ""
-
-#: includes/includes/admin/views/html-admin-page-installer.php:120
-msgid "Show next demo"
-msgstr ""
-
-#: includes/includes/admin/views/html-admin-page-installer.php:121
-msgid "Close details dialog"
-msgstr ""
-
-#: includes/includes/admin/views/html-admin-page-installer.php:134
-msgid "Imported Demo"
-msgstr ""
-
-#: includes/includes/admin/views/html-admin-page-installer.php:144
-msgid "Required Plugin must be activated to import this demo."
-msgstr ""
-
-#: includes/includes/admin/views/html-admin-page-installer.php:150
-msgid "Plugins Information"
-msgstr ""
-
-#: includes/includes/admin/views/html-admin-page-installer.php:155
-msgid "Plugin Name"
-msgstr ""
-
-#: includes/includes/admin/views/html-admin-page-installer.php:156
-msgid "Type"
-msgstr ""
-
-#: includes/includes/admin/views/html-admin-page-installer.php:157
-msgid "Status"
-msgstr ""
-
-#: includes/includes/admin/views/html-admin-page-installer.php:173
-msgid "Required"
-msgstr ""
-
-#: includes/includes/admin/views/html-admin-page-installer.php:175
-msgid "Recommended"
-msgstr ""
-
-#: includes/includes/admin/views/html-admin-page-installer.php:189
-msgid "No plugins are needed to import this demo."
-msgstr ""
-
-#: includes/includes/admin/views/html-admin-page-installer.php:196
-msgid "Tags:"
-msgstr ""
-
-#: includes/includes/admin/views/html-admin-page-installer.php:221
-msgid "Delete"
-msgstr ""
-
-#: includes/includes/admin/views/html-admin-page-installer.php:236
-msgid "Demo Preview"
-msgstr ""
-
-#: includes/includes/admin/views/html-admin-page-installer.php:250
-msgid "Download"
-msgstr ""
-
-#: includes/includes/admin/views/html-admin-page-installer.php:257
-msgid "View Pro"
-msgstr ""
-
-#: includes/includes/admin/views/html-admin-page-installer.php:270
-msgid "Welcome to ThemeGrill Demo Importer!"
-msgstr ""
-
-#: includes/includes/admin/views/html-admin-page-installer.php:271
-msgid "Get Started"
-msgstr ""
-
-#: includes/includes/admin/views/html-admin-page-installer.php:275
-msgid ""
-"1. Visit <a href=\"%s\" target=\"_blank\"><strong>this page</strong></a> "
-"and download the theme demo zip file."
-msgstr ""
-
-#: includes/includes/admin/views/html-admin-page-installer.php:276
-msgid "2. Click on the <strong>Upload Demo</strong> button on the top of this page."
-msgstr ""
-
-#: includes/includes/admin/views/html-admin-page-installer.php:277
-msgid ""
-"3. Browse the downloaded demo zip file and click on <strong>Install "
-"Now</strong> button."
-msgstr ""
-
-#: includes/includes/admin/views/html-admin-page-installer.php:278
-msgid "4. Go to <strong>Installed Demos</strong> tab."
-msgstr ""
-
-#: includes/includes/admin/views/html-admin-page-installer.php:279
-msgid ""
-"5. Click on the <strong>Import</strong> button and wait for few minutes. "
-"Done!"
-msgstr ""
-
 #: themegrill-demo-importer.php:257
 msgid "View Demo Importer"
 msgstr ""
@@ -988,15 +762,12 @@ msgid "Details &amp; Preview"
 msgstr ""
 
 #: includes/admin/views/html-admin-page-importer.php:145
-#: includes/includes/admin/views/html-admin-page-installer.php:102
-#: includes/includes/admin/views/html-admin-page-installer.php:208
 #. translators: %s: Demo name
 msgctxt "demo"
 msgid "Import %s"
 msgstr ""
 
 #: includes/admin/views/html-admin-page-importer.php:155
-#: includes/includes/admin/views/html-admin-page-installer.php:111
 msgctxt "demo"
 msgid "Imported"
 msgstr ""
@@ -1021,23 +792,6 @@ msgctxt "demo"
 msgid "Live Preview %s"
 msgstr ""
 
-#: includes/includes/admin/views/html-admin-page-installer.php:248
-#. translators: %s: Demo name
-msgctxt "demo"
-msgid "Download %s"
-msgstr ""
-
-#: includes/includes/admin/views/html-admin-page-installer.php:255
-#. translators: %s: Demo name
-msgctxt "demo"
-msgid "View %s Pro"
-msgstr ""
-
-#: includes/includes/admin/views/html-admin-page-installer.php:263
-msgctxt "demo"
-msgid "Installed"
-msgstr ""
-
 #: includes/admin/views/html-admin-page-importer.php:163
 msgctxt "Button label for a demo"
 msgid "Previous"
@@ -1051,19 +805,4 @@ msgstr ""
 #: includes/class-demo-importer.php:152
 msgctxt "Admin menu name"
 msgid "Demo Importer"
-msgstr ""
-
-#: includes/includes/admin/views/html-admin-page-installer.php:49
-msgctxt "demos"
-msgid "Welcome"
-msgstr ""
-
-#: includes/includes/admin/views/html-admin-page-installer.php:50
-msgctxt "demos"
-msgid "Installed Demos"
-msgstr ""
-
-#: includes/includes/admin/views/html-admin-page-installer.php:51
-msgctxt "demos"
-msgid "Theme Demos"
 msgstr ""
