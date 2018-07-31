@@ -162,9 +162,13 @@
 		}
 
 		.wp-full-overlay-footer {
-			height: 120px;
+			height: 132px;
 
 			.demo-import-actions {
+				padding: 20px;
+				background: #fff;
+				border-bottom: 1px solid #ddd;
+
 				.button {
 					width: 100%;
 				}
