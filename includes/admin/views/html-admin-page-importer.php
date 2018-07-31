@@ -7,14 +7,14 @@ defined( 'ABSPATH' ) || exit;
 
 $previewable_devices = array(
 	'desktop' => array(
-		'label' => __( 'Enter desktop preview mode' ),
+		'label' => __( 'Enter desktop preview mode', 'themegrill-demo-importer' ),
 		'default' => true,
 	),
 	'tablet' => array(
-		'label' => __( 'Enter tablet preview mode' ),
+		'label' => __( 'Enter tablet preview mode', 'themegrill-demo-importer' ),
 	),
 	'mobile' => array(
-		'label' => __( 'Enter mobile preview mode' ),
+		'label' => __( 'Enter mobile preview mode', 'themegrill-demo-importer' ),
 	),
 );
 $demo_filter_links   = apply_filters( 'themegrill_demo_importer_filter_links_array', array(
@@ -62,7 +62,7 @@ $feature_lists      = apply_filters( 'themegrill_demo_importer_feature_lists', a
 			<?php endforeach; ?>
 		</ul>
 
-		<button type="button" class="button drawer-toggle" aria-expanded="false"><?php _e( 'Feature Filter' ); ?></button>
+		<button type="button" class="button drawer-toggle" aria-expanded="false"><?php _e( 'Feature Filter', 'themegrill-demo-importer' ); ?></button>
 
 		<form class="search-form"></form>
 
@@ -190,7 +190,7 @@ $feature_lists      = apply_filters( 'themegrill_demo_importer_feature_lists', a
 					<div class="theme-version">
 						<?php
 						/* translators: %s: Demo version */
-						printf( __( 'Version: %s' ), '{{ data.version }}', 'themegrill-demo-importer' );
+						printf( __( 'Version: %s', 'themegrill-demo-importer' ), '{{ data.version }}', 'themegrill-demo-importer' );
 						?>
 					</div>
 					<div class="theme-description">{{{ data.description }}}</div>
@@ -222,9 +222,9 @@ $feature_lists      = apply_filters( 'themegrill_demo_importer_feature_lists', a
 			<div class="demo-import-actions">
 				<button class="button button-hero button-primary demo-import" href="#" data-import="disabled"><?php _e( 'Import Demo', 'themegrill-demo-importer' ); ?></button>
 			</div>
-			<button type="button" class="collapse-sidebar button" aria-expanded="true" aria-label="<?php esc_attr_e( 'Collapse Sidebar' ); ?>">
+			<button type="button" class="collapse-sidebar button" aria-expanded="true" aria-label="<?php esc_attr_e( 'Collapse Sidebar', 'themegrill-demo-importer' ); ?>">
 				<span class="collapse-sidebar-arrow"></span>
-				<span class="collapse-sidebar-label"><?php _e( 'Collapse' ); ?></span>
+				<span class="collapse-sidebar-label"><?php _e( 'Collapse', 'themegrill-demo-importer' ); ?></span>
 			</button>
 
 			<?php if ( ! empty( $previewable_devices ) ) : ?>
@@ -251,7 +251,7 @@ $feature_lists      = apply_filters( 'themegrill_demo_importer_feature_lists', a
 		</div>
 	</div>
 	<div class="wp-full-overlay-main">
-		<iframe src="{{ data.preview_url }}" title="<?php esc_attr_e( 'Preview' ); ?>"></iframe>
+		<iframe src="{{ data.preview_url }}" title="<?php esc_attr_e( 'Preview', 'themegrill-demo-importer' ); ?>"></iframe>
 	</div>
 </script>
 

@@ -215,11 +215,8 @@ class TG_Demo_Importer {
 					'addNew'              => __( 'Add New Demo', 'themegrill-demo-importer' ),
 					'search'              => __( 'Search Demos', 'themegrill-demo-importer' ),
 					'searchPlaceholder'   => __( 'Search demos...', 'themegrill-demo-importer' ), // placeholder (no ellipsis)
-					'error'               => sprintf(
-						/* translators: %s: support forums URL */
-						__( 'An unexpected error occurred. Something may be wrong with ThemeGrill demo server&#8217;s configuration. If you continue to have problems, please try the <a href="%s">support forums</a>.', 'themegrill-demo-importer' ),
-						__( 'https://wordpress.org/support/plugin/themegrill-demo-importer' )
-					),
+					/* translators: %s: support forums URL */
+					'error'               => sprintf( __( 'An unexpected error occurred. Something may be wrong with ThemeGrill demo server&#8217;s configuration. If you continue to have problems, please try the <a href="%s">support forums</a>.', 'themegrill-demo-importer' ), 'https://wordpress.org/support/plugin/themegrill-demo-importer' ),
 					'tryAgain'            => __( 'Try Again', 'themegrill-demo-importer' ),
 					'demosFound'          => __( 'Number of Demos found: %d', 'themegrill-demo-importer' ),
 					'noDemosFound'        => __( 'No demos found. Try a different search.', 'themegrill-demo-importer' ),

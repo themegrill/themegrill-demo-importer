@@ -335,7 +335,7 @@ demos.Collection = Backbone.Collection.extend({
 		request: {}
 	},
 
-	// Send request to api.wordpress.org/themes
+	// Send request to api.github.com/repos/themegrill-demo-pack
 	apiCall: function( request, paginated ) {
 		return wp.ajax.send( 'query-demos', {
 			data: {
@@ -353,7 +353,7 @@ demos.Collection = Backbone.Collection.extend({
 						homepage: true,
 						num_ratings: true
 					}
-				}, request)
+				}, request )
 			},
 
 			beforeSend: function() {
@@ -365,7 +365,7 @@ demos.Collection = Backbone.Collection.extend({
 		});
 	},
 
-	// Static status controller for when we are loading themes.
+	// Static status controller for when we are loading demos.
 	loadingDemos: false
 });
 
@@ -1634,7 +1634,7 @@ demos.view.InstallerSearch = demos.view.Search.extend({
 		$( 'body' ).removeClass( 'show-filters filters-applied show-favorites-form' );
 		$( '.drawer-toggle' ).attr( 'aria-expanded', 'false' );
 
-		// Get the themes by sending Ajax POST request to api.wordpress.org/themes
+		// Get the demos by sending Ajax POST request to api.github.com/repos/themegrill-demo-pack
 		// or searching the local cache
 		this.collection.query( request );
 
@@ -1647,7 +1647,7 @@ demos.view.Installer = demos.view.Appearance.extend({
 
 	el: '#wpbody-content .wrap',
 
-	// Register events for sorting and filters in theme-navigation
+	// Register events for sorting and filters in demo-navigation
 	events: {
 		'click .filter-links li > a': 'onSort'
 	},
