@@ -246,7 +246,7 @@ demos.Collection = Backbone.Collection.extend({
 			query, isPaginated, count;
 
 		// Store current query request args
-		// for later use with the event `theme:end`
+		// for later use with the event `demo:end`
 		this.currentQuery.request = request;
 
 		// Search the query cache for matches.
@@ -310,13 +310,13 @@ demos.Collection = Backbone.Collection.extend({
 				$( 'body' ).removeClass( 'no-results' );
 			}
 
-			// Only trigger an update event since we already have the themes
+			// Only trigger an update event since we already have the demos
 			// on our cached object
 			if ( _.isNumber( query.total ) ) {
 				this.count = query.total;
 			}
 
-			this.reset( query.themes );
+			this.reset( query.demos );
 			if ( ! query.total ) {
 				this.count = this.length;
 			}
@@ -337,7 +337,7 @@ demos.Collection = Backbone.Collection.extend({
 
 	// Send request to api.wordpress.org/themes
 	apiCall: function( request, paginated ) {
-		return wp.ajax.send( 'query-themes', {
+		return wp.ajax.send( 'query-demos', {
 			data: {
 				// Request data
 				request: _.extend({
@@ -359,7 +359,7 @@ demos.Collection = Backbone.Collection.extend({
 			beforeSend: function() {
 				if ( ! paginated ) {
 					// Spin it
-					// $( 'body' ).addClass( 'loading-content' ).removeClass( 'no-results' );
+					$( 'body' ).addClass( 'loading-content' ).removeClass( 'no-results' );
 				}
 			}
 		});
@@ -1427,9 +1427,7 @@ demos.view.Search = wp.Backbone.View.extend({
 			event.target.value = '';
 		}
 
-		/**
-		 * Since doSearch is debounced, it will only run when user input comes to a rest
-		 */
+		// Since doSearch is debounced, it will only run when user input comes to a rest.
 		this.doSearch( event );
 	},
 
@@ -1437,7 +1435,7 @@ demos.view.Search = wp.Backbone.View.extend({
 	doSearch: _.debounce( function( event ) {
 		var options = {};
 
-		this.collection.doSearch( event.target.value );
+		this.collection.doSearch( event.target.value.replace( /\+/g, ' ' ) );
 
 		// if search is initiated and key is not return
 		if ( this.searching && event.which !== 13 ) {
@@ -1458,7 +1456,7 @@ demos.view.Search = wp.Backbone.View.extend({
 		var url = demos.router.baseUrl( '' );
 
 		if ( event.target.value ) {
-			url = demos.router.baseUrl( demos.router.searchPath + event.target.value );
+			url = demos.router.baseUrl( demos.router.searchPath + encodeURIComponent( event.target.value ) );
 		}
 
 		this.searching = false;
@@ -1570,6 +1568,81 @@ demos.Run = {
 	}
 };
 
+// Extend the main Search view
+demos.view.InstallerSearch = demos.view.Search.extend({
+
+	events: {
+		'input': 'search',
+		'keyup': 'search'
+	},
+
+	terms: '',
+
+	// Handles Ajax request for searching through demos in public repo
+	search: function( event ) {
+
+		// Tabbing or reverse tabbing into the search input shouldn't trigger a search
+		if ( event.type === 'keyup' && ( event.which === 9 || event.which === 16 ) ) {
+			return;
+		}
+
+		this.collection = this.options.parent.view.collection;
+
+		// Clear on escape.
+		if ( event.type === 'keyup' && event.which === 27 ) {
+			event.target.value = '';
+		}
+
+		this.doSearch( event.target.value );
+	},
+
+	doSearch: function( value ) {
+		var request = {};
+
+		// Don't do anything if the search terms haven't changed.
+		if ( this.terms === value ) {
+			return;
+		}
+
+		// Updates terms with the value passed.
+		this.terms = value;
+
+		request.search = value;
+
+		// Intercept an [author] search.
+		//
+		// If input value starts with `author:` send a request
+		// for `author` instead of a regular `search`
+		if ( value.substring( 0, 7 ) === 'author:' ) {
+			request.search = '';
+			request.author = value.slice( 7 );
+		}
+
+		// Intercept a [tag] search.
+		//
+		// If input value starts with `tag:` send a request
+		// for `tag` instead of a regular `search`
+		if ( value.substring( 0, 4 ) === 'tag:' ) {
+			request.search = '';
+			request.tag = [ value.slice( 4 ) ];
+		}
+
+		$( '.filter-links li > a.current' )
+			.removeClass( 'current' )
+			.removeAttr( 'aria-current' );
+
+		$( 'body' ).removeClass( 'show-filters filters-applied show-favorites-form' );
+		$( '.drawer-toggle' ).attr( 'aria-expanded', 'false' );
+
+		// Get the themes by sending Ajax POST request to api.wordpress.org/themes
+		// or searching the local cache
+		this.collection.query( request );
+
+		// Set route
+		demos.router.navigate( demos.router.baseUrl( demos.router.searchPath + encodeURIComponent( value ) ), { replace: true } );
+	}
+});
+
 demos.view.Installer = demos.view.Appearance.extend({
 
 	el: '#wpbody-content .wrap',
@@ -1585,12 +1658,52 @@ demos.view.Installer = demos.view.Appearance.extend({
 
 		this.search();
 
-		// Setup the main demo view
-		// with the current demo collection
+		this.collection = new demos.Collection();
+
+		// Bump `collection.currentQuery.page` and request more demos if we hit the end of the page.
+		this.listenTo( this, 'demo:end', function() {
+
+			// Make sure we are not already loading
+			if ( self.collection.loadingDemos ) {
+				return;
+			}
+
+			// Set loadingDemos to true and bump page instance of currentQuery.
+			self.collection.loadingDemos = true;
+			self.collection.currentQuery.page++;
+
+			// Use currentQuery.page to build the demos request.
+			_.extend( self.collection.currentQuery.request, { page: self.collection.currentQuery.page } );
+			self.collection.query( self.collection.currentQuery.request );
+		});
+
+		this.listenTo( this.collection, 'query:success', function() {
+			$( 'body' ).removeClass( 'loading-content' );
+			$( '.theme-browser' ).find( 'div.error' ).remove();
+		});
+
+		this.listenTo( this.collection, 'query:fail', function() {
+			$( 'body' ).removeClass( 'loading-content' );
+			$( '.theme-browser' ).find( 'div.error' ).remove();
+			$( '.theme-browser' ).find( 'div.themes' ).before( '<div class="error"><p>' + l10n.error + '</p><p><button class="button try-again">' + l10n.tryAgain + '</button></p></div>' );
+			$( '.theme-browser .error .try-again' ).on( 'click', function( e ) {
+				e.preventDefault();
+				$( 'input.wp-filter-search' ).trigger( 'input' );
+			} );
+		});
+
+		if ( this.view ) {
+			this.view.remove();
+		}
+
+		// Set ups the view and passes the section argument
 		this.view = new demos.view.Demos({
 			collection: this.collection,
 			parent: this
 		});
+
+		// Reset pagination every time the install view handler is run
+		this.page = 0;
 
 		// Render and append
 		this.$el.find( '.themes' ).remove();
@@ -1598,9 +1711,9 @@ demos.view.Installer = demos.view.Appearance.extend({
 		this.$el.find( '.theme-browser' ).append( this.view.el ).addClass( 'rendered' );
 	},
 
-	// Handles all the rendering of the public theme directory
+	// Handles all the rendering of the public demo directory
 	browse: function( section ) {
-		// Create a new collection with the proper theme data
+		// Create a new collection with the proper demo data
 		// for each section
 		this.collection.query( { browse: section } );
 	},
@@ -1640,12 +1753,6 @@ demos.view.Installer = demos.view.Appearance.extend({
 			.addClass( this.activeClass )
 			.attr( 'aria-current', 'page' );
 
-		if ( 'favorites' === sort ) {
-			$( 'body' ).addClass( 'show-favorites-form' );
-		} else {
-			$( 'body' ).removeClass( 'show-favorites-form' );
-		}
-
 		this.browse( sort );
 	},
 
@@ -1683,16 +1790,18 @@ demos.InstallerRouter = Backbone.Router.extend({
 demos.RunInstaller = {
 
 	init: function() {
-		// Initializes the blog's demo library view
-		// Create a new collection with data
-		this.demos = new demos.Collection( demos.data.demos );
-
 		// Set up the view
+		// Passes the default 'section' as an option
 		this.view = new demos.view.Installer({
-			collection: this.demos
+			section: 'all',
+			SearchView: demos.view.InstallerSearch
 		});
 
+		// Render results
 		this.render();
+
+		// Start debouncing user searches after Backbone.history.start().
+		this.view.SearchView.doSearch = _.debounce( this.view.SearchView.doSearch, 500 );
 	},
 
 	render: function() {
@@ -1702,6 +1811,9 @@ demos.RunInstaller = {
 		this.view.initTipTip();
 		this.routes();
 
+		if ( Backbone.History.started ) {
+			Backbone.history.stop();
+		}
 		Backbone.history.start({
 			root: demos.data.settings.adminUrl,
 			pushState: true,
@@ -1801,30 +1913,6 @@ $( document ).ready( function() {
 
 		$this_el.parent().text( $this_el.data( 'rated' ) );
 	} );
-
-	// Make disabled checkbox always checked through data-checked.
-	$( document.body ).on( 'click', 'thead .check-column :checkbox', function( event ) {
-		var $this = $( this ),
-			$table = $this.closest( 'table' ),
-			controlChecked = $this.prop( 'checked' ),
-			toggle = event.shiftKey || $this.data( 'wp-toggle' );
-
-		$table.children( 'tbody' ).filter( ':visible' )
-			.children().children( '.check-column' ).find( ':checkbox' )
-			.prop( 'checked', function() {
-				if ( $( this ).is( ':hidden,:disabled' ) ) {
-					return $( this ).data( 'checked' ) ? true : false;
-				}
-
-				if ( toggle ) {
-					return ! $( this ).prop( 'checked' );
-				} else if ( controlChecked ) {
-					return true;
-				}
-
-				return false;
-			});
-	});
 });
 
 })( jQuery );

@@ -51,6 +51,7 @@ class TG_Demo_Importer {
 		add_filter( 'woocommerce_enable_setup_wizard', '__return_false', 1 );
 
 		// AJAX Events to import demo and update rating footer.
+		add_action( 'wp_ajax_query-demos', array( $this, 'ajax_query_demos' ) );
 		add_action( 'wp_ajax_import-demo', array( $this, 'ajax_import_demo' ) );
 		add_action( 'wp_ajax_footer-text-rated', array( $this, 'ajax_footer_text_rated' ) );
 
@@ -198,7 +199,7 @@ class TG_Demo_Importer {
 				),
 			) );
 			wp_localize_script( 'tg-demo-importer', '_demoImporterSettings', array(
-				'demos'    => $this->prepare_demos_for_js(),
+				'demos'    => false,
 				'settings' => array(
 					'isInstall'      => apply_filters( 'themegrill_demo_importer_installer', true ),
 					'canInstall'     => current_user_can( 'upload_files' ),
@@ -214,6 +215,12 @@ class TG_Demo_Importer {
 					'addNew'              => __( 'Add New Demo', 'themegrill-demo-importer' ),
 					'search'              => __( 'Search Demos', 'themegrill-demo-importer' ),
 					'searchPlaceholder'   => __( 'Search demos...', 'themegrill-demo-importer' ), // placeholder (no ellipsis)
+					'error'               => sprintf(
+						/* translators: %s: support forums URL */
+						__( 'An unexpected error occurred. Something may be wrong with ThemeGrill demo server&#8217;s configuration. If you continue to have problems, please try the <a href="%s">support forums</a>.', 'themegrill-demo-importer' ),
+						__( 'https://wordpress.org/support/plugin/themegrill-demo-importer' )
+					),
+					'tryAgain'            => __( 'Try Again', 'themegrill-demo-importer' ),
 					'demosFound'          => __( 'Number of Demos found: %d', 'themegrill-demo-importer' ),
 					'noDemosFound'        => __( 'No demos found. Try a different search.', 'themegrill-demo-importer' ),
 					'collapseSidebar'     => __( 'Collapse Sidebar', 'themegrill-demo-importer' ),
@@ -589,6 +596,13 @@ class TG_Demo_Importer {
 		if ( $result || is_wp_error( $result ) ) {
 			$file_upload->cleanup();
 		}
+	}
+
+	/**
+	 * Ajax handler for fetching demos.
+	 */
+	public function ajax_query_demos() {
+		wp_send_json_success( $this->prepare_demos_for_js() );
 	}
 
 	/**
