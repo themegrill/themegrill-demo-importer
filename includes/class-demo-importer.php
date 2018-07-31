@@ -599,7 +599,14 @@ class TG_Demo_Importer {
 	 * Ajax handler for fetching demos.
 	 */
 	public function ajax_query_demos() {
-		wp_send_json_success( $this->prepare_demos_for_js() );
+		wp_send_json_success( array(
+		    'info' => array(
+		      'page'    => 1,
+		      'pages'   => 35,
+		      'results' => 11,
+		    ),
+			'demos' => $this->prepare_demos_for_js()
+		) );
 	}
 
 	/**

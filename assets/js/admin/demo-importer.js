@@ -958,7 +958,7 @@ demos.view.Details = wp.Backbone.View.extend({
 
 // Theme Preview view
 // Set ups a modal overlay with the expanded demo data
-demos.view.Preview = wp.Backbone.View.extend({
+demos.view.Preview = demos.view.Details.extend({
 
 	className: 'wp-full-overlay expanded',
 	el: '.theme-install-overlay',
