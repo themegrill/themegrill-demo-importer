@@ -53,7 +53,7 @@ $feature_lists      = apply_filters( 'themegrill_demo_importer_feature_lists', a
 
 	<div class="wp-filter hide-if-no-js">
 		<div class="filter-count">
-			<span class="count theme-count demo-count"><?php echo count( $this->demo_config ); ?></span>
+			<span class="count theme-count demo-count"></span>
 		</div>
 
 		<ul class="filter-links">

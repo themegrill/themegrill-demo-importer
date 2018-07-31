@@ -430,6 +430,30 @@ class TG_Demo_Importer {
 	}
 
 	/**
+	 * Demo Importer page output.
+	 */
+	public function demo_importer() {
+		include_once dirname( __FILE__ ) . '/admin/views/html-admin-page-importer.php';
+	}
+
+	/**
+	 * Ajax handler for getting demos from github.
+	 */
+	public function ajax_query_demos() {
+		$config = wp_safe_remote_get( 'https://raw.githubusercontent.com/themegrill/themegrill-demo-pack/demo-configs/configs/' . get_option( 'template' ) . '.json' );
+
+
+		wp_send_json_success( array(
+		    'info' => array(
+		      'page'    => 1,
+		      'pages'   => 1,
+		      'results' => 11,
+		    ),
+			'demos' => $this->prepare_demos_for_js()
+		) );
+	}
+
+	/**
 	 * Prepare demos for JavaScript.
 	 *
 	 * @return array An associative array of demo data, sorted by name.
@@ -533,58 +557,6 @@ class TG_Demo_Importer {
 		$prepared_demos = apply_filters( 'themegrill_demo_importer_prepare_demos_for_js', $prepared_demos );
 		$prepared_demos = array_values( $prepared_demos );
 		return array_filter( $prepared_demos );
-	}
-
-	/**
-	 * Demo Importer page output.
-	 */
-	public function demo_importer() {
-		include_once dirname( __FILE__ ) . '/admin/views/html-admin-page-importer.php';
-	}
-
-	/**
-	 * Upload demo pack.
-	 */
-	private function upload_demo_pack() {
-		include_once( ABSPATH . 'wp-admin/includes/class-wp-upgrader.php' );
-
-		if ( ! current_user_can( 'upload_files' ) ) {
-			wp_die( __( 'Sorry, you are not allowed to install demo on this site.', 'themegrill-demo-importer' ) );
-		}
-
-		check_admin_referer( 'demo-upload' );
-
-		$file_upload = new File_Upload_Upgrader( 'demozip', 'package' );
-
-		$title = sprintf( __( 'Installing Demo from uploaded file: %s', 'themegrill-demo-importer' ), esc_html( basename( $file_upload->filename ) ) );
-		$nonce = 'demo-upload';
-		$url   = add_query_arg( array( 'package' => $file_upload->id ), 'themes.php?page=demo-importer&action=upload-demo' );
-		$type  = 'upload'; // Install demo type, From Web or an Upload.
-
-		// Demo Upgrader Class.
-		include_once( dirname( __FILE__ ) . '/admin/class-demo-upgrader.php' );
-		include_once( dirname( __FILE__ ) . '/admin/class-demo-installer-skin.php' );
-
-		$upgrader = new TG_Demo_Upgrader( new TG_Demo_Installer_Skin( compact( 'type', 'title', 'nonce', 'url' ) ) );
-		$result = $upgrader->install( $file_upload->package );
-
-		if ( $result || is_wp_error( $result ) ) {
-			$file_upload->cleanup();
-		}
-	}
-
-	/**
-	 * Ajax handler for fetching demos.
-	 */
-	public function ajax_query_demos() {
-		wp_send_json_success( array(
-		    'info' => array(
-		      'page'    => 1,
-		      'pages'   => 35,
-		      'results' => 11,
-		    ),
-			'demos' => $this->prepare_demos_for_js()
-		) );
 	}
 
 	/**
