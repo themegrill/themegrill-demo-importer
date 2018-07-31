@@ -271,28 +271,6 @@ class TG_Demo_Importer {
 			return;
 		}
 
-		$video_map = array(
-			'demo-importer' => array(
-				'title' => __( 'Importing Demo', 'themegrill-demo-importer' ),
-				'id'    => 'Ou6_rgjw6is',
-			),
-		);
-
-		$video_key = empty( $_GET['page'] ) ? $screen->id : sanitize_title( $_GET['page'] );
-
-		if ( isset( $video_map[ $video_key ] ) ) {
-			$embed_code = '
-				<a href="https://www.youtube.com/watch?v=' . esc_attr( $video_map[ $video_key ]['id'] ) . '" target="_blank" class="themegrill-demo-importer-guided-tour-embed" data-video_id="' . esc_attr( $video_map[ $video_key ]['id'] ) . '">
-					<img src="https://img.youtube.com/vi/' . esc_attr( $video_map[ $video_key ]['id'] ) . '/maxresdefault.jpg" width="560" height="315" />
-				</a>';
-
-			$screen->add_help_tab( array(
-				'id'      => 'themegrill_demo_importer_guided_tour_tab',
-				'title'   => __( 'Guided Tour', 'themegrill-demo-importer' ),
-				'content' => '<h2>' . __( 'Guided Tour', 'themegrill-demo-importer' ) . ' &ndash; ' . esc_html( $video_map[ $video_key ]['title'] ) . '</h2>' . $embed_code,
-			) );
-		}
-
 		$screen->add_help_tab( array(
 			'id'        => 'themegrill_demo_importer_support_tab',
 			'title'     => __( 'Help &amp; Support', 'themegrill-demo-importer' ),

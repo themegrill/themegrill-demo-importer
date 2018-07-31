@@ -1895,14 +1895,6 @@ $( document ).ready( function() {
 		return window.confirm( _demoImporterSettings.settings.confirmReset );
 	});
 
-	// Load videos when help button is clicked.
-	$( '#contextual-help-link' ).on( 'click', function() {
-		$( '.themegrill-demo-importer-guided-tour-embed' ).each( function() {
-			var video_id = $( this ).data( 'video_id' );
-			$( this ).replaceWith( '<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/' + video_id + '" frameborder="0" allowfullscreen></iframe>' );
-		} );
-	} );
-
 	// Change the footer text when rating link is clicked.
 	$( '.themegrill-demo-importer-rating-link' ).on( 'click', function() {
 		var $this_el = $( this );
