@@ -466,7 +466,35 @@ class TG_Demo_Importer {
 	 * Ajax handler for getting demos from github.
 	 */
 	public function ajax_query_demos() {
-		$packages = $this->get_demo_packages();
+		$prepared_demos     = array();
+		$current_template   = get_option( 'template' );
+		$available_packages = $this->get_demo_packages();
+
+		if ( is_object( $available_packages ) ) {
+			foreach ( $available_packages->availableDemos as $package_id => $package_data ) {
+
+				// Prepare all demos.
+				$prepared_demos[ $package_id ] = array(
+					'id'              => $package_id,
+					'name'            => $package_data->title,
+					'is_pro'          => isset( $package_data->isPro ) ? $package_data->isPro : false,
+					'version'         => isset( $package_data->version ) ? $package_data->version : $available_packages->version,
+					'homepage'        => $available_packages->homepage,
+					'preview_url'     => set_url_scheme( $package_data->preview ),
+					'screenshot_url'  => tg_get_demo_preview_screenshot_url( $package_id, $current_template ),
+				);
+			}
+		}
+
+		/**
+		 * Filters the demos prepared for JavaScript.
+		 *
+		 * Could be useful for changing the order, which is by name by default.
+		 *
+		 * @param array $prepared_demos Array of demos.
+		 */
+		$prepared_demos = apply_filters( 'themegrill_demo_importer_prepare_demos_for_js', $prepared_demos );
+		$prepared_demos = array_values( $prepared_demos );
 
 		wp_send_json_success( array(
 		    'info' => array(
@@ -474,7 +502,7 @@ class TG_Demo_Importer {
 		      'pages'   => 1,
 		      'results' => 11,
 		    ),
-			'demos' => $this->prepare_demos_for_js()
+			'demos' => array_filter( $prepared_demos ),
 		) );
 	}
 
