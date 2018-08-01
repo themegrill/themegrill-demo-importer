@@ -34,9 +34,6 @@ class TG_Demo_Importer {
 			add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 		}
 
-		// Add Demo Importer filter links.
-		add_action( 'themegrill_demo_importer_filter_links', array( $this, 'add_filter_links' ) );
-
 		// Help Tabs.
 		if ( apply_filters( 'themegrill_demo_importer_enable_admin_help_tab', true ) ) {
 			add_action( 'current_screen', array( $this, 'add_help_tabs' ), 50 );
@@ -88,15 +85,15 @@ class TG_Demo_Importer {
 	 *
 	 * @return array of objects
 	 */
-	private function get_packages() {
-		$template = get_option( 'template' );
+	private function get_demo_packages() {
+		$template = strtolower( str_replace( '-pro', '', get_option( 'template' ) ) );
 		$packages = get_transient( 'themegrill_demo_importer_packages_' . $template );
 
 		if ( false === $packages ) {
-			$raw_packages = wp_safe_remote_get( 'https://raw.githubusercontent.com/themegrill/themegrill-demo-pack/demo-configs/configs/' . $template . '.json' );
+			$raw_packages = wp_safe_remote_get( "https://raw.githubusercontent.com/themegrill/themegrill-demo-pack/master/configs/{$template}.json" );
 
 			if ( ! is_wp_error( $raw_packages ) ) {
-				$packages = wp_remote_retrieve_body( $raw_packages );
+				$packages = json_decode( wp_remote_retrieve_body( $raw_packages ) );
 
 				if ( $packages ) {
 					set_transient( 'themegrill_demo_importer_packages_' . $template, $packages, WEEK_IN_SECONDS );
@@ -183,27 +180,6 @@ class TG_Demo_Importer {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Add filter links.
-	 *
-	 * @param  array $filter_links Filter links.
-	 * @return array
-	 */
-	public function add_filter_links( $filter_links ) {
-		$packages = $this->get_packages();
-
-		$new_filter_links = array(
-			'all'      => __( 'All', 'themegrill-demo-importer' ),
-			'blog'     => __( 'Blog', 'themegrill-demo-importer' ),
-			'news'     => __( 'News', 'themegrill-demo-importer' ),
-			'business' => __( 'Business', 'themegrill-demo-importer' ),
-			'free'     => __( 'Free', 'themegrill-demo-importer' ),
-			'others'   => __( 'Others', 'themegrill-demo-importer' ),
-		);
-
-		return array_merge( $filter_links, $new_filter_links );
 	}
 
 	/**
@@ -481,6 +457,8 @@ class TG_Demo_Importer {
 	 * Demo Importer page output.
 	 */
 	public function demo_importer() {
+		$packages = $this->get_demo_packages();
+
 		include_once dirname( __FILE__ ) . '/admin/views/html-admin-page-importer.php';
 	}
 
@@ -488,7 +466,7 @@ class TG_Demo_Importer {
 	 * Ajax handler for getting demos from github.
 	 */
 	public function ajax_query_demos() {
-		$packages = $this->get_packages();
+		$packages = $this->get_demo_packages();
 
 		wp_send_json_success( array(
 		    'info' => array(

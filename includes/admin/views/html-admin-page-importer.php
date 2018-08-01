@@ -7,8 +7,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-$demo_filter_links = apply_filters( 'themegrill_demo_importer_filter_links', array() );
-$feature_lists     = apply_filters( 'themegrill_demo_importer_feature_lists', array(
+$feature_lists = apply_filters( 'themegrill_demo_importer_feature_lists', array(
 	'pagebuilder' => array(
 		'name'  => __( 'Pagebuilder', 'themegrill-demo-importer' ),
 		'lists' => array(
@@ -40,7 +39,7 @@ $feature_lists     = apply_filters( 'themegrill_demo_importer_feature_lists', ar
 		</div>
 
 		<ul class="filter-links">
-			<?php foreach ( $demo_filter_links as $slug => $label ) : ?>
+			<?php foreach ( $packages->category as $slug => $label ) : ?>
 				<li><a href="#" data-sort="<?php echo esc_attr( $slug ); ?>" class="demo-tab"><?php echo esc_html( $label ); ?></a></li>
 			<?php endforeach; ?>
 		</ul>
@@ -209,7 +208,6 @@ $feature_lists     = apply_filters( 'themegrill_demo_importer_feature_lists', ar
 				<span class="collapse-sidebar-arrow"></span>
 				<span class="collapse-sidebar-label"><?php _e( 'Collapse', 'themegrill-demo-importer' ); ?></span>
 			</button>
-
 			<div class="devices-wrapper">
 				<div class="devices">
 					<button type="button" class="preview-desktop active" aria-pressed="true" data-device="desktop">
