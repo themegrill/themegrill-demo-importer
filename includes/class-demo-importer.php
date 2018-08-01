@@ -468,17 +468,38 @@ class TG_Demo_Importer {
 	public function ajax_query_demos() {
 		$prepared_demos     = array();
 		$current_template   = get_option( 'template' );
+		$demo_activated_id  = get_option( 'themegrill_demo_importer_activated_id' );
 		$available_packages = $this->get_demo_packages();
+
+		/**
+		 * Filters demo data before it is prepared for JavaScript.
+		 *
+		 * @param array      $prepared_demos     An associative array of demo data. Default empty array.
+		 * @param null|array $available_packages An array of demo package config to prepare, if any.
+		 * @param string     $demo_activated_id  The current demo activated id.
+		 */
+		$prepared_demos = (array) apply_filters( 'themegrill_demo_importer_pre_prepare_demos_for_js', array(), $available_packages, $demo_activated_id );
+
+		if ( ! empty( $prepared_demos ) ) {
+			return $prepared_demos;
+		}
+
+		// Make sure the imported demo is listed first.
+		if ( isset( $available_packages->$demo_activated_id ) ) {
+			$prepared_demos[ $demo_activated_id ] = array();
+		}
 
 		if ( is_object( $available_packages ) ) {
 			foreach ( $available_packages->availableDemos as $package_id => $package_data ) {
-
 				// Prepare all demos.
 				$prepared_demos[ $package_id ] = array(
 					'id'              => $package_id,
 					'name'            => $package_data->title,
+					'active'          => $package_id === $demo_activated_id,
 					'is_pro'          => isset( $package_data->isPro ) ? $package_data->isPro : false,
+					'author'          => isset( $package_data->author ) ? $package_data->author : __( 'ThemeGrill', 'themegrill-demo-importer' ),
 					'version'         => isset( $package_data->version ) ? $package_data->version : $available_packages->version,
+					'description'     => isset( $package_data->description ) ? $package_data->description : '',
 					'homepage'        => $available_packages->homepage,
 					'preview_url'     => set_url_scheme( $package_data->preview ),
 					'screenshot_url'  => tg_get_demo_preview_screenshot_url( $package_id, $current_template ),
@@ -512,33 +533,6 @@ class TG_Demo_Importer {
 	 * @return array An associative array of demo data, sorted by name.
 	 */
 	private function prepare_demos_for_js() {
-		$prepared_demos    = array();
-		$current_template  = get_option( 'template' );
-		$demo_activated_id = get_option( 'themegrill_demo_importer_activated_id' );
-		$available_demos   = $this->demo_config;
-
-		if ( apply_filters( 'themegrill_demo_importer_installer', true ) ) {
-			$available_demos = apply_filters( 'themegrill_demo_importer_packages', array() );
-		}
-
-		/**
-		 * Filters demo data before it is prepared for JavaScript.
-		 *
-		 * @param array      $prepared_demos    An associative array of demo data. Default empty array.
-		 * @param null|array $available_demos   An array of demo config to prepare, if any.
-		 * @param string     $demo_activated_id The current demo activated id.
-		 */
-		$prepared_demos = (array) apply_filters( 'themegrill_demo_importer_pre_prepare_demos_for_js', array(), $available_demos, $demo_activated_id );
-
-		if ( ! empty( $prepared_demos ) ) {
-			return $prepared_demos;
-		}
-
-		// Make sure the imported demo is listed first.
-		if ( isset( $available_demos[ $demo_activated_id ] ) ) {
-			$prepared_demos[ $demo_activated_id ] = array();
-		}
-
 		if ( ! empty( $available_demos ) ) {
 			foreach ( $available_demos as $demo_id => $demo_data ) {
 				$author       = isset( $demo_data['author'] ) ? $demo_data['author'] : __( 'ThemeGrill', 'themegrill-demo-importer' );
@@ -574,18 +568,18 @@ class TG_Demo_Importer {
 
 				// Prepare all demos.
 				$prepared_demos[ $demo_id ] = array(
-					'id'              => $demo_id,
-					'name'            => $demo_data['name'],
+					// 'id'              => $demo_id,
+					// 'name'            => $demo_data['name'],
 					'theme'           => $demo_data['theme'],
-					'is_pro'          => $premium_link,
+					// 'is_pro'          => $premium_link,
 					'preview_url'     => $demo_data['preview_url'],
 					'screenshot_url'  => tg_get_demo_preview_screenshot_url( $demo_id, $current_template ),
 					'package'         => $demo_package,
-					'description'     => $description,
-					'author'          => $author,
+					// 'description'     => $description,
+					// 'author'          => $author,
 					'authorAndUri'    => '<a href="https://themegrill.com" target="_blank">ThemeGrill</a>',
-					'version'         => $version,
-					'active'          => $demo_id === $demo_activated_id,
+					// 'version'         => $version,
+					// 'active'          => $demo_id === $demo_activated_id,
 					'hasNotice'       => $demo_notices,
 					'plugins'         => $plugins_list,
 					'pluginActions'   => array(
@@ -599,17 +593,6 @@ class TG_Demo_Importer {
 				);
 			}
 		}
-
-		/**
-		 * Filters the demos prepared for JavaScript.
-		 *
-		 * Could be useful for changing the order, which is by name by default.
-		 *
-		 * @param array $prepared_demos Array of demos.
-		 */
-		$prepared_demos = apply_filters( 'themegrill_demo_importer_prepare_demos_for_js', $prepared_demos );
-		$prepared_demos = array_values( $prepared_demos );
-		return array_filter( $prepared_demos );
 	}
 
 	/**
