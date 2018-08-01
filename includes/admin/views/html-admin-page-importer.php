@@ -1,31 +1,14 @@
 <?php
 /**
  * Admin View: Page - Importer
+ *
+ * @package Importer
  */
 
 defined( 'ABSPATH' ) || exit;
 
-$previewable_devices = array(
-	'desktop' => array(
-		'label' => __( 'Enter desktop preview mode', 'themegrill-demo-importer' ),
-		'default' => true,
-	),
-	'tablet' => array(
-		'label' => __( 'Enter tablet preview mode', 'themegrill-demo-importer' ),
-	),
-	'mobile' => array(
-		'label' => __( 'Enter mobile preview mode', 'themegrill-demo-importer' ),
-	),
-);
-$demo_filter_links   = apply_filters( 'themegrill_demo_importer_filter_links_array', array(
-	'all'       => __( 'All', 'themegrill-demo-importer' ),
-	'blog'      => __( 'Blog', 'themegrill-demo-importer' ),
-	'news'      => __( 'News', 'themegrill-demo-importer' ),
-	'business'  => __( 'Business', 'themegrill-demo-importer' ),
-	'free'      => __( 'Free', 'themegrill-demo-importer' ),
-	'others'    => __( 'Others', 'themegrill-demo-importer' ),
-) );
-$feature_lists      = apply_filters( 'themegrill_demo_importer_feature_lists', array(
+$demo_filter_links = apply_filters( 'themegrill_demo_importer_filter_links', array() );
+$feature_lists     = apply_filters( 'themegrill_demo_importer_feature_lists', array(
 	'pagebuilder' => array(
 		'name'  => __( 'Pagebuilder', 'themegrill-demo-importer' ),
 		'lists' => array(
@@ -227,27 +210,19 @@ $feature_lists      = apply_filters( 'themegrill_demo_importer_feature_lists', a
 				<span class="collapse-sidebar-label"><?php _e( 'Collapse', 'themegrill-demo-importer' ); ?></span>
 			</button>
 
-			<?php if ( ! empty( $previewable_devices ) ) : ?>
-				<div class="devices-wrapper">
-					<div class="devices">
-						<?php foreach ( (array) $previewable_devices as $device => $settings ) : ?>
-							<?php
-							if ( empty( $settings['label'] ) ) {
-								continue;
-							}
-							$active = ! empty( $settings['default'] );
-							$class = 'preview-' . $device;
-							if ( $active ) {
-								$class .= ' active';
-							}
-							?>
-							<button type="button" class="<?php echo esc_attr( $class ); ?>" aria-pressed="<?php echo esc_attr( $active ) ?>" data-device="<?php echo esc_attr( $device ); ?>">
-								<span class="screen-reader-text"><?php echo esc_html( $settings['label'] ); ?></span>
-							</button>
-						<?php endforeach; ?>
-					</div>
+			<div class="devices-wrapper">
+				<div class="devices">
+					<button type="button" class="preview-desktop active" aria-pressed="true" data-device="desktop">
+						<span class="screen-reader-text"><?php esc_html_e( 'Enter desktop preview mode', 'themegrill-demo-importer' ); ?></span>
+					</button>
+					<button type="button" class="preview-tablet" aria-pressed="false" data-device="tablet">
+						<span class="screen-reader-text"><?php esc_html_e( 'Enter tablet preview mode', 'themegrill-demo-importer' ); ?></span>
+					</button>
+					<button type="button" class="preview-mobile" aria-pressed="false" data-device="mobile">
+						<span class="screen-reader-text"><?php esc_html_e( 'Enter mobile preview mode', 'themegrill-demo-importer' ); ?></span>
+					</button>
 				</div>
-			<?php endif; ?>
+			</div>
 		</div>
 	</div>
 	<div class="wp-full-overlay-main">

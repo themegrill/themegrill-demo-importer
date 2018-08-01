@@ -164,6 +164,13 @@
 		.wp-full-overlay-footer {
 			height: 132px;
 
+			.devices button {
+				&:hover,
+				&:focus {
+					background-color: transparent;
+				}
+			}
+
 			.demo-import-actions {
 				padding: 20px;
 				background: #fff;

@@ -1,6 +1,8 @@
 <?php
 /**
  * Admin View: Notice - Reset Wizard
+ *
+ * @package Importer
  */
 
 defined( 'ABSPATH' ) || exit;
