@@ -188,24 +188,24 @@ $feature_lists = apply_filters( 'themegrill_demo_importer_feature_lists', array(
 				</div>
 
 				<div class="required-plugins">
-					<h3><?php _e( 'Required Plugins', 'themegrill-demo-importer' ); ?></h3>
-					<p><?php _e( 'This plugins are required to import demo.', 'themegrill-demo-importer' ); ?></p>
-					<ul class="plugin-list">
-						<li>
-							<span class="plugin-name">Everest Forms</span>
-							<div class="circle-loader"></div>
-						</li>
-						<li>
-							<span class="plugin-name">Elementor</span>
-							<div class="circle-loader circle-loading"></div>
-						</li>
-						<li>
-							<span class="plugin-name">Woocommerce</span>
-							<div class="circle-loader circle-colored">
-								<div class="checked"></div>
-							</div>
-						</li>
-					</ul>
+					<# if ( ! _.isEmpty( data.plugins ) ) { #>
+						<h3><?php _e( 'Required Plugins', 'themegrill-demo-importer' ); ?></h3>
+						<p class="desc"><?php _e( 'This plugins are required to import demo.', 'themegrill-demo-importer' ); ?></p>
+						<ul class="plugins-list">
+							<# _.each( data.plugins, function( plugin, slug ) { #>
+								<li class="plugin<# if ( ! plugin.is_install ) { #> install<# } #>" data-slug="{{ slug }}" data-plugin="{{ plugin.slug }}" data-name="{{ plugin.name }}">
+									<# if ( plugin.link ) { #>
+										<a href="{{{ plugin.link }}}" target="_blank">{{{ plugin.name }}}</a>
+									<# } else { #>
+										<a href="<?php printf( esc_url( 'https://wordpress.org/plugins/%s' ), '{{ slug }}' ); ?>" target="_blank">{{ plugin.name }}</a>
+									<# } #>
+									<div class="circle-loader"></div>
+								</li>
+							<# }); #>
+						</ul>
+					<# } else { #>
+						<p class="no-items"><?php _e( 'No plugins are needed to import this demo.', 'themegrill-demo-importer' ); ?></p>
+					<# } #>
 				</div>
 			</div>
 		</div>
