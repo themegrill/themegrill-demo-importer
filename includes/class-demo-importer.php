@@ -463,11 +463,38 @@ class TG_Demo_Importer {
 	}
 
 	/**
+	 * Get the demo package screenshot URL.
+	 *
+	 * @param  string $demo_dir
+	 * @param  string $current_template
+	 * @return string the demo package screenshot URL.
+	 */
+	private function get_screenshot_url( $package_id, $current_template ) {
+		$package_screenshot    = $this->import_file_path( $package_id, 'screenshot.jpg' );
+		$screenshot_theme_path = get_template_directory() . "/images/demo/{$package_id}.jpg";
+
+		if ( file_exists( $package_screenshot ) ) {
+			$screenshot_url = $this->import_file_url( $package_id, 'screenshot.jpg' );
+		} elseif ( file_exists( $screenshot_theme_path ) ) {
+			$screenshot_url = get_template_directory_uri() . "/images/demo/{$package_id}.jpg";
+		} else {
+			$screenshot_url = "https://raw.githubusercontent.com/themegrill/themegrill-demo-pack/master/resources/{$current_template}/{$package_id}/screenshot.jpg";
+
+			$headers = wp_get_http_headers( $screenshot_url );
+			if ( ! isset( $headers['content-type'] ) ) {
+				$screenshot_url = '';
+			}
+		}
+
+		return $screenshot_url;
+	}
+
+	/**
 	 * Ajax handler for getting demos from github.
 	 */
 	public function ajax_query_demos() {
 		$prepared_demos     = array();
-		$current_template   = get_option( 'template' );
+		$current_template   = str_replace( '-pro', '', get_option( 'template' ) );
 		$demo_activated_id  = get_option( 'themegrill_demo_importer_activated_id' );
 		$available_packages = $this->get_demo_packages();
 
@@ -502,7 +529,7 @@ class TG_Demo_Importer {
 					'description'     => isset( $package_data->description ) ? $package_data->description : '',
 					'homepage'        => $available_packages->homepage,
 					'preview_url'     => set_url_scheme( $package_data->preview ),
-					'screenshot_url'  => tg_get_demo_preview_screenshot_url( $package_id, $current_template ),
+					'screenshot_url'  => $this->get_screenshot_url( $package_id, $current_template ),
 				);
 			}
 		}
@@ -572,8 +599,8 @@ class TG_Demo_Importer {
 					// 'name'            => $demo_data['name'],
 					'theme'           => $demo_data['theme'],
 					// 'is_pro'          => $premium_link,
-					'preview_url'     => $demo_data['preview_url'],
-					'screenshot_url'  => tg_get_demo_preview_screenshot_url( $demo_id, $current_template ),
+					// 'preview_url'     => $demo_data['preview_url'],
+					// 'screenshot_url'  => tg_get_demo_preview_screenshot_url( $demo_id, $current_template ),
 					'package'         => $demo_package,
 					// 'description'     => $description,
 					// 'author'          => $author,

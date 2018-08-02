@@ -180,7 +180,7 @@ $feature_lists = apply_filters( 'themegrill_demo_importer_feature_lists', array(
 
 				<div class="required-plugins">
 					<h3><?php _e( 'Required Plugins', 'themegrill-demo-importer' ); ?></h3>
-					<p><?php _e( 'Let\'s install required plugins to import this demo.', 'themegrill-demo-importer' ); ?></p>
+					<p><?php _e( 'This plugins are required to import demo.', 'themegrill-demo-importer' ); ?></p>
 					<ul class="plugin-list">
 						<li>
 							<span class="plugin-name">Everest Forms</span>
