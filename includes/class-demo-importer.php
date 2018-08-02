@@ -492,6 +492,9 @@ class TG_Demo_Importer {
 					'homepage'        => $available_packages->homepage,
 					'preview_url'     => set_url_scheme( $package_data->preview ),
 					'screenshot_url'  => $this->get_screenshot_url( $package_id, $current_template ),
+					'actions'         => array(
+						'preview'  => home_url( '/' )
+					),
 				);
 			}
 		}
