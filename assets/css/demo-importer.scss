@@ -88,72 +88,57 @@
 				}
 
 				.theme-details {
-					padding-bottom: 30px;
-					border-bottom: 1px solid #ddd;
+					padding-bottom: 25px;
 
 					.theme-version {
 						margin-top: 0;
 					}
 				}
 
-				.required-plugins {
-					padding-top: 10px;
+				table.plugins-list-table {
+					margin-bottom: 1em;
 
-					.plugins-list {
-						border: 1px solid #ddd;
-						margin-top: 20px;
+					.plugin-status {
+						float: right;
 
-						li {
-							padding: 10px;
-							margin-bottom: 0;
-							border-bottom: 1px solid #ddd;
-							display: flex;
-							align-items: center;
-							justify-content: space-between;
+						span.circle-loader {
+							width: 24px;
+							height: 24px;
+							border-radius: 50%;
+							position: relative;
+							vertical-align: top;
+							display: inline-block;
+							border: 2px solid #bfbfbf;
 
-							&:last-child {
-								border-bottom: none;
+							&.circle-loading {
+								border-left-color: #5cb85c;
+								animation: spin .75s linear infinite;
 							}
-						}
-					}
 
-					.circle-loader {
-						width: 24px;
-						height: 24px;
-						border-radius: 50%;
-						position: relative;
-						vertical-align: top;
-						display: inline-block;
-						border: 2px solid #bfbfbf;
+							&.circle-colored {
+								border-color: #5cb85c;
 
-						&.circle-loading {
-							border-left-color: #5cb85c;
-							animation: spin .75s linear infinite;
-						}
-
-						&.circle-colored {
-							border-color: #5cb85c;
-
-							.checked {
-								display: block;
+								span.checked {
+									display: block;
+								}
 							}
-						}
 
-						.checked {
-							display: none;
+							span.checked {
+								display: none;
 
-							&::after {
-								position: absolute;
-								left: 50%;
-								top: 50%;
-								opacity: 1;
-								content: "";
-								height: 50%;
-								width: 25%;
-								transform-origin: left top;
-								border-right: 2px solid #5cb85c;
-								border-top: 2px solid #5cb85c;
-								transform: scaleX(-1) rotate(135deg) translate(-58%, -40%);
+								&::after {
+									position: absolute;
+									left: 50%;
+									top: 50%;
+									opacity: 1;
+									content: "";
+									height: 50%;
+									width: 25%;
+									transform-origin: left top;
+									border-right: 2px solid #5cb85c;
+									border-top: 2px solid #5cb85c;
+									transform: scaleX(-1) rotate(135deg) translate(-58%, -40%);
+								}
 							}
 						}
 					}
