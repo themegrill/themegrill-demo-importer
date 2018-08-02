@@ -27,6 +27,9 @@ class TG_Demo_Importer {
 		add_action( 'init', array( $this, 'setup' ), 5 );
 		add_action( 'init', array( $this, 'includes' ) );
 
+		// Clear demo packages.
+		add_action( 'switch_theme', array( $this, 'clear_demo_packages' ) );
+
 		// Add Demo Importer menu.
 		if ( apply_filters( 'themegrill_show_demo_importer_page', true ) ) {
 			add_action( 'admin_menu', array( $this, 'admin_menu' ), 9 );
@@ -86,8 +89,8 @@ class TG_Demo_Importer {
 	 * @return array of objects
 	 */
 	private function get_demo_packages() {
+		$packages = get_transient( 'themegrill_demo_importer_packages' );
 		$template = strtolower( str_replace( '-pro', '', get_option( 'template' ) ) );
-		$packages = get_transient( 'themegrill_demo_importer_packages_' . $template );
 
 		if ( false === $packages ) {
 			$raw_packages = wp_safe_remote_get( "https://raw.githubusercontent.com/themegrill/themegrill-demo-pack/master/configs/{$template}.json" );
@@ -96,12 +99,19 @@ class TG_Demo_Importer {
 				$packages = json_decode( wp_remote_retrieve_body( $raw_packages ) );
 
 				if ( $packages ) {
-					set_transient( 'themegrill_demo_importer_packages_' . $template, $packages, WEEK_IN_SECONDS );
+					set_transient( 'themegrill_demo_importer_packages', $packages, WEEK_IN_SECONDS );
 				}
 			}
 		}
 
 		return apply_filters( 'themegrill_demo_importer_packages_' . $template, $packages );
+	}
+
+	/**
+	 * Clear demo packages.
+	 */
+	public function clear_demo_packages() {
+		delete_transient( 'themegrill_demo_importer_packages' );
 	}
 
 	/**
