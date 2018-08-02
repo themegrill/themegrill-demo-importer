@@ -107,51 +107,23 @@ class TG_Demo_Importer {
 	/**
 	 * Get the import file URL.
 	 *
-	 * @param  string $demo_dir demo dir.
+	 * @param  string $package_dir package dir.
 	 * @param  string $filename import filename.
 	 * @return string the demo import data file URL.
 	 */
-	private function import_file_url( $demo_dir, $filename ) {
-		$working_dir = tg_get_demo_file_url( $demo_dir );
-
-		// If enabled demo pack, load from upload dir.
-		if ( $this->is_enabled_demo_pack( $demo_dir ) ) {
-			$working_dir = TGDM_DEMO_URL . $demo_dir;
-		}
-
-		return trailingslashit( $working_dir ) . sanitize_file_name( $filename );
+	private function import_file_url( $package_dir, $filename ) {
+		return trailingslashit( TGDM_DEMO_URL . $package_dir ) . sanitize_file_name( $filename );
 	}
 
 	/**
 	 * Get the import file path.
 	 *
-	 * @param  string $demo_dir demo dir.
+	 * @param  string $package_dir package dir.
 	 * @param  string $filename import filename.
 	 * @return string the import data file path.
 	 */
-	private function import_file_path( $demo_dir, $filename ) {
-		$working_dir = tg_get_demo_file_path( $demo_dir );
-
-		// If enabled demo pack, load from upload dir.
-		if ( $this->is_enabled_demo_pack( $demo_dir ) ) {
-			$working_dir = TGDM_DEMO_DIR . $demo_dir . '/dummy-data';
-		}
-
-		return trailingslashit( $working_dir ) . sanitize_file_name( $filename );
-	}
-
-	/**
-	 * Check if demo pack is enabled.
-	 *
-	 * @param  array $demo_id
-	 * @return bool
-	 */
-	public function is_enabled_demo_pack( $demo_id ) {
-		if ( isset( $this->demo_config[ $demo_id ]['demo_pack'] ) && true === $this->demo_config[ $demo_id ]['demo_pack'] ) {
-			return true;
-		}
-
-		return false;
+	private function import_file_path( $package_dir, $filename ) {
+		return trailingslashit( TGDM_DEMO_DIR . $package_dir ) . sanitize_file_name( $filename );
 	}
 
 	/**
@@ -459,6 +431,8 @@ class TG_Demo_Importer {
 	public function demo_importer() {
 		$packages = $this->get_demo_packages();
 
+		$this->get_screenshot_url( 'colormag-free', 'colormag' );
+
 		include_once dirname( __FILE__ ) . '/admin/views/html-admin-page-importer.php';
 	}
 
@@ -470,20 +444,12 @@ class TG_Demo_Importer {
 	 * @return string the demo package screenshot URL.
 	 */
 	private function get_screenshot_url( $package_id, $current_template ) {
-		$package_screenshot    = $this->import_file_path( $package_id, 'screenshot.jpg' );
-		$screenshot_theme_path = get_template_directory() . "/images/demo/{$package_id}.jpg";
+		$package_screenshot = $this->import_file_path( $package_id, 'dummy-data.xml' );
 
 		if ( file_exists( $package_screenshot ) ) {
 			$screenshot_url = $this->import_file_url( $package_id, 'screenshot.jpg' );
-		} elseif ( file_exists( $screenshot_theme_path ) ) {
-			$screenshot_url = get_template_directory_uri() . "/images/demo/{$package_id}.jpg";
 		} else {
 			$screenshot_url = "https://raw.githubusercontent.com/themegrill/themegrill-demo-pack/master/resources/{$current_template}/{$package_id}/screenshot.jpg";
-
-			$headers = wp_get_http_headers( $screenshot_url );
-			if ( ! isset( $headers['content-type'] ) ) {
-				$screenshot_url = '';
-			}
 		}
 
 		return $screenshot_url;
@@ -695,7 +661,7 @@ class TG_Demo_Importer {
 	 * @return bool
 	 */
 	public function import_dummy_xml( $demo_id, $demo_data, $status ) {
-		$import_file = $this->import_file_path( $demo_id, 'dummy-data.xml' );
+		$import_file = $this->import_file_path( $demo_id, 'dummy-data/dummy-data.xml' );
 
 		// Load Importer API
 		require_once ABSPATH . 'wp-admin/includes/import.php';
