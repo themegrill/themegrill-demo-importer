@@ -123,7 +123,7 @@ class TG_Demo_Importer {
 	 * @return string the import data file path.
 	 */
 	private function import_file_path( $package_dir, $filename ) {
-		return trailingslashit( TGDM_DEMO_DIR . $package_dir ) . sanitize_file_name( $filename );
+		return trailingslashit( TGDM_DEMO_DIR . $package_dir . '/dummy-data' ) . sanitize_file_name( $filename );
 	}
 
 	/**
@@ -431,23 +431,19 @@ class TG_Demo_Importer {
 	public function demo_importer() {
 		$packages = $this->get_demo_packages();
 
-		$this->get_screenshot_url( 'colormag-free', 'colormag' );
-
 		include_once dirname( __FILE__ ) . '/admin/views/html-admin-page-importer.php';
 	}
 
 	/**
 	 * Get the demo package screenshot URL.
 	 *
-	 * @param  string $demo_dir
+	 * @param  string $package_id
 	 * @param  string $current_template
 	 * @return string the demo package screenshot URL.
 	 */
 	private function get_screenshot_url( $package_id, $current_template ) {
-		$package_screenshot = $this->import_file_path( $package_id, 'screenshot.jpg' );
-
-		if ( file_exists( $package_screenshot ) ) {
-			$screenshot_url = $this->import_file_url( $package_id, 'screenshot.jpg' );
+		if ( file_exists( TGDM_DEMO_DIR . $package_id . '/screenshot.jpg' ) ) {
+			$screenshot_url = TGDM_DEMO_URL . $package_id . '/screenshot.jpg';
 		} else {
 			$screenshot_url = "https://raw.githubusercontent.com/themegrill/themegrill-demo-pack/master/resources/{$current_template}/{$package_id}/screenshot.jpg";
 		}
