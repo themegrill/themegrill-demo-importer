@@ -482,8 +482,13 @@ class TG_Demo_Importer {
 					$screenshot_url = TGDM_DEMO_URL . $package_id . '/screenshot.jpg';
 				}
 
+				// Premium banner.
+				if ( ! $is_pro_theme_demo ) {
+					$is_pro = isset( $package_data->isPro ) ? $package_data->isPro : false;
+				}
+
 				// Plugins status.
-				foreach ( $plugins_list as $plugin => &$plugin_data ) {
+				foreach ( $plugins_list as $plugin => $plugin_data ) {
 					$plugin_data->is_active = is_plugin_active( $plugin_data->slug );
 
 					// Looks like a plugin is installed, but not active.
@@ -499,8 +504,10 @@ class TG_Demo_Importer {
 
 				// Add demo notices.
 				$demo_notices = array();
-				if ( isset( $demo_data->template ) && $current_template !== $demo_data->template ) {
-					$demo_notices->required_theme = true;
+				if ( isset( $package_data->template ) && $package_data->template !== get_option( 'template' ) ) {
+					$demo_notices['required_theme'] = true;
+				} elseif ( wp_list_filter( $plugins_list, array( 'is_active' => false ) ) ) {
+					$demo_notices['required_plugins'] = true;
 				}
 
 				// Prepare all demos.
@@ -508,7 +515,7 @@ class TG_Demo_Importer {
 					'id'              => $package_id,
 					'name'            => $package_data->title,
 					'active'          => $package_id === $demo_activated_id,
-					'is_pro'          => isset( $package_data->isPro ) ? ( $package_data->isPro !== $is_pro_theme_demo ) : true,
+					'is_pro'          => $is_pro,
 					'author'          => isset( $package_data->author ) ? $package_data->author : __( 'ThemeGrill', 'themegrill-demo-importer' ),
 					'version'         => isset( $package_data->version ) ? $package_data->version : $available_packages->version,
 					'description'     => isset( $package_data->description ) ? $package_data->description : '',
@@ -546,58 +553,6 @@ class TG_Demo_Importer {
 		    ),
 			'demos' => array_filter( $prepared_demos ),
 		) );
-	}
-
-	/**
-	 * Prepare demos for JavaScript.
-	 *
-	 * @return array An associative array of demo data, sorted by name.
-	 */
-	private function prepare_demos_for_js() {
-		if ( ! empty( $available_demos ) ) {
-			foreach ( $available_demos as $demo_id => $demo_data ) {
-				$author       = isset( $demo_data['author'] ) ? $demo_data['author'] : __( 'ThemeGrill', 'themegrill-demo-importer' );
-				$version      = isset( $demo_data['version'] ) ? $demo_data['version'] : TGDM_VERSION;
-				$description  = isset( $demo_data['description'] ) ? $demo_data['description'] : '';
-				$premium_link = isset( $demo_data['pro_link'] ) ? $demo_data['pro_link'] : '';
-				$download_url = isset( $demo_data['download'] ) ? $demo_data['download'] : "https://github.com/themegrill/themegrill-demo-pack/raw/master/packages/{$current_template}/{$demo_id}.zip";
-				$plugins_list = isset( $demo_data['plugins_list'] ) ? $demo_data['plugins_list'] : array();
-
-				// Add demo notices.
-				$demo_notices = array();
-				if ( isset( $demo_data['template'] ) && $current_template !== $demo_data['template'] ) {
-					$demo_notices['required_theme'] = true;
-				} elseif ( wp_list_filter( $plugins_list, array( 'required' => true, 'is_active' => false ) ) ) {
-					$demo_notices['required_plugins'] = true;
-				}
-
-				// Prepare all demos.
-				$prepared_demos[ $demo_id ] = array(
-					// 'id'              => $demo_id,
-					// 'name'            => $demo_data['name'],
-					'theme'           => $demo_data['theme'],
-					// 'is_pro'          => $premium_link,
-					// 'preview_url'     => $demo_data['preview_url'],
-					// 'screenshot_url'  => tg_get_demo_preview_screenshot_url( $demo_id, $current_template ),
-					// 'package'         => $demo_package,
-					// 'description'     => $description,
-					// 'author'          => $author,
-					'authorAndUri'    => '<a href="https://themegrill.com" target="_blank">ThemeGrill</a>',
-					// 'version'         => $version,
-					// 'active'          => $demo_id === $demo_activated_id,
-					'hasNotice'       => $demo_notices,
-					'plugins'         => $plugins_list,
-					'pluginActions'   => array(
-						'install'  => wp_list_filter( $plugins_list, array( 'is_install' => false ) ) ? true : false,
-						'activate' => wp_list_filter( $plugins_list, array( 'is_active' => false ) ) ? true : false,
-					),
-					'actions'         => array(
-						'preview'  => home_url( '/' ),
-						'delete'   => current_user_can( 'upload_files' ) ? wp_nonce_url( admin_url( 'themes.php?page=demo-importer&browse=uploads&action=delete&amp;demo_pack=' . urlencode( $demo_id ) ), 'delete-demo_' . $demo_id ) : null,
-					),
-				);
-			}
-		}
 	}
 
 	/**
