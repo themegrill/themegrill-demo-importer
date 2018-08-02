@@ -435,28 +435,12 @@ class TG_Demo_Importer {
 	}
 
 	/**
-	 * Get the demo package screenshot URL.
-	 *
-	 * @param  string $package_id
-	 * @param  string $current_template
-	 * @return string the demo package screenshot URL.
-	 */
-	private function get_screenshot_url( $package_id, $current_template ) {
-		if ( file_exists( TGDM_DEMO_DIR . $package_id . '/screenshot.jpg' ) ) {
-			$screenshot_url = TGDM_DEMO_URL . $package_id . '/screenshot.jpg';
-		} else {
-			$screenshot_url = "https://raw.githubusercontent.com/themegrill/themegrill-demo-pack/master/resources/{$current_template}/{$package_id}/screenshot.jpg";
-		}
-
-		return $screenshot_url;
-	}
-
-	/**
 	 * Ajax handler for getting demos from github.
 	 */
 	public function ajax_query_demos() {
 		$prepared_demos     = array();
 		$current_template   = str_replace( '-pro', '', get_option( 'template' ) );
+		$is_pro_theme_demo  = strpos( get_option( 'template' ), '-pro' ) !== false;
 		$demo_activated_id  = get_option( 'themegrill_demo_importer_activated_id' );
 		$available_packages = $this->get_demo_packages();
 
@@ -480,30 +464,33 @@ class TG_Demo_Importer {
 
 		if ( is_object( $available_packages ) ) {
 			foreach ( $available_packages->availableDemos as $package_id => $package_data ) {
-				$plugins_list = isset( $package_data->plugins_list ) ? $package_data->plugins_list : array();
-				$download_url = "https://github.com/themegrill/themegrill-demo-pack/raw/master/packages/{$current_template}/{$package_id}.zip";
+				$plugins_list   = isset( $package_data->plugins_list ) ? $package_data->plugins_list : array();
+				$screenshot_url = "https://raw.githubusercontent.com/themegrill/themegrill-demo-pack/master/resources/{$current_template}/{$package_id}/screenshot.jpg";
+
+				// Screenshot URL.
+				if ( file_exists( TGDM_DEMO_DIR . $package_id . '/screenshot.jpg' ) ) {
+					$screenshot_url = TGDM_DEMO_URL . $package_id . '/screenshot.jpg';
+				}
 
 				// Plugins status.
-				// foreach ( $plugins_list as $plugin => $plugin_data ) {
-				// 	$plugins_list[ $plugin ]['is_active'] = is_plugin_active( $plugin_data->slug );
+				foreach ( $plugins_list as $plugin => &$plugin_data ) {
+					$plugin_data->is_active = is_plugin_active( $plugin_data->slug );
 
-				// 	// Looks like a plugin is installed, but not active.
-				// 	if ( file_exists( WP_PLUGIN_DIR . '/' . $plugin ) ) {
-				// 		$plugins = get_plugins( '/' . $plugin );
-				// 		if ( ! empty( $plugins ) ) {
-				// 			$plugins_list[ $plugin ]['is_install'] = true;
-				// 		}
-				// 	} else {
-				// 		$plugins_list[ $plugin ]['is_install'] = false;
-				// 	}
-				// }
+					// Looks like a plugin is installed, but not active.
+					if ( file_exists( WP_PLUGIN_DIR . '/' . $plugin ) ) {
+						$plugins = get_plugins( '/' . $plugin );
+						if ( ! empty( $plugins ) ) {
+							$plugin_data->is_install = true;
+						}
+					} else {
+						$plugin_data->is_install = false;
+					}
+				}
 
 				// Add demo notices.
 				$demo_notices = array();
 				if ( isset( $demo_data->template ) && $current_template !== $demo_data->template ) {
-					$demo_notices['required_theme'] = true;
-				} elseif ( wp_list_filter( $plugins_list, array( 'is_active' => false ) ) ) {
-					$demo_notices['required_plugins'] = true;
+					$demo_notices->required_theme = true;
 				}
 
 				// Prepare all demos.
@@ -511,13 +498,13 @@ class TG_Demo_Importer {
 					'id'              => $package_id,
 					'name'            => $package_data->title,
 					'active'          => $package_id === $demo_activated_id,
-					'is_pro'          => isset( $package_data->isPro ) ? $package_data->isPro : false,
+					'banner'          => isset( $package_data->isPro ) && ! $is_pro_theme_demo ? $package_data->isPro : false,
 					'author'          => isset( $package_data->author ) ? $package_data->author : __( 'ThemeGrill', 'themegrill-demo-importer' ),
 					'version'         => isset( $package_data->version ) ? $package_data->version : $available_packages->version,
 					'description'     => isset( $package_data->description ) ? $package_data->description : '',
 					'homepage'        => $available_packages->homepage,
 					'preview_url'     => set_url_scheme( $package_data->preview ),
-					'screenshot_url'  => $this->get_screenshot_url( $package_id, $current_template ),
+					'screenshot_url'  => $screenshot_url,
 					'hasNotice'       => $demo_notices,
 					'plugins'         => $plugins_list,
 					'pluginActions'   => array(
@@ -545,7 +532,7 @@ class TG_Demo_Importer {
 		    'info' => array(
 		      'page'    => 1,
 		      'pages'   => 1,
-		      'results' => 11,
+		      'results' => count( $prepared_demos ),
 		    ),
 			'demos' => array_filter( $prepared_demos ),
 		) );
@@ -565,21 +552,6 @@ class TG_Demo_Importer {
 				$premium_link = isset( $demo_data['pro_link'] ) ? $demo_data['pro_link'] : '';
 				$download_url = isset( $demo_data['download'] ) ? $demo_data['download'] : "https://github.com/themegrill/themegrill-demo-pack/raw/master/packages/{$current_template}/{$demo_id}.zip";
 				$plugins_list = isset( $demo_data['plugins_list'] ) ? $demo_data['plugins_list'] : array();
-
-				// Plugins status.
-				foreach ( $plugins_list as $plugin => $plugin_data ) {
-					$plugins_list[ $plugin ]['is_active'] = is_plugin_active( $plugin_data['slug'] );
-
-					// Looks like a plugin is installed, but not active.
-					if ( file_exists( WP_PLUGIN_DIR . '/' . $plugin ) ) {
-						$plugins = get_plugins( '/' . $plugin );
-						if ( ! empty( $plugins ) ) {
-							$plugins_list[ $plugin ]['is_install'] = true;
-						}
-					} else {
-						$plugins_list[ $plugin ]['is_install'] = false;
-					}
-				}
 
 				// Add demo notices.
 				$demo_notices = array();

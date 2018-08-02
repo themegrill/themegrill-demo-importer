@@ -96,7 +96,7 @@ $feature_lists = apply_filters( 'themegrill_demo_importer_feature_lists', array(
 		<div class="theme-screenshot blank"></div>
 	<# } #>
 
-	<# if ( data.is_pro ) { #>
+	<# if ( data.banner ) { #>
 		<span class="premium-demo-banner"><?php _e( 'Pro', 'themegrill-demo-importer' ); ?></span>
 	<# } #>
 
@@ -154,7 +154,7 @@ $feature_lists = apply_filters( 'themegrill_demo_importer_feature_lists', array(
 			<div class="install-theme-info">
 				<h3 class="theme-name">
 					{{ data.name }}
-					<# if ( data.is_pro ) { #>
+					<# if ( data.banner ) { #>
 						<span class="premium-demo-tag"><?php _e( 'Pro', 'themegrill-demo-importer' ); ?></span>
 					<# } #>
 				</h3>
