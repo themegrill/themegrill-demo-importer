@@ -480,6 +480,32 @@ class TG_Demo_Importer {
 
 		if ( is_object( $available_packages ) ) {
 			foreach ( $available_packages->availableDemos as $package_id => $package_data ) {
+				$plugins_list = isset( $package_data->plugins_list ) ? $package_data->plugins_list : array();
+				$download_url = "https://github.com/themegrill/themegrill-demo-pack/raw/master/packages/{$current_template}/{$package_id}.zip";
+
+				// Plugins status.
+				// foreach ( $plugins_list as $plugin => $plugin_data ) {
+				// 	$plugins_list[ $plugin ]['is_active'] = is_plugin_active( $plugin_data->slug );
+
+				// 	// Looks like a plugin is installed, but not active.
+				// 	if ( file_exists( WP_PLUGIN_DIR . '/' . $plugin ) ) {
+				// 		$plugins = get_plugins( '/' . $plugin );
+				// 		if ( ! empty( $plugins ) ) {
+				// 			$plugins_list[ $plugin ]['is_install'] = true;
+				// 		}
+				// 	} else {
+				// 		$plugins_list[ $plugin ]['is_install'] = false;
+				// 	}
+				// }
+
+				// Add demo notices.
+				$demo_notices = array();
+				if ( isset( $demo_data->template ) && $current_template !== $demo_data->template ) {
+					$demo_notices['required_theme'] = true;
+				} elseif ( wp_list_filter( $plugins_list, array( 'is_active' => false ) ) ) {
+					$demo_notices['required_plugins'] = true;
+				}
+
 				// Prepare all demos.
 				$prepared_demos[ $package_id ] = array(
 					'id'              => $package_id,
@@ -492,6 +518,12 @@ class TG_Demo_Importer {
 					'homepage'        => $available_packages->homepage,
 					'preview_url'     => set_url_scheme( $package_data->preview ),
 					'screenshot_url'  => $this->get_screenshot_url( $package_id, $current_template ),
+					'hasNotice'       => $demo_notices,
+					'plugins'         => $plugins_list,
+					'pluginActions'   => array(
+						'install'  => wp_list_filter( $plugins_list, array( 'is_install' => false ) ) ? true : false,
+						'activate' => wp_list_filter( $plugins_list, array( 'is_active' => false ) ) ? true : false,
+					),
 				);
 			}
 		}
@@ -529,7 +561,6 @@ class TG_Demo_Importer {
 				$description  = isset( $demo_data['description'] ) ? $demo_data['description'] : '';
 				$premium_link = isset( $demo_data['pro_link'] ) ? $demo_data['pro_link'] : '';
 				$download_url = isset( $demo_data['download'] ) ? $demo_data['download'] : "https://github.com/themegrill/themegrill-demo-pack/raw/master/packages/{$current_template}/{$demo_id}.zip";
-				$demo_package = isset( $demo_data['demo_pack'] ) ? $demo_data['demo_pack'] : false;
 				$plugins_list = isset( $demo_data['plugins_list'] ) ? $demo_data['plugins_list'] : array();
 
 				// Plugins status.
@@ -563,7 +594,7 @@ class TG_Demo_Importer {
 					// 'is_pro'          => $premium_link,
 					// 'preview_url'     => $demo_data['preview_url'],
 					// 'screenshot_url'  => tg_get_demo_preview_screenshot_url( $demo_id, $current_template ),
-					'package'         => $demo_package,
+					// 'package'         => $demo_package,
 					// 'description'     => $description,
 					// 'author'          => $author,
 					'authorAndUri'    => '<a href="https://themegrill.com" target="_blank">ThemeGrill</a>',
