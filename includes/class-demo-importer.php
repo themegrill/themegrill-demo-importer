@@ -444,7 +444,7 @@ class TG_Demo_Importer {
 	 * @return string the demo package screenshot URL.
 	 */
 	private function get_screenshot_url( $package_id, $current_template ) {
-		$package_screenshot = $this->import_file_path( $package_id, 'dummy-data.xml' );
+		$package_screenshot = $this->import_file_path( $package_id, 'screenshot.jpg' );
 
 		if ( file_exists( $package_screenshot ) ) {
 			$screenshot_url = $this->import_file_url( $package_id, 'screenshot.jpg' );
