@@ -498,7 +498,7 @@ class TG_Demo_Importer {
 					'id'              => $package_id,
 					'name'            => $package_data->title,
 					'active'          => $package_id === $demo_activated_id,
-					'banner'          => isset( $package_data->isPro ) && ! $is_pro_theme_demo ? $package_data->isPro : false,
+					'is_pro'          => isset( $package_data->isPro ) ? ( $package_data->isPro !== $is_pro_theme_demo ) : true,
 					'author'          => isset( $package_data->author ) ? $package_data->author : __( 'ThemeGrill', 'themegrill-demo-importer' ),
 					'version'         => isset( $package_data->version ) ? $package_data->version : $available_packages->version,
 					'description'     => isset( $package_data->description ) ? $package_data->description : '',
