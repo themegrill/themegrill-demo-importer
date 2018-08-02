@@ -483,7 +483,9 @@ class TG_Demo_Importer {
 				}
 
 				// Premium banner.
-				if ( ! $is_pro_theme_demo ) {
+				if ( $is_pro_theme_demo ) {
+					$is_pro = false;
+				} else {
 					$is_pro = isset( $package_data->isPro ) ? $package_data->isPro : false;
 				}
 

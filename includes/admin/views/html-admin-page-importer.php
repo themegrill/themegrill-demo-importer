@@ -109,16 +109,25 @@ $feature_lists = apply_filters( 'themegrill_demo_importer_feature_lists', array(
 	</div>
 
 	<div class="theme-id-container">
-		<h3 class="theme-name">{{ data.name }}</h3>
+		<# if ( data.active ) { #>
+			<h2 class="theme-name" id="{{ data.id }}-name">
+				<?php
+				/* translators: %s: Demo name */
+				printf( __( '<span>Imported:</span> %s', 'themegrill-demo-importer' ), '{{{ data.name }}}' );
+				?>
+			</h2>
+		<# } else { #>
+			<h2 class="theme-name" id="{{ data.id }}-name">{{{ data.name }}}</h2>
+		<# } #>
 
 		<div class="theme-actions">
 			<# if ( data.active ) { #>
 				<a class="button button-primary live-preview" target="_blank" href="{{{ data.actions.preview }}}"><?php _e( 'Live Preview', 'themegrill-demo-importer' ); ?></a>
 			<# } else { #>
 				<# if ( ! _.isEmpty( data.hasNotice ) ) { #>
-					<# if ( data.hasNotice['required_theme'] ) { #>
+					<# if ( ! data.is_pro && data.hasNotice['required_theme'] ) { #>
 						<a class="button button-primary hide-if-no-js tips demo-import disabled" href="#" data-name="{{ data.name }}" data-slug="{{ data.id }}" data-tip="<?php echo esc_attr( sprintf( __( 'Required %s theme must be activated to import this demo.', 'themegrill-demo-importer' ), '{{{ data.theme }}}' ) ); ?>"><?php _e( 'Import', 'themegrill-demo-importer' ); ?></a>
-					<# } else if ( data.hasNotice['required_plugins'] ) { #>
+					<# } else if ( ! data.is_pro && data.hasNotice['required_plugins'] ) { #>
 						<a class="button button-primary hide-if-no-js tips demo-import disabled" href="#" data-name="{{ data.name }}" data-slug="{{ data.id }}" data-tip="<?php echo esc_attr( 'Required Plugin must be activated to import this demo.', 'themegrill-demo-importer' ); ?>"><?php _e( 'Import', 'themegrill-demo-importer' ); ?></a>
 					<# } #>
 				<# } else { #>
@@ -144,10 +153,10 @@ $feature_lists = apply_filters( 'themegrill_demo_importer_feature_lists', array(
 			<button class="close-full-overlay"><span class="screen-reader-text"><?php _e( 'Close', 'themegrill-demo-importer' ); ?></span></button>
 			<button class="previous-theme"><span class="screen-reader-text"><?php _ex( 'Previous', 'Button label for a demo', 'themegrill-demo-importer' ); ?></span></button>
 			<button class="next-theme"><span class="screen-reader-text"><?php _ex( 'Next', 'Button label for a demo', 'themegrill-demo-importer' ); ?></span></button>
-			<# if ( data.installed ) { #>
-				<a class="button button-primary activate" href="{{ data.activate_url }}"><?php _e( 'Activate', 'themegrill-demo-importer' ); ?></a>
+			<# if ( data.is_pro ) { #>
+				<a class="button button-primary purchase-now" href="{{ data.homepage }}" target="_blank"><?php _e( 'Buy Now', 'themegrill-demo-importer' ); ?></a>
 			<# } else { #>
-				<a href="{{ data.install_url }}" class="button button-primary demo-install" data-name="{{ data.name }}" data-slug="{{ data.id }}"><?php _e( 'Import', 'themegrill-demo-importer' ); ?></a>
+				<a class="button button-primary hide-if-no-js demo-import" href="#" data-name="{{ data.name }}" data-slug="{{ data.id }}"><?php _e( 'Import', 'themegrill-demo-importer' ); ?></a>
 			<# } #>
 		</div>
 		<div class="wp-full-overlay-sidebar-content">
@@ -202,7 +211,11 @@ $feature_lists = apply_filters( 'themegrill_demo_importer_feature_lists', array(
 		</div>
 		<div class="wp-full-overlay-footer">
 			<div class="demo-import-actions">
-				<button class="button button-hero button-primary demo-import" href="#" data-import="disabled"><?php _e( 'Import Demo', 'themegrill-demo-importer' ); ?></button>
+				<# if ( data.is_pro ) { #>
+					<a class="button button-hero button-primary purchase-now" href="{{ data.homepage }}" target="_blank"><?php _e( 'Buy Now', 'themegrill-demo-importer' ); ?></a>
+				<# } else { #>
+					<a class="button button-hero button-primary hide-if-no-js demo-import" href="#" data-name="{{ data.name }}" data-slug="{{ data.id }}"><?php _e( 'Import', 'themegrill-demo-importer' ); ?></a>
+				<# } #>
 			</div>
 			<button type="button" class="collapse-sidebar button" aria-expanded="true" aria-label="<?php esc_attr_e( 'Collapse Sidebar', 'themegrill-demo-importer' ); ?>">
 				<span class="collapse-sidebar-arrow"></span>
