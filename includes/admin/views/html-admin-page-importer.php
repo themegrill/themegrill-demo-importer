@@ -7,16 +7,6 @@
 
 defined( 'ABSPATH' ) || exit;
 
-$feature_lists = apply_filters( 'themegrill_demo_importer_feature_lists', array(
-	'pagebuilder' => array(
-		'name'  => __( 'Pagebuilder', 'themegrill-demo-importer' ),
-		'lists' => array(
-			'elementor'  => __( 'Elementor', 'themegrill-demo-importer' ),
-			'siteorigin' => __( 'SiteOrigin', 'themegrill-demo-importer' ),
-		)
-	)
-) );
-
 ?>
 <div class="wrap demo-importer">
 	<h1 class="wp-heading-inline"><?php esc_html_e( 'Demo Importer', 'themegrill-demo-importer' ); ?></h1>
@@ -34,59 +24,29 @@ $feature_lists = apply_filters( 'themegrill_demo_importer_feature_lists', array(
 	<h2 class="screen-reader-text hide-if-no-js"><?php _e( 'Filter demos list', 'themegrill-demo-importer' ); ?></h2>
 
 	<div class="wp-filter hide-if-no-js">
-		<div class="filter-count">
-			<span class="count theme-count demo-count"></span>
+		<div class="filter-section">
+			<div class="filter-count">
+				<span class="count theme-count demo-count"></span>
+			</div>
+
+			<?php if ( ! empty( $this->demo_packages->category ) ) : ?>
+				<ul class="filter-links category">
+					<?php foreach ( $this->demo_packages->category as $slug => $label ) : ?>
+						<li><a href="#" data-sort="<?php echo esc_attr( $slug ); ?>" class="category-tab"><?php echo esc_html( $label ); ?></a></li>
+					<?php endforeach; ?>
+				</ul>
+			<?php endif; ?>
 		</div>
+		<div class="filter-section right">
+			<?php if ( ! empty( $this->demo_packages->pagebuilder ) ) : ?>
+				<ul class="filter-links pagebuilder">
+					<?php foreach ( $this->demo_packages->pagebuilder as $slug => $label ) : ?>
+						<li><a href="#" data-sort="<?php echo esc_attr( $slug ); ?>" class="pagebuilder-tab"><?php echo esc_html( $label ); ?></a></li>
+					<?php endforeach; ?>
+				</ul>
+			<?php endif; ?>
 
-		<?php if ( ! empty( $this->demo_packages->category ) ) : ?>
-			<ul class="filter-links category">
-				<?php foreach ( $this->demo_packages->category as $slug => $label ) : ?>
-					<li><a href="#" data-sort="<?php echo esc_attr( $slug ); ?>" class="category-tab"><?php echo esc_html( $label ); ?></a></li>
-				<?php endforeach; ?>
-			</ul>
-		<?php endif; ?>
-
-		<?php if ( ! empty( $this->demo_packages->pagebuilder ) ) : ?>
-			<ul class="filter-links pagebuilder">
-				<?php foreach ( $this->demo_packages->pagebuilder as $slug => $label ) : ?>
-					<li><a href="#" data-sort="<?php echo esc_attr( $slug ); ?>" class="pagebuilder-tab"><?php echo esc_html( $label ); ?></a></li>
-				<?php endforeach; ?>
-			</ul>
-		<?php endif; ?>
-
-		<button type="button" class="button drawer-toggle hidden" aria-expanded="false"><?php _e( 'Feature Filter', 'themegrill-demo-importer' ); ?></button>
-
-		<form class="search-form"></form>
-
-		<div class="filter-drawer">
-			<div class="buttons">
-				<button type="button" class="apply-filters button"><?php _e( 'Apply Filters', 'themegrill-demo-importer' ); ?><span></span></button>
-				<button type="button" class="clear-filters button" aria-label="<?php esc_attr_e( 'Clear current filters', 'themegrill-demo-importer' ); ?>"><?php _e( 'Clear', 'themegrill-demo-importer' ); ?></button>
-			</div>
-			<?php
-			foreach ( $feature_lists as $feature_key => $features ) {
-				echo '<fieldset class="filter-group">';
-				$feature_name = esc_html( $features['name'] );
-				echo '<legend>' . $feature_name . '</legend>';
-				echo '<div class="filter-group-feature">';
-				foreach ( $features['lists'] as $feature => $feature_name ) {
-					$feature = esc_attr( $feature );
-					echo '<input type="checkbox" id="filter-id-' . $feature . '" value="' . $feature . '" /> ';
-					echo '<label for="filter-id-' . $feature . '">' . $feature_name . '</label>';
-				}
-				echo '</div>';
-				echo '</fieldset>';
-			}
-			?>
-			<div class="buttons">
-				<button type="button" class="apply-filters button"><?php _e( 'Apply Filters', 'themegrill-demo-importer' ); ?><span></span></button>
-				<button type="button" class="clear-filters button" aria-label="<?php esc_attr_e( 'Clear current filters', 'themegrill-demo-importer' ); ?>"><?php _e( 'Clear', 'themegrill-demo-importer' ); ?></button>
-			</div>
-			<div class="filtered-by">
-				<span><?php _e( 'Filtering by:', 'themegrill-demo-importer' ); ?></span>
-				<div class="tags"></div>
-				<button type="button" class="button-link edit-filters"><?php _e( 'Edit Filters', 'themegrill-demo-importer' ); ?></button>
-			</div>
+			<form class="search-form"></form>
 		</div>
 	</div>
 	<h2 class="screen-reader-text hide-if-no-js"><?php _e( 'Themes list', 'themegrill-demo-importer' ); ?></h2>

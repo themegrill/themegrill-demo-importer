@@ -16,6 +16,18 @@
 		.wp-filter {
 			padding: 0 20px;
 
+			.search-form {
+				margin-left: 1em;
+			}
+
+			.filter-section {
+				float: left;
+
+				&.right {
+					float: right;
+				}
+			}
+
 			.filter-links li > a:focus {
 				box-shadow: none;
 			}
