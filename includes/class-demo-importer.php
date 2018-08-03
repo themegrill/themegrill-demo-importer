@@ -526,10 +526,7 @@ class TG_Demo_Importer {
 					'pluginActions'   => array(
 						'install'  => wp_list_filter( $plugins_list, array( 'is_install' => false ) ) ? true : false,
 						'activate' => wp_list_filter( $plugins_list, array( 'is_active' => false ) ) ? true : false,
-					),
-					'actions'         => array(
-						'preview'  => home_url( '/' )
-					),
+					)
 				);
 			}
 		}
