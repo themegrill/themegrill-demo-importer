@@ -994,7 +994,7 @@ demos.view.Preview = demos.view.Details.extend({
 		demos.router.navigate( demos.router.baseUrl( demos.router.demoPath + this.model.get( 'id' ) ), { replace: false } );
 
 		this.$el.fadeIn( 200, function() {
-			$body.addClass( 'theme-installer-active full-overlay-active' );
+			$body.addClass( 'demo-importer-active full-overlay-active' );
 		});
 
 		this.$el.find( 'iframe' ).one( 'load', function() {
@@ -1009,7 +1009,7 @@ demos.view.Preview = demos.view.Details.extend({
 
 	close: function() {
 		this.$el.fadeOut( 200, function() {
-			$( 'body' ).removeClass( 'theme-installer-active full-overlay-active' );
+			$( 'body' ).removeClass( 'demo-importer-active full-overlay-active' );
 
 			// Return focus to the demo div
 			if ( demos.focusedTheme ) {

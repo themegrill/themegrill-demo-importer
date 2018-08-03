@@ -21,7 +21,7 @@ $feature_lists = apply_filters( 'themegrill_demo_importer_feature_lists', array(
 <div class="wrap demo-importer">
 	<h1 class="wp-heading-inline"><?php esc_html_e( 'Demo Importer', 'themegrill-demo-importer' ); ?></h1>
 
-	<?php if ( apply_filters( 'themegrill_demo_importer_upcoming_demos', true ) ) : ?>
+	<?php if ( apply_filters( 'themegrill_demo_importer_upcoming_demos', false ) ) : ?>
 		<a href="<?php echo esc_url( 'https://themegrill.com/upcoming-demos' ); ?>" class="page-title-action" target="_blank"><?php esc_html_e( 'Upcoming Demos', 'themegrill-demo-importer' ); ?></a>
 	<?php endif; ?>
 
@@ -38,13 +38,23 @@ $feature_lists = apply_filters( 'themegrill_demo_importer_feature_lists', array(
 			<span class="count theme-count demo-count"></span>
 		</div>
 
-		<ul class="filter-links">
-			<?php foreach ( $packages->category as $slug => $label ) : ?>
-				<li><a href="#" data-sort="<?php echo esc_attr( $slug ); ?>" class="demo-tab"><?php echo esc_html( $label ); ?></a></li>
-			<?php endforeach; ?>
-		</ul>
+		<?php if ( ! empty( $this->demo_packages->category ) ) : ?>
+			<ul class="filter-links category">
+				<?php foreach ( $this->demo_packages->category as $slug => $label ) : ?>
+					<li><a href="#" data-sort="<?php echo esc_attr( $slug ); ?>" class="category-tab"><?php echo esc_html( $label ); ?></a></li>
+				<?php endforeach; ?>
+			</ul>
+		<?php endif; ?>
 
-		<button type="button" class="button drawer-toggle" aria-expanded="false"><?php _e( 'Feature Filter', 'themegrill-demo-importer' ); ?></button>
+		<?php if ( ! empty( $this->demo_packages->pagebuilder ) ) : ?>
+			<ul class="filter-links pagebuilder">
+				<?php foreach ( $this->demo_packages->pagebuilder as $slug => $label ) : ?>
+					<li><a href="#" data-sort="<?php echo esc_attr( $slug ); ?>" class="pagebuilder-tab"><?php echo esc_html( $label ); ?></a></li>
+				<?php endforeach; ?>
+			</ul>
+		<?php endif; ?>
+
+		<button type="button" class="button drawer-toggle hidden" aria-expanded="false"><?php _e( 'Feature Filter', 'themegrill-demo-importer' ); ?></button>
 
 		<form class="search-form"></form>
 
@@ -124,18 +134,20 @@ $feature_lists = apply_filters( 'themegrill_demo_importer_feature_lists', array(
 			<# if ( data.active ) { #>
 				<a class="button button-primary live-preview" target="_blank" href="{{{ data.actions.preview }}}"><?php _e( 'Live Preview', 'themegrill-demo-importer' ); ?></a>
 			<# } else { #>
-				<# if ( ! _.isEmpty( data.hasNotice ) ) { #>
-					<# if ( ! data.is_pro && data.hasNotice['required_theme'] ) { #>
-						<a class="button button-primary hide-if-no-js tips demo-import disabled" href="#" data-name="{{ data.name }}" data-slug="{{ data.id }}" data-tip="<?php echo esc_attr( sprintf( __( 'Required %s theme must be activated to import this demo.', 'themegrill-demo-importer' ), '{{{ data.theme }}}' ) ); ?>"><?php _e( 'Import', 'themegrill-demo-importer' ); ?></a>
-					<# } else if ( ! data.is_pro && data.hasNotice['required_plugins'] ) { #>
-						<a class="button button-primary hide-if-no-js tips demo-import disabled" href="#" data-name="{{ data.name }}" data-slug="{{ data.id }}" data-tip="<?php echo esc_attr( 'Required Plugin must be activated to import this demo.', 'themegrill-demo-importer' ); ?>"><?php _e( 'Import', 'themegrill-demo-importer' ); ?></a>
+				<# if ( ! data.is_pro ) { #>
+					<# if ( ! _.isEmpty( data.hasNotice ) ) { #>
+						<# if ( data.hasNotice['required_theme'] ) { #>
+							<a class="button button-primary hide-if-no-js tips demo-import disabled" href="#" data-name="{{ data.name }}" data-slug="{{ data.id }}" data-tip="<?php echo esc_attr( sprintf( __( 'Required %s theme must be activated to import this demo.', 'themegrill-demo-importer' ), '{{{ data.theme }}}' ) ); ?>"><?php _e( 'Import', 'themegrill-demo-importer' ); ?></a>
+						<# } else if ( data.hasNotice['required_plugins'] ) { #>
+							<a class="button button-primary hide-if-no-js tips demo-import disabled" href="#" data-name="{{ data.name }}" data-slug="{{ data.id }}" data-tip="<?php echo esc_attr( 'Required Plugin must be activated to import this demo.', 'themegrill-demo-importer' ); ?>"><?php _e( 'Import', 'themegrill-demo-importer' ); ?></a>
+						<# } #>
+					<# } else { #>
+						<?php
+						/* translators: %s: Demo name */
+						$aria_label = sprintf( _x( 'Import %s', 'demo', 'themegrill-demo-importer' ), '{{ data.name }}' );
+						?>
+						<a class="button button-primary hide-if-no-js demo-import" href="#" data-name="{{ data.name }}" data-slug="{{ data.id }}" aria-label="<?php echo $aria_label; ?>"><?php _e( 'Import', 'themegrill-demo-importer' ); ?></a>
 					<# } #>
-				<# } else { #>
-					<?php
-					/* translators: %s: Demo name */
-					$aria_label = sprintf( _x( 'Import %s', 'demo', 'themegrill-demo-importer' ), '{{ data.name }}' );
-					?>
-					<a class="button button-primary hide-if-no-js demo-import" href="#" data-name="{{ data.name }}" data-slug="{{ data.id }}" aria-label="<?php echo $aria_label; ?>"><?php _e( 'Import', 'themegrill-demo-importer' ); ?></a>
 				<# } #>
 				<button class="button preview install-demo-preview"><?php _e( 'Preview', 'themegrill-demo-importer' ); ?></button>
 			<# } #>

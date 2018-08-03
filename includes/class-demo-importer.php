@@ -21,14 +21,18 @@ class TG_Demo_Importer {
 	public $demo_config;
 
 	/**
+	 * Demo packages.
+	 *
+	 * @var array
+	 */
+	public $demo_packages;
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
 		add_action( 'init', array( $this, 'setup' ), 5 );
 		add_action( 'init', array( $this, 'includes' ) );
-
-		// Clear demo packages.
-		add_action( 'switch_theme', array( $this, 'clear_demo_packages' ) );
 
 		// Add Demo Importer menu.
 		if ( apply_filters( 'themegrill_show_demo_importer_page', true ) ) {
@@ -72,7 +76,8 @@ class TG_Demo_Importer {
 	 * Demo importer setup.
 	 */
 	public function setup() {
-		$this->demo_config = apply_filters( 'themegrill_demo_importer_config', array() );
+		$this->demo_config   = apply_filters( 'themegrill_demo_importer_config', array() );
+		$this->demo_packages = $this->get_demo_packages();
 	}
 
 	/**
@@ -92,7 +97,7 @@ class TG_Demo_Importer {
 		$packages = get_transient( 'themegrill_demo_importer_packages' );
 		$template = strtolower( str_replace( '-pro', '', get_option( 'template' ) ) );
 
-		if ( false === $packages ) {
+		if ( false === $packages || ( isset( $packages->slug ) && $template !== $packages->slug ) ) {
 			$raw_packages = wp_safe_remote_get( "https://raw.githubusercontent.com/themegrill/themegrill-demo-pack/master/configs/{$template}.json" );
 
 			if ( ! is_wp_error( $raw_packages ) ) {
@@ -105,13 +110,6 @@ class TG_Demo_Importer {
 		}
 
 		return apply_filters( 'themegrill_demo_importer_packages_' . $template, $packages );
-	}
-
-	/**
-	 * Clear demo packages.
-	 */
-	public function clear_demo_packages() {
-		delete_transient( 'themegrill_demo_importer_packages' );
 	}
 
 	/**
@@ -439,8 +437,6 @@ class TG_Demo_Importer {
 	 * Demo Importer page output.
 	 */
 	public function demo_importer() {
-		$packages = $this->get_demo_packages();
-
 		include_once dirname( __FILE__ ) . '/admin/views/html-admin-page-importer.php';
 	}
 
@@ -472,8 +468,8 @@ class TG_Demo_Importer {
 			$prepared_demos[ $demo_activated_id ] = array();
 		}
 
-		if ( is_object( $available_packages ) ) {
-			foreach ( $available_packages->availableDemos as $package_id => $package_data ) {
+		if ( is_object( $available_packages->demos ) ) {
+			foreach ( $available_packages->demos as $package_id => $package_data ) {
 				$plugins_list   = isset( $package_data->plugins_list ) ? $package_data->plugins_list : array();
 				$screenshot_url = "https://raw.githubusercontent.com/themegrill/themegrill-demo-pack/master/resources/{$current_template}/{$package_id}/screenshot.jpg";
 
@@ -506,7 +502,7 @@ class TG_Demo_Importer {
 
 				// Add demo notices.
 				$demo_notices = array();
-				if ( isset( $package_data->template ) && $package_data->template !== get_option( 'template' ) ) {
+				if ( isset( $package_data->template ) && $package_data->template !== $current_template ) {
 					$demo_notices['required_theme'] = true;
 				} elseif ( wp_list_filter( json_decode( wp_json_encode( $plugins_list ), true ), array( 'is_active' => false ) ) ) {
 					$demo_notices['required_plugins'] = true;
@@ -516,6 +512,7 @@ class TG_Demo_Importer {
 				$prepared_demos[ $package_id ] = array(
 					'id'              => $package_id,
 					'name'            => $package_data->title,
+					'theme'           => $available_packages->name,
 					'active'          => $package_id === $demo_activated_id,
 					'is_pro'          => $is_pro,
 					'author'          => isset( $package_data->author ) ? $package_data->author : __( 'ThemeGrill', 'themegrill-demo-importer' ),
