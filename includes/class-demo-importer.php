@@ -508,7 +508,7 @@ class TG_Demo_Importer {
 				$demo_notices = array();
 				if ( isset( $package_data->template ) && $package_data->template !== get_option( 'template' ) ) {
 					$demo_notices['required_theme'] = true;
-				} elseif ( wp_list_filter( $plugins_list, array( 'is_active' => false ) ) ) {
+				} elseif ( wp_list_filter( json_decode( wp_json_encode( $plugins_list ), true ), array( 'is_active' => false ) ) ) {
 					$demo_notices['required_plugins'] = true;
 				}
 
