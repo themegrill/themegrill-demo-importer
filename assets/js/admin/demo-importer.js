@@ -582,6 +582,8 @@ demos.view.Demo = wp.Backbone.View.extend({
 			return;
 		}
 
+		wp.updates.maybeRequestFilesystemCredentials( event );
+
 		$( document ).on( 'wp-demo-import-success', function( event, response ) {
 			if ( _this.model.get( 'id' ) === response.slug ) {
 				_this.model.set( { 'imported': true } );
@@ -742,12 +744,12 @@ demos.view.Preview = wp.Backbone.View.extend({
 			return;
 		}
 
-		wp.updates.maybeRequestFilesystemCredentials( event );
-
 		// Confirmation dialog for importing a demo.
 		if ( ! window.confirm( wp.demos.data.settings.confirmImport ) ) {
 			return;
 		}
+
+		wp.updates.maybeRequestFilesystemCredentials( event );
 
 		$( document ).on( 'wp-demo-import-success', function( event, response ) {
 			if ( _this.model.get( 'id' ) === response.slug ) {
@@ -927,11 +929,11 @@ demos.view.Demos = wp.Backbone.View.extend({
 		// Set up parent
 		this.parent = options.parent;
 
-		// Move the imported demo to the beginning of the collection
-		self.importedDemo();
-
 		// Set current view to [grid]
 		this.setView( 'grid' );
+
+		// Move the imported demo to the beginning of the collection
+		self.importedDemo();
 
 		// When the collection is updated by user input...
 		this.listenTo( self.collection, 'demos:update', function() {
@@ -1000,22 +1002,6 @@ demos.view.Demos = wp.Backbone.View.extend({
 		// Clear the DOM, please
 		this.$el.empty();
 
-		// If the user doesn't have switch capabilities
-		// or there is only one demo in the collection
-		// render the detailed view of the active demo
-		if ( demos.data.demos.length === 1 ) {
-
-			// Constructs the view
-			this.singleDemo = new demos.view.Details({
-				model: this.collection.models[0]
-			});
-
-			// Render and apply a 'single-theme' class to our container
-			this.singleDemo.render();
-			this.$el.addClass( 'single-theme' );
-			this.$el.append( this.singleDemo.el );
-		}
-
 		// Generate the demos
 		// Using page instance
 		// While checking the collection has items
@@ -1026,6 +1012,14 @@ demos.view.Demos = wp.Backbone.View.extend({
 		// Display a live demo count for the collection
 		this.liveDemoCount = this.collection.count ? this.collection.count : this.collection.length;
 		this.count.text( this.liveDemoCount );
+
+		/*
+		 * In the demo installer the demos count is already announced
+		 * because `announceSearchResults` is called on `query:success`.
+		 */
+		if ( ! demos.isInstall ) {
+			this.announceSearchResults( this.liveDemoCount );
+		}
 	},
 
 	// Iterates through each instance of the collection
@@ -1079,61 +1073,6 @@ demos.view.Demos = wp.Backbone.View.extend({
 	// Sets current view
 	setView: function( view ) {
 		return view;
-	},
-
-	// Renders the overlay with the DemoDetails view
-	// Uses the current model data
-	expand: function( id ) {
-		var self = this, $card, $modal;
-
-		// Set the current demo model
-		this.model = self.collection.get( id );
-
-		// Trigger a route update for the current model
-		demos.router.navigate( demos.router.baseUrl( demos.router.demoPath + this.model.id ) );
-
-		// Sets this.view to 'detail'
-		this.setView( 'detail' );
-		$( 'body' ).addClass( 'modal-open' );
-
-		// Set up the demo details view
-		this.overlay = new demos.view.Details({
-			model: self.model
-		});
-
-		this.overlay.render();
-
-		if ( this.model.get( 'hasUpdate' ) ) {
-			$card  = $( '[data-slug="' + this.model.id + '"]' );
-			$modal = $( this.overlay.el );
-
-			if ( $card.find( '.updating-message' ).length ) {
-				$modal.find( '.notice-warning h3' ).remove();
-				$modal.find( '.notice-warning' )
-					.removeClass( 'notice-large' )
-					.addClass( 'updating-message' )
-					.find( 'p' ).text( wp.updates.l10n.updating );
-			} else if ( $card.find( '.notice-error' ).length ) {
-				$modal.find( '.notice-warning' ).remove();
-			}
-		}
-
-		this.$overlay.html( this.overlay.el );
-
-		// Bind to demo:next and demo:previous
-		// triggered by the arrow keys
-		//
-		// Keep track of the current model so we
-		// can infer an index position
-		this.listenTo( this.overlay, 'demo:next', function() {
-			// Renders the next demo on the overlay
-			self.next( [ self.model.cid ] );
-
-		})
-		.listenTo( this.overlay, 'demo:previous', function() {
-			// Renders the previous demo on the overlay
-			self.previous( [ self.model.cid ] );
-		});
 	},
 
 	// This method renders the next demo on the overlay modal
