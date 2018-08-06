@@ -179,6 +179,12 @@
 				}
 			}
 		}
+
+		.expanded {
+			.wp-full-overlay-footer {
+				left: initial;
+			}
+		}
 	}
 }
 
