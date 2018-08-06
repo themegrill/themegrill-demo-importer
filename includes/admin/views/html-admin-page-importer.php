@@ -160,6 +160,15 @@ defined( 'ABSPATH' ) || exit;
 				<img class="theme-screenshot" src="{{ data.screenshot_url }}" alt="" />
 
 				<div class="theme-details">
+					<# if ( ! data.is_pro && ! _.isEmpty( data.hasNotice ) ) { #>
+						<div class="notice demo-message notice-warning notice-alt">
+							<# if ( data.hasNotice['required_theme'] ) { #>
+								<p class="demo-notice"><?php printf( esc_html__( 'Required %s theme must be activated to import this demo.', 'themegrill-demo-importer' ), '<strong>{{{ data.theme }}}</strong>' ); ?></p>
+							<# } else if ( data.hasNotice['required_plugins'] ) { #>
+								<p class="demo-notice"><?php _e( 'Required Plugins must be activated.', 'themegrill-demo-importer' ); ?></p>
+							<# } #>
+						</div>
+					<# } #>
 					<div class="theme-version">
 						<?php
 						/* translators: %s: Demo version */

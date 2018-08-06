@@ -445,8 +445,8 @@ class TG_Demo_Importer {
 	 */
 	public function ajax_query_demos() {
 		$prepared_demos     = array();
-		$current_template   = str_replace( '-pro', '', get_option( 'template' ) );
-		$is_pro_theme_demo  = strpos( get_option( 'template' ), '-pro' ) !== false;
+		$current_template   = get_option( 'template' );
+		$is_pro_theme_demo  = strpos( $current_template, '-pro' ) !== false;
 		$demo_activated_id  = get_option( 'themegrill_demo_importer_activated_id' );
 		$available_packages = $this->get_demo_packages();
 
@@ -471,7 +471,7 @@ class TG_Demo_Importer {
 		if ( is_object( $available_packages->demos ) ) {
 			foreach ( $available_packages->demos as $package_id => $package_data ) {
 				$plugins_list   = isset( $package_data->plugins_list ) ? $package_data->plugins_list : array();
-				$screenshot_url = "https://raw.githubusercontent.com/themegrill/themegrill-demo-pack/master/resources/{$current_template}/{$package_id}/screenshot.jpg";
+				$screenshot_url = "https://raw.githubusercontent.com/themegrill/themegrill-demo-pack/master/resources/{$available_packages->slug}/{$package_id}/screenshot.jpg";
 
 				// Screenshot URL.
 				if ( file_exists( TGDM_DEMO_DIR . $package_id . '/screenshot.jpg' ) ) {
@@ -502,7 +502,7 @@ class TG_Demo_Importer {
 
 				// Add demo notices.
 				$demo_notices = array();
-				if ( isset( $package_data->template ) && $package_data->template !== $current_template ) {
+				if ( isset( $package_data->template ) && ! in_array( $current_template, $package_data->template, true ) ) {
 					$demo_notices['required_theme'] = true;
 				} elseif ( wp_list_filter( json_decode( wp_json_encode( $plugins_list ), true ), array( 'is_active' => false ) ) ) {
 					$demo_notices['required_plugins'] = true;
