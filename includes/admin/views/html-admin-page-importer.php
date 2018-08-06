@@ -134,7 +134,7 @@ defined( 'ABSPATH' ) || exit;
 					<# if ( data.hasNotice['required_theme'] ) { #>
 						<a class="button button-primary hide-if-no-js tips demo-import disabled" href="#" data-name="{{ data.name }}" data-slug="{{ data.id }}" data-tip="<?php echo esc_attr( sprintf( __( 'Required %s theme must be activated to import this demo.', 'themegrill-demo-importer' ), '{{{ data.theme }}}' ) ); ?>"><?php _e( 'Import', 'themegrill-demo-importer' ); ?></a>
 					<# } else if ( data.hasNotice['required_plugins'] ) { #>
-						<a class="button button-secondary hide-if-no-js install-plugins" href="#"><?php _e( 'Install Plugins', 'themegrill-demo-importer' ); ?></a>
+						<a class="button button-secondary hide-if-no-js plugins-install" href="#"><?php _e( 'Install Plugins', 'themegrill-demo-importer' ); ?></a>
 					<# } #>
 				<# } else { #>
 					<a class="button button-primary hide-if-no-js demo-import" href="#" data-name="{{ data.name }}" data-slug="{{ data.id }}"><?php _e( 'Import Demo', 'themegrill-demo-importer' ); ?></a>
@@ -225,7 +225,7 @@ defined( 'ABSPATH' ) || exit;
 						<# if ( data.hasNotice['required_theme'] ) { #>
 							<a class="button button-hero button-primary hide-if-no-js tips demo-import disabled" href="#" data-name="{{ data.name }}" data-slug="{{ data.id }}" data-tip="<?php echo esc_attr( sprintf( __( 'Required %s theme must be activated to import this demo.', 'themegrill-demo-importer' ), '{{{ data.theme }}}' ) ); ?>"><?php _e( 'Import Demo', 'themegrill-demo-importer' ); ?></a>
 						<# } else if ( data.hasNotice['required_plugins'] ) { #>
-							<a class="button button-hero button-secondary hide-if-no-js install-plugins" href="#"><?php _e( 'Install Plugins', 'themegrill-demo-importer' ); ?></a>
+							<a class="button button-hero button-secondary hide-if-no-js plugins-install" href="#"><?php _e( 'Install Plugins', 'themegrill-demo-importer' ); ?></a>
 						<# } #>
 					<# } else { #>
 						<a class="button button-hero button-primary hide-if-no-js demo-import" href="#" data-name="{{ data.name }}" data-slug="{{ data.id }}"><?php _e( 'Import Demo', 'themegrill-demo-importer' ); ?></a>

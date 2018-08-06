@@ -594,139 +594,143 @@ demos.view.Demo = wp.Backbone.View.extend({
 	}
 });
 
-// Demo Details view
+// Theme Preview view
 // Set ups a modal overlay with the expanded demo data
-demos.view.Details = wp.Backbone.View.extend({
+demos.view.Preview = wp.Backbone.View.extend({
 
-	// Wrap theme data on a div.theme element
-	className: 'theme-overlay',
+	className: 'wp-full-overlay expanded',
+	el: '.theme-install-overlay',
 
 	events: {
-		'click': 'collapse',
-		'click .delete-demo': 'deleteDemo',
-		'click .left': 'previousDemo',
-		'click .right': 'nextDemo',
+		'click .close-full-overlay': 'close',
+		'click .collapse-sidebar': 'collapse',
+		'click .devices button': 'previewDevice',
+		'click .previous-theme': 'previousDemo',
+		'click .next-theme': 'nextDemo',
+		'keyup': 'keyEvent',
 		'click .demo-import': 'importDemo',
 		'click .plugins-install': 'installPlugin'
 	},
 
-	// The HTML template for the theme overlay
-	html: demos.template( 'demo-single' ),
+	// The HTML template for the demo preview
+	html: demos.template( 'demo-preview' ),
 
 	render: function() {
-		var data = this.model.toJSON();
-		this.$el.html( this.html( data ) );
-		// Renders active theme styles
-		this.activeDemo();
-		// Set up navigation events
-		this.navigation();
-		// Checks screenshot size
-		this.screenshotCheck( this.$el );
-		// Contain "tabbing" inside the overlay
-		this.containFocus( this.$el );
-	},
+		var self = this,
+			currentPreviewDevice,
+			data = this.model.toJSON(),
+			$body = $( document.body );
 
-	// Adds a class to the currently active theme
-	// and to the overlay in detailed view mode
-	activeDemo: function() {
-		// Check the model has the active property
-		this.$el.toggleClass( 'active', this.model.get( 'active' ) );
-	},
+		$body.attr( 'aria-busy', 'true' );
 
-	// Set initial focus and constrain tabbing within the theme browser modal.
-	containFocus: function( $el ) {
+		this.$el.removeClass( 'iframe-ready' ).html( this.html( data ) );
 
-		// Set initial focus on the primary action control.
-		_.delay( function() {
-			$( '.theme-wrap a.button-primary:visible' ).focus();
-		}, 100 );
+		currentPreviewDevice = this.$el.data( 'current-preview-device' );
+		if ( currentPreviewDevice ) {
+			self.tooglePreviewDeviceButtons( currentPreviewDevice );
+		}
 
-		// Constrain tabbing within the modal.
-		$el.on( 'keydown.wp-themes', function( event ) {
-			var $firstFocusable = $el.find( '.theme-header button:not(.disabled)' ).first(),
-				$lastFocusable = $el.find( '.theme-actions a:visible' ).last();
+		demos.router.navigate( demos.router.baseUrl( demos.router.demoPath + this.model.get( 'id' ) ), { replace: false } );
 
-			// Check for the Tab key.
-			if ( 9 === event.which ) {
-				if ( $firstFocusable[0] === event.target && event.shiftKey ) {
-					$lastFocusable.focus();
-					event.preventDefault();
-				} else if ( $lastFocusable[0] === event.target && ! event.shiftKey ) {
-					$firstFocusable.focus();
-					event.preventDefault();
-				}
-			}
+		this.$el.fadeIn( 200, function() {
+			$body.addClass( 'demo-importer-active full-overlay-active' );
+		});
+
+		this.$el.find( 'iframe' ).one( 'load', function() {
+			self.iframeLoaded();
 		});
 	},
 
-	// Single demo overlay screen
-	// It's shown when clicking a demo
-	collapse: function( event ) {
-		var self = this,
-			scroll;
-
-		event = event || window.event;
-
-		// Prevent collapsing detailed view when there is only one demo available
-		if ( demos.data.demos.length === 1 ) {
-			return;
-		}
-
-		// Detect if the click is inside the overlay
-		// and don't close it unless the target was
-		// the div.back button
-		if ( $( event.target ).is( '.theme-backdrop' ) || $( event.target ).is( '.close' ) || event.keyCode === 27 ) {
-
-			// Add a temporary closing class while overlay fades out
-			$( 'body' ).addClass( 'closing-overlay' );
-
-			// With a quick fade out animation
-			this.$el.fadeOut( 130, function() {
-				// Clicking outside the modal box closes the overlay
-				$( 'body' ).removeClass( 'closing-overlay' );
-				// Handle event cleanup
-				self.closeOverlay();
-
-				// Get scroll position to avoid jumping to the top
-				scroll = document.body.scrollTop;
-
-				// Clean the url structure
-				demos.router.navigate( demos.router.baseUrl( '' ) );
-
-				// Restore scroll position
-				document.body.scrollTop = scroll;
-
-				// Return focus to the demo div
-				if ( demos.focusedDemo ) {
-					demos.focusedDemo.focus();
-				}
-			});
-		}
+	iframeLoaded: function() {
+		this.$el.addClass( 'iframe-ready' );
+		$( document.body ).attr( 'aria-busy', 'false' );
 	},
 
-	// Handles .disabled classes for next/previous buttons
-	navigation: function() {
+	close: function() {
+		this.$el.fadeOut( 200, function() {
+			$( 'body' ).removeClass( 'demo-importer-active full-overlay-active' );
 
-		// Disable Left/Right when at the start or end of the collection
-		if ( this.model.cid === this.model.collection.at(0).cid ) {
-			this.$el.find( '.left' )
-				.addClass( 'disabled' )
-				.prop( 'disabled', true );
-		}
-		if ( this.model.cid === this.model.collection.at( this.model.collection.length - 1 ).cid ) {
-			this.$el.find( '.right' )
-				.addClass( 'disabled' )
-				.prop( 'disabled', true );
-		}
-	},
+			// Return focus to the demo div
+			if ( demos.focusedTheme ) {
+				demos.focusedTheme.focus();
+			}
+		}).removeClass( 'iframe-ready' );
 
-	// Performs the actions to effectively close
-	// the demo details overlay
-	closeOverlay: function() {
-		$( 'body' ).removeClass( 'modal-open' );
-		this.remove();
+		// Restore the previous browse tab if available.
+		if ( demos.router.selectedTab ) {
+			demos.router.navigate( demos.router.baseUrl( '&browse=' + demos.router.selectedTab ) );
+			demos.router.selectedTab = false;
+		} else {
+			demos.router.navigate( demos.router.baseUrl( '' ) );
+		}
+		this.trigger( 'preview:close' );
+		this.undelegateEvents();
 		this.unbind();
-		this.trigger( 'demo:collapse' );
+		return false;
+	},
+
+	collapse: function( event ) {
+		var $button = $( event.currentTarget );
+		if ( 'true' === $button.attr( 'aria-expanded' ) ) {
+			$button.attr({ 'aria-expanded': 'false', 'aria-label': l10n.expandSidebar });
+		} else {
+			$button.attr({ 'aria-expanded': 'true', 'aria-label': l10n.collapseSidebar });
+		}
+
+		this.$el.toggleClass( 'collapsed' ).toggleClass( 'expanded' );
+		return false;
+	},
+
+	previewDevice: function( event ) {
+		var device = $( event.currentTarget ).data( 'device' );
+
+		this.$el
+			.removeClass( 'preview-desktop preview-tablet preview-mobile' )
+			.addClass( 'preview-' + device )
+			.data( 'current-preview-device', device );
+
+		this.tooglePreviewDeviceButtons( device );
+	},
+
+	tooglePreviewDeviceButtons: function( newDevice ) {
+		var $devices = $( '.wp-full-overlay-footer .devices' );
+
+		$devices.find( 'button' )
+			.removeClass( 'active' )
+			.attr( 'aria-pressed', false );
+
+		$devices.find( 'button.preview-' + newDevice )
+			.addClass( 'active' )
+			.attr( 'aria-pressed', true );
+	},
+
+	keyEvent: function( event ) {
+		// The escape key closes the preview
+		if ( event.keyCode === 27 ) {
+			this.undelegateEvents();
+			this.close();
+		}
+		// The right arrow key, next theme
+		if ( event.keyCode === 39 ) {
+			_.once( this.nextDemo() );
+		}
+
+		// The left arrow key, previous theme
+		if ( event.keyCode === 37 ) {
+			this.previousDemo();
+		}
+	},
+
+	nextDemo: function() {
+		var self = this;
+		self.trigger( 'demo:next', self.model.cid );
+		return false;
+	},
+
+	previousDemo: function() {
+		var self = this;
+		self.trigger( 'demo:previous', self.model.cid );
+		return false;
 	},
 
 	importDemo: function( event ) {
@@ -737,6 +741,8 @@ demos.view.Details = wp.Backbone.View.extend({
 		if ( $target.hasClass( 'disabled' ) ) {
 			return;
 		}
+
+		wp.updates.maybeRequestFilesystemCredentials( event );
 
 		// Confirmation dialog for importing a demo.
 		if ( ! window.confirm( wp.demos.data.settings.confirmImport ) ) {
@@ -895,203 +901,6 @@ demos.view.Details = wp.Backbone.View.extend({
 
 		// Check the queue, now that the event handlers have been added.
 		wp.updates.queueChecker();
-	},
-
-	deleteDemo: function( event ) {
-		var _this = this,
-			_collection = this.model.collection,
-			_demos = demos;
-		event.preventDefault();
-
-		// Confirmation dialog for deleting a demo.
-		if ( ! window.confirm( wp.demos.data.settings.confirmDelete ) ) {
-			return;
-		}
-
-		wp.updates.maybeRequestFilesystemCredentials( event );
-
-		$( document ).one( 'wp-demo-delete-success', function( event, response ) {
-			_this.$el.find( '.close' ).trigger( 'click' );
-			$( '[data-slug="' + response.slug + '"' ).css( { backgroundColor:'#faafaa' } ).fadeOut( 350, function() {
-				$( this ).remove();
-				_demos.data.demos = _.without( _demos.data.demos, _.findWhere( _demos.data.demos, { id: response.slug } ) );
-
-				$( '.wp-filter-search' ).val( '' );
-				_collection.doSearch( '' );
-				_collection.remove( _this.model );
-				_collection.trigger( 'demos:update' );
-			} );
-		} );
-
-		wp.updates.deleteDemo( {
-			slug: this.model.get( 'id' )
-		} );
-	},
-
-	nextDemo: function() {
-		var self = this;
-		self.trigger( 'demo:next', self.model.cid );
-		return false;
-	},
-
-	previousDemo: function() {
-		var self = this;
-		self.trigger( 'demo:previous', self.model.cid );
-		return false;
-	},
-
-	// Checks if the theme screenshot is the old 300px width version
-	// and adds a corresponding class if it's true
-	screenshotCheck: function( el ) {
-		var screenshot, image;
-
-		screenshot = el.find( '.screenshot img' );
-		image = new Image();
-		image.src = screenshot.attr( 'src' );
-
-		// Width check
-		if ( image.width && image.width <= 300 ) {
-			el.addClass( 'small-screenshot' );
-		}
-	}
-});
-
-// Theme Preview view
-// Set ups a modal overlay with the expanded demo data
-demos.view.Preview = demos.view.Details.extend({
-
-	className: 'wp-full-overlay expanded',
-	el: '.theme-install-overlay',
-
-	events: {
-		'click .close-full-overlay': 'close',
-		'click .collapse-sidebar': 'collapse',
-		'click .devices button': 'previewDevice',
-		'click .previous-theme': 'previousDemo',
-		'click .next-theme': 'nextDemo',
-		'keyup': 'keyEvent',
-		'click .demo-import': 'importDemo'
-	},
-
-	// The HTML template for the demo preview
-	html: demos.template( 'demo-preview' ),
-
-	render: function() {
-		var self = this,
-			currentPreviewDevice,
-			data = this.model.toJSON(),
-			$body = $( document.body );
-
-		$body.attr( 'aria-busy', 'true' );
-
-		this.$el.removeClass( 'iframe-ready' ).html( this.html( data ) );
-
-		currentPreviewDevice = this.$el.data( 'current-preview-device' );
-		if ( currentPreviewDevice ) {
-			self.tooglePreviewDeviceButtons( currentPreviewDevice );
-		}
-
-		demos.router.navigate( demos.router.baseUrl( demos.router.demoPath + this.model.get( 'id' ) ), { replace: false } );
-
-		this.$el.fadeIn( 200, function() {
-			$body.addClass( 'demo-importer-active full-overlay-active' );
-		});
-
-		this.$el.find( 'iframe' ).one( 'load', function() {
-			self.iframeLoaded();
-		});
-	},
-
-	iframeLoaded: function() {
-		this.$el.addClass( 'iframe-ready' );
-		$( document.body ).attr( 'aria-busy', 'false' );
-	},
-
-	close: function() {
-		this.$el.fadeOut( 200, function() {
-			$( 'body' ).removeClass( 'demo-importer-active full-overlay-active' );
-
-			// Return focus to the demo div
-			if ( demos.focusedTheme ) {
-				demos.focusedTheme.focus();
-			}
-		}).removeClass( 'iframe-ready' );
-
-		// Restore the previous browse tab if available.
-		if ( demos.router.selectedTab ) {
-			demos.router.navigate( demos.router.baseUrl( '&browse=' + demos.router.selectedTab ) );
-			demos.router.selectedTab = false;
-		} else {
-			demos.router.navigate( demos.router.baseUrl( '' ) );
-		}
-		this.trigger( 'preview:close' );
-		this.undelegateEvents();
-		this.unbind();
-		return false;
-	},
-
-	collapse: function( event ) {
-		var $button = $( event.currentTarget );
-		if ( 'true' === $button.attr( 'aria-expanded' ) ) {
-			$button.attr({ 'aria-expanded': 'false', 'aria-label': l10n.expandSidebar });
-		} else {
-			$button.attr({ 'aria-expanded': 'true', 'aria-label': l10n.collapseSidebar });
-		}
-
-		this.$el.toggleClass( 'collapsed' ).toggleClass( 'expanded' );
-		return false;
-	},
-
-	previewDevice: function( event ) {
-		var device = $( event.currentTarget ).data( 'device' );
-
-		this.$el
-			.removeClass( 'preview-desktop preview-tablet preview-mobile' )
-			.addClass( 'preview-' + device )
-			.data( 'current-preview-device', device );
-
-		this.tooglePreviewDeviceButtons( device );
-	},
-
-	tooglePreviewDeviceButtons: function( newDevice ) {
-		var $devices = $( '.wp-full-overlay-footer .devices' );
-
-		$devices.find( 'button' )
-			.removeClass( 'active' )
-			.attr( 'aria-pressed', false );
-
-		$devices.find( 'button.preview-' + newDevice )
-			.addClass( 'active' )
-			.attr( 'aria-pressed', true );
-	},
-
-	keyEvent: function( event ) {
-		// The escape key closes the preview
-		if ( event.keyCode === 27 ) {
-			this.undelegateEvents();
-			this.close();
-		}
-		// The right arrow key, next theme
-		if ( event.keyCode === 39 ) {
-			_.once( this.nextDemo() );
-		}
-
-		// The left arrow key, previous theme
-		if ( event.keyCode === 37 ) {
-			this.previousDemo();
-		}
-	},
-
-	importDemo: function( event ) {
-		var _this   = this,
-		    $target = $( event.target );
-		event.preventDefault();
-
-		if ( $target.hasClass( 'disabled' ) ) {
-			return;
-		}
-
-		wp.updates.maybeRequestFilesystemCredentials( event );
 	}
 });
 
