@@ -75,114 +75,129 @@
 			}
 		}
 
-		.wp-full-overlay-sidebar-content {
-			bottom: 132px;
-
-			* {
-				box-sizing: border-box;
+		.theme-install-overlay {
+			.wp-full-overlay-header {
+				background-color: #eee;
+				transition: padding ease-in-out .18s;
 			}
 
-			.install-theme-info {
-				.premium-demo-tag {
-					color: #fff;
-					font-size: 13px;
-					font-weight: 400;
-					margin-left: 5px;
-					padding: 0px 10px;
-					line-height: 22px;
-					border-radius: 3px;
-					display: inline-block;
-					background: #67c016;
+			.wp-full-overlay-sidebar-content {
+				bottom: 132px;
+				overflow-y: auto;
+				overflow-x: hidden;
+			    background: #fff;
+			    border-top: 1px solid #ddd;
+			    border-bottom: 1px solid #ddd;
+
+				* {
+					box-sizing: border-box;
 				}
 
-				.theme-screenshot {
-					width: 100%;
-				}
+				.install-theme-info {
+					background: #fff;
 
-				.theme-details {
-					padding-bottom: 25px;
-
-					.theme-version {
-						margin-top: 0;
+					.premium-demo-tag {
+						color: #fff;
+						font-size: 13px;
+						font-weight: 400;
+						margin-left: 5px;
+						padding: 0px 10px;
+						line-height: 22px;
+						border-radius: 3px;
+						display: inline-block;
+						background: #67c016;
 					}
-				}
 
-				table.plugins-list-table {
-					margin-bottom: 1em;
+					.theme-screenshot {
+						width: 100%;
+					}
 
-					.plugin-status {
-						float: right;
+					.theme-details {
+						padding-bottom: 25px;
 
-						span.circle-loader {
-							width: 24px;
-							height: 24px;
-							border-radius: 50%;
-							position: relative;
-							vertical-align: top;
-							display: inline-block;
-							border: 2px solid #bfbfbf;
+						.theme-version {
+							margin-top: 0;
+						}
+					}
 
-							&.circle-loading {
-								border-left-color: #5cb85c;
-								animation: spin .75s linear infinite;
-							}
+					table.plugins-list-table {
+						margin-bottom: 1em;
 
-							&.circle-colored {
-								border-color: #5cb85c;
+						.plugin-status {
+							float: right;
+
+							span.circle-loader {
+								width: 24px;
+								height: 24px;
+								border-radius: 50%;
+								position: relative;
+								vertical-align: top;
+								display: inline-block;
+								border: 2px solid #bfbfbf;
+
+								&.circle-loading {
+									border-left-color: #5cb85c;
+									animation: spin .75s linear infinite;
+								}
+
+								&.circle-colored {
+									border-color: #5cb85c;
+
+									span.checked {
+										display: block;
+									}
+								}
 
 								span.checked {
-									display: block;
-								}
-							}
+									display: none;
 
-							span.checked {
-								display: none;
-
-								&::after {
-									position: absolute;
-									left: 50%;
-									top: 50%;
-									opacity: 1;
-									content: "";
-									height: 50%;
-									width: 25%;
-									transform-origin: left top;
-									border-right: 2px solid #5cb85c;
-									border-top: 2px solid #5cb85c;
-									transform: scaleX(-1) rotate(135deg) translate(-58%, -40%);
+									&::after {
+										position: absolute;
+										left: 50%;
+										top: 50%;
+										opacity: 1;
+										content: "";
+										height: 50%;
+										width: 25%;
+										transform-origin: left top;
+										border-right: 2px solid #5cb85c;
+										border-top: 2px solid #5cb85c;
+										transform: scaleX(-1) rotate(135deg) translate(-58%, -40%);
+									}
 								}
 							}
 						}
 					}
 				}
 			}
-		}
 
-		.wp-full-overlay-footer {
-			height: 132px;
-
-			.devices button {
-				&:hover,
-				&:focus {
-					background-color: transparent;
-				}
-			}
-
-			.demo-import-actions {
-				padding: 20px;
-				background: #fff;
-				border-bottom: 1px solid #ddd;
-
-				.button {
-					width: 100%;
-					text-align: center;
-				}
-			}
-		}
-
-		.expanded {
 			.wp-full-overlay-footer {
-				left: initial;
+				height: 132px;
+				transition: .18s bottom ease-in-out;
+
+				.devices button {
+					&:hover,
+					&:focus {
+						background-color: transparent;
+					}
+				}
+
+				.demo-import-actions {
+					padding: 20px;
+					background: #fff;
+					border-bottom: 1px solid #ddd;
+
+					.button {
+						width: 100%;
+						text-align: center;
+					}
+				}
+			}
+
+			&.expanded {
+				.wp-full-overlay-footer {
+					left: initial;
+				}
 			}
 		}
 	}
