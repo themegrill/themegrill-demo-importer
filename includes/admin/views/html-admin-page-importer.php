@@ -199,6 +199,8 @@ defined( 'ABSPATH' ) || exit;
 									<td class="plugin-status">
 										<# if ( plugin.is_active ) { #>
 											<span class="circle-loader circle-colored checked"><span class="checked"></span></span>
+										<# } else if ( plugin.is_install ) { #>
+											<span class="circle-loader circle-colored"></span>
 										<# } else { #>
 											<span class="circle-loader"></span>
 										<# } #>
