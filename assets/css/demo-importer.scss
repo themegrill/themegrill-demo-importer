@@ -82,12 +82,8 @@
 			}
 
 			.wp-full-overlay-sidebar-content {
+				z-index: 1;
 				bottom: 132px;
-				overflow-y: auto;
-				overflow-x: hidden;
-			    background: #fff;
-			    border-top: 1px solid #ddd;
-			    border-bottom: 1px solid #ddd;
 
 				* {
 					box-sizing: border-box;
