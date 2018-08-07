@@ -78,16 +78,11 @@
 		.theme-install-overlay {
 			.wp-full-overlay-header {
 				background-color: #eee;
-				transition: padding ease-in-out .18s;
 			}
 
 			.wp-full-overlay-sidebar-content {
 				z-index: 1;
 				bottom: 132px;
-
-				* {
-					box-sizing: border-box;
-				}
 
 				.install-theme-info {
 					.premium-demo-tag {
@@ -104,6 +99,7 @@
 
 					.theme-screenshot {
 						width: 100%;
+						box-sizing: border-box;
 					}
 
 					.theme-details {
@@ -121,8 +117,8 @@
 							float: right;
 
 							span.circle-loader {
-								width: 24px;
-								height: 24px;
+								width: 20px;
+								height: 20px;
 								border-radius: 50%;
 								position: relative;
 								vertical-align: top;
@@ -167,7 +163,6 @@
 
 			.wp-full-overlay-footer {
 				height: 132px;
-				transition: .18s bottom ease-in-out;
 
 				.devices button {
 					&:hover,
