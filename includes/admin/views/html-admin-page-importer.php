@@ -217,10 +217,6 @@ defined( 'ABSPATH' ) || exit;
 			</div>
 		</div>
 		<div class="wp-full-overlay-footer">
-			<button type="button" class="collapse-sidebar button" aria-expanded="true" aria-label="<?php esc_attr_e( 'Collapse Sidebar', 'themegrill-demo-importer' ); ?>">
-				<span class="collapse-sidebar-arrow"></span>
-				<span class="collapse-sidebar-label"><?php _e( 'Collapse', 'themegrill-demo-importer' ); ?></span>
-			</button>
 			<div class="demo-import-actions">
 				<# if ( data.is_pro ) { #>
 					<a class="button button-hero button-primary purchase-now" href="{{ data.homepage }}" target="_blank"><?php _e( 'Buy Now', 'themegrill-demo-importer' ); ?></a>
@@ -236,6 +232,10 @@ defined( 'ABSPATH' ) || exit;
 					<# } #>
 				<# } #>
 			</div>
+			<button type="button" class="collapse-sidebar button" aria-expanded="true" aria-label="<?php esc_attr_e( 'Collapse Sidebar', 'themegrill-demo-importer' ); ?>">
+				<span class="collapse-sidebar-arrow"></span>
+				<span class="collapse-sidebar-label"><?php _e( 'Collapse', 'themegrill-demo-importer' ); ?></span>
+			</button>
 			<div class="devices-wrapper">
 				<div class="devices">
 					<button type="button" class="preview-desktop active" aria-pressed="true" data-device="desktop">
