@@ -178,42 +178,45 @@ defined( 'ABSPATH' ) || exit;
 					<div class="theme-description">{{{ data.description }}}</div>
 				</div>
 
-				<table class="plugins-list-table widefat striped">
-					<thead>
-						<tr>
-							<th scope="col" class="manage-column required-plugins" colspan="2"><?php esc_html_e( 'Required Plugins', 'themegrill-demo-importer' ); ?></th>
-						</tr>
-					</thead>
-					<tbody id="the-list">
-						<# if ( ! _.isEmpty( data.plugins ) ) { #>
-							<# _.each( data.plugins, function( plugin, slug ) { #>
-								<# var checkboxIdPrefix = _.uniqueId( 'checkbox_' ) #>
-								<tr class="plugin<# if ( ! plugin.is_install ) { #> install<# } #>" data-slug="{{ slug }}" data-plugin="{{ plugin.slug }}" data-name="{{ plugin.name }}">
-									<td class="plugin-name">
-										<# if ( plugin.link ) { #>
-											<a href="{{{ plugin.link }}}" target="_blank">{{{ plugin.name }}}</a>
-										<# } else { #>
-											<a href="<?php printf( esc_url( 'https://wordpress.org/plugins/%s' ), '{{ slug }}' ); ?>" target="_blank">{{ plugin.name }}</a>
-										<# } #>
-									</td>
-									<td class="plugin-status">
-										<# if ( plugin.is_active ) { #>
-											<span class="circle-loader circle-colored checked"><span class="checked"></span></span>
-										<# } else if ( plugin.is_install ) { #>
-											<span class="circle-loader circle-colored"></span>
-										<# } else { #>
-											<span class="circle-loader"></span>
-										<# } #>
-									</td>
-								</tr>
-							<# }); #>
-						<# } else { #>
-							<tr class="no-items">
-								<td class="colspanchange" colspan="4"><?php _e( 'No plugins are needed to import this demo.', 'themegrill-demo-importer' ); ?></td>
+				<div class="plugins-details">
+					<h4 class="plugins-info"><?php _e( 'Plugins Information', 'themegrill-demo-importer' ); ?></h4>
+
+					<table class="plugins-list-table widefat striped">
+						<thead>
+							<tr>
+								<th scope="col" class="manage-column required-plugins" colspan="2"><?php esc_html_e( 'Required Plugins', 'themegrill-demo-importer' ); ?></th>
 							</tr>
-						<# } #>
-					</tbody>
-				</table>
+						</thead>
+						<tbody id="the-list">
+							<# if ( ! _.isEmpty( data.plugins ) ) { #>
+								<# _.each( data.plugins, function( plugin, slug ) { #>
+									<tr class="plugin<# if ( ! plugin.is_install ) { #> install<# } #>" data-slug="{{ slug }}" data-plugin="{{ plugin.slug }}" data-name="{{ plugin.name }}">
+										<td class="plugin-name">
+											<# if ( plugin.link ) { #>
+												<a href="{{{ plugin.link }}}" target="_blank">{{{ plugin.name }}}</a>
+											<# } else { #>
+												<a href="<?php printf( esc_url( 'https://wordpress.org/plugins/%s' ), '{{ slug }}' ); ?>" target="_blank">{{ plugin.name }}</a>
+											<# } #>
+										</td>
+										<td class="plugin-status">
+											<# if ( plugin.is_active ) { #>
+												<span class="circle-loader circle-colored checked"><span class="checked"></span></span>
+											<# } else if ( plugin.is_install ) { #>
+												<span class="circle-loader circle-colored"></span>
+											<# } else { #>
+												<span class="circle-loader"></span>
+											<# } #>
+										</td>
+									</tr>
+								<# }); #>
+							<# } else { #>
+								<tr class="no-items">
+									<td class="colspanchange" colspan="4"><?php _e( 'No plugins are needed to import this demo.', 'themegrill-demo-importer' ); ?></td>
+								</tr>
+							<# } #>
+						</tbody>
+					</table>
+				</div>
 			</div>
 		</div>
 		<div class="wp-full-overlay-footer">

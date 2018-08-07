@@ -770,7 +770,7 @@ demos.view.Preview = wp.Backbone.View.extend({
 	},
 
 	installPlugin: function( event ) {
-		var itemsSelected = $( document ).find( 'input[name="required[]"], input[name="checked[]"]:checked' ),
+		var itemsSelected = $( '.plugins-list-table' ).find( '#the-list tr' ),
 			$target       = $( event.target ),
 			success       = 0,
 			error         = 0,
@@ -783,18 +783,7 @@ demos.view.Preview = wp.Backbone.View.extend({
 		}
 
 		// Remove previous error messages, if any.
-		$( '.theme-info .update-message' ).remove();
-
-		// Bail if there were no items selected.
-		if ( ! itemsSelected.length ) {
-			event.preventDefault();
-			$( '.theme-about' ).animate( { scrollTop: 0 } );
-			$( '.theme-info .plugins-info' ).after( wp.updates.adminNotice( {
-				id:        'no-items-selected',
-				className: 'update-message notice-error notice-alt',
-				message:   wp.updates.l10n.noItemsSelected
-			} ) );
-		}
+		$( '.plugins-details .update-message' ).remove();
 
 		wp.updates.maybeRequestFilesystemCredentials( event );
 
@@ -803,28 +792,15 @@ demos.view.Preview = wp.Backbone.View.extend({
 			return;
 		}
 
-		// Un-check the bulk checkboxes.
-		$( document ).find( '.manage-column [type="checkbox"]' ).prop( 'checked', false );
-
 		$( document ).trigger( 'wp-plugin-bulk-install', itemsSelected );
 
-		// Find all the checkboxes which have been checked.
+		// Find all the plugins which are required.
 		itemsSelected.each( function( index, element ) {
-			var $checkbox = $( element ),
-				$itemRow  = $checkbox.parents( 'tr' );
+			var $itemRow = $( element );
 
 			// Only add install-able items to the update queue.
 			if ( ! $itemRow.hasClass( 'install' ) || $itemRow.find( 'notice-error' ).length ) {
-
-				// Un-check the box.
-				$checkbox.filter( ':not(:disabled)' ).prop( 'checked', false );
 				return;
-			} else {
-				$target
-					.addClass( 'updating-message' )
-					.text( wp.updates.l10n.installing );
-
-				wp.a11y.speak( wp.updates.l10n.installingMsg, 'polite' );
 			}
 
 			// Add it to the queue.
