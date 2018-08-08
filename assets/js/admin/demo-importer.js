@@ -770,7 +770,7 @@ demos.view.Preview = wp.Backbone.View.extend({
 	},
 
 	installPlugin: function( event ) {
-		var itemsSelected = $( '.plugins-list-table' ).find( '#the-list tr' ),
+		var pluginsList   = $( '.plugins-list-table' ).find( '#the-list tr' ),
 			$target       = $( event.target ),
 			success       = 0,
 			error         = 0,
@@ -792,10 +792,10 @@ demos.view.Preview = wp.Backbone.View.extend({
 			return;
 		}
 
-		$( document ).trigger( 'wp-plugin-bulk-install', itemsSelected );
+		$( document ).trigger( 'wp-plugin-bulk-install', pluginsList );
 
 		// Find all the plugins which are required.
-		itemsSelected.each( function( index, element ) {
+		pluginsList.each( function( index, element ) {
 			var $itemRow = $( element );
 
 			// Only add install-able items to the update queue.

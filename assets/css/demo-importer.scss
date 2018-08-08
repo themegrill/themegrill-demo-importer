@@ -85,6 +85,15 @@
 				bottom: 132px;
 
 				.install-theme-info {
+					.theme-version {
+						margin-top: 0;
+					}
+
+					.theme-screenshot {
+						width: 100%;
+						box-sizing: border-box;
+					}
+
 					.premium-demo-tag {
 						color: #fff;
 						font-size: 13px;
@@ -95,17 +104,6 @@
 						border-radius: 3px;
 						background: #67c016;
 						display: inline-block;
-					}
-
-					.theme-screenshot {
-						width: 100%;
-						box-sizing: border-box;
-					}
-
-					.theme-details {
-						.theme-version {
-							margin-top: 0;
-						}
 					}
 
 					table.plugins-list-table {
@@ -131,9 +129,9 @@
 										left: 50%;
 										top: 50%;
 										opacity: 1;
-										content: "";
-										height: 50%;
 										width: 25%;
+										height: 50%;
+										content: '';
 										transform-origin: left top;
 										border-right: 2px solid #5cb85c;
 										border-top: 2px solid #5cb85c;
