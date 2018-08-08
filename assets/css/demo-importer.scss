@@ -114,7 +114,7 @@
 						.plugin-status {
 							float: right;
 
-							span.circle-loader {
+							span {
 								width: 20px;
 								height: 20px;
 								border-radius: 50%;
@@ -123,21 +123,8 @@
 								display: inline-block;
 								border: 2px solid #bfbfbf;
 
-								&.circle-loading {
-									border-left-color: #5cb85c;
-									animation: spin .75s linear infinite;
-								}
-
-								&.circle-colored {
+								&.active {
 									border-color: #5cb85c;
-
-									span.checked {
-										display: block;
-									}
-								}
-
-								span.checked {
-									display: none;
 
 									&::after {
 										position: absolute;
@@ -152,6 +139,15 @@
 										border-top: 2px solid #5cb85c;
 										transform: scaleX(-1) rotate(135deg) translate(-58%, -40%);
 									}
+								}
+
+								&.activate-now {
+									border-color: #5cb85c;
+								}
+
+								&.updating-message {
+									border-left-color: #5cb85c;
+									animation: spin .75s linear infinite;
 								}
 							}
 						}
