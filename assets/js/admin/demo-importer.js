@@ -800,7 +800,7 @@ demos.view.Preview = wp.Backbone.View.extend({
 
 			// Only add install-able items to the update queue.
 			if ( ! $itemRow.hasClass( 'install' ) || $itemRow.find( 'notice-error' ).length ) {
-				return;
+				// return;
 			}
 
 			// Add it to the queue.
@@ -857,7 +857,7 @@ demos.view.Preview = wp.Backbone.View.extend({
 
 					wp.a11y.speak( wp.updates.l10n.installedMsg, 'polite' );
 
-					$( '.theme-about' ).animate( { scrollTop: 0 } );
+					$( '.wp-full-overlay-sidebar-content' ).animate( { scrollBottom: 0 } );
 				} else {
 					$target
 						.removeClass( 'updating-message' ).addClass( 'disabled' )
