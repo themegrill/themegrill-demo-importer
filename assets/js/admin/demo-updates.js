@@ -301,7 +301,7 @@
 
 		$updateMessage
 			.removeClass( 'updating-message install-now' )
-			.addClass( 'updated-message activate-now' )
+			.addClass( 'updated-message active' )
 			.attr( 'aria-label', wp.updates.l10n.pluginInstalledLabel.replace( '%s', response.pluginName ) )
 			.text( wp.updates.l10n.pluginInstalled );
 

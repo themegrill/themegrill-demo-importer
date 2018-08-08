@@ -190,7 +190,7 @@ defined( 'ABSPATH' ) || exit;
 						<tbody id="the-list">
 							<# if ( ! _.isEmpty( data.plugins ) ) { #>
 								<# _.each( data.plugins, function( plugin, slug ) { #>
-									<tr class="plugin<# if ( ! plugin.is_install ) { #> install<# } #>" data-slug="{{ slug }}" data-plugin="{{ plugin.slug }}" data-name="{{ plugin.name }}">
+									<tr class="plugin<# if ( ! plugin.is_active ) { #> inactive<# } #>" data-slug="{{ slug }}" data-plugin="{{ plugin.slug }}" data-name="{{ plugin.name }}">
 										<td class="plugin-name">
 											<# if ( plugin.link ) { #>
 												<a href="{{{ plugin.link }}}" target="_blank">{{{ plugin.name }}}</a>

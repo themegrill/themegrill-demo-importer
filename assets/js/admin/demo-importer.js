@@ -785,12 +785,12 @@ demos.view.Preview = wp.Backbone.View.extend({
 		// Remove previous error messages, if any.
 		$( '.plugins-details .update-message' ).remove();
 
-		wp.updates.maybeRequestFilesystemCredentials( event );
-
 		// Confirmation dialog for installing bulk plugins.
 		if ( ! window.confirm( wp.demos.data.settings.confirmInstall ) ) {
 			return;
 		}
+
+		wp.updates.maybeRequestFilesystemCredentials( event );
 
 		$( document ).trigger( 'wp-plugin-bulk-install', pluginsList );
 
@@ -798,9 +798,9 @@ demos.view.Preview = wp.Backbone.View.extend({
 		pluginsList.each( function( index, element ) {
 			var $itemRow = $( element );
 
-			// Only add install-able items to the update queue.
-			if ( ! $itemRow.hasClass( 'install' ) || $itemRow.find( 'notice-error' ).length ) {
-				// return;
+			// Only add inactive items to the update queue.
+			if ( ! $itemRow.hasClass( 'inactive' ) || $itemRow.find( 'notice-error' ).length ) {
+				return;
 			}
 
 			// Add it to the queue.
