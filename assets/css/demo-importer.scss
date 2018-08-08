@@ -115,9 +115,12 @@
 							span {
 								width: 20px;
 								height: 20px;
+							    overflow: hidden;
+							    text-indent: 100%;
 								border-radius: 50%;
 								position: relative;
 								vertical-align: top;
+							    white-space: nowrap;
 								display: inline-block;
 								border: 2px solid #bfbfbf;
 
