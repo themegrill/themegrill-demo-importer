@@ -468,7 +468,7 @@ class TG_Demo_Importer {
 			$prepared_demos[ $demo_activated_id ] = array();
 		}
 
-		if ( is_object( $available_packages->demos ) ) {
+		if ( isset( $available_packages->demos ) ) {
 			foreach ( $available_packages->demos as $package_id => $package_data ) {
 				$plugins_list   = isset( $package_data->plugins_list ) ? $package_data->plugins_list : array();
 				$screenshot_url = "https://raw.githubusercontent.com/themegrill/themegrill-demo-pack/master/resources/{$available_packages->slug}/{$package_id}/screenshot.jpg";
