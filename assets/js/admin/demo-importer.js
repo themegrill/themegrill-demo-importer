@@ -826,14 +826,12 @@ demos.view.Preview = wp.Backbone.View.extend({
 				errorMessages.push( itemName + ': ' + response.errorMessage );
 			}
 
-			$itemRow.find( 'input[name="checked[]"]:checked' ).filter( ':not(:disabled)' ).prop( 'checked', false );
-
 			wp.updates.adminNotice = wp.template( 'wp-bulk-installs-admin-notice' );
 
 			// Remove previous error messages, if any.
-			$( '.theme-info .bulk-action-notice' ).remove();
+			$( '.plugins-details .bulk-action-notice' ).remove();
 
-			$( '.theme-info .plugins-info' ).after( wp.updates.adminNotice( {
+			$( '.plugins-details .plugins-info' ).after( wp.updates.adminNotice( {
 				id:            'bulk-action-notice',
 				className:     'bulk-action-notice notice-alt',
 				successes:     success,
