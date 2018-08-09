@@ -116,7 +116,7 @@
 						.plugin-status {
 							float: right;
 
-							span.circle-loader {
+							span.inactive {
 								width: 20px;
 								height: 20px;
 								border-radius: 50%;
@@ -125,21 +125,13 @@
 								display: inline-block;
 								border: 2px solid #bfbfbf;
 
-								&.circle-loading {
+								&.installing {
 									border-left-color: #5cb85c;
 									animation: spin .75s linear infinite;
 								}
 
-								&.circle-colored {
+								&.activated {
 									border-color: #5cb85c;
-
-									span.checked {
-										display: block;
-									}
-								}
-
-								span.checked {
-									display: none;
 
 									&::after {
 										position: absolute;
@@ -179,6 +171,13 @@
 					.button {
 						width: 100%;
 						text-align: center;
+
+						&.installed::before,
+						&.installing::before,
+						&.updating-message::before {
+							margin-right: 6px;
+							vertical-align: text-bottom;
+						}
 					}
 				}
 			}

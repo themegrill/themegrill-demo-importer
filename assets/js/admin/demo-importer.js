@@ -1615,7 +1615,7 @@ demos.view.Installer = demos.view.Appearance.extend({
 demos.InstallerRouter = Backbone.Router.extend({
 
 	routes: {
-		'themes.php?page=demo-importer&demo=:slug': 'demo',
+		'themes.php?page=demo-importer&demo=:slug': 'preview',
 		'themes.php?page=demo-importer&browse=:sort': 'sort',
 		'themes.php?page=demo-importer&search=:query': 'search',
 		'themes.php?page=demo-importer': 'sort'

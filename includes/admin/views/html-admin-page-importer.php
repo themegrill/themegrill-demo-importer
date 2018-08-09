@@ -198,11 +198,11 @@ defined( 'ABSPATH' ) || exit;
 									</td>
 									<td class="plugin-status">
 										<# if ( plugin.is_active ) { #>
-											<span class="circle-loader circle-colored checked"><span class="checked"></span></span>
+											<span class="inactive activated"></span>
 										<# } else if ( plugin.is_install ) { #>
-											<span class="circle-loader circle-colored"></span>
+											<span class="inactive installing"></span>
 										<# } else { #>
-											<span class="circle-loader"></span>
+											<span class="inactive"></span>
 										<# } #>
 									</td>
 								</tr>
