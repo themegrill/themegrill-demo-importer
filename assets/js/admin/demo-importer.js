@@ -611,7 +611,7 @@ demos.view.Preview = wp.Backbone.View.extend({
 		'click .next-theme': 'nextDemo',
 		'keyup': 'keyEvent',
 		'click .demo-import': 'importDemo',
-		'click .plugins-install': 'installPlugin'
+		'click .plugins-install': 'installPlugins'
 	},
 
 	// The HTML template for the demo preview
@@ -769,7 +769,7 @@ demos.view.Preview = wp.Backbone.View.extend({
 		} );
 	},
 
-	installPlugin: function( event ) {
+	installPlugins: function( event ) {
 		var pluginsList   = $( '.plugins-list-table' ).find( '#the-list tr' ),
 			$target       = $( event.target ),
 			success       = 0,
