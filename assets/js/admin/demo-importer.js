@@ -771,7 +771,7 @@ demos.view.Preview = wp.Backbone.View.extend({
 
 	installPlugins: function( event ) {
 		var pluginsList   = $( '.plugins-list-table' ).find( '#the-list tr' ),
-			$target       = $( event.target ),
+			$target       = $( '.plugins-install' ),
 			success       = 0,
 			error         = 0,
 			errorMessages = [];
@@ -780,14 +780,20 @@ demos.view.Preview = wp.Backbone.View.extend({
 
 		if ( $target.hasClass( 'disabled' ) || $target.hasClass( 'updating-message' ) ) {
 			return;
-		}
+		} else {
+			if ( ! window.confirm( wp.demos.data.settings.confirmInstall ) ) {
+				return;
+			}
 
-		// Remove previous error messages, if any.
-		$( '.plugins-details .update-message' ).remove();
+			$( '.wp-full-overlay-sidebar-content' ).animate( { scrollTop: $( document ).height() } );
 
-		// Confirmation dialog for installing bulk plugins.
-		if ( ! window.confirm( wp.demos.data.settings.confirmInstall ) ) {
-			return;
+			// Remove previous error messages, if any.
+			$( '.plugins-details .update-message' ).remove();
+
+			$target
+				.addClass( 'updating-message' )
+				.text( wp.updates.l10n.installing );
+			wp.a11y.speak( wp.updates.l10n.installingMsg, 'polite' );
 		}
 
 		wp.updates.maybeRequestFilesystemCredentials( event );
@@ -816,6 +822,8 @@ demos.view.Preview = wp.Backbone.View.extend({
 		$( document ).on( 'wp-plugin-bulk-install-success wp-plugin-bulk-install-error', function( event, response ) {
 			var $itemRow = $( '[data-slug="' + response.slug + '"]' ),
 				$bulkActionNotice, itemName;
+
+				// console.log( response );
 
 			if ( 'wp-' + response.install + '-bulk-install-success' === event.type ) {
 				success++;
@@ -856,8 +864,6 @@ demos.view.Preview = wp.Backbone.View.extend({
 						.text( wp.updates.l10n.installFailedShort );
 
 					wp.a11y.speak( wp.updates.l10n.installedMsg, 'polite' );
-
-					$( '.wp-full-overlay-sidebar-content' ).animate( { scrollBottom: 0 } );
 				} else {
 					$target
 						.removeClass( 'updating-message' ).addClass( 'disabled' )
