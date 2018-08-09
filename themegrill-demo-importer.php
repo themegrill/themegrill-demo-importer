@@ -277,13 +277,10 @@ if ( ! class_exists( 'ThemeGrill_Demo_Importer' ) ) :
 		 * Theme support fallback notice.
 		 */
 		public function theme_support_missing_notice() {
-			$current_screen = get_current_screen();
+			$themes_url = array_intersect( array_keys( wp_get_themes() ), $this->get_core_supported_themes() ) ? admin_url( 'themes.php?search=themegrill' ) : admin_url( 'theme-install.php?search=themegrill' );
 
-			// Check to make sure we're on a Themes admin page.
-			if ( isset( $current_screen->id ) && in_array( $current_screen->id, array( 'themes' ) ) ) {
-				$themes_url = array_intersect( array_keys( wp_get_themes() ), $this->get_core_supported_themes() ) ? admin_url( 'themes.php?search=themegrill' ) : admin_url( 'theme-install.php?search=themegrill' );
-				echo '<div class="error notice is-dismissible"><p><strong>' . __( 'ThemeGrill Demo Importer', 'themegrill-demo-importer' ) . '</strong> &#8211; ' . sprintf( __( 'This plugin requires %1$s to be activated to work.', 'themegrill-demo-importer' ), '<a href="' . esc_url( $themes_url ) . '">' . __( 'Official ThemeGrill Theme', 'themegrill-demo-importer' ) . '</a>' ) . '</p></div>';
-			}
+			/* translators: %s: official ThemeGrill themes URL */
+			echo '<div class="error notice is-dismissible"><p><strong>' . esc_html__( 'ThemeGrill Demo Importer', 'themegrill-demo-importer' ) . '</strong> &#8211; ' . sprintf( esc_html__( 'This plugin requires %s to be activated to work.', 'themegrill-demo-importer' ), '<a href="' . esc_url( $themes_url ) . '">' . esc_html__( 'Official ThemeGrill Theme', 'themegrill-demo-importer' ) . '</a>' ) . '</p></div>';
 		}
 	}
 
