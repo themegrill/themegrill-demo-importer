@@ -115,12 +115,12 @@
 							span {
 								width: 20px;
 								height: 20px;
-							    overflow: hidden;
-							    text-indent: 100%;
+								overflow: hidden;
 								border-radius: 50%;
 								position: relative;
 								vertical-align: top;
-							    white-space: nowrap;
+								white-space: nowrap;
+								text-indent: -9999px;
 								display: inline-block;
 								border: 2px solid #bfbfbf;
 
@@ -136,8 +136,8 @@
 										height: 50%;
 										content: '';
 										transform-origin: left top;
-										border-right: 2px solid #5cb85c;
 										border-top: 2px solid #5cb85c;
+										border-right: 2px solid #5cb85c;
 										transform: scaleX(-1) rotate(135deg) translate(-58%, -40%);
 									}
 								}
