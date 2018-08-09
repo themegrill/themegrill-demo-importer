@@ -510,23 +510,19 @@ class TG_Demo_Importer {
 
 				// Prepare all demos.
 				$prepared_demos[ $package_id ] = array(
-					'id'              => $package_id,
-					'name'            => $package_data->title,
-					'theme'           => $available_packages->name,
-					'active'          => $package_id === $demo_activated_id,
-					'is_pro'          => $is_pro,
-					'author'          => isset( $package_data->author ) ? $package_data->author : __( 'ThemeGrill', 'themegrill-demo-importer' ),
-					'version'         => isset( $package_data->version ) ? $package_data->version : $available_packages->version,
-					'description'     => isset( $package_data->description ) ? $package_data->description : '',
-					'homepage'        => $available_packages->homepage,
-					'preview_url'     => set_url_scheme( $package_data->preview ),
-					'screenshot_url'  => $screenshot_url,
-					'hasNotice'       => $demo_notices,
-					'plugins'         => $plugins_list,
-					'pluginActions'   => array(
-						'install'  => wp_list_filter( $plugins_list, array( 'is_install' => false ) ) ? true : false,
-						'activate' => wp_list_filter( $plugins_list, array( 'is_active' => false ) ) ? true : false,
-					)
+					'id'             => $package_id,
+					'name'           => $package_data->title,
+					'theme'          => $available_packages->name,
+					'active'         => $package_id === $demo_activated_id,
+					'is_pro'         => $is_pro,
+					'author'         => isset( $package_data->author ) ? $package_data->author : __( 'ThemeGrill', 'themegrill-demo-importer' ),
+					'version'        => isset( $package_data->version ) ? $package_data->version : $available_packages->version,
+					'description'    => isset( $package_data->description ) ? $package_data->description : '',
+					'homepage'       => $available_packages->homepage,
+					'preview_url'    => set_url_scheme( $package_data->preview ),
+					'screenshot_url' => $screenshot_url,
+					'hasNotice'      => $demo_notices,
+					'plugins'        => $plugins_list,
 				);
 			}
 		}
