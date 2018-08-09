@@ -771,7 +771,7 @@ demos.view.Preview = wp.Backbone.View.extend({
 
 	installPlugins: function( event ) {
 		var pluginsList   = $( '.plugins-list-table' ).find( '#the-list tr' ),
-			$target       = $( '.plugins-install' ),
+			$target       = $( event.target ),
 			success       = 0,
 			error         = 0,
 			errorMessages = [];
@@ -780,33 +780,51 @@ demos.view.Preview = wp.Backbone.View.extend({
 
 		if ( $target.hasClass( 'disabled' ) || $target.hasClass( 'updating-message' ) ) {
 			return;
-		} else {
-			if ( ! window.confirm( wp.demos.data.settings.confirmInstall ) ) {
-				return;
-			}
+		}
 
-			$( '.wp-full-overlay-sidebar-content' ).animate( { scrollTop: $( document ).height() } );
+		// Remove previous error messages, if any.
+		$( '.theme-info .update-message' ).remove();
 
-			// Remove previous error messages, if any.
-			$( '.plugins-details .update-message' ).remove();
-
-			$target
-				.addClass( 'updating-message' )
-				.text( wp.updates.l10n.installing );
-			wp.a11y.speak( wp.updates.l10n.installingMsg, 'polite' );
+		// Bail if there were no items selected.
+		if ( ! itemsSelected.length ) {
+			event.preventDefault();
+			$( '.theme-about' ).animate( { scrollTop: 0 } );
+			$( '.theme-info .plugins-info' ).after( wp.updates.adminNotice( {
+				id:        'no-items-selected',
+				className: 'update-message notice-error notice-alt',
+				message:   wp.updates.l10n.noItemsSelected
+			} ) );
 		}
 
 		wp.updates.maybeRequestFilesystemCredentials( event );
 
+		// Confirmation dialog for installing bulk plugins.
+		if ( ! window.confirm( wp.demos.data.settings.confirmInstall ) ) {
+			return;
+		}
+
+		// Un-check the bulk checkboxes.
+		$( document ).find( '.manage-column [type="checkbox"]' ).prop( 'checked', false );
+
 		$( document ).trigger( 'wp-plugin-bulk-install', pluginsList );
 
-		// Find all the plugins which are required.
+		// Find all the checkboxes which have been checked.
 		pluginsList.each( function( index, element ) {
-			var $itemRow = $( element );
+			var $checkbox = $( element ),
+				$itemRow  = $checkbox.parents( 'tr' );
 
-			// Only add inactive items to the update queue.
-			if ( ! $itemRow.hasClass( 'inactive' ) || $itemRow.find( 'notice-error' ).length ) {
+			// Only add install-able items to the update queue.
+			if ( ! $itemRow.hasClass( 'install' ) || $itemRow.find( 'notice-error' ).length ) {
+
+				// Un-check the box.
+				$checkbox.filter( ':not(:disabled)' ).prop( 'checked', false );
 				return;
+			} else {
+				$target
+					.addClass( 'updating-message' )
+					.text( wp.updates.l10n.installing );
+
+				wp.a11y.speak( wp.updates.l10n.installingMsg, 'polite' );
 			}
 
 			// Add it to the queue.
@@ -823,8 +841,6 @@ demos.view.Preview = wp.Backbone.View.extend({
 			var $itemRow = $( '[data-slug="' + response.slug + '"]' ),
 				$bulkActionNotice, itemName;
 
-				// console.log( response );
-
 			if ( 'wp-' + response.install + '-bulk-install-success' === event.type ) {
 				success++;
 			} else {
@@ -833,6 +849,8 @@ demos.view.Preview = wp.Backbone.View.extend({
 				error++;
 				errorMessages.push( itemName + ': ' + response.errorMessage );
 			}
+
+			$itemRow.find( 'input[name="checked[]"]:checked' ).filter( ':not(:disabled)' ).prop( 'checked', false );
 
 			wp.updates.adminNotice = wp.template( 'wp-bulk-installs-admin-notice' );
 
@@ -864,6 +882,8 @@ demos.view.Preview = wp.Backbone.View.extend({
 						.text( wp.updates.l10n.installFailedShort );
 
 					wp.a11y.speak( wp.updates.l10n.installedMsg, 'polite' );
+
+					$( '.theme-about' ).animate( { scrollTop: 0 } );
 				} else {
 					$target
 						.removeClass( 'updating-message' ).addClass( 'disabled' )
