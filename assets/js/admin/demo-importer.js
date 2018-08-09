@@ -611,7 +611,7 @@ demos.view.Preview = wp.Backbone.View.extend({
 		'click .next-theme': 'nextDemo',
 		'keyup': 'keyEvent',
 		'click .demo-import': 'importDemo',
-		'click .plugins-install': 'installPlugin'
+		'click .plugins-install': 'installPlugins'
 	},
 
 	// The HTML template for the demo preview
@@ -769,8 +769,8 @@ demos.view.Preview = wp.Backbone.View.extend({
 		} );
 	},
 
-	installPlugin: function( event ) {
-		var itemsSelected = $( document ).find( 'input[name="required[]"], input[name="checked[]"]:checked' ),
+	installPlugins: function( event ) {
+		var pluginsList   = $( '.plugins-list-table' ).find( '#the-list tr' ),
 			$target       = $( event.target ),
 			success       = 0,
 			error         = 0,
@@ -806,10 +806,10 @@ demos.view.Preview = wp.Backbone.View.extend({
 		// Un-check the bulk checkboxes.
 		$( document ).find( '.manage-column [type="checkbox"]' ).prop( 'checked', false );
 
-		$( document ).trigger( 'wp-plugin-bulk-install', itemsSelected );
+		$( document ).trigger( 'wp-plugin-bulk-install', pluginsList );
 
 		// Find all the checkboxes which have been checked.
-		itemsSelected.each( function( index, element ) {
+		pluginsList.each( function( index, element ) {
 			var $checkbox = $( element ),
 				$itemRow  = $checkbox.parents( 'tr' );
 
@@ -855,9 +855,9 @@ demos.view.Preview = wp.Backbone.View.extend({
 			wp.updates.adminNotice = wp.template( 'wp-bulk-installs-admin-notice' );
 
 			// Remove previous error messages, if any.
-			$( '.theme-info .bulk-action-notice' ).remove();
+			$( '.plugins-details .bulk-action-notice' ).remove();
 
-			$( '.theme-info .plugins-info' ).after( wp.updates.adminNotice( {
+			$( '.plugins-details .plugins-info' ).after( wp.updates.adminNotice( {
 				id:            'bulk-action-notice',
 				className:     'bulk-action-notice notice-alt',
 				successes:     success,

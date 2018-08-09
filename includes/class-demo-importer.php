@@ -211,7 +211,7 @@ class TG_Demo_Importer {
 					'confirmReset'   => __( 'It is strongly recommended that you backup your database before proceeding. Are you sure you wish to run the reset wizard now?', 'themegrill-demo-importer' ),
 					'confirmDelete'  => __( "Are you sure you want to delete this demo?\n\nClick 'Cancel' to go back, 'OK' to confirm the delete.", 'themegrill-demo-importer' ),
 					'confirmImport'  => __( 'Importing demo content will replicate the live demo and overwrites your current customizer, widgets and other settings. It might take few minutes to complete the demo import. Are you sure you want to import this demo?', 'themegrill-demo-importer' ),
-					'confirmInstall' => __( 'Are you sure you want to install the selected plugins and their data?', 'themegrill-demo-importer' ),
+					'confirmInstall' => __( 'Are you sure you want to install the required plugins and their data?', 'themegrill-demo-importer' ),
 					'ajaxUrl'        => admin_url( 'admin-ajax.php' ),
 					'adminUrl'       => parse_url( self_admin_url(), PHP_URL_PATH ),
 				),
@@ -468,7 +468,7 @@ class TG_Demo_Importer {
 			$prepared_demos[ $demo_activated_id ] = array();
 		}
 
-		if ( is_object( $available_packages ) && isset( $available_packages->demos ) ) {
+		if ( isset( $available_packages->demos ) ) {
 			foreach ( $available_packages->demos as $package_id => $package_data ) {
 				$plugins_list   = isset( $package_data->plugins_list ) ? $package_data->plugins_list : array();
 				$screenshot_url = "https://raw.githubusercontent.com/themegrill/themegrill-demo-pack/master/resources/{$available_packages->slug}/{$package_id}/screenshot.jpg";
@@ -510,23 +510,19 @@ class TG_Demo_Importer {
 
 				// Prepare all demos.
 				$prepared_demos[ $package_id ] = array(
-					'id'              => $package_id,
-					'name'            => $package_data->title,
-					'theme'           => $available_packages->name,
-					'active'          => $package_id === $demo_activated_id,
-					'is_pro'          => $is_pro,
-					'author'          => isset( $package_data->author ) ? $package_data->author : __( 'ThemeGrill', 'themegrill-demo-importer' ),
-					'version'         => isset( $package_data->version ) ? $package_data->version : $available_packages->version,
-					'description'     => isset( $package_data->description ) ? $package_data->description : '',
-					'homepage'        => $available_packages->homepage,
-					'preview_url'     => set_url_scheme( $package_data->preview ),
-					'screenshot_url'  => $screenshot_url,
-					'hasNotice'       => $demo_notices,
-					'plugins'         => $plugins_list,
-					'pluginActions'   => array(
-						'install'  => wp_list_filter( $plugins_list, array( 'is_install' => false ) ) ? true : false,
-						'activate' => wp_list_filter( $plugins_list, array( 'is_active' => false ) ) ? true : false,
-					)
+					'id'             => $package_id,
+					'name'           => $package_data->title,
+					'theme'          => $available_packages->name,
+					'active'         => $package_id === $demo_activated_id,
+					'is_pro'         => $is_pro,
+					'author'         => isset( $package_data->author ) ? $package_data->author : __( 'ThemeGrill', 'themegrill-demo-importer' ),
+					'version'        => isset( $package_data->version ) ? $package_data->version : $available_packages->version,
+					'description'    => isset( $package_data->description ) ? $package_data->description : '',
+					'homepage'       => $available_packages->homepage,
+					'preview_url'    => set_url_scheme( $package_data->preview ),
+					'screenshot_url' => $screenshot_url,
+					'hasNotice'      => $demo_notices,
+					'plugins'        => $plugins_list,
 				);
 			}
 		}

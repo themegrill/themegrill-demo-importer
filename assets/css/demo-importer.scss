@@ -85,6 +85,15 @@
 				bottom: 132px;
 
 				.install-theme-info {
+					.theme-version {
+						margin-top: 0;
+					}
+
+					.theme-screenshot {
+						width: 100%;
+						box-sizing: border-box;
+					}
+
 					.premium-demo-tag {
 						color: #fff;
 						font-size: 13px;
@@ -97,40 +106,25 @@
 						display: inline-block;
 					}
 
-					.theme-screenshot {
-						width: 100%;
-						box-sizing: border-box;
-					}
-
-					.theme-details {
-						padding-bottom: 25px;
-
-						.theme-version {
-							margin-top: 0;
-						}
-					}
-
 					table.plugins-list-table {
 						margin-bottom: 1em;
 
 						.plugin-status {
 							float: right;
 
-							span.inactive {
+							span {
 								width: 20px;
 								height: 20px;
+								overflow: hidden;
 								border-radius: 50%;
 								position: relative;
 								vertical-align: top;
+								white-space: nowrap;
+								text-indent: -9999px;
 								display: inline-block;
 								border: 2px solid #bfbfbf;
 
-								&.installing {
-									border-left-color: #5cb85c;
-									animation: spin .75s linear infinite;
-								}
-
-								&.activated {
+								&.active {
 									border-color: #5cb85c;
 
 									&::after {
@@ -138,14 +132,19 @@
 										left: 50%;
 										top: 50%;
 										opacity: 1;
-										content: "";
-										height: 50%;
 										width: 25%;
+										height: 50%;
+										content: '';
 										transform-origin: left top;
-										border-right: 2px solid #5cb85c;
 										border-top: 2px solid #5cb85c;
+										border-right: 2px solid #5cb85c;
 										transform: scaleX(-1) rotate(135deg) translate(-58%, -40%);
 									}
+								}
+
+								&.updating-message {
+									border-left-color: #5cb85c;
+									animation: spin .75s linear infinite;
 								}
 							}
 						}
