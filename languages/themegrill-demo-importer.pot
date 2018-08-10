@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: ThemeGrill Demo Importer 1.4.3\n"
 "Report-Msgid-Bugs-To: "
 "https://github.com/themegrill/themegrill-demo-importer/issues\n"
-"POT-Creation-Date: 2018-08-08 04:35:54+00:00\n"
+"POT-Creation-Date: 2018-08-10 10:02:13+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -36,7 +36,7 @@ msgid "Themes list"
 msgstr ""
 
 #: includes/admin/views/html-admin-page-importer.php:56
-#: includes/class-demo-importer.php:226
+#: includes/class-demo-importer.php:225
 msgid "No demos found. Try a different search."
 msgstr ""
 
@@ -63,14 +63,14 @@ msgstr ""
 
 #: includes/admin/views/html-admin-page-importer.php:98
 #: includes/admin/views/html-admin-page-importer.php:131
-#: includes/admin/views/html-admin-page-importer.php:222
+#: includes/admin/views/html-admin-page-importer.php:225
 msgid "Buy Now"
 msgstr ""
 
 #: includes/admin/views/html-admin-page-importer.php:102
 #: includes/admin/views/html-admin-page-importer.php:135
 #: includes/admin/views/html-admin-page-importer.php:166
-#: includes/admin/views/html-admin-page-importer.php:226
+#: includes/admin/views/html-admin-page-importer.php:229
 msgid "Required %s theme must be activated to import this demo."
 msgstr ""
 
@@ -82,7 +82,7 @@ msgid "Import"
 msgstr ""
 
 #: includes/admin/views/html-admin-page-importer.php:114
-#: includes/admin/views/html-admin-page-importer.php:255
+#: includes/admin/views/html-admin-page-importer.php:258
 msgid "Preview"
 msgstr ""
 
@@ -91,13 +91,13 @@ msgid "Close"
 msgstr ""
 
 #: includes/admin/views/html-admin-page-importer.php:137
-#: includes/admin/views/html-admin-page-importer.php:228
+#: includes/admin/views/html-admin-page-importer.php:231
 msgid "Install Plugins"
 msgstr ""
 
 #: includes/admin/views/html-admin-page-importer.php:140
-#: includes/admin/views/html-admin-page-importer.php:226
-#: includes/admin/views/html-admin-page-importer.php:231
+#: includes/admin/views/html-admin-page-importer.php:229
+#: includes/admin/views/html-admin-page-importer.php:234
 msgid "Import Demo"
 msgstr ""
 
@@ -110,32 +110,36 @@ msgstr ""
 msgid "Version: %s"
 msgstr ""
 
-#: includes/admin/views/html-admin-page-importer.php:184
+#: includes/admin/views/html-admin-page-importer.php:182
+msgid "Plugins Information"
+msgstr ""
+
+#: includes/admin/views/html-admin-page-importer.php:187
 msgid "Required Plugins"
 msgstr ""
 
-#: includes/admin/views/html-admin-page-importer.php:212
-msgid "No plugins are needed to import this demo."
+#: includes/admin/views/html-admin-page-importer.php:214
+msgid "No plugins are required for this demo."
 msgstr ""
 
-#: includes/admin/views/html-admin-page-importer.php:235
-#: includes/class-demo-importer.php:227
+#: includes/admin/views/html-admin-page-importer.php:238
+#: includes/class-demo-importer.php:226
 msgid "Collapse Sidebar"
 msgstr ""
 
-#: includes/admin/views/html-admin-page-importer.php:237
+#: includes/admin/views/html-admin-page-importer.php:240
 msgid "Collapse"
 msgstr ""
 
-#: includes/admin/views/html-admin-page-importer.php:242
+#: includes/admin/views/html-admin-page-importer.php:245
 msgid "Enter desktop preview mode"
 msgstr ""
 
-#: includes/admin/views/html-admin-page-importer.php:245
+#: includes/admin/views/html-admin-page-importer.php:248
 msgid "Enter tablet preview mode"
 msgstr ""
 
-#: includes/admin/views/html-admin-page-importer.php:248
+#: includes/admin/views/html-admin-page-importer.php:251
 msgid "Enter mobile preview mode"
 msgstr ""
 
@@ -207,23 +211,19 @@ msgid ""
 "to complete the demo import. Are you sure you want to import this demo?"
 msgstr ""
 
-#: includes/class-demo-importer.php:214
-msgid "Are you sure you want to install the selected plugins and their data?"
-msgstr ""
-
-#: includes/class-demo-importer.php:219
+#: includes/class-demo-importer.php:218
 msgid "Add New Demo"
 msgstr ""
 
-#: includes/class-demo-importer.php:220
+#: includes/class-demo-importer.php:219
 msgid "Search Demos"
 msgstr ""
 
-#: includes/class-demo-importer.php:221
+#: includes/class-demo-importer.php:220
 msgid "Search demos..."
 msgstr ""
 
-#: includes/class-demo-importer.php:223
+#: includes/class-demo-importer.php:222
 #. translators: %s: support forums URL
 msgid ""
 "An unexpected error occurred. Something may be wrong with ThemeGrill demo "
@@ -231,24 +231,24 @@ msgid ""
 "the <a href=\"%s\">support forums</a>."
 msgstr ""
 
-#: includes/class-demo-importer.php:224
+#: includes/class-demo-importer.php:223
 msgid "Try Again"
 msgstr ""
 
-#: includes/class-demo-importer.php:225
+#: includes/class-demo-importer.php:224
 msgid "Number of Demos found: %d"
 msgstr ""
 
-#: includes/class-demo-importer.php:228
+#: includes/class-demo-importer.php:227
 msgid "Expand Sidebar"
 msgstr ""
 
-#: includes/class-demo-importer.php:230
+#: includes/class-demo-importer.php:229
 #. translators: accessibility text
 msgid "Select one or more Demo features to filter by"
 msgstr ""
 
-#: includes/class-demo-importer.php:256
+#: includes/class-demo-importer.php:255
 #. translators: 1: ThemeGrill Demo Importer 2: five stars
 msgid "If you like %1$s please leave us a %2$s rating. A huge thanks in advance!"
 msgstr ""
@@ -257,45 +257,45 @@ msgstr ""
 msgid "ThemeGrill Demo Importer"
 msgstr ""
 
-#: includes/class-demo-importer.php:258
+#: includes/class-demo-importer.php:257
 msgid "Thanks :)"
 msgstr ""
 
-#: includes/class-demo-importer.php:261
+#: includes/class-demo-importer.php:260
 msgid "Thank you for importing with ThemeGrill Demo Importer."
 msgstr ""
 
-#: includes/class-demo-importer.php:280 includes/class-demo-importer.php:282
+#: includes/class-demo-importer.php:279 includes/class-demo-importer.php:281
 msgid "Help &amp; Support"
 msgstr ""
 
-#: includes/class-demo-importer.php:284
+#: includes/class-demo-importer.php:283
 msgid ""
 "Should you need help understanding, using, or extending ThemeGrill Demo "
 "Importer, <a href=\"%s\">please read our documentation</a>. You will find "
 "all kinds of resources including snippets, tutorials and much more."
 msgstr ""
 
-#: includes/class-demo-importer.php:288
+#: includes/class-demo-importer.php:287
 msgid ""
 "For further assistance with ThemeGrill Demo Importer core you can use the "
 "<a href=\"%1$s\">community forum</a>. If you need help with premium themes "
 "sold by ThemeGrill, please <a href=\"%2$s\">use our free support forum</a>."
 msgstr ""
 
-#: includes/class-demo-importer.php:292
+#: includes/class-demo-importer.php:291
 msgid "Community forum"
 msgstr ""
 
-#: includes/class-demo-importer.php:292
+#: includes/class-demo-importer.php:291
 msgid "ThemeGrill Support"
 msgstr ""
 
-#: includes/class-demo-importer.php:297 includes/class-demo-importer.php:299
+#: includes/class-demo-importer.php:296 includes/class-demo-importer.php:298
 msgid "Found a bug?"
 msgstr ""
 
-#: includes/class-demo-importer.php:300
+#: includes/class-demo-importer.php:299
 msgid ""
 "If you find a bug within ThemeGrill Demo Importer you can create a ticket "
 "via <a href=\"%1$s\">Github issues</a>. Ensure you read the <a "
@@ -303,50 +303,50 @@ msgid ""
 "help us solve your issue, please be as descriptive as possible."
 msgstr ""
 
-#: includes/class-demo-importer.php:301
+#: includes/class-demo-importer.php:300
 msgid "Report a bug"
 msgstr ""
 
-#: includes/class-demo-importer.php:307 includes/class-demo-importer.php:309
-#: includes/class-demo-importer.php:311
+#: includes/class-demo-importer.php:306 includes/class-demo-importer.php:308
+#: includes/class-demo-importer.php:310
 msgid "Reset wizard"
 msgstr ""
 
-#: includes/class-demo-importer.php:310
+#: includes/class-demo-importer.php:309
 msgid ""
 "If you need to reset the WordPress back to default again, please click on "
 "the button below."
 msgstr ""
 
-#: includes/class-demo-importer.php:315
+#: includes/class-demo-importer.php:314
 msgid "For more information:"
 msgstr ""
 
-#: includes/class-demo-importer.php:316
+#: includes/class-demo-importer.php:315
 msgid "About Demo Importer"
 msgstr ""
 
-#: includes/class-demo-importer.php:317
+#: includes/class-demo-importer.php:316
 msgid "WordPress.org project"
 msgstr ""
 
-#: includes/class-demo-importer.php:318
+#: includes/class-demo-importer.php:317
 msgid "Github project"
 msgstr ""
 
-#: includes/class-demo-importer.php:319
+#: includes/class-demo-importer.php:318
 msgid "Official themes"
 msgstr ""
 
-#: includes/class-demo-importer.php:320
+#: includes/class-demo-importer.php:319
 msgid "Official plugins"
 msgstr ""
 
-#: includes/class-demo-importer.php:350
+#: includes/class-demo-importer.php:349
 msgid "Action failed. Please refresh the page and retry."
 msgstr ""
 
-#: includes/class-demo-importer.php:354 themegrill-demo-importer.php:55
+#: includes/class-demo-importer.php:353 themegrill-demo-importer.php:55
 #: themegrill-demo-importer.php:63
 msgid "Cheatin&#8217; huh?"
 msgstr ""
@@ -355,24 +355,24 @@ msgstr ""
 msgid "ThemeGrill"
 msgstr ""
 
-#: includes/class-demo-importer.php:564
+#: includes/class-demo-importer.php:559
 #: includes/functions-demo-importer.php:105
 msgid "No demo specified."
 msgstr ""
 
-#: includes/class-demo-importer.php:580
+#: includes/class-demo-importer.php:575
 msgid "Sorry, you are not allowed to import."
 msgstr ""
 
-#: includes/class-demo-importer.php:658
+#: includes/class-demo-importer.php:653
 msgid "The XML file dummy content is missing."
 msgstr ""
 
-#: includes/class-demo-importer.php:723
+#: includes/class-demo-importer.php:718
 msgid "The DAT file customizer data is missing."
 msgstr ""
 
-#: includes/class-demo-importer.php:748
+#: includes/class-demo-importer.php:743
 msgid "The WIE file widget content is missing."
 msgstr ""
 
@@ -692,12 +692,12 @@ msgstr ""
 msgid "Free Support"
 msgstr ""
 
-#: themegrill-demo-importer.php:281
-msgid "This plugin requires %s by ThemeGrill to work."
+#: themegrill-demo-importer.php:283
+msgid "This plugin requires %s to be activated to work."
 msgstr ""
 
-#: themegrill-demo-importer.php:281
-msgid "Official Theme"
+#: themegrill-demo-importer.php:283
+msgid "Official ThemeGrill Theme"
 msgstr ""
 
 #. Plugin URI of the plugin/theme
