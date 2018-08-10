@@ -785,9 +785,6 @@ demos.view.Preview = wp.Backbone.View.extend({
 		if ( pluginsList.length ) {
 			$( '.wp-full-overlay-sidebar-content' ).animate( { scrollTop: $( document ).height() } );
 
-			// Remove previous error messages, if any.
-			$( '.plugins-details .update-message' ).remove();
-
 			$target
 				.addClass( 'updating-message' )
 				.text( wp.updates.l10n.installing );
