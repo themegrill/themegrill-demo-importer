@@ -775,16 +775,14 @@ demos.view.Preview = wp.Backbone.View.extend({
 			success       = 0,
 			error         = 0,
 			errorMessages = [];
-
 		event.preventDefault();
 
 		if ( $target.hasClass( 'disabled' ) || $target.hasClass( 'updating-message' ) ) {
 			return;
-		} else {
-			if ( ! window.confirm( wp.demos.data.settings.confirmInstall ) ) {
-				return;
-			}
+		}
 
+		// Bail if there were required plugins.
+		if ( pluginsList.length ) {
 			$( '.wp-full-overlay-sidebar-content' ).animate( { scrollTop: $( document ).height() } );
 
 			// Remove previous error messages, if any.
