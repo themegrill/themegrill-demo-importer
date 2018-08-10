@@ -22,6 +22,7 @@
 	 *
 	 * @since 4.6.0
 	 * @see https://core.trac.wordpress.org/ticket/41221
+	 * @see https://core.trac.wordpress.org/changeset/42700
 	 *
 	 * @param {object}  data
 	 * @param {*=}      data.selector      Optional. Selector of an element to be replaced with the admin notice.
@@ -49,7 +50,7 @@
 		if ( $notice.length ) {
 			$notice.replaceWith( $adminNotice );
 		} else if ( $headerEnd.length ) {
-			$( '.wp-header-end' ).after( $adminNotice );
+			$headerEnd.after( $adminNotice );
 		} else {
 			$( '.wrap' ).find( '> h1' ).after( $adminNotice );
 		}
@@ -69,6 +70,10 @@
 	 */
 	wp.updates.importDemo = function( args ) {
 		var $message = $( '.demo-import[data-slug="' + args.slug + '"]' );
+
+		if ( $document.find( 'body' ).hasClass( 'full-overlay-active' ) ) {
+			$message = $( '.wp-full-overlay-header, .wp-full-overlay-footer' ).find( '.demo-import' );
+		}
 
 		args = _.extend( {
 			success: wp.updates.importDemoSuccess,
@@ -153,6 +158,10 @@
 			} );
 
 		if ( ! wp.updates.isValidResponse( response, 'import' ) ) {
+			return;
+		}
+
+		if ( wp.updates.maybeHandleCredentialError( response, 'import-demo' ) ) {
 			return;
 		}
 
@@ -405,6 +414,7 @@
 
 	/**
 	 * Pulls available jobs from the queue and runs them.
+	 *
 	 * @see https://core.trac.wordpress.org/ticket/39364
 	 */
 	wp.updates.queueChecker = function() {

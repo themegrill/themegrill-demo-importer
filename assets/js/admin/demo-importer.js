@@ -577,7 +577,6 @@ demos.view.Demo = wp.Backbone.View.extend({
 			return;
 		}
 
-		// Confirmation dialog for importing a demo.
 		if ( ! window.confirm( wp.demos.data.settings.confirmImport ) ) {
 			return;
 		}
@@ -744,7 +743,6 @@ demos.view.Preview = wp.Backbone.View.extend({
 			return;
 		}
 
-		// Confirmation dialog for importing a demo.
 		if ( ! window.confirm( wp.demos.data.settings.confirmImport ) ) {
 			return;
 		}
@@ -754,13 +752,6 @@ demos.view.Preview = wp.Backbone.View.extend({
 		$( document ).on( 'wp-demo-import-success', function( event, response ) {
 			if ( _this.model.get( 'id' ) === response.slug ) {
 				_this.model.set( { 'imported': true } );
-			}
-		} );
-
-		// Handle a demo queue job.
-		$( document ).on( 'wp-updates-queue-job', function( event, job ) {
-			if ( 'import-demo' === job.action ) {
-				wp.updates.importDemo( job.data );
 			}
 		} );
 
@@ -775,6 +766,7 @@ demos.view.Preview = wp.Backbone.View.extend({
 			success       = 0,
 			error         = 0,
 			errorMessages = [];
+
 		event.preventDefault();
 
 		if ( $target.hasClass( 'disabled' ) || $target.hasClass( 'updating-message' ) ) {
