@@ -87,7 +87,7 @@
 		wp.a11y.speak( wp.updates.l10n.importingMsg, 'polite' );
 
 		// Remove previous error messages, if any.
-		$( '.theme-info .theme-description, [data-slug="' + args.slug + '"]' ).removeClass( 'demo-import-failed' ).find( '.notice.notice-error' ).remove();
+		$( '.install-theme-info, [data-slug="' + args.slug + '"]' ).removeClass( 'demo-import-failed' ).find( '.notice.notice-error' ).remove();
 
 		$document.trigger( 'wp-demo-importing', args );
 
@@ -103,12 +103,12 @@
 	 * @param {string} response.previewUrl URL to preview the just imported demo.
 	 */
 	wp.updates.importDemoSuccess = function( response ) {
-		var $card = $( '.theme-overlay, [data-slug=' + response.slug + ']' ),
+		var $card = $( '.wp-full-overlay-header, .wp-full-overlay-footer, [data-slug=' + response.slug + ']' ),
 			$message;
 
 		$document.trigger( 'wp-demo-import-success', response );
 
-		$message = $card.find( '.button-primary:not(.plugins-install)' )
+		$message = $card.find( '.button-primary' )
 			.removeClass( 'updating-message' )
 			.addClass( 'updated-message disabled' )
 			.attr( 'aria-label', wp.updates.l10n.demoImportedLabel.replace( '%s', response.demoName ) )
@@ -156,9 +156,9 @@
 			return;
 		}
 
-		if ( $document.find( 'body' ).hasClass( 'modal-open' ) || $document.find( '.themes' ).hasClass( 'single-theme' ) ) {
+		if ( $document.find( 'body' ).hasClass( 'full-overlay-active' ) ) {
 			$button = $( '.demo-import[data-slug="' + response.slug + '"]' );
-			$card   = $( '.theme-info .theme-description' ).prepend( $message );
+			$card   = $( '.install-theme-info' ).prepend( $message );
 		} else {
 			$card   = $( '[data-slug="' + response.slug + '"]' ).removeClass( 'focus' ).addClass( 'demo-import-failed' ).append( $message );
 			$button = $card.find( '.demo-import' );

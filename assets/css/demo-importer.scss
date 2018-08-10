@@ -171,11 +171,14 @@
 						width: 100%;
 						text-align: center;
 
-						&.installed::before,
-						&.installing::before,
-						&.updating-message::before {
-							margin-right: 6px;
-							vertical-align: text-bottom;
+						&.installed,
+						&.installing,
+						&.updated-message,
+						&.updating-message {
+							&::before {
+								margin-right: 6px;
+								vertical-align: text-bottom;
+							}
 						}
 					}
 				}
