@@ -211,7 +211,7 @@ defined( 'ABSPATH' ) || exit;
 								<# }); #>
 							<# } else { #>
 								<tr class="no-items">
-									<td class="colspanchange" colspan="4"><?php _e( 'No plugins are needed to import this demo.', 'themegrill-demo-importer' ); ?></td>
+									<td class="colspanchange" colspan="4"><?php esc_html_e( 'No plugins are required for this demo.', 'themegrill-demo-importer' ); ?></td>
 								</tr>
 							<# } #>
 						</tbody>
