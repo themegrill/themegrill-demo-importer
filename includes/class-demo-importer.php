@@ -477,13 +477,6 @@ class TG_Demo_Importer {
 					$screenshot_url = TGDM_DEMO_URL . $package_id . '/screenshot.jpg';
 				}
 
-				// Premium banner.
-				if ( $is_pro_theme_demo ) {
-					$is_pro = false;
-				} else {
-					$is_pro = isset( $package_data->isPro ) ? $package_data->isPro : false;
-				}
-
 				// Plugins status.
 				foreach ( $plugins_list as $plugin => $plugin_data ) {
 					$plugin_data->is_active = is_plugin_active( $plugin_data->slug );
@@ -503,9 +496,9 @@ class TG_Demo_Importer {
 				$prepared_demos[ $package_id ] = array(
 					'id'             => $package_id,
 					'name'           => $package_data->title,
-					'theme'          => $available_packages->name,
+					'theme'          => $is_pro_theme_demo ? sprintf( esc_html__( '%s Pro', 'themegrill-demo-importer' ), $available_packages->name ) : $available_packages->name,
+					'isPro'          => $is_pro_theme_demo ? false : isset( $package_data->isPro ),
 					'active'         => $package_id === $demo_activated_id,
-					'is_pro'         => $is_pro,
 					'author'         => isset( $package_data->author ) ? $package_data->author : __( 'ThemeGrill', 'themegrill-demo-importer' ),
 					'version'        => isset( $package_data->version ) ? $package_data->version : $available_packages->version,
 					'description'    => isset( $package_data->description ) ? $package_data->description : '',
@@ -513,10 +506,8 @@ class TG_Demo_Importer {
 					'preview_url'    => set_url_scheme( $package_data->preview ),
 					'screenshot_url' => $screenshot_url,
 					'plugins'        => $plugins_list,
-					'hasNotice'      => array(
-						'required_theme'   => isset( $package_data->template ) && ! in_array( $current_template, $package_data->template, true ),
-						'required_plugins' => wp_list_filter( json_decode( wp_json_encode( $plugins_list ), true ), array( 'is_active' => false ) ) ? true : false,
-					),
+					'hasSupport'     => isset( $package_data->template ) && ! in_array( $current_template, $package_data->template, true ),
+					'hasPlugins'     => wp_list_filter( json_decode( wp_json_encode( $plugins_list ), true ), array( 'is_active' => false ) ) ? true : false,
 				);
 			}
 		}
