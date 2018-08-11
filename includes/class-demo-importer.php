@@ -494,20 +494,20 @@ class TG_Demo_Importer {
 
 				// Prepare all demos.
 				$prepared_demos[ $package_id ] = array(
-					'id'             => $package_id,
-					'name'           => $package_data->title,
-					'theme'          => $is_pro_theme_demo ? sprintf( esc_html__( '%s Pro', 'themegrill-demo-importer' ), $available_packages->name ) : $available_packages->name,
-					'isPro'          => $is_pro_theme_demo ? false : isset( $package_data->isPro ),
-					'active'         => $package_id === $demo_activated_id,
-					'author'         => isset( $package_data->author ) ? $package_data->author : __( 'ThemeGrill', 'themegrill-demo-importer' ),
-					'version'        => isset( $package_data->version ) ? $package_data->version : $available_packages->version,
-					'description'    => isset( $package_data->description ) ? $package_data->description : '',
-					'homepage'       => $available_packages->homepage,
-					'preview_url'    => set_url_scheme( $package_data->preview ),
-					'screenshot_url' => $screenshot_url,
-					'plugins'        => $plugins_list,
-					'hasSupport'     => isset( $package_data->template ) && ! in_array( $current_template, $package_data->template, true ),
-					'hasPlugins'     => wp_list_filter( json_decode( wp_json_encode( $plugins_list ), true ), array( 'is_active' => false ) ) ? true : false,
+					'id'              => $package_id,
+					'name'            => $package_data->title,
+					'theme'           => $is_pro_theme_demo ? sprintf( esc_html__( '%s Pro', 'themegrill-demo-importer' ), $available_packages->name ) : $available_packages->name,
+					'isPro'           => $is_pro_theme_demo ? false : isset( $package_data->isPro ),
+					'active'          => $package_id === $demo_activated_id,
+					'author'          => isset( $package_data->author ) ? $package_data->author : __( 'ThemeGrill', 'themegrill-demo-importer' ),
+					'version'         => isset( $package_data->version ) ? $package_data->version : $available_packages->version,
+					'description'     => isset( $package_data->description ) ? $package_data->description : '',
+					'homepage'        => $available_packages->homepage,
+					'preview_url'     => set_url_scheme( $package_data->preview ),
+					'screenshot_url'  => $screenshot_url,
+					'plugins'         => $plugins_list,
+					'requiredTheme'   => isset( $package_data->template ) && ! in_array( $current_template, $package_data->template, true ),
+					'requiredPlugins' => wp_list_filter( json_decode( wp_json_encode( $plugins_list ), true ), array( 'is_active' => false ) ) ? true : false,
 				);
 			}
 		}
