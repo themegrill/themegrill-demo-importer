@@ -499,14 +499,6 @@ class TG_Demo_Importer {
 					}
 				}
 
-				// Add demo notices.
-				$demo_notices = array();
-				if ( isset( $package_data->template ) && ! in_array( $current_template, $package_data->template, true ) ) {
-					$demo_notices['required_theme'] = true;
-				} elseif ( wp_list_filter( json_decode( wp_json_encode( $plugins_list ), true ), array( 'is_active' => false ) ) ) {
-					$demo_notices['required_plugins'] = true;
-				}
-
 				// Prepare all demos.
 				$prepared_demos[ $package_id ] = array(
 					'id'             => $package_id,
@@ -520,8 +512,11 @@ class TG_Demo_Importer {
 					'homepage'       => $available_packages->homepage,
 					'preview_url'    => set_url_scheme( $package_data->preview ),
 					'screenshot_url' => $screenshot_url,
-					'hasNotice'      => $demo_notices,
 					'plugins'        => $plugins_list,
+					'hasNotice'      => array(
+						'required_theme'   => isset( $package_data->template ) && ! in_array( $current_template, $package_data->template, true ),
+						'required_plugins' => wp_list_filter( json_decode( wp_json_encode( $plugins_list ), true ), array( 'is_active' => false ) ) ? true : false,
+					),
 				);
 			}
 		}
