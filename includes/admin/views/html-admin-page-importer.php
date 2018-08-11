@@ -97,7 +97,7 @@ defined( 'ABSPATH' ) || exit;
 				<# if ( data.isPro ) { #>
 					<a class="button button-primary purchase-now" href="{{ data.homepage }}" target="_blank"><?php _e( 'Buy Now', 'themegrill-demo-importer' ); ?></a>
 				<# } else if ( data.requiredTheme ) { #>
-					<a class="button button-primary hide-if-no-js tips demo-import disabled" href="#" data-name="{{ data.name }}" data-slug="{{ data.id }}" data-tip="<?php echo sprintf( __( '%s theme must be active to import this demo.', 'themegrill-demo-importer' ), '{{{ data.theme }}}' ); ?>"><?php _e( 'Import', 'themegrill-demo-importer' ); ?></a>
+					<a class="button button-primary hide-if-no-js tips demo-import disabled" href="#" data-name="{{ data.name }}" data-slug="{{ data.id }}" data-tip="<?php echo sprintf( __( '%s theme must be activated to import this demo.', 'themegrill-demo-importer' ), '{{{ data.theme }}}' ); ?>"><?php _e( 'Import', 'themegrill-demo-importer' ); ?></a>
 				<# } else if ( data.requiredPlugins ) { #>
 					<a class="button button-primary hide-if-no-js tips demo-import disabled" href="#" data-name="{{ data.name }}" data-slug="{{ data.id }}" data-tip="<?php echo esc_attr__( 'Required Plugins must be activated to import this demo.', 'themegrill-demo-importer' ); ?>"><?php _e( 'Import', 'themegrill-demo-importer' ); ?></a>
 				<# } else { #>
@@ -154,9 +154,9 @@ defined( 'ABSPATH' ) || exit;
 				<div class="theme-details">
 					<# if ( ! data.isPro ) { #>
 						<# if ( data.requiredTheme ) { #>
-							<div class="demo-message notice notice-warning notice-alt"><p><?php printf( esc_html__( '%s theme is required.', 'themegrill-demo-importer' ), '<strong>{{{ data.theme }}}</strong>' ); ?></p></div>
+							<div class="demo-message notice notice-error notice-alt"><p><?php printf( esc_html__( '%s theme is not active.', 'themegrill-demo-importer' ), '<strong>{{{ data.theme }}}</strong>' ); ?></p></div>
 						<# } else if ( data.requiredPlugins ) { #>
-							<div class="demo-message notice notice-warning notice-alt"><p><?php esc_html_e( 'Required Plugins must be activated.', 'themegrill-demo-importer' ); ?></p></div>
+							<div class="demo-message notice notice-info notice-alt"><p><?php esc_html_e( 'Required Plugins must be activated.', 'themegrill-demo-importer' ); ?></p></div>
 						<# } #>
 					<# } #>
 					<div class="theme-version">
