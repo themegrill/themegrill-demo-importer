@@ -98,9 +98,9 @@ defined( 'ABSPATH' ) || exit;
 					<a class="button button-primary purchase-now" href="{{ data.homepage }}" target="_blank"><?php _e( 'Buy Now', 'themegrill-demo-importer' ); ?></a>
 				<# } else { #>
 					<# if ( ! _.isEmpty( data.hasNotice ) ) { #>
-						<# if ( data.hasNotice['required_theme'] ) { #>
+						<# if ( data.hasNotice.required_theme ) { #>
 							<a class="button button-primary hide-if-no-js tips demo-import disabled" href="#" data-name="{{ data.name }}" data-slug="{{ data.id }}" data-tip="<?php echo esc_attr( sprintf( __( 'Required %s theme must be activated to import this demo.', 'themegrill-demo-importer' ), '{{{ data.theme }}}' ) ); ?>"><?php _e( 'Import', 'themegrill-demo-importer' ); ?></a>
-						<# } else if ( data.hasNotice['required_plugins'] ) { #>
+						<# } else if ( data.hasNotice.required_plugins ) { #>
 							<a class="button button-primary hide-if-no-js tips demo-import disabled" href="#" data-name="{{ data.name }}" data-slug="{{ data.id }}" data-tip="<?php echo esc_attr( 'Required Plugins must be activated to import this demo.', 'themegrill-demo-importer' ); ?>"><?php _e( 'Import', 'themegrill-demo-importer' ); ?></a>
 						<# } #>
 					<# } else { #>
@@ -131,9 +131,9 @@ defined( 'ABSPATH' ) || exit;
 				<a class="button button-primary purchase-now" href="{{ data.homepage }}" target="_blank"><?php _e( 'Buy Now', 'themegrill-demo-importer' ); ?></a>
 			<# } else { #>
 				<# if ( ! _.isEmpty( data.hasNotice ) ) { #>
-					<# if ( data.hasNotice['required_theme'] ) { #>
+					<# if ( data.hasNotice.required_theme ) { #>
 						<a class="button button-primary hide-if-no-js tips demo-import disabled" href="#" data-name="{{ data.name }}" data-slug="{{ data.id }}" data-tip="<?php echo esc_attr( sprintf( __( 'Required %s theme must be activated to import this demo.', 'themegrill-demo-importer' ), '{{{ data.theme }}}' ) ); ?>"><?php _e( 'Import Demo', 'themegrill-demo-importer' ); ?></a>
-					<# } else if ( data.hasNotice['required_plugins'] ) { #>
+					<# } else if ( data.hasNotice.required_plugins ) { #>
 						<a class="button button-secondary hide-if-no-js plugins-install" href="#"><?php _e( 'Install Plugins', 'themegrill-demo-importer' ); ?></a>
 					<# } #>
 				<# } else { #>
@@ -162,9 +162,9 @@ defined( 'ABSPATH' ) || exit;
 				<div class="theme-details">
 					<# if ( ! data.is_pro && ! _.isEmpty( data.hasNotice ) ) { #>
 						<div class="notice demo-message notice-warning notice-alt">
-							<# if ( data.hasNotice['required_theme'] ) { #>
+							<# if ( data.hasNotice.required_theme ) { #>
 								<p class="demo-notice"><?php printf( esc_html__( 'Required %s theme must be activated to import this demo.', 'themegrill-demo-importer' ), '<strong>{{{ data.theme }}}</strong>' ); ?></p>
-							<# } else if ( data.hasNotice['required_plugins'] ) { #>
+							<# } else if ( data.hasNotice.required_plugins ) { #>
 								<p class="demo-notice"><?php _e( 'Required Plugins must be activated.', 'themegrill-demo-importer' ); ?></p>
 							<# } #>
 						</div>
@@ -225,9 +225,9 @@ defined( 'ABSPATH' ) || exit;
 					<a class="button button-hero button-primary purchase-now" href="{{ data.homepage }}" target="_blank"><?php _e( 'Buy Now', 'themegrill-demo-importer' ); ?></a>
 				<# } else { #>
 					<# if ( ! _.isEmpty( data.hasNotice ) ) { #>
-						<# if ( data.hasNotice['required_theme'] ) { #>
+						<# if ( data.hasNotice.required_theme ) { #>
 							<a class="button button-hero button-primary hide-if-no-js tips demo-import disabled" href="#" data-name="{{ data.name }}" data-slug="{{ data.id }}" data-tip="<?php echo esc_attr( sprintf( __( 'Required %s theme must be activated to import this demo.', 'themegrill-demo-importer' ), '{{{ data.theme }}}' ) ); ?>"><?php _e( 'Import Demo', 'themegrill-demo-importer' ); ?></a>
-						<# } else if ( data.hasNotice['required_plugins'] ) { #>
+						<# } else if ( data.hasNotice.required_plugins ) { #>
 							<a class="button button-hero button-secondary hide-if-no-js plugins-install" href="#"><?php _e( 'Install Plugins', 'themegrill-demo-importer' ); ?></a>
 						<# } #>
 					<# } else { #>
