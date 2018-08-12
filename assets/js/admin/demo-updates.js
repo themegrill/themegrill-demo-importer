@@ -292,7 +292,7 @@
 
 		$document.trigger( 'wp-plugin-bulk-installing', args );
 
-		return wp.updates.ajax( 'install-plugin', args );
+		return wp.updates.ajax( 'install-activate-plugin', args );
 	};
 
 	/**

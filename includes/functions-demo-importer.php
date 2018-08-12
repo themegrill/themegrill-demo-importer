@@ -57,38 +57,121 @@ function tg_get_attachment_id( $filename ) {
 }
 
 /**
- * Bulk plugin activation action.
+ * Ajax handler for installing a plugin.
+ *
+ * @since 1.5.0
+ *
+ * @see Plugin_Upgrader
+ *
+ * @global WP_Filesystem_Base $wp_filesystem Subclass
  */
-function tg_activate_bulk_plugin() {
-	if ( ! empty( $_REQUEST['bulk_action'] ) ) {
-		if ( ! current_user_can( 'activate_plugins' ) ) {
-			wp_die( __( 'Sorry, you are not allowed to activate plugins for this site.', 'themegrill-demo-importer' ) );
-		}
+function tg_ajax_install_plugin() {
+	check_ajax_referer( 'updates' );
 
-		check_admin_referer( 'bulk-plugins-activate' );
-
-		$plugins = isset( $_POST['checked'] ) ? (array) $_POST['checked'] : array();
-
-		if ( is_network_admin() ) {
-			foreach ( $plugins as $i => $plugin ) {
-				// Only activate plugins which are not already network activated.
-				if ( is_plugin_active_for_network( $plugin ) ) {
-					unset( $plugins[ $i ] );
-				}
-			}
-		} else {
-			foreach ( $plugins as $i => $plugin ) {
-				// Only activate plugins which are not already active and are not network-only when on Multisite.
-				if ( is_plugin_active( $plugin ) || ( is_multisite() && is_network_only_plugin( $plugin ) ) ) {
-					unset( $plugins[ $i ] );
-				}
-			}
-		}
-
-		activate_plugins( $plugins, '', is_network_admin() );
+	if ( empty( $_POST['plugin'] ) || empty( $_POST['slug'] ) ) {
+		wp_send_json_error( array(
+			'slug'         => '',
+			'errorCode'    => 'no_plugin_specified',
+			'errorMessage' => __( 'No plugin specified.' ),
+		) );
 	}
+
+	$slug   = sanitize_key( wp_unslash( $_POST['slug'] ) );
+	$plugin = plugin_basename( sanitize_text_field( wp_unslash( $_POST['plugin'] ) ) );
+	$status = array(
+		'install' => 'plugin',
+		'slug'    => sanitize_key( wp_unslash( $_POST['slug'] ) ),
+	);
+
+	if ( ! current_user_can( 'install_plugins' ) ) {
+		$status['errorMessage'] = __( 'Sorry, you are not allowed to install plugins on this site.' );
+		wp_send_json_error( $status );
+	}
+
+	include_once( ABSPATH . 'wp-admin/includes/class-wp-upgrader.php' );
+	include_once( ABSPATH . 'wp-admin/includes/plugin-install.php' );
+
+	// Looks like a plugin is installed, but not active.
+	if ( file_exists( WP_PLUGIN_DIR . '/' . $slug ) ) {
+		$plugin_data          = get_plugin_data( WP_PLUGIN_DIR . '/' . $plugin );
+		$status['plugin']     = $plugin;
+		$status['pluginName'] = $plugin_data['Name'];
+
+		if ( current_user_can( 'activate_plugin', $plugin ) && is_plugin_inactive( $plugin ) ) {
+			$result = activate_plugin( $plugin );
+
+			if ( is_wp_error( $result ) ) {
+				$status['errorCode']    = $result->get_error_code();
+				$status['errorMessage'] = $result->get_error_message();
+				wp_send_json_error( $status );
+			}
+
+			wp_send_json_success( $status );
+		}
+	}
+
+	$api = plugins_api( 'plugin_information', array(
+		'slug'   => sanitize_key( wp_unslash( $_POST['slug'] ) ),
+		'fields' => array(
+			'sections' => false,
+		),
+	) );
+
+	if ( is_wp_error( $api ) ) {
+		$status['errorMessage'] = $api->get_error_message();
+		wp_send_json_error( $status );
+	}
+
+	$status['pluginName'] = $api->name;
+
+	$skin     = new WP_Ajax_Upgrader_Skin();
+	$upgrader = new Plugin_Upgrader( $skin );
+	$result   = $upgrader->install( $api->download_link );
+
+	if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+		$status['debug'] = $skin->get_upgrade_messages();
+	}
+
+	if ( is_wp_error( $result ) ) {
+		$status['errorCode']    = $result->get_error_code();
+		$status['errorMessage'] = $result->get_error_message();
+		wp_send_json_error( $status );
+	} elseif ( is_wp_error( $skin->result ) ) {
+		$status['errorCode']    = $skin->result->get_error_code();
+		$status['errorMessage'] = $skin->result->get_error_message();
+		wp_send_json_error( $status );
+	} elseif ( $skin->get_errors()->get_error_code() ) {
+		$status['errorMessage'] = $skin->get_error_messages();
+		wp_send_json_error( $status );
+	} elseif ( is_null( $result ) ) {
+		global $wp_filesystem;
+
+		$status['errorCode']    = 'unable_to_connect_to_filesystem';
+		$status['errorMessage'] = __( 'Unable to connect to the filesystem. Please confirm your credentials.' );
+
+		// Pass through the error from WP_Filesystem if one was raised.
+		if ( $wp_filesystem instanceof WP_Filesystem_Base && is_wp_error( $wp_filesystem->errors ) && $wp_filesystem->errors->get_error_code() ) {
+			$status['errorMessage'] = esc_html( $wp_filesystem->errors->get_error_message() );
+		}
+
+		wp_send_json_error( $status );
+	}
+
+	$install_status = install_plugin_install_status( $api );
+
+	if ( current_user_can( 'activate_plugin', $install_status['file'] ) && is_plugin_inactive( $install_status['file'] ) ) {
+		$result = activate_plugin( $install_status['file'] );
+
+		if ( is_wp_error( $result ) ) {
+			$status['errorCode']    = $result->get_error_code();
+			$status['errorMessage'] = $result->get_error_message();
+			wp_send_json_error( $status );
+		}
+	}
+
+	wp_send_json_success( $status );
 }
-add_action( 'admin_init', 'tg_activate_bulk_plugin' );
+add_action( 'wp_ajax_install-activate-plugin', 'tg_ajax_install_plugin', 1 );
 
 /**
  * Ajax handler for deleting a demo pack.

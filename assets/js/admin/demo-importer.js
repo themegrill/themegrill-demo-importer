@@ -805,6 +805,7 @@ demos.view.Preview = wp.Backbone.View.extend({
 			wp.updates.queue.push( {
 				action: 'install-plugin',
 				data:   {
+					plugin: $itemRow.data( 'plugin' ),
 					slug: $itemRow.data( 'slug' )
 				}
 			} );
