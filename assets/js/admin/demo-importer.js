@@ -777,6 +777,10 @@ demos.view.Preview = wp.Backbone.View.extend({
 		if ( pluginsList.length ) {
 			$( '.wp-full-overlay-sidebar-content' ).animate( { scrollTop: $( document ).height() } );
 
+			if ( $target.html() !== wp.updates.l10n.installing ) {
+				$target.data( 'originaltext', $target.html() );
+			}
+
 			$target
 				.addClass( 'updating-message' )
 				.text( wp.updates.l10n.installing );
