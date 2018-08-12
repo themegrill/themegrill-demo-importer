@@ -761,7 +761,8 @@ demos.view.Preview = wp.Backbone.View.extend({
 	},
 
 	installPlugins: function( event ) {
-		var pluginsList   = $( '.plugins-list-table' ).find( '#the-list tr' ),
+		var _this         = this,
+			pluginsList   = $( '.plugins-list-table' ).find( '#the-list tr' ),
 			$target       = $( '.plugins-install' ),
 			success       = 0,
 			error         = 0,
@@ -817,7 +818,7 @@ demos.view.Preview = wp.Backbone.View.extend({
 			if ( 'wp-' + response.install + '-bulk-install-success' === event.type ) {
 				success++;
 			} else {
-				itemName = response.pluginName ? response.pluginName : $itemRow.find( '.plugin-name' ).text();
+				itemName = $itemRow.find( '.plugin-name' ).text();
 
 				error++;
 				errorMessages.push( itemName + ': ' + response.errorMessage );
@@ -849,18 +850,11 @@ demos.view.Preview = wp.Backbone.View.extend({
 			if ( ! wp.updates.queue.length ) {
 				if ( error > 0 ) {
 					$target
-						.removeClass( 'updating-message' ).addClass( 'disabled' )
-						.text( wp.updates.l10n.installFailedShort );
-
-					wp.a11y.speak( wp.updates.l10n.installedMsg, 'polite' );
+						.removeClass( 'updating-message' )
+						.text( $target.data( 'originaltext' ) );
 				} else {
-					$target
-						.removeClass( 'updating-message' ).addClass( 'disabled' )
-						.text( wp.updates.l10n.pluginInstalled );
-
-					wp.a11y.speak( wp.updates.l10n.installedMsg, 'polite' );
-
-					$( '.plugins-activate' ).removeAttr( 'disabled' );
+					_this.model.set( { requiredPlugins: false } );
+					_this.render();
 				}
 			}
 		} );

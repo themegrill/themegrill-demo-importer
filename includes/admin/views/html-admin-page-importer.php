@@ -188,9 +188,9 @@ defined( 'ABSPATH' ) || exit;
 											<# if ( plugin.is_active && plugin.is_install ) { #>
 												<span class="active"></span>
 											<# } else if ( plugin.is_install ) { #>
-												<span class="activate-now"></span>
+												<span class="activate-now<# if ( ! data.requiredPlugins ) { #> active<# } #>"></span>
 											<# } else { #>
-												<span class="install-now"></span>
+												<span class="install-now<# if ( ! data.requiredPlugins ) { #> active<# } #>"></span>
 											<# } #>
 										</td>
 									</tr>
