@@ -29,19 +29,19 @@ defined( 'ABSPATH' ) || exit;
 				<span class="count theme-count demo-count"></span>
 			</div>
 
-			<?php if ( ! empty( $this->demo_packages->category ) ) : ?>
-				<ul class="filter-links category">
-					<?php foreach ( $this->demo_packages->category as $slug => $label ) : ?>
-						<li><a href="#" data-sort="<?php echo esc_attr( $slug ); ?>" class="category-tab"><?php echo esc_html( $label ); ?></a></li>
+			<?php if ( ! empty( $this->demo_packages->builders ) ) : ?>
+				<ul class="filter-links builders">
+					<?php foreach ( $this->demo_packages->builders as $slug => $label ) : ?>
+						<li><a href="#" data-sort="<?php echo esc_attr( $slug ); ?>" class="builder-tab"><?php echo esc_html( $label ); ?></a></li>
 					<?php endforeach; ?>
 				</ul>
 			<?php endif; ?>
 		</div>
 		<div class="filter-section right">
-			<?php if ( ! empty( $this->demo_packages->pagebuilder ) ) : ?>
-				<ul class="filter-links pagebuilder">
-					<?php foreach ( $this->demo_packages->pagebuilder as $slug => $label ) : ?>
-						<li><a href="#" data-sort="<?php echo esc_attr( $slug ); ?>" class="pagebuilder-tab"><?php echo esc_html( $label ); ?></a></li>
+			<?php if ( ! empty( $this->demo_packages->categories ) ) : ?>
+				<ul class="filter-links categories">
+					<?php foreach ( $this->demo_packages->categories as $slug => $label ) : ?>
+						<li><a href="#" data-sort="<?php echo esc_attr( $slug ); ?>" class="category-tab"><?php echo esc_html( $label ); ?></a></li>
 					<?php endforeach; ?>
 				</ul>
 			<?php endif; ?>
