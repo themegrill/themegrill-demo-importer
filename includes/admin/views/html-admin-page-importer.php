@@ -182,11 +182,7 @@ defined( 'ABSPATH' ) || exit;
 								<# _.each( data.plugins, function( plugin, slug ) { #>
 									<tr class="plugin<# if ( ! plugin.is_active ) { #> inactive<# } #>" data-slug="{{ slug }}" data-plugin="{{ plugin.slug }}" data-name="{{ plugin.name }}">
 										<td class="plugin-name">
-											<# if ( plugin.link ) { #>
-												<a href="{{{ plugin.link }}}" target="_blank">{{{ plugin.name }}}</a>
-											<# } else { #>
-												<a href="<?php printf( esc_url( 'https://wordpress.org/plugins/%s' ), '{{ slug }}' ); ?>" target="_blank">{{ plugin.name }}</a>
-											<# } #>
+											<a href="<?php printf( esc_url( 'https://wordpress.org/plugins/%s' ), '{{ slug }}' ); ?>" target="_blank">{{ plugin.name }}</a>
 										</td>
 										<td class="plugin-status">
 											<# if ( plugin.is_active && plugin.is_install ) { #>
