@@ -818,7 +818,7 @@ demos.view.Preview = wp.Backbone.View.extend({
 			if ( 'wp-' + response.install + '-bulk-install-success' === event.type ) {
 				success++;
 			} else {
-				itemName = $itemRow.find( '.plugin-name' ).text();
+				itemName = response.pluginName ? response.pluginName : $itemRow.find( '.plugin-name' ).text();
 
 				error++;
 				errorMessages.push( itemName + ': ' + response.errorMessage );
