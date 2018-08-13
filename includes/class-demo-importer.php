@@ -89,6 +89,48 @@ class TG_Demo_Importer {
 	}
 
 	/**
+	 * Download demo packages.
+	 */
+	private function download_package( $package, $delete_package = true ) {
+		global $wp_filesystem;
+
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+
+		$current_template = get_option( 'template' );
+		$tmp_package_path = download_url( "https://github.com/themegrill/themegrill-demo-pack/raw/master/packages/{$current_template}/{$package}.zip" );
+
+		if ( ! is_wp_error( $tmp_package_path ) ) {
+			// We need a working directory - Strip off any .tmp or .zip suffixes
+			$working_dir = trailingslashit( TGDM_DEMO_DIR ) . basename( basename( $package, '.tmp' ), '.zip' );
+
+			// Clean up working directory
+			if ( $wp_filesystem->is_dir( $working_dir ) ) {
+				$wp_filesystem->delete( $working_dir, true );
+			}
+
+			// Unzip package to working directory.
+			$result = unzip_file( $package, $working_dir );
+
+			// Once extracted, delete the package if required.
+			if ( $delete_package ) {
+				unlink( $package );
+			}
+
+			if ( is_wp_error( $result ) ) {
+				$wp_filesystem->delete( $working_dir, true );
+				if ( 'incompatible_archive' == $result->get_error_code() ) {
+					return new WP_Error( 'incompatible_archive', __( 'The package could not be installed.' ), $result->get_error_data() );
+				}
+				return $result;
+			}
+
+			return $working_dir;
+		} else {
+			return new $tmp_package_path->get_error_message();
+		}
+	}
+
+	/**
 	 * Get demo packages.
 	 *
 	 * @return array of objects
@@ -619,7 +661,7 @@ class TG_Demo_Importer {
 		}
 
 		// Include WXR Importer.
-		require( dirname( __FILE__ ) . '/importers/wordpress-importer/class-wxr-importer.php' );
+		require dirname( __FILE__ ) . '/importers/wordpress-importer/class-wxr-importer.php';
 
 		do_action( 'themegrill_ajax_before_dummy_xml_import', $demo_data, $demo_id );
 
