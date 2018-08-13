@@ -49,59 +49,7 @@ function tg_ajax_import_demo() {
 add_action( 'wp_ajax_import-demo', 'tg_ajax_install_plugin', 1 );
 
 /**
- * Ajax handler for importing a demo.
- */
-function ajax_import_demo() {
-	check_ajax_referer( 'updates' );
-
-	if ( empty( $_POST['slug'] ) ) {
-		wp_send_json_error( array(
-			'slug'         => '',
-			'errorCode'    => 'no_demo_specified',
-			'errorMessage' => __( 'No demo specified.', 'themegrill-demo-importer' ),
-		) );
-	}
-
-	$slug = sanitize_key( wp_unslash( $_POST['slug'] ) );
-
-	$status = array(
-		'import' => 'demo',
-		'slug'   => $slug,
-	);
-
-	if ( ! defined( 'WP_LOAD_IMPORTERS' ) ) {
-		define( 'WP_LOAD_IMPORTERS', true );
-	}
-
-	if ( ! current_user_can( 'manage_options' ) ) {
-		$status['errorMessage'] = __( 'Sorry, you are not allowed to import.', 'themegrill-demo-importer' );
-		wp_send_json_error( $status );
-	}
-
-	$demo_data = isset( $this->demo_config[ $slug ] ) ? $this->demo_config[ $slug ] : array();
-
-	do_action( 'themegrill_ajax_before_demo_import' );
-
-	if ( ! empty( $demo_data ) ) {
-		$this->import_dummy_xml( $slug, $demo_data, $status );
-		$this->import_core_options( $slug, $demo_data );
-		$this->import_customizer_data( $slug, $demo_data, $status );
-		$this->import_widget_settings( $slug, $demo_data, $status );
-
-		// Update imported demo ID.
-		update_option( 'themegrill_demo_importer_activated_id', $slug );
-
-		do_action( 'themegrill_ajax_demo_imported', $slug, $demo_data );
-	}
-
-	$status['demoName']   = $demo_data['name'];
-	$status['previewUrl'] = get_home_url( '/' );
-
-	wp_send_json_success( $status );
-}
-
-/**
- * Ajax handler for installing a plugin.
+ * Ajax handler for installing a required plugin.
  *
  * @since 1.5.0
  *
@@ -109,7 +57,7 @@ function ajax_import_demo() {
  *
  * @global WP_Filesystem_Base $wp_filesystem Subclass
  */
-function tg_ajax_install_plugin() {
+function tg_ajax_install_required_plugin() {
 	check_ajax_referer( 'updates' );
 
 	if ( empty( $_POST['plugin'] ) || empty( $_POST['slug'] ) ) {
@@ -215,7 +163,7 @@ function tg_ajax_install_plugin() {
 
 	wp_send_json_success( $status );
 }
-add_action( 'wp_ajax_install-activate-plugin', 'tg_ajax_install_plugin', 1 );
+add_action( 'wp_ajax_install-required-plugin', 'tg_ajax_install_required_plugin', 1 );
 
 /**
  * Ajax handler for deleting a demo pack.
