@@ -38,6 +38,7 @@ class TG_Demo_Upgrader extends WP_Upgrader {
 	 */
 	public function install_strings() {
 		$this->strings['no_package'] = __( 'Install package not available.', 'themegrill-demo-importer' );
+		/* translators: %s: package URL */
 		$this->strings['downloading_package'] = __( 'Downloading install package from <span class="code">%s</span>&#8230;', 'themegrill-demo-importer' );
 		$this->strings['unpack_package'] = __( 'Unpacking the package&#8230;', 'themegrill-demo-importer' );
 		$this->strings['remove_old'] = __( 'Removing the old version of the demo&#8230;', 'themegrill-demo-importer' );

@@ -50,7 +50,7 @@ function tg_ajax_import_demo() {
 	include_once( dirname( __FILE__ ) . '/admin/class-demo-upgrader.php' );
 
 	$template     = strtolower( str_replace( '-pro', '', get_option( 'template' ) ) );
-	$package_link = "https://github.com/themegrill/themegrill-demo-pack/blob/master/packages/{$template}/{$slug}.zip";
+	$package_link = "https://github.com/themegrill/themegrill-demo-pack/raw/master/packages/{$template}/{$slug}.zip";
 
 	$skin     = new WP_Ajax_Upgrader_Skin();
 	$upgrader = new TG_Demo_Upgrader( $skin );
