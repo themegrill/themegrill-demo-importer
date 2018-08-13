@@ -501,6 +501,8 @@ class TG_Demo_Importer {
 					'active'          => $package_id === $demo_activated_id,
 					'author'          => isset( $package_data->author ) ? $package_data->author : __( 'ThemeGrill', 'themegrill-demo-importer' ),
 					'version'         => isset( $package_data->version ) ? $package_data->version : $available_packages->version,
+					'category'        => isset( $package_data->category ) ? $package_data->category : array(),
+					'pagebuilder'     => isset( $package_data->pagebuilder ) ? $package_data->pagebuilder : array(),
 					'description'     => isset( $package_data->description ) ? $package_data->description : '',
 					'homepage'        => $available_packages->homepage,
 					'preview_url'     => set_url_scheme( $package_data->preview ),
@@ -524,7 +526,7 @@ class TG_Demo_Importer {
 
 		wp_send_json_success( array(
 		    'info' => array(
-		      'page'    => 1,
+		      'page'    => 20,
 		      'pages'   => 1,
 		      'results' => count( $prepared_demos ),
 		    ),

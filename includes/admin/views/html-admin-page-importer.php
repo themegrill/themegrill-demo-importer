@@ -39,9 +39,9 @@ defined( 'ABSPATH' ) || exit;
 		</div>
 		<div class="filter-section right">
 			<?php if ( ! empty( $this->demo_packages->pagebuilders ) ) : ?>
-				<ul class="filter-links builders">
+				<ul class="filter-links pagebuilders">
 					<?php foreach ( $this->demo_packages->pagebuilders as $slug => $label ) : ?>
-						<li><a href="#" data-sort="<?php echo esc_attr( $slug ); ?>" class="pagebuilder-tab"><?php echo esc_html( $label ); ?></a></li>
+						<li><a href="#" data-type="<?php echo esc_attr( $slug ); ?>" class="pagebuilder-tab"><?php echo esc_html( $label ); ?></a></li>
 					<?php endforeach; ?>
 				</ul>
 			<?php endif; ?>
