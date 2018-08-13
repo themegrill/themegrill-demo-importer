@@ -448,7 +448,6 @@ class TG_Demo_Importer {
 		$is_pro_theme_demo  = strpos( $current_template, '-pro' ) !== false;
 		$demo_activated_id  = get_option( 'themegrill_demo_importer_activated_id' );
 		$available_packages = $this->get_demo_packages();
-		$request            = wp_parse_args( wp_unslash( $_REQUEST['request'] ), array( 'per_page' => 20 ) );
 
 		/**
 		 * Filters demo data before it is prepared for JavaScript.
@@ -468,18 +467,26 @@ class TG_Demo_Importer {
 			$prepared_demos[ $demo_activated_id ] = array();
 		}
 
+		$request = wp_parse_args( wp_unslash( $_REQUEST['request'] ), array(
+			'per_page'    => 20,
+			'pagebuilder' => 'none',
+		) );
+
 		if ( isset( $available_packages->demos ) ) {
 			foreach ( $available_packages->demos as $package_id => $package_data ) {
 				$plugins_list   = isset( $package_data->plugins_list ) ? $package_data->plugins_list : array();
 				$screenshot_url = "https://raw.githubusercontent.com/themegrill/themegrill-demo-pack/master/resources/{$available_packages->slug}/{$package_id}/screenshot.jpg";
 
-				if ( ! in_array( $request['browse'], $package_data->category, true ) ) {
-					continue;
-				}
-
 				// Screenshot URL.
 				if ( file_exists( TGDM_DEMO_DIR . $package_id . '/screenshot.jpg' ) ) {
 					$screenshot_url = TGDM_DEMO_URL . $package_id . '/screenshot.jpg';
+				}
+
+				if (
+					! in_array( $request['browse'], $package_data->category, true )
+					|| ! in_array( $request['pagebuilder'], $package_data->pagebuilder, true )
+				) {
+					continue;
 				}
 
 				// Plugins status.
