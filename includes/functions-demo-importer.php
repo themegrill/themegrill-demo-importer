@@ -57,7 +57,7 @@ function tg_get_attachment_id( $filename ) {
 }
 
 /**
- * Ajax handler for installing a plugin.
+ * Ajax handler for installing a required plugin.
  *
  * @since 1.5.0
  *
@@ -65,7 +65,7 @@ function tg_get_attachment_id( $filename ) {
  *
  * @global WP_Filesystem_Base $wp_filesystem Subclass
  */
-function tg_ajax_install_plugin() {
+function tg_ajax_install_required_plugin() {
 	check_ajax_referer( 'updates' );
 
 	if ( empty( $_POST['plugin'] ) || empty( $_POST['slug'] ) ) {
@@ -171,7 +171,7 @@ function tg_ajax_install_plugin() {
 
 	wp_send_json_success( $status );
 }
-add_action( 'wp_ajax_install-activate-plugin', 'tg_ajax_install_plugin', 1 );
+add_action( 'wp_ajax_install-required-plugin', 'tg_ajax_install_required_plugin', 1 );
 
 /**
  * Ajax handler for deleting a demo pack.
