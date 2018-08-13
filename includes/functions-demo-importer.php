@@ -41,12 +41,56 @@ function tg_ajax_import_demo() {
 		define( 'WP_LOAD_IMPORTERS', true );
 	}
 
-	if ( ! current_user_can( 'manage_options' ) ) {
-		$status['errorMessage'] = __( 'Sorry, you are not allowed to import.', 'themegrill-demo-importer' );
+	if ( ! current_user_can( 'import' ) ) {
+		$status['errorMessage'] = __( 'Sorry, you are not allowed to import content.', 'themegrill-demo-importer' );
 		wp_send_json_error( $status );
 	}
+
+	include_once( ABSPATH . 'wp-admin/includes/class-wp-upgrader.php' );
+	include_once( dirname( __FILE__ ) . '/admin/class-demo-upgrader.php' );
+
+	$template     = strtolower( str_replace( '-pro', '', get_option( 'template' ) ) );
+	$package_link = "https://github.com/themegrill/themegrill-demo-pack/blob/master/packages/{$template}/{$slug}.zip";
+
+	$skin     = new WP_Ajax_Upgrader_Skin();
+	$upgrader = new TG_Demo_Upgrader( $skin );
+	$result   = $upgrader->install( $package_link );
+
+	if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+		$status['debug'] = $skin->get_upgrade_messages();
+	}
+
+	if ( is_wp_error( $result ) ) {
+		$status['errorCode']    = $result->get_error_code();
+		$status['errorMessage'] = $result->get_error_message();
+		wp_send_json_error( $status );
+	} elseif ( is_wp_error( $skin->result ) ) {
+		$status['errorCode']    = $skin->result->get_error_code();
+		$status['errorMessage'] = $skin->result->get_error_message();
+		wp_send_json_error( $status );
+	} elseif ( $skin->get_errors()->get_error_code() ) {
+		$status['errorMessage'] = $skin->get_error_messages();
+		wp_send_json_error( $status );
+	} elseif ( is_null( $result ) ) {
+		global $wp_filesystem;
+
+		$status['errorCode']    = 'unable_to_connect_to_filesystem';
+		$status['errorMessage'] = __( 'Unable to connect to the filesystem. Please confirm your credentials.', 'themegrill-demo-importer' );
+
+		// Pass through the error from WP_Filesystem if one was raised.
+		if ( $wp_filesystem instanceof WP_Filesystem_Base && is_wp_error( $wp_filesystem->errors ) && $wp_filesystem->errors->get_error_code() ) {
+			$status['errorMessage'] = esc_html( $wp_filesystem->errors->get_error_message() );
+		}
+
+		wp_send_json_error( $status );
+	}
+
+	$status['demoName']   = 'ColorMag';
+	$status['previewUrl'] = get_home_url( '/' );
+
+	wp_send_json_success( $status );
 }
-add_action( 'wp_ajax_import-demo', 'tg_ajax_install_plugin', 1 );
+add_action( 'wp_ajax_import-demo', 'tg_ajax_import_demo', 1 );
 
 /**
  * Ajax handler for installing a required plugin.
