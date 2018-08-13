@@ -59,7 +59,7 @@ class TG_Demo_Importer {
 
 		// AJAX Events to query demo, import demo and update rating footer.
 		add_action( 'wp_ajax_query-demos', array( $this, 'ajax_query_demos' ) );
-		add_action( 'wp_ajax_import-demo', array( $this, 'ajax_import_demo' ) );
+		// add_action( 'wp_ajax_import-demo', array( $this, 'ajax_import_demo' ) );
 		add_action( 'wp_ajax_footer-text-rated', array( $this, 'ajax_footer_text_rated' ) );
 
 		// Update custom nav menu items, elementor and siteorigin panel data.

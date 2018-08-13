@@ -12,48 +12,92 @@ defined( 'ABSPATH' ) || exit;
 include_once TGDM_ABSPATH . 'includes/functions-demo-update.php';
 
 /**
- * Get an attachment ID from the filename.
+ * Ajax handler for importing a demo.
  *
- * @param  string $filename
- * @return int Attachment ID on success, 0 on failure
+ * @since 1.5.0
+ *
+ * @see TG_Demo_Upgrader
+ *
+ * @global WP_Filesystem_Base $wp_filesystem Subclass
  */
-function tg_get_attachment_id( $filename ) {
-	$attachment_id = 0;
+function tg_ajax_import_demo() {
+	check_ajax_referer( 'updates' );
 
-	$file = basename( $filename );
-
-	$query_args = array(
-		'post_type'   => 'attachment',
-		'post_status' => 'inherit',
-		'fields'      => 'ids',
-		'meta_query'  => array(
-			array(
-				'value'   => $file,
-				'compare' => 'LIKE',
-				'key'     => '_wp_attachment_metadata',
-			),
-		),
-	);
-
-	$query = new WP_Query( $query_args );
-
-	if ( $query->have_posts() ) {
-
-		foreach ( $query->posts as $post_id ) {
-
-			$meta = wp_get_attachment_metadata( $post_id );
-
-			$original_file       = basename( $meta['file'] );
-			$cropped_image_files = wp_list_pluck( $meta['sizes'], 'file' );
-
-			if ( $original_file === $file || in_array( $file, $cropped_image_files ) ) {
-				$attachment_id = $post_id;
-				break;
-			}
-		}
+	if ( empty( $_POST['slug'] ) ) {
+		wp_send_json_error( array(
+			'slug'         => '',
+			'errorCode'    => 'no_demo_specified',
+			'errorMessage' => __( 'No demo specified.', 'themegrill-demo-importer' ),
+		) );
 	}
 
-	return $attachment_id;
+	$slug   = sanitize_key( wp_unslash( $_POST['slug'] ) );
+	$status = array(
+		'import' => 'demo',
+		'slug'   => $slug,
+	);
+
+	if ( ! defined( 'WP_LOAD_IMPORTERS' ) ) {
+		define( 'WP_LOAD_IMPORTERS', true );
+	}
+
+	if ( ! current_user_can( 'manage_options' ) ) {
+		$status['errorMessage'] = __( 'Sorry, you are not allowed to import.', 'themegrill-demo-importer' );
+		wp_send_json_error( $status );
+	}
+}
+add_action( 'wp_ajax_import-demo', 'tg_ajax_install_plugin', 1 );
+
+/**
+ * Ajax handler for importing a demo.
+ */
+function ajax_import_demo() {
+	check_ajax_referer( 'updates' );
+
+	if ( empty( $_POST['slug'] ) ) {
+		wp_send_json_error( array(
+			'slug'         => '',
+			'errorCode'    => 'no_demo_specified',
+			'errorMessage' => __( 'No demo specified.', 'themegrill-demo-importer' ),
+		) );
+	}
+
+	$slug = sanitize_key( wp_unslash( $_POST['slug'] ) );
+
+	$status = array(
+		'import' => 'demo',
+		'slug'   => $slug,
+	);
+
+	if ( ! defined( 'WP_LOAD_IMPORTERS' ) ) {
+		define( 'WP_LOAD_IMPORTERS', true );
+	}
+
+	if ( ! current_user_can( 'manage_options' ) ) {
+		$status['errorMessage'] = __( 'Sorry, you are not allowed to import.', 'themegrill-demo-importer' );
+		wp_send_json_error( $status );
+	}
+
+	$demo_data = isset( $this->demo_config[ $slug ] ) ? $this->demo_config[ $slug ] : array();
+
+	do_action( 'themegrill_ajax_before_demo_import' );
+
+	if ( ! empty( $demo_data ) ) {
+		$this->import_dummy_xml( $slug, $demo_data, $status );
+		$this->import_core_options( $slug, $demo_data );
+		$this->import_customizer_data( $slug, $demo_data, $status );
+		$this->import_widget_settings( $slug, $demo_data, $status );
+
+		// Update imported demo ID.
+		update_option( 'themegrill_demo_importer_activated_id', $slug );
+
+		do_action( 'themegrill_ajax_demo_imported', $slug, $demo_data );
+	}
+
+	$status['demoName']   = $demo_data['name'];
+	$status['previewUrl'] = get_home_url( '/' );
+
+	wp_send_json_success( $status );
 }
 
 /**
@@ -304,6 +348,51 @@ function tg_delete_demo_pack( $demo_pack, $redirect = '' ) {
 	}
 
 	return true;
+}
+
+/**
+ * Get an attachment ID from the filename.
+ *
+ * @param  string $filename
+ * @return int Attachment ID on success, 0 on failure
+ */
+function tg_get_attachment_id( $filename ) {
+	$attachment_id = 0;
+
+	$file = basename( $filename );
+
+	$query_args = array(
+		'post_type'   => 'attachment',
+		'post_status' => 'inherit',
+		'fields'      => 'ids',
+		'meta_query'  => array(
+			array(
+				'value'   => $file,
+				'compare' => 'LIKE',
+				'key'     => '_wp_attachment_metadata',
+			),
+		),
+	);
+
+	$query = new WP_Query( $query_args );
+
+	if ( $query->have_posts() ) {
+
+		foreach ( $query->posts as $post_id ) {
+
+			$meta = wp_get_attachment_metadata( $post_id );
+
+			$original_file       = basename( $meta['file'] );
+			$cropped_image_files = wp_list_pluck( $meta['sizes'], 'file' );
+
+			if ( $original_file === $file || in_array( $file, $cropped_image_files ) ) {
+				$attachment_id = $post_id;
+				break;
+			}
+		}
+	}
+
+	return $attachment_id;
 }
 
 /**
