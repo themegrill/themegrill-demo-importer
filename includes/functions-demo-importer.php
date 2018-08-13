@@ -12,51 +12,6 @@ defined( 'ABSPATH' ) || exit;
 include_once TGDM_ABSPATH . 'includes/functions-demo-update.php';
 
 /**
- * Get an attachment ID from the filename.
- *
- * @param  string $filename
- * @return int Attachment ID on success, 0 on failure
- */
-function tg_get_attachment_id( $filename ) {
-	$attachment_id = 0;
-
-	$file = basename( $filename );
-
-	$query_args = array(
-		'post_type'   => 'attachment',
-		'post_status' => 'inherit',
-		'fields'      => 'ids',
-		'meta_query'  => array(
-			array(
-				'value'   => $file,
-				'compare' => 'LIKE',
-				'key'     => '_wp_attachment_metadata',
-			),
-		),
-	);
-
-	$query = new WP_Query( $query_args );
-
-	if ( $query->have_posts() ) {
-
-		foreach ( $query->posts as $post_id ) {
-
-			$meta = wp_get_attachment_metadata( $post_id );
-
-			$original_file       = basename( $meta['file'] );
-			$cropped_image_files = wp_list_pluck( $meta['sizes'], 'file' );
-
-			if ( $original_file === $file || in_array( $file, $cropped_image_files ) ) {
-				$attachment_id = $post_id;
-				break;
-			}
-		}
-	}
-
-	return $attachment_id;
-}
-
-/**
  * Ajax handler for installing a required plugin.
  *
  * @since 1.5.0
@@ -304,6 +259,51 @@ function tg_delete_demo_pack( $demo_pack, $redirect = '' ) {
 	}
 
 	return true;
+}
+
+/**
+ * Get an attachment ID from the filename.
+ *
+ * @param  string $filename
+ * @return int Attachment ID on success, 0 on failure
+ */
+function tg_get_attachment_id( $filename ) {
+	$attachment_id = 0;
+
+	$file = basename( $filename );
+
+	$query_args = array(
+		'post_type'   => 'attachment',
+		'post_status' => 'inherit',
+		'fields'      => 'ids',
+		'meta_query'  => array(
+			array(
+				'value'   => $file,
+				'compare' => 'LIKE',
+				'key'     => '_wp_attachment_metadata',
+			),
+		),
+	);
+
+	$query = new WP_Query( $query_args );
+
+	if ( $query->have_posts() ) {
+
+		foreach ( $query->posts as $post_id ) {
+
+			$meta = wp_get_attachment_metadata( $post_id );
+
+			$original_file       = basename( $meta['file'] );
+			$cropped_image_files = wp_list_pluck( $meta['sizes'], 'file' );
+
+			if ( $original_file === $file || in_array( $file, $cropped_image_files ) ) {
+				$attachment_id = $post_id;
+				break;
+			}
+		}
+	}
+
+	return $attachment_id;
 }
 
 /**
