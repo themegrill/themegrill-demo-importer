@@ -115,7 +115,7 @@ demos.view.Appearance = wp.Backbone.View.extend({
 	},
 
 	// Checks when the user gets close to the bottom
-	// of the mage and triggers a demo:scroll event
+	// of the page and triggers a demo:scroll event
 	scroller: function() {
 		var self = this,
 			bottom, threshold;
@@ -125,7 +125,7 @@ demos.view.Appearance = wp.Backbone.View.extend({
 		threshold = Math.round( threshold * 0.9 );
 
 		if ( bottom > threshold ) {
-			this.trigger( 'theme:scroll' );
+			this.trigger( 'demo:scroll' );
 		}
 	},
 
