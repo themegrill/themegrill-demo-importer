@@ -52,7 +52,6 @@ class TG_Demo_Upgrader extends WP_Upgrader {
 	 *
 	 * @since 2.8.0
 	 * @since 3.7.0 The `$args` parameter was added, making clearing the update cache optional.
-	 * @access public
 	 *
 	 * @param string $package The full local path or URI of the package.
 	 * @param array  $args {
