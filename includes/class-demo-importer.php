@@ -469,6 +469,7 @@ class TG_Demo_Importer {
 
 		$request = wp_parse_args( wp_unslash( $_REQUEST['request'] ), array(
 			'per_page'    => 20,
+			'browse'      => 'all',
 			'pagebuilder' => 'none',
 		) );
 
