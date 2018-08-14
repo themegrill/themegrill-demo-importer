@@ -84,8 +84,8 @@ class TG_Demo_Importer {
 	 * Include required core files.
 	 */
 	public function includes() {
-		include_once( dirname( __FILE__ ) . '/importers/class-widget-importer.php' );
-		include_once( dirname( __FILE__ ) . '/importers/class-customizer-importer.php' );
+		include_once dirname( __FILE__ ) . '/importers/class-widget-importer.php';
+		include_once dirname( __FILE__ ) . '/importers/class-customizer-importer.php';
 	}
 
 	/**
@@ -631,7 +631,7 @@ class TG_Demo_Importer {
 		}
 
 		// Include WXR Importer.
-		require( dirname( __FILE__ ) . '/importers/wordpress-importer/class-wxr-importer.php' );
+		require dirname( __FILE__ ) . '/importers/wordpress-importer/class-wxr-importer.php';
 
 		do_action( 'themegrill_ajax_before_dummy_xml_import', $demo_data, $demo_id );
 
