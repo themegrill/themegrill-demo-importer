@@ -468,7 +468,6 @@ class TG_Demo_Importer {
 		}
 
 		$request = wp_parse_args( wp_unslash( $_REQUEST['request'] ), array(
-			'per_page'    => 20,
 			'browse'      => 'all',
 			'pagebuilder' => 'none',
 		) );
@@ -484,8 +483,8 @@ class TG_Demo_Importer {
 				}
 
 				if (
-					! in_array( $request['browse'], $package_data->category, true )
-					|| ! in_array( $request['pagebuilder'], $package_data->pagebuilder, true )
+					( ! empty( $package_data->category ) && ! in_array( $request['browse'], $package_data->category, true ) )
+					|| ( ! empty( $package_data->pagebuilder ) && ! in_array( $request['pagebuilder'], $package_data->pagebuilder, true ) )
 				) {
 					continue;
 				}

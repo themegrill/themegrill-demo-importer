@@ -405,7 +405,7 @@
 		$( '.button.updating-message' )
 			.removeClass( 'updating-message' )
 			.removeAttr( 'aria-label' )
-			.text( wp.updates.l10n.updateFailedShort );
+			.text( wp.updates.l10n.importFailedShort );
 
 		wp.a11y.speak( errorMessage, 'assertive' );
 
