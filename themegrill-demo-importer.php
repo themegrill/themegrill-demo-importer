@@ -159,20 +159,8 @@ if ( ! class_exists( 'ThemeGrill_Demo_Importer' ) ) :
 		 * Includes.
 		 */
 		private function includes() {
-			include_once( TGDM_ABSPATH . 'includes/class-demo-importer.php' );
-			include_once( TGDM_ABSPATH . 'includes/functions-demo-importer.php' );
-
-			// Include valid demo packages config.
-			if ( false === strpos( get_option( 'template' ), '-pro' ) ) {
-				$files = glob( TGDM_DEMO_DIR . '**/tg-demo-config.php' );
-				if ( $files ) {
-					foreach ( $files as $file ) {
-						if ( $file && is_readable( $file ) ) {
-							include_once $file;
-						}
-					}
-				}
-			}
+			include_once TGDM_ABSPATH . 'includes/class-demo-importer.php';
+			include_once TGDM_ABSPATH . 'includes/functions-demo-importer.php';
 		}
 
 		/**

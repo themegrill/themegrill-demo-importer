@@ -59,7 +59,7 @@ class TG_Demo_Importer {
 
 		// AJAX Events to query demo, import demo and update rating footer.
 		add_action( 'wp_ajax_query-demos', array( $this, 'ajax_query_demos' ) );
-		// add_action( 'wp_ajax_import-demo', array( $this, 'ajax_import_demo' ) );
+		add_action( 'wp_ajax_import-demo', array( $this, 'ajax_import_demo' ) );
 		add_action( 'wp_ajax_footer-text-rated', array( $this, 'ajax_footer_text_rated' ) );
 
 		// Update custom nav menu items, elementor and siteorigin panel data.
@@ -546,6 +546,10 @@ class TG_Demo_Importer {
 
 	/**
 	 * Ajax handler for importing a demo.
+	 *
+	 * @see TG_Demo_Upgrader
+	 *
+	 * @global WP_Filesystem_Base $wp_filesystem Subclass
 	 */
 	public function ajax_import_demo() {
 		check_ajax_referer( 'updates' );
@@ -558,8 +562,7 @@ class TG_Demo_Importer {
 			) );
 		}
 
-		$slug = sanitize_key( wp_unslash( $_POST['slug'] ) );
-
+		$slug   = sanitize_key( wp_unslash( $_POST['slug'] ) );
 		$status = array(
 			'import' => 'demo',
 			'slug'   => $slug,
@@ -569,12 +572,52 @@ class TG_Demo_Importer {
 			define( 'WP_LOAD_IMPORTERS', true );
 		}
 
-		if ( ! current_user_can( 'manage_options' ) ) {
-			$status['errorMessage'] = __( 'Sorry, you are not allowed to import.', 'themegrill-demo-importer' );
+		if ( ! current_user_can( 'import' ) ) {
+			$status['errorMessage'] = __( 'Sorry, you are not allowed to import content.', 'themegrill-demo-importer' );
 			wp_send_json_error( $status );
 		}
 
-		$demo_data = isset( $this->demo_config[ $slug ] ) ? $this->demo_config[ $slug ] : array();
+		include_once( ABSPATH . 'wp-admin/includes/class-wp-upgrader.php' );
+		include_once( dirname( __FILE__ ) . '/admin/class-demo-pack-upgrader.php' );
+
+		$skin     = new WP_Ajax_Upgrader_Skin();
+		$upgrader = new TG_Demo_Pack_Upgrader( $skin );
+		$template = strtolower( str_replace( '-pro', '', get_option( 'template' ) ) );
+		$packages = isset( $this->demo_packages->demos ) ? json_decode( wp_json_encode( $this->demo_packages->demos ), true ) : array();
+		$result   = $upgrader->install( "https://github.com/themegrill/themegrill-demo-pack/raw/master/packages/{$template}/{$slug}.zip" );
+
+		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+			$status['debug'] = $skin->get_upgrade_messages();
+		}
+
+		if ( is_wp_error( $result ) ) {
+			$status['errorCode']    = $result->get_error_code();
+			$status['errorMessage'] = $result->get_error_message();
+			wp_send_json_error( $status );
+		} elseif ( is_wp_error( $skin->result ) ) {
+			$status['errorCode']    = $skin->result->get_error_code();
+			$status['errorMessage'] = $skin->result->get_error_message();
+			wp_send_json_error( $status );
+		} elseif ( $skin->get_errors()->get_error_code() ) {
+			$status['errorMessage'] = $skin->get_error_messages();
+			wp_send_json_error( $status );
+		} elseif ( is_null( $result ) ) {
+			global $wp_filesystem;
+
+			$status['errorCode']    = 'unable_to_connect_to_filesystem';
+			$status['errorMessage'] = __( 'Unable to connect to the filesystem. Please confirm your credentials.', 'themegrill-demo-importer' );
+
+			// Pass through the error from WP_Filesystem if one was raised.
+			if ( $wp_filesystem instanceof WP_Filesystem_Base && is_wp_error( $wp_filesystem->errors ) && $wp_filesystem->errors->get_error_code() ) {
+				$status['errorMessage'] = esc_html( $wp_filesystem->errors->get_error_message() );
+			}
+
+			wp_send_json_error( $status );
+		}
+
+		$demo_data            = $packages[ $slug ];
+		$status['demoName']   = $demo_data['title'];
+		$status['previewUrl'] = get_home_url( '/' );
 
 		do_action( 'themegrill_ajax_before_demo_import' );
 
@@ -588,10 +631,12 @@ class TG_Demo_Importer {
 			update_option( 'themegrill_demo_importer_activated_id', $slug );
 
 			do_action( 'themegrill_ajax_demo_imported', $slug, $demo_data );
-		}
+		} else {
+			$status['errorCode']    = 'error_empty_package_data';
+			$status['errorMessage'] = __( 'Empty demo data', 'themegrill-demo-importer' );
 
-		$status['demoName']   = $demo_data['name'];
-		$status['previewUrl'] = get_home_url( '/' );
+			wp_send_json_error( $status );
+		}
 
 		wp_send_json_success( $status );
 	}
@@ -617,9 +662,9 @@ class TG_Demo_Importer {
 	 * @return bool
 	 */
 	public function import_dummy_xml( $demo_id, $demo_data, $status ) {
-		$import_file = $this->import_file_path( $demo_id, 'dummy-data/dummy-data.xml' );
+		$import_file = $this->import_file_path( $demo_id, 'dummy-data.xml' );
 
-		// Load Importer API
+		// Load Importer API.
 		require_once ABSPATH . 'wp-admin/includes/import.php';
 
 		if ( ! class_exists( 'WP_Importer' ) ) {
