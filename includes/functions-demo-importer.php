@@ -108,7 +108,7 @@ function tg_ajax_install_required_plugin() {
 		wp_send_json_error( array(
 			'slug'         => '',
 			'errorCode'    => 'no_plugin_specified',
-			'errorMessage' => __( 'No plugin specified.' ),
+			'errorMessage' => __( 'No plugin specified.', 'themegrill-demo-importer' ),
 		) );
 	}
 
@@ -120,7 +120,7 @@ function tg_ajax_install_required_plugin() {
 	);
 
 	if ( ! current_user_can( 'install_plugins' ) ) {
-		$status['errorMessage'] = __( 'Sorry, you are not allowed to install plugins on this site.' );
+		$status['errorMessage'] = __( 'Sorry, you are not allowed to install plugins on this site.', 'themegrill-demo-importer' );
 		wp_send_json_error( $status );
 	}
 
@@ -183,7 +183,7 @@ function tg_ajax_install_required_plugin() {
 		global $wp_filesystem;
 
 		$status['errorCode']    = 'unable_to_connect_to_filesystem';
-		$status['errorMessage'] = __( 'Unable to connect to the filesystem. Please confirm your credentials.' );
+		$status['errorMessage'] = __( 'Unable to connect to the filesystem. Please confirm your credentials.', 'themegrill-demo-importer' );
 
 		// Pass through the error from WP_Filesystem if one was raised.
 		if ( $wp_filesystem instanceof WP_Filesystem_Base && is_wp_error( $wp_filesystem->errors ) && $wp_filesystem->errors->get_error_code() ) {
