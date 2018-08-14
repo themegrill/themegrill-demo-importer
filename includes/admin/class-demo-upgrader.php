@@ -15,8 +15,8 @@ class TG_Demo_Upgrader extends WP_Upgrader {
 	 * Result of the demo upgrade offer.
 	 *
 	 * @since 2.8.0
-	 * @access public
 	 * @var array|WP_Error $result
+	 *
 	 * @see WP_Upgrader::$result
 	 */
 	public $result;
@@ -25,7 +25,6 @@ class TG_Demo_Upgrader extends WP_Upgrader {
 	 * Whether multiple demos are being upgraded/installed in bulk.
 	 *
 	 * @since 2.9.0
-	 * @access public
 	 * @var bool $bulk
 	 */
 	public $bulk = false;
@@ -34,7 +33,6 @@ class TG_Demo_Upgrader extends WP_Upgrader {
 	 * Initialize the install strings.
 	 *
 	 * @since 2.8.0
-	 * @access public
 	 */
 	public function install_strings() {
 		$this->strings['no_package'] = __( 'Install package not available.', 'themegrill-demo-importer' );
@@ -67,7 +65,6 @@ class TG_Demo_Upgrader extends WP_Upgrader {
 	 * @return bool|WP_Error True if the install was successful, false or a WP_Error object otherwise.
 	 */
 	public function install( $package, $args = array() ) {
-		$upload_dir = wp_upload_dir();
 
 		$defaults = array(
 			'clear_update_cache' => true,
@@ -101,34 +98,33 @@ class TG_Demo_Upgrader extends WP_Upgrader {
 	}
 
 	/**
-	 * Check that the package source contains a valid demo.
+	 * Check a source package to be sure it contains a demo.
 	 *
-	 * Hooked to the {@see 'upgrader_source_selection'} filter by TG_Demo_Upgrader::install().
-	 * It will return an error if the demo doesn't have tg-demo-config.php
-	 * files.
+	 * Hooked to the {@see 'upgrader_source_selection'} filter by
+	 * TG_Demo_Upgrader::install().
 	 *
 	 * @since 3.3.0
-	 * @access public
 	 *
 	 * @global WP_Filesystem_Base $wp_filesystem Subclass
-	 * @global array              $wp_theme_directories
 	 *
 	 * @param string $source The full path to the package source.
-	 * @return string|WP_Error The source or a WP_Error.
+	 * @return string|WP_Error The source as passed, or a WP_Error object
+	 *                         if no demos were found.
 	 */
 	public function check_package( $source ) {
-		global $wp_filesystem, $wp_theme_directories;
+		global $wp_filesystem;
 
-		if ( is_wp_error( $source ) )
+		if ( is_wp_error( $source ) ) {
 			return $source;
+		}
 
 		// Check the folder contains a valid demo.
 		$working_directory = str_replace( $wp_filesystem->wp_content_dir(), trailingslashit( WP_CONTENT_DIR ), $source );
 		if ( ! is_dir( $working_directory ) ) // Sanity check, if the above fails, let's not prevent installation.
 			return $source;
 
-		// A proper archive should have a tg-demo-config.php file in the single subdirectory
-		if ( ! file_exists( $working_directory . 'tg-demo-config.php' ) ) {
+		// Check the folder contains at least 1 valid demo.
+		if ( ! file_exists( $working_directory . 'screenshot.jpg' ) ) {
 			return new WP_Error( 'incompatible_archive_no_demos', $this->strings['incompatible_archive'], __( 'No valid demos were found.', 'themegrill-demo-importer' ) );
 		}
 

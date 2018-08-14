@@ -49,12 +49,10 @@ function tg_ajax_import_demo() {
 	include_once( ABSPATH . 'wp-admin/includes/class-wp-upgrader.php' );
 	include_once( dirname( __FILE__ ) . '/admin/class-demo-upgrader.php' );
 
-	$template     = strtolower( str_replace( '-pro', '', get_option( 'template' ) ) );
-	$package_link = "https://github.com/themegrill/themegrill-demo-pack/raw/master/packages/{$template}/{$slug}.zip";
-
 	$skin     = new WP_Ajax_Upgrader_Skin();
 	$upgrader = new TG_Demo_Upgrader( $skin );
-	$result   = $upgrader->install( $package_link );
+	$template = strtolower( str_replace( '-pro', '', get_option( 'template' ) ) );
+	$result   = $upgrader->install( "https://github.com/themegrill/themegrill-demo-pack/raw/master/packages/{$template}/{$slug}.zip" );
 
 	if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 		$status['debug'] = $skin->get_upgrade_messages();
