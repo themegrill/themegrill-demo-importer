@@ -509,6 +509,11 @@ class TG_Demo_Importer {
 			$prepared_demos[ $demo_activated_id ] = array();
 		}
 
+		$request = wp_parse_args( wp_unslash( $_REQUEST['request'] ), array(
+			'browse'      => 'all',
+			'pagebuilder' => 'elementor',
+		) );
+
 		if ( isset( $available_packages->demos ) ) {
 			foreach ( $available_packages->demos as $package_id => $package_data ) {
 				$plugins_list   = isset( $package_data->plugins_list ) ? $package_data->plugins_list : array();
@@ -517,6 +522,13 @@ class TG_Demo_Importer {
 				// Screenshot URL.
 				if ( file_exists( TGDM_DEMO_DIR . $package_id . '/screenshot.jpg' ) ) {
 					$screenshot_url = TGDM_DEMO_URL . $package_id . '/screenshot.jpg';
+				}
+
+				if (
+					( ! empty( $package_data->category ) && ! in_array( $request['browse'], $package_data->category, true ) )
+					|| ( ! empty( $package_data->pagebuilder ) && ! in_array( $request['pagebuilder'], $package_data->pagebuilder, true ) )
+				) {
+					continue;
 				}
 
 				// Plugins status.
@@ -566,7 +578,7 @@ class TG_Demo_Importer {
 
 		wp_send_json_success( array(
 		    'info' => array(
-		      'page'    => 1,
+		      'page'    => 20,
 		      'pages'   => 1,
 		      'results' => count( $prepared_demos ),
 		    ),
