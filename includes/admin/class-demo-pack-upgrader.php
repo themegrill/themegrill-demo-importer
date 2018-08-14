@@ -1,38 +1,34 @@
 <?php
 /**
- * Upgrade API: TG_Demo_Upgrader class
+ * Upgrade API: TG_Demo_Pack_Upgrader class
  *
- * Core class used for upgrading/installing demos.
+ * Core class used for upgrading/installing demo packs.
  *
  * It is designed to upgrade/install demo from a local zip, remote zip URL,
  * or uploaded zip file.
  *
+ * @since 1.5.0
  * @see WP_Upgrader
  */
-class TG_Demo_Upgrader extends WP_Upgrader {
+class TG_Demo_Pack_Upgrader extends WP_Upgrader {
 
 	/**
-	 * Result of the demo upgrade offer.
+	 * Result of the demo pack upgrade.
 	 *
-	 * @since 2.8.0
 	 * @var array|WP_Error $result
-	 *
 	 * @see WP_Upgrader::$result
 	 */
 	public $result;
 
 	/**
-	 * Whether multiple demos are being upgraded/installed in bulk.
+	 * Whether a bulk upgrade/installation is being performed.
 	 *
-	 * @since 2.9.0
 	 * @var bool $bulk
 	 */
 	public $bulk = false;
 
 	/**
 	 * Initialize the install strings.
-	 *
-	 * @since 2.8.0
 	 */
 	public function install_strings() {
 		$this->strings['no_package'] = __( 'Install package not available.', 'themegrill-demo-importer' );
@@ -49,9 +45,6 @@ class TG_Demo_Upgrader extends WP_Upgrader {
 
 	/**
 	 * Install a demo package.
-	 *
-	 * @since 2.8.0
-	 * @since 3.7.0 The `$args` parameter was added, making clearing the update cache optional.
 	 *
 	 * @param string $package The full local path or URI of the package.
 	 * @param array  $args {
@@ -102,8 +95,6 @@ class TG_Demo_Upgrader extends WP_Upgrader {
 	 * Hooked to the {@see 'upgrader_source_selection'} filter by
 	 * TG_Demo_Upgrader::install().
 	 *
-	 * @since 3.3.0
-	 *
 	 * @global WP_Filesystem_Base $wp_filesystem Subclass
 	 *
 	 * @param string $source The full path to the package source.
@@ -139,9 +130,6 @@ class TG_Demo_Upgrader extends WP_Upgrader {
 	 *
 	 * Stuck with this until a fix for https://core.trac.wordpress.org/ticket/38946.
 	 * We use a custom upgrader, just like WordPress does.
-	 *
-	 * @since 2.8.0
-	 * @access public
 	 *
 	 * @global WP_Filesystem_Base $wp_filesystem Subclass
 	 * @global array              $wp_theme_directories
