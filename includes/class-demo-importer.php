@@ -623,11 +623,6 @@ class TG_Demo_Importer {
 			update_option( 'themegrill_demo_importer_activated_id', $slug );
 
 			do_action( 'themegrill_ajax_demo_imported', $slug, $demo_data );
-		} else {
-			$status['errorCode']    = 'error_empty_package_data';
-			$status['errorMessage'] = __( 'Empty demo data', 'themegrill-demo-importer' );
-
-			wp_send_json_error( $status );
 		}
 
 		wp_send_json_success( $status );
