@@ -165,7 +165,6 @@ if ( ! class_exists( 'ThemeGrill_Demo_Importer' ) ) :
 			// Backward compatibility for demo packages config.
 			if ( false === strpos( get_option( 'template' ), '-pro' ) ) {
 				$files = glob( TGDM_DEMO_DIR . '**/tg-demo-config.php' );
-
 				if ( $files ) {
 					foreach ( $files as $file ) {
 						if ( $file && is_readable( $file ) ) {
