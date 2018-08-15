@@ -105,25 +105,13 @@ class TG_Demo_Importer {
 	}
 
 	/**
-	 * Get the import file URL.
-	 *
-	 * @param  string $package_dir package dir.
-	 * @param  string $filename import filename.
-	 * @return string the demo import data file URL.
-	 */
-	private function import_file_url( $package_dir, $filename ) {
-		return trailingslashit( TGDM_DEMO_URL . $package_dir ) . sanitize_file_name( $filename );
-	}
-
-	/**
 	 * Get the import file path.
 	 *
-	 * @param  string $package_dir package dir.
-	 * @param  string $filename import filename.
-	 * @return string the import data file path.
+	 * @param  string $filename File name.
+	 * @return string The import file path.
 	 */
-	private function import_file_path( $package_dir, $filename ) {
-		return trailingslashit( TGDM_DEMO_DIR . $package_dir . '/dummy-data' ) . sanitize_file_name( $filename );
+	private function get_import_file_path( $filename ) {
+		return trailingslashit( TGDM_DEMO_DIR . '/dummy-data' ) . sanitize_file_name( $filename );
 	}
 
 	/**
@@ -644,7 +632,7 @@ class TG_Demo_Importer {
 	 * @return bool
 	 */
 	public function import_dummy_xml( $demo_id, $demo_data, $status ) {
-		$import_file = $this->import_file_path( $demo_id, 'dummy-data.xml' );
+		$import_file = $this->get_import_file_path( 'dummy-data.xml' );
 
 		// Load Importer API.
 		require_once ABSPATH . 'wp-admin/includes/import.php';
@@ -731,7 +719,7 @@ class TG_Demo_Importer {
 	 * @return bool
 	 */
 	public function import_customizer_data( $demo_id, $demo_data, $status ) {
-		$import_file = $this->import_file_path( $demo_id, 'dummy-customizer.dat' );
+		$import_file = $this->get_import_file_path( 'dummy-customizer.dat' );
 
 		if ( is_file( $import_file ) ) {
 			$results = TG_Customizer_Importer::import( $import_file, $demo_id, $demo_data );
@@ -756,7 +744,7 @@ class TG_Demo_Importer {
 	 * @return bool
 	 */
 	public function import_widget_settings( $demo_id, $demo_data, $status ) {
-		$import_file = $this->import_file_path( $demo_id, 'dummy-widgets.wie' );
+		$import_file = $this->get_import_file_path( 'dummy-widgets.wie' );
 
 		if ( is_file( $import_file ) ) {
 			$results = TG_Widget_Importer::import( $import_file, $demo_id, $demo_data );
