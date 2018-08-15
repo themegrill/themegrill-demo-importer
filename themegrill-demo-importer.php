@@ -159,10 +159,10 @@ if ( ! class_exists( 'ThemeGrill_Demo_Importer' ) ) :
 		 * Includes.
 		 */
 		private function includes() {
-			include_once( TGDM_ABSPATH . 'includes/class-demo-importer.php' );
-			include_once( TGDM_ABSPATH . 'includes/functions-demo-importer.php' );
+			include_once TGDM_ABSPATH . 'includes/class-demo-importer.php';
+			include_once TGDM_ABSPATH . 'includes/functions-demo-importer.php';
 
-			// Include valid demo packages config.
+			// Backward compatibility for free theme demo packages.
 			if ( false === strpos( get_option( 'template' ), '-pro' ) ) {
 				$files = glob( TGDM_DEMO_DIR . '**/tg-demo-config.php' );
 				if ( $files ) {

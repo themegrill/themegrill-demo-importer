@@ -4,16 +4,11 @@
  *
  * Code adapted from the "Customizer Export/Import" plugin.
  *
- * @class    TG_Customizer_Importer
- * @version  1.0.0
- * @package  Importer/Classes
- * @category Admin
- * @author   ThemeGrill
+ * @package Importer/Classes
+ * @version 1.0.0
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * TG_Customizer_Importer Class.
@@ -59,11 +54,11 @@ class TG_Customizer_Importer {
 
 			// Load WordPress Customize Setting Class.
 			if ( ! class_exists( 'WP_Customize_Setting' ) ) {
-				require_once( ABSPATH . WPINC . '/class-wp-customize-setting.php' );
+				require_once ABSPATH . WPINC . '/class-wp-customize-setting.php';
 			}
 
 			// Include Customizer Demo Importer Setting class.
-			include_once( dirname( __FILE__ ) . '/customize/class-oc-customize-demo-importer-setting.php' );
+			include_once dirname( __FILE__ ) . '/customize/class-oc-customize-demo-importer-setting.php';
 
 			foreach ( $data['options'] as $option_key => $option_value ) {
 				$option = new OC_Customize_Demo_Importer_Setting( $wp_customize, $option_key, array(
@@ -134,9 +129,9 @@ class TG_Customizer_Importer {
 		$data = new stdClass();
 
 		if ( ! function_exists( 'media_handle_sideload' ) ) {
-			require_once( ABSPATH . 'wp-admin/includes/media.php' );
-			require_once( ABSPATH . 'wp-admin/includes/file.php' );
-			require_once( ABSPATH . 'wp-admin/includes/image.php' );
+			require_once ABSPATH . 'wp-admin/includes/media.php';
+			require_once ABSPATH . 'wp-admin/includes/file.php';
+			require_once ABSPATH . 'wp-admin/includes/image.php';
 		}
 
 		if ( ! empty( $file ) ) {

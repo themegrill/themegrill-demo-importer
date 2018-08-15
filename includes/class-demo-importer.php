@@ -14,13 +14,6 @@ defined( 'ABSPATH' ) || exit;
 class TG_Demo_Importer {
 
 	/**
-	 * Demo config.
-	 *
-	 * @var array
-	 */
-	public $demo_config;
-
-	/**
 	 * Demo packages.
 	 *
 	 * @var array
@@ -76,7 +69,6 @@ class TG_Demo_Importer {
 	 * Demo importer setup.
 	 */
 	public function setup() {
-		$this->demo_config   = apply_filters( 'themegrill_demo_importer_config', array() );
 		$this->demo_packages = $this->get_demo_packages();
 	}
 
@@ -228,7 +220,7 @@ class TG_Demo_Importer {
 					/* translators: accessibility text */
 					'selectFeatureFilter' => __( 'Select one or more Demo features to filter by', 'themegrill-demo-importer' ),
 				),
-				'installedDemos' => array_keys( $this->demo_config ),
+				'installedDemos' => array(),
 			) );
 		}
 	}
@@ -333,10 +325,10 @@ class TG_Demo_Importer {
 		}
 
 		// Output reset wizard notice.
-		if ( ! $demo_notice_dismiss && in_array( $demo_activated_id, array_keys( $this->demo_config ) ) ) {
-			include_once( dirname( __FILE__ ) . '/admin/views/html-notice-reset-wizard.php' );
+		if ( ! $demo_notice_dismiss && $demo_activated_id ) {
+			include_once dirname( __FILE__ ) . '/admin/views/html-notice-reset-wizard.php';
 		} elseif ( isset( $_GET['reset'] ) && 'true' === $_GET['reset'] ) {
-			include_once( dirname( __FILE__ ) . '/admin/views/html-notice-reset-wizard-success.php' );
+			include_once dirname( __FILE__ ) . '/admin/views/html-notice-reset-wizard-success.php';
 		}
 	}
 
@@ -368,7 +360,7 @@ class TG_Demo_Importer {
 		global $wpdb, $current_user;
 
 		if ( ! empty( $_GET['do_reset_wordpress'] ) ) {
-			require_once( ABSPATH . '/wp-admin/includes/upgrade.php' );
+			require_once ABSPATH . '/wp-admin/includes/upgrade.php';
 
 			$template     = get_option( 'template' );
 			$blogname     = get_option( 'blogname' );
@@ -447,7 +439,7 @@ class TG_Demo_Importer {
 		$current_template   = get_option( 'template' );
 		$is_pro_theme_demo  = strpos( $current_template, '-pro' ) !== false;
 		$demo_activated_id  = get_option( 'themegrill_demo_importer_activated_id' );
-		$available_packages = $this->get_demo_packages();
+		$available_packages = $this->demo_packages;
 
 		/**
 		 * Filters demo data before it is prepared for JavaScript.
@@ -558,8 +550,7 @@ class TG_Demo_Importer {
 			) );
 		}
 
-		$slug = sanitize_key( wp_unslash( $_POST['slug'] ) );
-
+		$slug   = sanitize_key( wp_unslash( $_POST['slug'] ) );
 		$status = array(
 			'import' => 'demo',
 			'slug'   => $slug,
@@ -569,8 +560,8 @@ class TG_Demo_Importer {
 			define( 'WP_LOAD_IMPORTERS', true );
 		}
 
-		if ( ! current_user_can( 'manage_options' ) ) {
-			$status['errorMessage'] = __( 'Sorry, you are not allowed to import.', 'themegrill-demo-importer' );
+		if ( ! current_user_can( 'import' ) ) {
+			$status['errorMessage'] = __( 'Sorry, you are not allowed to import content.', 'themegrill-demo-importer' );
 			wp_send_json_error( $status );
 		}
 
@@ -617,9 +608,9 @@ class TG_Demo_Importer {
 	 * @return bool
 	 */
 	public function import_dummy_xml( $demo_id, $demo_data, $status ) {
-		$import_file = $this->import_file_path( $demo_id, 'dummy-data/dummy-data.xml' );
+		$import_file = $this->import_file_path( $demo_id, 'dummy-data.xml' );
 
-		// Load Importer API
+		// Load Importer API.
 		require_once ABSPATH . 'wp-admin/includes/import.php';
 
 		if ( ! class_exists( 'WP_Importer' ) ) {
