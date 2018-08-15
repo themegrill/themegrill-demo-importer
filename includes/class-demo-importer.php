@@ -14,13 +14,6 @@ defined( 'ABSPATH' ) || exit;
 class TG_Demo_Importer {
 
 	/**
-	 * Demo config.
-	 *
-	 * @var array
-	 */
-	public $demo_config;
-
-	/**
 	 * Demo packages.
 	 *
 	 * @var array
@@ -76,7 +69,6 @@ class TG_Demo_Importer {
 	 * Demo importer setup.
 	 */
 	public function setup() {
-		$this->demo_config   = apply_filters( 'themegrill_demo_importer_config', array() );
 		$this->demo_packages = $this->get_demo_packages();
 	}
 
@@ -228,7 +220,7 @@ class TG_Demo_Importer {
 					/* translators: accessibility text */
 					'selectFeatureFilter' => __( 'Select one or more Demo features to filter by', 'themegrill-demo-importer' ),
 				),
-				'installedDemos' => array_keys( $this->demo_config ),
+				'installedDemos' => array(),
 			) );
 		}
 	}
@@ -333,7 +325,7 @@ class TG_Demo_Importer {
 		}
 
 		// Output reset wizard notice.
-		if ( ! $demo_notice_dismiss && in_array( $demo_activated_id, array_keys( $this->demo_config ) ) ) {
+		if ( ! $demo_notice_dismiss && $demo_activated_id ) {
 			include_once( dirname( __FILE__ ) . '/admin/views/html-notice-reset-wizard.php' );
 		} elseif ( isset( $_GET['reset'] ) && 'true' === $_GET['reset'] ) {
 			include_once( dirname( __FILE__ ) . '/admin/views/html-notice-reset-wizard-success.php' );
