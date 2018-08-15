@@ -2,10 +2,8 @@
 /**
  * Customize API: OC_Customize_Demo_Importer_Setting class
  *
- * @version  1.0.0
- * @package  Importer/Classes
- * @category Customize
- * @author   ThemeGrill
+ * @package Importer/Classes
+ * @version 1.0.0
  */
 
 /**

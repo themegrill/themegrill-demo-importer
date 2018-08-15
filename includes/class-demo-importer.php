@@ -320,9 +320,9 @@ class TG_Demo_Importer {
 
 		// Output reset wizard notice.
 		if ( ! $demo_notice_dismiss && $demo_activated_id ) {
-			include_once( dirname( __FILE__ ) . '/admin/views/html-notice-reset-wizard.php' );
+			include_once dirname( __FILE__ ) . '/admin/views/html-notice-reset-wizard.php';
 		} elseif ( isset( $_GET['reset'] ) && 'true' === $_GET['reset'] ) {
-			include_once( dirname( __FILE__ ) . '/admin/views/html-notice-reset-wizard-success.php' );
+			include_once dirname( __FILE__ ) . '/admin/views/html-notice-reset-wizard-success.php';
 		}
 	}
 
@@ -354,7 +354,7 @@ class TG_Demo_Importer {
 		global $wpdb, $current_user;
 
 		if ( ! empty( $_GET['do_reset_wordpress'] ) ) {
-			require_once( ABSPATH . '/wp-admin/includes/upgrade.php' );
+			require_once ABSPATH . '/wp-admin/includes/upgrade.php';
 
 			$template     = get_option( 'template' );
 			$blogname     = get_option( 'blogname' );

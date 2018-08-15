@@ -4,16 +4,11 @@
  *
  * Code adapted from the "Widget Importer & Exporter" plugin.
  *
- * @class    TG_Widget_Importer
- * @version  1.0.0
- * @package  Importer/Classes
- * @category Admin
- * @author   ThemeGrill
+ * @package Importer/Classes
+ * @version 1.0.0
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * TG_Widget_Importer Class.

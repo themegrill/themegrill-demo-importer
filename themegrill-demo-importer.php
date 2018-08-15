@@ -159,8 +159,8 @@ if ( ! class_exists( 'ThemeGrill_Demo_Importer' ) ) :
 		 * Includes.
 		 */
 		private function includes() {
-			include_once( TGDM_ABSPATH . 'includes/class-demo-importer.php' );
-			include_once( TGDM_ABSPATH . 'includes/functions-demo-importer.php' );
+			include_once TGDM_ABSPATH . 'includes/class-demo-importer.php';
+			include_once TGDM_ABSPATH . 'includes/functions-demo-importer.php';
 
 			// Backward compatibility for demo packages config.
 			if ( false === strpos( get_option( 'template' ), '-pro' ) ) {

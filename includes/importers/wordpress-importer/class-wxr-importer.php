@@ -4,12 +4,9 @@
  *
  * Code adapted from the "WordPress Importer" plugin.
  *
- * @class    TG_WXR_Importer
  * @extends  WP_Importer
- * @version  1.0.0
- * @package  Importer/Classes
- * @category Admin
- * @author   ThemeGrill
+ * @package Importer/Classes
+ * @version 1.0.0
  */
 
 if ( ! defined( 'WP_LOAD_IMPORTERS' ) ) {
