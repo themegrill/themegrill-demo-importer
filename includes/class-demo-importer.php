@@ -565,7 +565,8 @@ class TG_Demo_Importer {
 			wp_send_json_error( $status );
 		}
 
-		$demo_data = isset( $this->demo_config[ $slug ] ) ? $this->demo_config[ $slug ] : array();
+		$packages  = isset( $this->demo_packages->demos ) ? json_decode( wp_json_encode( $this->demo_packages->demos ), true ) : array();
+		$demo_data = $packages[ $slug ];
 
 		do_action( 'themegrill_ajax_before_demo_import' );
 
