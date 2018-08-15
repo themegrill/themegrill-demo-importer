@@ -149,7 +149,7 @@ class TG_Demo_Importer {
 		$screen      = get_current_screen();
 		$screen_id   = $screen ? $screen->id : '';
 		$suffix      = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
-		$assets_path = TGDM()->plugin_url() . '/assets/';
+		$assets_path = tgdm()->plugin_url() . '/assets/';
 
 		// Register admin styles.
 		wp_register_style( 'tg-demo-importer', $assets_path . 'css/demo-importer.css', array(), TGDM_VERSION );

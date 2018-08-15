@@ -47,7 +47,7 @@ final class ThemeGrill_Demo_Importer {
 	 * @since 1.4
 	 */
 	public function __clone() {
-		_doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'themegrill-demo-importer' ), '1.4' );
+		_doing_it_wrong( __FUNCTION__, esc_html__( 'Cheatin&#8217; huh?', 'themegrill-demo-importer' ), '1.4' );
 	}
 
 	/**
@@ -56,7 +56,7 @@ final class ThemeGrill_Demo_Importer {
 	 * @since 1.4
 	 */
 	public function __wakeup() {
-		_doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'themegrill-demo-importer' ), '1.4' );
+		_doing_it_wrong( __FUNCTION__, esc_html__( 'Cheatin&#8217; huh?', 'themegrill-demo-importer' ), '1.4' );
 	}
 
 	/**
@@ -104,7 +104,7 @@ final class ThemeGrill_Demo_Importer {
 		register_activation_hook( TGDM_PLUGIN_FILE, array( $this, 'install' ) );
 
 		// Check with Official ThemeGrill theme is installed.
-		if ( in_array( get_option( 'template' ), $this->get_core_supported_themes() ) ) {
+		if ( in_array( get_option( 'template' ), $this->get_core_supported_themes(), true ) ) {
 			$this->includes();
 
 			add_filter( 'plugin_action_links_' . TGDM_PLUGIN_BASENAME, array( $this, 'plugin_action_links' ) );
@@ -122,7 +122,7 @@ final class ThemeGrill_Demo_Importer {
 	private function get_core_supported_themes() {
 		$core_themes = array( 'spacious', 'colormag', 'flash', 'estore', 'ample', 'accelerate', 'colornews', 'foodhunt', 'fitclub', 'radiate', 'freedom', 'himalayas', 'esteem', 'envince', 'suffice', 'explore', 'masonic', 'cenote' );
 
-		// Check for core themes pro version :)
+		// Check for official core themes pro version.
 		$pro_themes = array_diff( $core_themes, array( 'explore', 'masonic' ) );
 		if ( ! empty( $pro_themes ) ) {
 			$pro_themes = preg_replace( '/$/', '-pro', $pro_themes );
@@ -241,7 +241,7 @@ final class ThemeGrill_Demo_Importer {
 	 * @return array
 	 */
 	public function plugin_row_meta( $plugin_meta, $plugin_file ) {
-		if ( TGDM_PLUGIN_BASENAME == $plugin_file ) {
+		if ( TGDM_PLUGIN_BASENAME === $plugin_file ) {
 			$new_plugin_meta = array(
 				'docs'    => '<a href="' . esc_url( apply_filters( 'themegrill_demo_importer_docs_url', 'https://themegrill.com/docs/themegrill-demo-importer/' ) ) . '" title="' . esc_attr( __( 'View Demo Importer Documentation', 'themegrill-demo-importer' ) ) . '">' . __( 'Docs', 'themegrill-demo-importer' ) . '</a>',
 				'support' => '<a href="' . esc_url( apply_filters( 'themegrill_demo_importer_support_url', 'https://themegrill.com/support-forum/' ) ) . '" title="' . esc_attr( __( 'Visit Free Customer Support Forum', 'themegrill-demo-importer' ) ) . '">' . __( 'Free Support', 'themegrill-demo-importer' ) . '</a>',

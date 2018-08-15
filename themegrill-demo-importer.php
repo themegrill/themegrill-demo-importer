@@ -35,9 +35,9 @@ if ( ! class_exists( 'ThemeGrill_Demo_Importer' ) ) {
  * @since  1.3.4
  * @return ThemeGrill_Demo_Importer
  */
-function TGDM() {
+function tgdm() {
 	return ThemeGrill_Demo_Importer::instance();
 }
 
 // Global for backwards compatibility.
-$GLOBALS['themegrill-demo-importer'] = TGDM();
+$GLOBALS['themegrill-demo-importer'] = tgdm();
