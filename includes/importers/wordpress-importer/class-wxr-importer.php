@@ -4,7 +4,7 @@
  *
  * Code adapted from the "WordPress Importer" plugin.
  *
- * @extends  WP_Importer
+ * @extends WP_Importer
  * @package Importer/Classes
  * @version 1.0.0
  */

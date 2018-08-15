@@ -24,8 +24,7 @@ class TG_Demo_Importer {
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->demo_packages = $this->get_demo_packages();
-
+		add_action( 'init', array( $this, 'setup' ), 5 );
 		add_action( 'init', array( $this, 'includes' ) );
 
 		// Add Demo Importer menu.
@@ -64,6 +63,13 @@ class TG_Demo_Importer {
 		// Update widget and customizer demo import settings data.
 		add_filter( 'themegrill_widget_demo_import_settings', array( $this, 'update_widget_data' ), 10, 4 );
 		add_filter( 'themegrill_customizer_demo_import_settings', array( $this, 'update_customizer_data' ), 10, 2 );
+	}
+
+	/**
+	 * Demo importer setup.
+	 */
+	public function setup() {
+		$this->demo_packages = $this->get_demo_packages();
 	}
 
 	/**
