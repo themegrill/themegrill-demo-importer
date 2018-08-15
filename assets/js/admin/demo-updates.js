@@ -401,6 +401,10 @@
 			message:   _.unescape( errorMessage )
 		} );
 
+		// Remove the lock, and clear the queue.
+		wp.updates.ajaxLocked = false;
+		wp.updates.queue      = [];
+
 		// Change buttons of all running updates.
 		$( '.button.updating-message' )
 			.removeClass( 'updating-message' )
