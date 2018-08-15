@@ -1,19 +1,20 @@
 === ThemeGrill Demo Importer ===
 Contributors: ThemeGrill, shivapoudel
-Tags: themegrill, themes,  demo, importer, download
+Tags: themegrill, theme demos, demo, importer, one click import
 Requires at least: 4.7
 Tested up to: 4.9
-Stable tag: 1.4.3
+Requires PHP: 5.4
+Stable tag: 1.5.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-Import your demo content, widgets and theme settings with one click for ThemeGrill official themes.
+Import ThemeGrill official themes demo content, widgets and theme settings with just one click.
 
 == Description ==
 
-Import your demo content, widgets and theme settings with one click for <a href="https://themegrill.com/themes/" target="_blank" rel="nofollow">ThemeGrill</a> official themes.
+Import <a href="https://themegrill.com/themes/" target="_blank" rel="nofollow">ThemeGrill</a> official themes demo content, widgets and theme settings with just one click.
 
-Get free support at https://themegrill.com/support-forum/
+Get [free support](https://themegrill.com/support-forum/)
 
 = Demo Importer in action: =
 
@@ -66,6 +67,13 @@ Bugs can be reported either in our support forum or preferably on the [GitHub re
 Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/themegrill-demo-importer/) :)
 
 == Changelog ==
+
+= 1.5.0 - XX-08-2018 =
+* Dev - Improve PHP7 compatibility.
+* Fix - Slashes to be stripped from imported comments.
+* Fix - Importing export files with multiline term meta data.
+* Fix - Deprecation notices including `wp_get_http()` and `screen_icon()`.
+
 = 1.4.3 - 23-04-2018 =
 * Support - Cenote theme.
 

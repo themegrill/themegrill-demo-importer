@@ -1,5 +1,18 @@
 == Changelog ==
 
+= 1.5.0 - XX-08-2018 =
+* Dev - Improve PHP7 compatibility.
+* Fix - Slashes to be stripped from imported comments.
+* Fix - Importing export files with multiline term meta data.
+* Fix - Deprecation notices including `wp_get_http()` and `screen_icon()`.
+
+= 1.4.3 - 23-04-2018 =
+* Support - Cenote theme.
+
+= 1.4.2 - 25-12-2017 =
+* Fix - Disable WooCommerce setup wizard for demo import.
+* Fix - Styling issue caused by missing `theme-id-container` container.
+
 = 1.4.1 - 08-12-2017 =
 * Feature - Compatiable with Elementor page builder.
 * Fix - Styling issue caused by missing `theme-id-container` container.
