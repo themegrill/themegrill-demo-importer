@@ -777,6 +777,7 @@ class TG_WXR_Importer extends WP_Importer {
 					if ( ! $post_exists || ! comment_exists( $comment['comment_author'], $comment['comment_date'] ) ) {
 						if ( isset( $inserted_comments[$comment['comment_parent']] ) )
 							$comment['comment_parent'] = $inserted_comments[$comment['comment_parent']];
+						$comment = wp_slash( $comment );
 						$comment = wp_filter_comment( $comment );
 						$inserted_comments[$key] = wp_insert_comment( $comment );
 						do_action( 'wp_import_insert_comment', $inserted_comments[$key], $comment, $comment_post_ID, $post );
@@ -926,63 +927,43 @@ class TG_WXR_Importer extends WP_Importer {
 	 * If fetching attachments is enabled then attempt to create a new attachment
 	 *
 	 * @param array $post Attachment post details from WXR
-	 * @param string $remote_url URL to fetch attachment from
+	 * @param string $url URL to fetch attachment from
 	 * @return int|WP_Error Post ID on success, WP_Error otherwise
 	 */
-	function process_attachment( $post, $remote_url ) {
+	function process_attachment( $post, $url ) {
 		if ( ! $this->fetch_attachments )
 			return new WP_Error( 'attachment_processing_error',
 				__( 'Fetching attachments is not enabled', 'themegrill-demo-importer' ) );
 
 		// if the URL is absolute, but does not contain address, then upload it assuming base_site_url
-		if ( preg_match( '|^/[\w\W]+$|', $remote_url ) ) {
-			$remote_url = rtrim( $this->base_url, '/' ) . $remote_url;
-		}
+		if ( preg_match( '|^/[\w\W]+$|', $url ) )
+			$url = rtrim( $this->base_url, '/' ) . $url;
 
-		$upload = $this->fetch_remote_file( $remote_url, $post );
-		if ( is_wp_error( $upload ) ) {
+		$upload = $this->fetch_remote_file( $url, $post );
+		if ( is_wp_error( $upload ) )
 			return $upload;
-		}
 
-		$info = wp_check_filetype( $upload['file'] );
-		if ( ! $info ) {
-			return new WP_Error( 'attachment_processing_error', __( 'Invalid file type', 'themegrill-demo-importer' ) );
-		}
+		if ( $info = wp_check_filetype( $upload['file'] ) )
+			$post['post_mime_type'] = $info['type'];
+		else
+			return new WP_Error( 'attachment_processing_error', __('Invalid file type', 'themegrill-demo-importer') );
 
-		$post['post_mime_type'] = $info['type'];
-
-		// WP really likes using the GUID for display. Allow updating it.
-		// See https://core.trac.wordpress.org/ticket/33386
 		$post['guid'] = $upload['url'];
 
 		// as per wp-admin/includes/upload.php
 		$post_id = wp_insert_attachment( $post, $upload['file'] );
-		if ( is_wp_error( $post_id ) ) {
-			return $post_id;
-		}
-
-		$attachment_metadata = wp_generate_attachment_metadata( $post_id, $upload['file'] );
-		wp_update_attachment_metadata( $post_id, $attachment_metadata );
-
-		// Map this image URL later if we need to
-		$this->url_remap[ $remote_url ] = $upload['url'];
-
-		// If we have a HTTPS URL, ensure the HTTP URL gets replaced too
-		if ( substr( $remote_url, 0, 8 ) === 'https://' ) {
-			$insecure_url = 'http' . substr( $remote_url, 5 );
-			$this->url_remap[ $insecure_url ] = $upload['url'];
-		}
+		wp_update_attachment_metadata( $post_id, wp_generate_attachment_metadata( $post_id, $upload['file'] ) );
 
 		// remap resized image URLs, works by stripping the extension and remapping the URL stub.
-		/*if ( preg_match( '!^image/!', $info['type'] ) ) {
-			$parts = pathinfo( $remote_url );
+		if ( preg_match( '!^image/!', $info['type'] ) ) {
+			$parts = pathinfo( $url );
 			$name = basename( $parts['basename'], ".{$parts['extension']}" ); // PATHINFO_FILENAME in PHP 5.2
 
 			$parts_new = pathinfo( $upload['url'] );
 			$name_new = basename( $parts_new['basename'], ".{$parts_new['extension']}" );
 
 			$this->url_remap[$parts['dirname'] . '/' . $name] = $parts_new['dirname'] . '/' . $name_new;
-		}*/
+		}
 
 		return $post_id;
 	}
@@ -994,63 +975,62 @@ class TG_WXR_Importer extends WP_Importer {
 	 * @param array $post Attachment details
 	 * @return array|WP_Error Local file location details on success, WP_Error otherwise
 	 */
-	protected function fetch_remote_file( $url, $post ) {
+	function fetch_remote_file( $url, $post ) {
 		// extract the file name and extension from the url
 		$file_name = basename( $url );
 
 		// get placeholder file in the upload dir with a unique, sanitized filename
 		$upload = wp_upload_bits( $file_name, 0, '', $post['upload_date'] );
-		if ( $upload['error'] ) {
+		if ( $upload['error'] )
 			return new WP_Error( 'upload_dir_error', $upload['error'] );
-		}
 
 		// fetch the remote url and write it to the placeholder file
-		$response = wp_remote_get( $url, array(
-			'stream' => true,
+		$remote_response = wp_safe_remote_get( $url, array(
+			'timeout'  => 300,
+			'stream'   => true,
 			'filename' => $upload['file'],
 		) );
 
+		$headers = wp_remote_retrieve_headers( $remote_response );
+
 		// request failed
-		if ( is_wp_error( $response ) ) {
-			unlink( $upload['file'] );
-			return $response;
+		if ( ! $headers ) {
+			@unlink( $upload['file'] );
+			return new WP_Error( 'import_file_error', __('Remote server did not respond', 'themegrill-demo-importer') );
 		}
 
-		$code = (int) wp_remote_retrieve_response_code( $response );
+		$remote_response_code = wp_remote_retrieve_response_code( $remote_response );
 
 		// make sure the fetch was successful
-		if ( $code !== 200 ) {
-			unlink( $upload['file'] );
-			return new WP_Error(
-				'import_file_error',
-				sprintf(
-					__( 'Remote server returned %1$d %2$s for %3$s', 'themegrill-demo-importer' ),
-					$code,
-					get_status_header_desc( $code ),
-					$url
-				)
-			);
+		if ( $remote_response_code != '200' ) {
+			@unlink( $upload['file'] );
+			return new WP_Error( 'import_file_error', sprintf( __('Remote server returned error response %1$d %2$s', 'themegrill-demo-importer'), esc_html($remote_response_code), get_status_header_desc($remote_response_code) ) );
 		}
 
 		$filesize = filesize( $upload['file'] );
-		$headers = wp_remote_retrieve_headers( $response );
 
-		if ( isset( $headers['content-length'] ) && $filesize !== (int) $headers['content-length'] ) {
-			unlink( $upload['file'] );
-			return new WP_Error( 'import_file_error', __( 'Remote file is incorrect size', 'themegrill-demo-importer' ) );
+		if ( isset( $headers['content-length'] ) && $filesize != $headers['content-length'] ) {
+			@unlink( $upload['file'] );
+			return new WP_Error( 'import_file_error', __('Remote file is incorrect size', 'themegrill-demo-importer') );
 		}
 
-		if ( 0 === $filesize ) {
-			unlink( $upload['file'] );
-			return new WP_Error( 'import_file_error', __( 'Zero size file downloaded', 'themegrill-demo-importer' ) );
+		if ( 0 == $filesize ) {
+			@unlink( $upload['file'] );
+			return new WP_Error( 'import_file_error', __('Zero size file downloaded', 'themegrill-demo-importer') );
 		}
 
 		$max_size = (int) $this->max_attachment_size();
 		if ( ! empty( $max_size ) && $filesize > $max_size ) {
-			unlink( $upload['file'] );
-			$message = sprintf( __( 'Remote file is too large, limit is %s', 'themegrill-demo-importer' ), size_format( $max_size ) );
-			return new WP_Error( 'import_file_error', $message );
+			@unlink( $upload['file'] );
+			return new WP_Error( 'import_file_error', sprintf(__('Remote file is too large, limit is %s', 'themegrill-demo-importer'), size_format($max_size) ) );
 		}
+
+		// keep track of the old and new urls so we can substitute them later
+		$this->url_remap[$url] = $upload['url'];
+		$this->url_remap[$post['guid']] = $upload['url']; // r13735, really needed?
+		// keep track of the destination if the remote url is redirected somewhere else
+		if ( isset($headers['x-final-location']) && $headers['x-final-location'] != $url )
+			$this->url_remap[$headers['x-final-location']] = $upload['url'];
 
 		return $upload;
 	}
@@ -1073,8 +1053,10 @@ class TG_WXR_Importer extends WP_Importer {
 			if ( isset( $this->processed_posts[$parent_id] ) )
 				$local_parent_id = $this->processed_posts[$parent_id];
 
-			if ( $local_child_id && $local_parent_id )
+			if ( $local_child_id && $local_parent_id ) {
 				$wpdb->update( $wpdb->posts, array( 'post_parent' => $local_parent_id ), array( 'ID' => $local_child_id ), '%d', '%d' );
+				clean_post_cache( $local_child_id );
+			}
 		}
 
 		// all other posts/terms are imported, retry menu items with missing associated object
@@ -1140,7 +1122,6 @@ class TG_WXR_Importer extends WP_Importer {
 	// Display import page title
 	function header() {
 		echo '<div class="wrap">';
-		screen_icon();
 		echo '<h2>' . __( 'Import WordPress', 'themegrill-demo-importer' ) . '</h2>';
 
 		$updates = get_plugin_updates();
