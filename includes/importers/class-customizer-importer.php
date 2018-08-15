@@ -29,7 +29,6 @@ class TG_Customizer_Importer {
 	public static function import( $import_file, $demo_id, $demo_data ) {
 		global $wp_customize;
 
-		$temp = get_template();
 		$data = maybe_unserialize( file_get_contents( $import_file ) );
 
 		// Data checks.
@@ -37,7 +36,7 @@ class TG_Customizer_Importer {
 			return new WP_Error( 'themegrill_customizer_import_data_error', __( 'The customizer import file is not in a correct format. Please make sure to use the correct customizer import file.', 'themegrill-demo-importer' ) );
 		}
 
-		if ( $temp !== $data['template'] || ( ! empty( $demo_data['template'] ) && ! in_array( $temp, $demo_data['template'] ) ) ) {
+		if ( ! empty( $demo_data['template'] ) && ! in_array( $data['template'], $demo_data['template'], true ) ) {
 			return new WP_Error( 'themegrill_customizer_import_wrong_theme', __( 'The customizer import file is not suitable for current theme. You can only import customizer settings for the same theme or a child theme.', 'themegrill-demo-importer' ) );
 		}
 
