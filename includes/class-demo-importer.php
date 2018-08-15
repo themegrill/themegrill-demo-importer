@@ -202,15 +202,7 @@ class TG_Demo_Importer {
 					'installURI'     => current_user_can( 'upload_files' ) ? self_admin_url( 'themes.php?page=demo-importer&browse=preview' ) : null,
 					'confirmReset'   => __( 'It is strongly recommended that you backup your database before proceeding. Are you sure you wish to run the reset wizard now?', 'themegrill-demo-importer' ),
 					'confirmDelete'  => __( "Are you sure you want to delete this demo?\n\nClick 'Cancel' to go back, 'OK' to confirm the delete.", 'themegrill-demo-importer' ),
-					'confirmImport'  => __( 'Importing demo data will ensure that your site will look similar as theme demo. It makes you easy to modify the content instead of creating them from scratch. Also consider before importing theme demo:
-
-1. You need to import demo on fresh WordPress install to exactly replicate the theme demo.
-
-2. None of the posts, pages, attachments or any other data already existing in your site will be deleted or modified.
-
-3. Copyright images will get replaced with other placeholder images.
-
-4. It will take some time to import the theme demo.', 'themegrill-demo-importer' ),
+					'confirmImport'  => __( "Importing demo data will ensure that your site will look similar as theme demo. It makes you easy to modify the content instead of creating them from scratch. Also consider before importing theme demo: \n\n1. You need to import demo on fresh WordPress install to exactly replicate the theme demo. \n\n2. None of the posts, pages, attachments or any other data already existing in your site will be deleted or modified. \n\n3. Copyright images will get replaced with other placeholder images. \n\n4. It will take some time to import the theme demo.", 'themegrill-demo-importer' ),
 					'ajaxUrl'        => admin_url( 'admin-ajax.php' ),
 					'adminUrl'       => parse_url( self_admin_url(), PHP_URL_PATH ),
 				),
