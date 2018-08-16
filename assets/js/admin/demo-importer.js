@@ -926,12 +926,6 @@ demos.view.Demos = wp.Backbone.View.extend({
 			self.renderDemos( self.parent.page );
 		});
 
-		this.listenTo( this.parent, 'demo:close', function() {
-			if ( self.overlay ) {
-				self.overlay.closeOverlay();
-			}
-		} );
-
 		// Bind keyboard events.
 		$( 'body' ).on( 'keyup', function( event ) {
 			if ( ! self.overlay ) {
