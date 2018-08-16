@@ -739,7 +739,7 @@ demos.view.Preview = wp.Backbone.View.extend({
 			$target = $( event.target );
 		event.preventDefault();
 
-		if ( $target.hasClass( 'disabled' ) ) {
+		if ( $target.hasClass( 'disabled' ) || $target.hasClass( 'updating-message' ) ) {
 			return;
 		}
 
@@ -748,6 +748,9 @@ demos.view.Preview = wp.Backbone.View.extend({
 		}
 
 		wp.updates.maybeRequestFilesystemCredentials( event );
+
+		// Disable the next and previous demo.
+		$( '.theme-install-overlay' ).find( '.next-theme, .previous-theme' ).addClass( 'disabled' );
 
 		$( document ).on( 'wp-demo-import-success', function( event, response ) {
 			if ( _this.model.get( 'id' ) === response.slug ) {
@@ -786,6 +789,9 @@ demos.view.Preview = wp.Backbone.View.extend({
 				.addClass( 'updating-message' )
 				.text( wp.updates.l10n.installing );
 			wp.a11y.speak( wp.updates.l10n.installingMsg, 'polite' );
+
+			// Disable the next and previous demo.
+			$( '.theme-install-overlay' ).find( '.next-theme, .previous-theme' ).addClass( 'disabled' );
 		}
 
 		wp.updates.maybeRequestFilesystemCredentials( event );
@@ -856,6 +862,9 @@ demos.view.Preview = wp.Backbone.View.extend({
 				} else {
 					_this.model.set( { requiredPlugins: false } );
 					_this.render();
+
+					// Disable the next and previous demo.
+					$( '.theme-install-overlay' ).find( '.next-theme, .previous-theme' ).addClass( 'disabled' );
 				}
 			}
 		} );
