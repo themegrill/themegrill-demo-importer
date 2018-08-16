@@ -442,11 +442,6 @@ class TG_Demo_Importer {
 			return $prepared_demos;
 		}
 
-		// Make sure the imported demo is listed first.
-		if ( isset( $available_packages->$demo_activated_id ) ) {
-			$prepared_demos[ $demo_activated_id ] = array();
-		}
-
 		$request = wp_parse_args( wp_unslash( $_REQUEST['request'] ), array(
 			'browse'      => 'all',
 			'pagebuilder' => 'elementor',
