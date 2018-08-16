@@ -139,15 +139,8 @@ final class ThemeGrill_Demo_Importer {
 		include_once TGDM_ABSPATH . 'includes/functions-demo-importer.php';
 
 		// Backward compatibility for demo packages config.
-		if ( false === strpos( get_option( 'template' ), '-pro' ) ) {
-			$files = glob( TGDM_DEMO_DIR . '**/tg-demo-config.php' );
-			if ( $files ) {
-				foreach ( $files as $file ) {
-					if ( $file && is_readable( $file ) ) {
-						include_once $file;
-					}
-				}
-			}
+		if ( file_exists( TGDM_DEMO_DIR . 'tg-demo-config.php' ) ) {
+			include_once TGDM_DEMO_DIR . 'tg-demo-config.php';
 		}
 	}
 
