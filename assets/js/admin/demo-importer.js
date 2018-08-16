@@ -12,8 +12,8 @@ demos = wp.demos = wp.demos || {};
 demos.data = _demoImporterSettings;
 l10n = demos.data.l10n;
 
-// Shortcut for isInstall check
-demos.isInstall = !! demos.data.settings.isInstall;
+// Shortcut for isNew check
+demos.isNew = !! demos.data.settings.isNew;
 
 // Setup app structure
 _.extend( demos, { model: {}, view: {}, routes: {}, router: {}, template: wp.template });
@@ -125,7 +125,7 @@ demos.view.Appearance = wp.Backbone.View.extend({
 		threshold = Math.round( threshold * 0.9 );
 
 		if ( bottom > threshold ) {
-			// this.trigger( 'demo:scroll' );
+			this.trigger( 'demo:scroll' );
 		}
 	},
 
@@ -976,14 +976,6 @@ demos.view.Demos = wp.Backbone.View.extend({
 		// Display a live demo count for the collection
 		this.liveDemoCount = this.collection.count ? this.collection.count : this.collection.length;
 		this.count.text( this.liveDemoCount );
-
-		/*
-		 * In the demo installer the demos count is already announced
-		 * because `announceSearchResults` is called on `query:success`.
-		 */
-		if ( ! demos.isInstall ) {
-			this.announceSearchResults( this.liveDemoCount );
-		}
 	},
 
 	// Iterates through each instance of the collection
@@ -998,6 +990,11 @@ demos.view.Demos = wp.Backbone.View.extend({
 			// Fire a no-more-demos event.
 			this.parent.trigger( 'demo:end' );
 			return;
+		}
+
+		// Make sure the add-new stays at the end
+		if ( demos.isNew && page >= 1 ) {
+			$( '.add-new-theme' ).remove();
 		}
 
 		// Loop through the demos and setup each demo view
@@ -1016,6 +1013,11 @@ demos.view.Demos = wp.Backbone.View.extend({
 			// with the demo details
 			self.listenTo( self.demo, 'demo:expand', self.expand, self );
 		});
+
+		// 'Suggest us!' element shown at the end of the grid
+		if ( demos.isNew && demos.data.settings.suggestURI ) {
+			this.$el.append( '<div class="theme add-new-theme"><a href="' + demos.data.settings.suggestURI + '" target="blank"><div class="theme-screenshot"><span></span></div><h2 class="theme-name">' + l10n.suggestNew + '</h2></a></div>' );
+		}
 
 		this.parent.page++;
 	},

@@ -185,22 +185,20 @@ class TG_Demo_Importer {
 			wp_localize_script( 'tg-demo-importer', '_demoImporterSettings', array(
 				'demos'    => false,
 				'settings' => array(
-					'isInstall'      => apply_filters( 'themegrill_demo_importer_installer', true ),
-					'canInstall'     => current_user_can( 'upload_files' ),
-					'installURI'     => current_user_can( 'upload_files' ) ? self_admin_url( 'themes.php?page=demo-importer&browse=preview' ) : null,
-					'confirmReset'   => __( 'It is strongly recommended that you backup your database before proceeding. Are you sure you wish to run the reset wizard now?', 'themegrill-demo-importer' ),
-					'confirmDelete'  => __( "Are you sure you want to delete this demo?\n\nClick 'Cancel' to go back, 'OK' to confirm the delete.", 'themegrill-demo-importer' ),
-					'confirmImport'  => __( "Importing demo data will ensure that your site will look similar as theme demo. It makes you easy to modify the content instead of creating them from scratch. Also consider before importing theme demo: \n\n1. You need to import demo on fresh WordPress install to exactly replicate the theme demo. \n\n2. None of the posts, pages, attachments or any other data already existing in your site will be deleted or modified. \n\n3. Copyright images will get replaced with other placeholder images. \n\n4. It will take some time to import the theme demo.", 'themegrill-demo-importer' ),
+					'isNew'          => false,
 					'ajaxUrl'        => admin_url( 'admin-ajax.php' ),
 					'adminUrl'       => parse_url( self_admin_url(), PHP_URL_PATH ),
+					'suggestURI'     => apply_filters( 'themegrill_demo_importer_suggest_new', 'https://themegrill.com/contact/' ),
+					'confirmReset'   => __( 'It is strongly recommended that you backup your database before proceeding. Are you sure you wish to run the reset wizard now?', 'themegrill-demo-importer' ),
+					'confirmImport'  => __( "Importing demo data will ensure that your site will look similar as theme demo. It makes you easy to modify the content instead of creating them from scratch. Also consider before importing theme demo: \n\n1. You need to import demo on fresh WordPress install to exactly replicate the theme demo. \n\n2. None of the posts, pages, attachments or any other data already existing in your site will be deleted or modified. \n\n3. Copyright images will get replaced with other placeholder images. \n\n4. It will take some time to import the theme demo.", 'themegrill-demo-importer' ),
 				),
 				'l10n' => array(
-					'addNew'              => __( 'Add New Demo', 'themegrill-demo-importer' ),
 					'search'              => __( 'Search Demos', 'themegrill-demo-importer' ),
 					'searchPlaceholder'   => __( 'Search demos...', 'themegrill-demo-importer' ), // placeholder (no ellipsis)
 					/* translators: %s: support forums URL */
 					'error'               => sprintf( __( 'An unexpected error occurred. Something may be wrong with ThemeGrill demo server&#8217;s configuration. If you continue to have problems, please try the <a href="%s">support forums</a>.', 'themegrill-demo-importer' ), 'https://wordpress.org/support/plugin/themegrill-demo-importer' ),
 					'tryAgain'            => __( 'Try Again', 'themegrill-demo-importer' ),
+					'suggestNew'          => __( 'Please suggest us!', 'themegrill-demo-importer' ),
 					'demosFound'          => __( 'Number of Demos found: %d', 'themegrill-demo-importer' ),
 					'noDemosFound'        => __( 'No demos found. Try a different search.', 'themegrill-demo-importer' ),
 					'collapseSidebar'     => __( 'Collapse Sidebar', 'themegrill-demo-importer' ),
@@ -506,8 +504,8 @@ class TG_Demo_Importer {
 
 		wp_send_json_success( array(
 		    'info' => array(
-		      'page'    => 20,
-		      'pages'   => 1,
+		      'page'    => 1,
+		      'pages'   => 2,
 		      'results' => count( $prepared_demos ),
 		    ),
 			'demos' => array_filter( $prepared_demos ),
