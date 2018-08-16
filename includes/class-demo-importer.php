@@ -503,11 +503,11 @@ class TG_Demo_Importer {
 		$prepared_demos = array_values( $prepared_demos );
 
 		wp_send_json_success( array(
-		    'info' => array(
-		      'page'    => 1,
-		      'pages'   => 2,
-		      'results' => count( $prepared_demos ),
-		    ),
+			'info' => array(
+				'page'    => 1,
+				'pages'   => 2,
+				'results' => count( $prepared_demos ),
+			),
 			'demos' => array_filter( $prepared_demos ),
 		) );
 	}
