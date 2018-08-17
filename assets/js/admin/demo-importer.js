@@ -546,7 +546,7 @@ demos.view.Demo = wp.Backbone.View.extend({
 		});
 	},
 
-	// Handles .disabled classes for previous/next buttons in theme installer preview
+	// Handles .disabled classes for previous/next buttons in demo installer preview
 	setNavButtonsState: function() {
 		var $themeInstaller = $( '.theme-install-overlay' ),
 			current = _.isUndefined( this.current ) ? this.model : this.current;
