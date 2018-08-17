@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: ThemeGrill Demo Importer 1.5.0\n"
 "Report-Msgid-Bugs-To: "
 "https://github.com/themegrill/themegrill-demo-importer/issues\n"
-"POT-Creation-Date: 2018-08-16 10:23:16+00:00\n"
+"POT-Creation-Date: 2018-08-17 11:46:51+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -57,7 +57,7 @@ msgstr ""
 
 #: includes/admin/views/html-admin-page-importer.php:12
 #: includes/class-demo-importer.php:121
-#: includes/class-themegrill-demo-importer.php:230
+#: includes/class-themegrill-demo-importer.php:223
 msgid "Demo Importer"
 msgstr ""
 
@@ -407,7 +407,7 @@ msgstr ""
 msgid "Cheatin&#8217; huh?"
 msgstr ""
 
-#: includes/class-demo-importer.php:479
+#: includes/class-demo-importer.php:485
 msgid "%s Pro"
 msgstr ""
 
@@ -415,56 +415,56 @@ msgstr ""
 msgid "ThemeGrill"
 msgstr ""
 
-#: includes/class-demo-importer.php:529
+#: includes/class-demo-importer.php:539
 msgid "No demo specified."
 msgstr ""
 
-#: includes/class-demo-importer.php:544
+#: includes/class-demo-importer.php:554
 msgid "Sorry, you are not allowed to import content."
 msgstr ""
 
-#: includes/class-demo-importer.php:576
+#: includes/class-demo-importer.php:586
 #: includes/functions-demo-importer.php:105
 msgid "Unable to connect to the filesystem. Please confirm your credentials."
 msgstr ""
 
-#: includes/class-demo-importer.php:659
+#: includes/class-demo-importer.php:669
 msgid "The XML file dummy content is missing."
 msgstr ""
 
-#: includes/class-demo-importer.php:724
+#: includes/class-demo-importer.php:734
 msgid "The DAT file customizer data is missing."
 msgstr ""
 
-#: includes/class-demo-importer.php:749
+#: includes/class-demo-importer.php:759
 msgid "The WIE file widget content is missing."
 msgstr ""
 
-#: includes/class-themegrill-demo-importer.php:230
+#: includes/class-themegrill-demo-importer.php:223
 msgid "View Demo Importer"
 msgstr ""
 
-#: includes/class-themegrill-demo-importer.php:246
+#: includes/class-themegrill-demo-importer.php:239
 msgid "View Demo Importer Documentation"
 msgstr ""
 
-#: includes/class-themegrill-demo-importer.php:246
+#: includes/class-themegrill-demo-importer.php:239
 msgid "Docs"
 msgstr ""
 
-#: includes/class-themegrill-demo-importer.php:247
+#: includes/class-themegrill-demo-importer.php:240
 msgid "Visit Free Customer Support Forum"
 msgstr ""
 
-#: includes/class-themegrill-demo-importer.php:247
+#: includes/class-themegrill-demo-importer.php:240
 msgid "Free Support"
 msgstr ""
 
-#: includes/class-themegrill-demo-importer.php:263
+#: includes/class-themegrill-demo-importer.php:256
 msgid "This plugin requires %s to be activated to work."
 msgstr ""
 
-#: includes/class-themegrill-demo-importer.php:263
+#: includes/class-themegrill-demo-importer.php:256
 msgid "Official ThemeGrill Theme"
 msgstr ""
 
