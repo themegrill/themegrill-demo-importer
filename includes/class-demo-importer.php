@@ -455,7 +455,11 @@ class TG_Demo_Importer {
 				$plugins_list   = isset( $package_data->plugins_list ) ? $package_data->plugins_list : array();
 				$screenshot_url = "https://raw.githubusercontent.com/themegrill/themegrill-demo-pack/master/resources/{$available_packages->slug}/{$package_id}/screenshot.jpg";
 
-				if ( ! empty( $package_data->category ) && ! in_array( $request['browse'], $package_data->category, true ) ) {
+				if ( isset( $request['browse'], $package_data->category ) && ! in_array( $request['browse'], $package_data->category, true ) ) {
+					continue;
+				}
+
+				if ( isset( $request['builder'], $package_data->pagebuilder ) && ! in_array( $request['builder'], $package_data->pagebuilder, true ) ) {
 					continue;
 				}
 

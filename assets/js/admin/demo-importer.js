@@ -1255,12 +1255,7 @@ demos.view.Installer = demos.view.Appearance.extend({
 
 	// Register events for sorting and filters in demo-navigation
 	events: {
-		'click .filter-links li > a': 'onSort',
-		'click .drawer-toggle': 'moreFilters',
-		'click .filter-drawer .apply-filters': 'applyFilters',
-		'click .filter-group [type="checkbox"]': 'addFilter',
-		'click .filter-drawer .clear-filters': 'clearFilters',
-		'click .edit-filters': 'backToFilters'
+		'click .filter-links li > a': 'onSort'
 	},
 
 	// Initial render method
@@ -1323,155 +1318,67 @@ demos.view.Installer = demos.view.Appearance.extend({
 	},
 
 	// Handles all the rendering of the public demo directory
-	browse: function( section ) {
+	browse: function( section, builder ) {
 		// Create a new collection with the proper demo data
 		// for each section
-		this.collection.query( { browse: section } );
+		if ( ! builder ) {
+			this.collection.query( { browse: section } );
+		} else {
+			this.collection.query( { browse: section, builder: builder } );
+		}
 	},
 
 	// Sorting navigation
 	onSort: function( event ) {
 		var $el = $( event.target ),
-			sort = $el.data( 'sort' );
+			sort = $el.data( 'sort' ),
+			type = $el.data( 'type' ),
+			filter = type ? 'pagebuilders' : 'categories';
 
 		event.preventDefault();
-
-		$( 'body' ).removeClass( 'filters-applied show-filters' );
-		$( '.drawer-toggle' ).attr( 'aria-expanded', 'false' );
 
 		// Bail if this is already active
 		if ( $el.hasClass( this.activeClass ) ) {
 			return;
 		}
 
-		this.sort( sort );
+		$( '.filter-links.' + filter + ' li > a' )
+			.removeClass( this.activeClass )
+			.removeAttr( 'aria-current' );
+
+		if ( ! sort ) {
+			sort = demos.router.selectedTab;
+		}
+
+		if ( ! type ) {
+			type = demos.router.selectedType;
+		}
+
+		this.sort( sort, type );
 
 		// Trigger a router.naviagte update
 		demos.router.navigate( demos.router.baseUrl( demos.router.browsePath + sort ) );
 	},
 
-	sort: function( sort ) {
+	sort: function( sort, type ) {
 		this.clearSearch();
 
 		// Track sorting so we can restore the correct tab when closing preview.
-		demos.router.selectedTab = sort;
-
-		$( '.filter-links li > a' )
-			.removeClass( this.activeClass )
-			.removeAttr( 'aria-current' );
+		demos.router.selectedTab  = sort;
+		demos.router.selectedType = type;
 
 		$( '[data-sort="' + sort + '"]' )
 			.addClass( this.activeClass )
 			.attr( 'aria-current', 'page' );
 
-		this.browse( sort );
-	},
+		$( '[data-type="' + type + '"]' )
+			.addClass( this.activeClass )
+			.attr( 'aria-current', 'page' );
 
-	// Clicking on a checkbox to add another filter to the request
-	addFilter: function() {
-		this.filtersChecked();
-	},
-
-	// Applying filters triggers a tag request
-	applyFilters: function( event ) {
-		var name,
-			tags = this.filtersChecked(),
-			request = { tag: tags },
-			filteringBy = $( '.filtered-by .tags' );
-
-		if ( event ) {
-			event.preventDefault();
-		}
-
-		if ( ! tags ) {
-			wp.a11y.speak( l10n.selectFeatureFilter );
-			return;
-		}
-
-		$( 'body' ).addClass( 'filters-applied' );
-		$( '.filter-links li > a.current' )
-			.removeClass( 'current' )
-			.removeAttr( 'aria-current' );
-
-		filteringBy.empty();
-
-		_.each( tags, function( tag ) {
-			name = $( 'label[for="filter-id-' + tag + '"]' ).text();
-			filteringBy.append( '<span class="tag">' + name + '</span>' );
-		});
-
-		// Get the themes by sending Ajax POST request to api.wordpress.org/themes
-		// or searching the local cache
-		this.collection.query( request );
-	},
-
-	// Get the checked filters
-	// @return {array} of tags or false
-	filtersChecked: function() {
-		var items = $( '.filter-group' ).find( ':checkbox' ),
-			tags = [];
-
-		_.each( items.filter( ':checked' ), function( item ) {
-			tags.push( $( item ).prop( 'value' ) );
-		});
-
-		// When no filters are checked, restore initial state and return
-		if ( tags.length === 0 ) {
-			$( '.filter-drawer .apply-filters' ).find( 'span' ).text( '' );
-			$( '.filter-drawer .clear-filters' ).hide();
-			$( 'body' ).removeClass( 'filters-applied' );
-			return false;
-		}
-
-		$( '.filter-drawer .apply-filters' ).find( 'span' ).text( tags.length );
-		$( '.filter-drawer .clear-filters' ).css( 'display', 'inline-block' );
-
-		return tags;
+		this.browse( sort, type );
 	},
 
 	activeClass: 'current',
-
-	// Toggle the full filters navigation
-	moreFilters: function( event ) {
-		var $body = $( 'body' ),
-			$toggleButton = $( '.drawer-toggle' );
-
-		event.preventDefault();
-
-		if ( $body.hasClass( 'filters-applied' ) ) {
-			return this.backToFilters();
-		}
-
-		this.clearSearch();
-
-		demos.router.navigate( demos.router.baseUrl( '' ) );
-		// Toggle the feature filters view.
-		$body.toggleClass( 'show-filters' );
-		// Toggle the `aria-expanded` button attribute.
-		$toggleButton.attr( 'aria-expanded', $body.hasClass( 'show-filters' ) );
-	},
-
-	// Clears all the checked filters
-	// @uses filtersChecked()
-	clearFilters: function( event ) {
-		var items = $( '.filter-group' ).find( ':checkbox' ),
-			self = this;
-
-		event.preventDefault();
-
-		_.each( items.filter( ':checked' ), function( item ) {
-			$( item ).prop( 'checked', false );
-			return self.filtersChecked();
-		});
-	},
-
-	backToFilters: function( event ) {
-		if ( event ) {
-			event.preventDefault();
-		}
-
-		$( 'body' ).removeClass( 'filters-applied' );
-	},
 
 	clearSearch: function() {
 		$( '#wp-filter-search-input').val( '' );
@@ -1575,12 +1482,13 @@ demos.RunInstaller = {
 		// Handles sorting / browsing routes
 		// Also handles the root URL triggering a sort request
 		// for `all`, the default view
-		demos.router.on( 'route:sort', function( sort ) {
+		demos.router.on( 'route:sort', function( sort, type ) {
+			type = $( '.filter-links.pagebuilders li' ).first().find( 'a' ).data( 'type' );
 			if ( ! sort ) {
 				sort = 'all';
 				demos.router.navigate( demos.router.baseUrl( '&browse=all' ), { replace: true } );
 			}
-			self.view.sort( sort );
+			self.view.sort( sort, type );
 
 			// Close the preview if open.
 			if ( demos.preview ) {
