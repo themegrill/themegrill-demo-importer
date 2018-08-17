@@ -1324,34 +1324,11 @@ demos.view.InstallerSearch = demos.view.Search.extend({
 
 		request.search = value;
 
-		// Intercept an [author] search.
-		//
-		// If input value starts with `author:` send a request
-		// for `author` instead of a regular `search`
-		if ( value.substring( 0, 7 ) === 'author:' ) {
-			request.search = '';
-			request.author = value.slice( 7 );
-		}
-
-		// Intercept a [tag] search.
-		//
-		// If input value starts with `tag:` send a request
-		// for `tag` instead of a regular `search`
-		if ( value.substring( 0, 4 ) === 'tag:' ) {
-			request.search = '';
-			request.tag = [ value.slice( 4 ) ];
-		}
-
 		$( '.filter-links li > a.current' )
 			.removeClass( 'current' )
 			.removeAttr( 'aria-current' );
 
-		$( 'body' ).removeClass( 'show-filters filters-applied show-favorites-form' );
-		$( '.drawer-toggle' ).attr( 'aria-expanded', 'false' );
-
-		// Get the demos by sending Ajax POST request to api.github.com/repos/themegrill-demo-pack
-		// or searching the local cache
-		this.collection.query( request );
+		this.collection.doSearch( value.replace( /\+/g, ' ' ) );
 
 		// Set route
 		demos.router.navigate( demos.router.baseUrl( demos.router.searchPath + encodeURIComponent( value ) ), { replace: true } );

@@ -183,7 +183,7 @@ class TG_Demo_Importer {
 				),
 			) );
 			wp_localize_script( 'tg-demo-importer', '_demoImporterSettings', array(
-				'demos'    => false,
+				'demos'    => $this->ajax_query_demos( true ),
 				'settings' => array(
 					'isNew'          => false,
 					'ajaxUrl'        => admin_url( 'admin-ajax.php' ),
@@ -420,7 +420,7 @@ class TG_Demo_Importer {
 	/**
 	 * Ajax handler for getting demos from github.
 	 */
-	public function ajax_query_demos() {
+	public function ajax_query_demos( $return = true ) {
 		$prepared_demos     = array();
 		$current_template   = get_option( 'template' );
 		$is_pro_theme_demo  = strpos( $current_template, '-pro' ) !== false;
@@ -440,9 +440,15 @@ class TG_Demo_Importer {
 			return $prepared_demos;
 		}
 
-		$request = wp_parse_args( wp_unslash( $_REQUEST['request'] ), array(
-			'browse' => 'all',
-		) );
+		if ( ! $return ) {
+			$request = wp_parse_args( wp_unslash( $_REQUEST['request'] ), array(
+				'browse' => 'all',
+			) );
+		} else {
+			$request = array(
+				'browse' => 'all',
+			);
+		}
 
 		if ( isset( $available_packages->demos ) ) {
 			foreach ( $available_packages->demos as $package_id => $package_data ) {
@@ -497,6 +503,10 @@ class TG_Demo_Importer {
 		 */
 		$prepared_demos = apply_filters( 'themegrill_demo_importer_prepare_demos_for_js', $prepared_demos );
 		$prepared_demos = array_values( $prepared_demos );
+
+		if ( $return ) {
+			return $prepared_demos;
+		}
 
 		wp_send_json_success( array(
 			'info' => array(
