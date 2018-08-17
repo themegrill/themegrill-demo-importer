@@ -934,39 +934,6 @@ demos.view.Demos = wp.Backbone.View.extend({
 		this.listenTo( this.parent, 'demo:scroll', function() {
 			self.renderDemos( self.parent.page );
 		});
-
-		this.listenTo( this.parent, 'demo:close', function() {
-			if ( self.overlay ) {
-				self.overlay.closeOverlay();
-			}
-		} );
-
-		// Bind keyboard events.
-		$( 'body' ).on( 'keyup', function( event ) {
-			if ( ! self.overlay ) {
-				return;
-			}
-
-			// Bail if the filesystem credentials dialog is shown.
-			if ( $( '#request-filesystem-credentials-dialog' ).is( ':visible' ) ) {
-				return;
-			}
-
-			// Pressing the right arrow key fires a demo:next event
-			if ( event.keyCode === 39 ) {
-				self.overlay.nextDemo();
-			}
-
-			// Pressing the left arrow key fires a demo:previous event
-			if ( event.keyCode === 37 ) {
-				self.overlay.previousDemo();
-			}
-
-			// Pressing the escape key fires a demo:collapse event
-			if ( event.keyCode === 27 ) {
-				self.overlay.collapse( event );
-			}
-		});
 	},
 
 	// Manages rendering of demo pages
@@ -1048,53 +1015,6 @@ demos.view.Demos = wp.Backbone.View.extend({
 	// Sets current view
 	setView: function( view ) {
 		return view;
-	},
-
-	// This method renders the next demo on the overlay modal
-	// based on the current position in the collection
-	// @params [model cid]
-	next: function( args ) {
-		var self = this,
-			model, nextModel;
-
-		// Get the current demo
-		model = self.collection.get( args[0] );
-		// Find the next model within the collection
-		nextModel = self.collection.at( self.collection.indexOf( model ) + 1 );
-
-		// Sanity check which also serves as a boundary test
-		if ( nextModel !== undefined ) {
-
-			// We have a new demo...
-			// Close the overlay
-			this.overlay.closeOverlay();
-
-			// Trigger a route update for the current model
-			self.demo.trigger( 'demo:expand', nextModel.cid );
-		}
-	},
-
-	// This method renders the previous demo on the overlay modal
-	// based on the current position in the collection
-	// @params [model cid]
-	previous: function( args ) {
-		var self = this,
-			model, previousModel;
-
-		// Get the current demo
-		model = self.collection.get( args[0] );
-		// Find the previous model within the collection
-		previousModel = self.collection.at( self.collection.indexOf( model ) - 1 );
-
-		if ( previousModel !== undefined ) {
-
-			// We have a new demo...
-			// Close the overlay
-			this.overlay.closeOverlay();
-
-			// Trigger a route update for the current model
-			self.demo.trigger( 'demo:expand', previousModel.cid );
-		}
 	},
 
 	// Dispatch audible search results feedback message
