@@ -548,10 +548,10 @@ demos.view.Demo = wp.Backbone.View.extend({
 
 	// Handles .disabled classes for previous/next buttons in demo installer preview
 	setNavButtonsState: function() {
-		var $themeInstaller = $( '.theme-install-overlay' ),
+		var $demoInstaller = $( '.theme-install-overlay' ),
 			current = _.isUndefined( this.current ) ? this.model : this.current,
-			previousDemoButton = $themeInstaller.find( '.previous-theme' ),
-			nextDemoButton = $themeInstaller.find( '.next-theme' );
+			previousDemoButton = $demoInstaller.find( '.previous-theme' ),
+			nextDemoButton = $demoInstaller.find( '.next-theme' );
 
 		// Disable previous at the zero position
 		if ( 0 === this.model.collection.indexOf( current ) ) {
