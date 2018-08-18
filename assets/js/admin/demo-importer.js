@@ -656,8 +656,8 @@ demos.view.Preview = wp.Backbone.View.extend({
 			$( 'body' ).removeClass( 'demo-importer-active full-overlay-active' );
 
 			// Return focus to the demo div
-			if ( demos.focusedTheme ) {
-				demos.focusedTheme.focus();
+			if ( demos.focusedDemo ) {
+				demos.focusedDemo.focus();
 			}
 		}).removeClass( 'iframe-ready' );
 
