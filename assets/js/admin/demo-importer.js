@@ -549,16 +549,26 @@ demos.view.Demo = wp.Backbone.View.extend({
 	// Handles .disabled classes for previous/next buttons in demo installer preview
 	setNavButtonsState: function() {
 		var $themeInstaller = $( '.theme-install-overlay' ),
-			current = _.isUndefined( this.current ) ? this.model : this.current;
+			current = _.isUndefined( this.current ) ? this.model : this.current,
+			previousDemoButton = $themeInstaller.find( '.previous-theme' ),
+			nextDemoButton = $themeInstaller.find( '.next-theme' );
 
 		// Disable previous at the zero position
 		if ( 0 === this.model.collection.indexOf( current ) ) {
-			$themeInstaller.find( '.previous-theme' ).addClass( 'disabled' );
+			previousDemoButton
+				.addClass( 'disabled' )
+				.prop( 'disabled', true );
+
+			nextDemoButton.focus();
 		}
 
 		// Disable next if the next model is undefined
 		if ( _.isUndefined( this.model.collection.at( this.model.collection.indexOf( current ) + 1 ) ) ) {
-			$themeInstaller.find( '.next-theme' ).addClass( 'disabled' );
+			nextDemoButton
+				.addClass( 'disabled' )
+				.prop( 'disabled', true );
+
+			previousDemoButton.focus();
 		}
 	},
 
