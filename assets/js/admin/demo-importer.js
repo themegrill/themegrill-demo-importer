@@ -715,12 +715,12 @@ demos.view.Preview = wp.Backbone.View.extend({
 			this.undelegateEvents();
 			this.close();
 		}
-		// The right arrow key, next theme
+		// The right arrow key, next demo
 		if ( event.keyCode === 39 ) {
 			_.once( this.nextDemo() );
 		}
 
-		// The left arrow key, previous theme
+		// The left arrow key, previous demo
 		if ( event.keyCode === 37 ) {
 			this.previousDemo();
 		}
@@ -959,7 +959,7 @@ demos.view.Demos = wp.Backbone.View.extend({
 	},
 
 	// Iterates through each instance of the collection
-	// and renders each theme module
+	// and renders each demo module
 	renderDemos: function( page ) {
 		var self = this;
 
