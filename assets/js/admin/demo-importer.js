@@ -1391,7 +1391,7 @@ demos.view.Installer = demos.view.Appearance.extend({
 	activeClass: 'current',
 
 	clearSearch: function() {
-		$( '#wp-filter-search-input').val( '' );
+		$( '#wp-filter-search-input' ).val( '' );
 	}
 });
 
@@ -1492,12 +1492,13 @@ demos.RunInstaller = {
 		// Handles sorting / browsing routes
 		// Also handles the root URL triggering a sort request
 		// for `all`, the default view
-		demos.router.on( 'route:sort', function( sort, type ) {
-			type = $( '.filter-links.pagebuilders li' ).first().find( 'a' ).data( 'type' );
+		demos.router.on( 'route:sort', function( sort ) {
+			var type = $( '.filter-links.pagebuilders li' ).first().find( 'a' ).data( 'type' );
 			if ( ! sort ) {
 				sort = 'all';
 				demos.router.navigate( demos.router.baseUrl( '&browse=all' ), { replace: true } );
 			}
+
 			self.view.sort( sort, type );
 
 			// Close the preview if open.
