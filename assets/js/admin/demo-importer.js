@@ -1495,7 +1495,7 @@ demos.RunInstaller = {
 		demos.router.on( 'route:sort', function( sort ) {
 			var type = $( '.filter-links.pagebuilders li' ).first().find( 'a' ).data( 'type' );
 
-			if ( ! sort ) {
+			if ( ! sort || ! $( '[data-sort="' + sort + '"]' ).length ) {
 				sort = 'all';
 				demos.router.navigate( demos.router.baseUrl( '&browse=all' ), { replace: true } );
 			}

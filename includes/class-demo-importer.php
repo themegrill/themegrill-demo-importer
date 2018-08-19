@@ -405,7 +405,7 @@ class TG_Demo_Importer {
 			wp_set_auth_cookie( $result['user_id'] );
 
 			// Redirect to demo importer page to display reset success notice.
-			wp_safe_redirect( admin_url( 'themes.php?page=demo-importer&reset=true' ) );
+			wp_safe_redirect( admin_url( 'themes.php?page=demo-importer&browse=all&reset=true' ) );
 			exit();
 		}
 	}
