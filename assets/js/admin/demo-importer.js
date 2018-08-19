@@ -1401,7 +1401,7 @@ demos.InstallerRouter = Backbone.Router.extend({
 		'themes.php?page=demo-importer&demo=:slug': 'preview',
 		'themes.php?page=demo-importer&browse=:sort': 'sort',
 		'themes.php?page=demo-importer&search=:query': 'search',
-		'themes.php?page=demo-importer': 'sort'
+		'themes.php?page=demo-importer&:query': 'sort'
 	},
 
 	baseUrl: function( url ) {
@@ -1493,11 +1493,16 @@ demos.RunInstaller = {
 		// Also handles the root URL triggering a sort request
 		// for `all`, the default view
 		demos.router.on( 'route:sort', function( sort ) {
+			var cats = $( '.filter-links.categories li' ).first().find( 'a' ).data( 'type' );
 			var type = $( '.filter-links.pagebuilders li' ).first().find( 'a' ).data( 'type' );
-			if ( ! sort ) {
+
+			if ( ! sort || cats !== sort ) {
 				sort = 'all';
+			console.log( sort );
+
 				demos.router.navigate( demos.router.baseUrl( '&browse=all' ), { replace: true } );
 			}
+
 
 			self.view.sort( sort, type );
 
