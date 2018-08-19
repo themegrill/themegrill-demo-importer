@@ -1493,16 +1493,13 @@ demos.RunInstaller = {
 		// Also handles the root URL triggering a sort request
 		// for `all`, the default view
 		demos.router.on( 'route:sort', function( sort ) {
-			var cats = $( '.filter-links.categories li' ).first().find( 'a' ).data( 'type' );
+			var cats = $( '.filter-links.categories li' ).find( '[data-sort="' + sort + '"]' );
 			var type = $( '.filter-links.pagebuilders li' ).first().find( 'a' ).data( 'type' );
 
-			if ( ! sort || cats !== sort ) {
+			if ( ! sort || ! cats.length ) {
 				sort = 'all';
-			console.log( sort );
-
 				demos.router.navigate( demos.router.baseUrl( '&browse=all' ), { replace: true } );
 			}
-
 
 			self.view.sort( sort, type );
 
