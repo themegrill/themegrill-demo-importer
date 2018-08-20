@@ -24,11 +24,6 @@ demos.Model = Backbone.Model.extend({
 	initialize: function() {
 		var description;
 
-		// If demo is already installed, set an attribute.
-		if ( _.indexOf( demos.data.installedDemos, this.get( 'slug' ) ) !== -1 ) {
-			this.set({ installed: true });
-		}
-
 		// Set the attributes
 		this.set({
 			// slug is for installation, id is for existing.
@@ -979,10 +974,6 @@ demos.view.Demos = wp.Backbone.View.extend({
 			self.demo.render();
 			// and append them to div.themes
 			self.$el.append( self.demo.el );
-
-			// Binds to demo:expand to show the modal box
-			// with the demo details
-			self.listenTo( self.demo, 'demo:expand', self.expand, self );
 		});
 
 		// 'Suggest us!' element shown at the end of the grid

@@ -206,7 +206,6 @@ class TG_Demo_Importer {
 					/* translators: accessibility text */
 					'selectFeatureFilter' => __( 'Select one or more Demo features to filter by', 'themegrill-demo-importer' ),
 				),
-				'installedDemos' => array(),
 			) );
 		}
 	}
@@ -451,9 +450,9 @@ class TG_Demo_Importer {
 		}
 
 		if ( isset( $available_packages->demos ) ) {
-			foreach ( $available_packages->demos as $package_id => $package_data ) {
+			foreach ( $available_packages->demos as $package_slug => $package_data ) {
 				$plugins_list   = isset( $package_data->plugins_list ) ? $package_data->plugins_list : array();
-				$screenshot_url = "https://raw.githubusercontent.com/themegrill/themegrill-demo-pack/master/resources/{$available_packages->slug}/{$package_id}/screenshot.jpg";
+				$screenshot_url = "https://raw.githubusercontent.com/themegrill/themegrill-demo-pack/master/resources/{$available_packages->slug}/{$package_slug}/screenshot.jpg";
 
 				if ( isset( $request['browse'], $package_data->category ) && ! in_array( $request['browse'], $package_data->category, true ) ) {
 					continue;
@@ -479,12 +478,12 @@ class TG_Demo_Importer {
 				}
 
 				// Prepare all demos.
-				$prepared_demos[ $package_id ] = array(
-					'id'              => $package_id,
+				$prepared_demos[ $package_slug ] = array(
+					'slug'            => $package_slug,
 					'name'            => $package_data->title,
 					'theme'           => $is_pro_theme_demo ? sprintf( esc_html__( '%s Pro', 'themegrill-demo-importer' ), $available_packages->name ) : $available_packages->name,
 					'isPro'           => $is_pro_theme_demo ? false : isset( $package_data->isPro ),
-					'active'          => $package_id === $demo_activated_id,
+					'active'          => $package_slug === $demo_activated_id,
 					'author'          => isset( $package_data->author ) ? $package_data->author : __( 'ThemeGrill', 'themegrill-demo-importer' ),
 					'version'         => isset( $package_data->version ) ? $package_data->version : $available_packages->version,
 					'description'     => isset( $package_data->description ) ? $package_data->description : '',
@@ -515,7 +514,7 @@ class TG_Demo_Importer {
 		wp_send_json_success( array(
 			'info' => array(
 				'page'    => 1,
-				'pages'   => 2,
+				'pages'   => 1,
 				'results' => count( $prepared_demos ),
 			),
 			'demos' => array_filter( $prepared_demos ),
