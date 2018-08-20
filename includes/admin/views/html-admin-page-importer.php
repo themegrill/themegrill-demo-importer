@@ -100,9 +100,7 @@ defined( 'ABSPATH' ) || exit;
 			<# } else { #>
 				<# if ( data.isPro ) { #>
 					<a class="button button-primary purchase-now" href="{{ data.homepage }}" target="_blank"><?php _e( 'Buy Now', 'themegrill-demo-importer' ); ?></a>
-				<# } else if ( data.requiredTheme ) { #>
-					<button class="button button-primary preview install-demo-preview"><?php _e( 'Import', 'themegrill-demo-importer' ); ?></button>
-				<# } else if ( data.requiredPlugins ) { #>
+				<# } else if ( data.requiredTheme || data.requiredPlugins ) { #>
 					<button class="button button-primary preview install-demo-preview"><?php _e( 'Import', 'themegrill-demo-importer' ); ?></button>
 				<# } else { #>
 					<?php
@@ -132,7 +130,7 @@ defined( 'ABSPATH' ) || exit;
 			<# } else if ( data.requiredTheme ) { #>
 				<button class="button button-primary hide-if-no-js demo-import disabled"><?php _e( 'Import Demo', 'themegrill-demo-importer' ); ?></button>
 			<# } else if ( data.requiredPlugins ) { #>
-				<a class="button button-secondary hide-if-no-js plugins-install" href="#"><?php _e( 'Install Plugins', 'themegrill-demo-importer' ); ?></a>
+				<button class="button button-secondary hide-if-no-js plugins-install"><?php _e( 'Install Plugins', 'themegrill-demo-importer' ); ?></button>
 			<# } else { #>
 				<a class="button button-primary hide-if-no-js demo-import" href="#" data-name="{{ data.name }}" data-slug="{{ data.id }}"><?php _e( 'Import Demo', 'themegrill-demo-importer' ); ?></a>
 			<# } #>
@@ -216,7 +214,7 @@ defined( 'ABSPATH' ) || exit;
 				<# } else if ( data.requiredTheme ) { #>
 					<button class="button button-hero button-primary hide-if-no-js demo-import disabled"><?php _e( 'Import Demo', 'themegrill-demo-importer' ); ?></button>
 				<# } else if ( data.requiredPlugins ) { #>
-					<a class="button button-hero button-secondary hide-if-no-js plugins-install" href="#"><?php _e( 'Install Plugins', 'themegrill-demo-importer' ); ?></a>
+					<button class="button button-hero button-secondary hide-if-no-js plugins-install"><?php _e( 'Install Plugins', 'themegrill-demo-importer' ); ?></button>
 				<# } else { #>
 					<a class="button button-hero button-primary hide-if-no-js demo-import" href="#" data-name="{{ data.name }}" data-slug="{{ data.id }}"><?php _e( 'Import Demo', 'themegrill-demo-importer' ); ?></a>
 				<# } #>

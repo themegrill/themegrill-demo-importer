@@ -1515,11 +1515,11 @@ demos.RunInstaller = {
 $( document ).ready( function() {
 	demos.RunInstaller.init();
 
-	// Initialize Tooltips.
+	// Initialize TipTip.
 	$( document.body ).on( 'init_tooltips', function() {
 		$( '#tiptip_holder' ).removeAttr( 'style' );
 		$( '#tiptip_arrow' ).removeAttr( 'style' );
-		$( '.tips' ).tipTip({ 'attribute': 'data-tip', 'fadeIn': 50, 'fadeOut': 50, 'delay': 50, 'defaultPosition': 'top' });
+		$( '.tips' ).tipTip({ 'attribute': 'data-tip', 'defaultPosition': 'top', 'fadeIn': 50, 'fadeOut': 50, 'delay': 50 });
 	} ).trigger( 'init_tooltips' );
 
 	// Confirm WordPress reset wizard.
