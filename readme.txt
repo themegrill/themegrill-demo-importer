@@ -68,11 +68,19 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 
 == Changelog ==
 
-= 1.5.0 - XX-08-2018 =
-* Dev - Improve PHP7 compatibility.
+= 1.5.0 - 20-08-2018 =
+* Feature - Fetches the demo config from GitHub repo.
+* Feature - Category and pagebuilder routes for views.
+* Fetaure - Install and activate plugins on a single click.
 * Fix - Slashes to be stripped from imported comments.
 * Fix - Importing export files with multiline term meta data.
 * Fix - Deprecation notices including `wp_get_http()` and `screen_icon()`.
+* Tweak - Demo preview is supported via iframe.
+* Tweak - Different device preview is possible for a demo.
+* Tweak - Only store single demo package files in upload directory.
+* Dev - Improve PHP7 compatibility.
+* Deprecated - Upload process for the demo packages.
+* Deprecated - Filter hooks `themegrill_demo_importer_config` and `themegrill_demo_importer_packages`.
 
 = 1.4.3 - 23-04-2018 =
 * Support - Cenote theme.
