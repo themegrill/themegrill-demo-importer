@@ -41,7 +41,11 @@ defined( 'ABSPATH' ) || exit;
 			<?php if ( ! empty( $this->demo_packages->pagebuilders ) ) : ?>
 				<ul class="filter-links pagebuilders">
 					<?php foreach ( $this->demo_packages->pagebuilders as $slug => $label ) : ?>
-						<li><a href="#" data-type="<?php echo esc_attr( $slug ); ?>" class="pagebuilder-tab"><?php echo esc_html( $label ); ?></a></li>
+						<?php if ( 'default' !== $slug ) : ?>
+							<li><a href="#" data-type="<?php echo esc_attr( $slug ); ?>" class="pagebuilder-tab"><?php echo esc_html( $label ); ?></a></li>
+						<?php else: ?>
+							<li><a href="#" data-type="<?php echo esc_attr( $slug ); ?>" class="pagebuilder-tab" title="<?php esc_attr_e( 'Without Page Builder', 'themegrill-demo-importer' ); ?>"><?php echo esc_html( $label ); ?></a></li>
+						<?php endif; ?>
 					<?php endforeach; ?>
 				</ul>
 			<?php endif; ?>
