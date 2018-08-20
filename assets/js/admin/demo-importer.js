@@ -127,13 +127,6 @@ demos.view.Appearance = wp.Backbone.View.extend({
 		if ( bottom > threshold ) {
 			this.trigger( 'demo:scroll' );
 		}
-	},
-
-	// Remove any lingering tooltips and initialize TipTip
-	initTipTip: function() {
-		$( '#tiptip_holder' ).removeAttr( 'style' );
-		$( '#tiptip_arrow' ).removeAttr( 'style' );
-		$( '.tips' ).tipTip({ 'attribute': 'data-tip', 'fadeIn': 50, 'fadeOut': 50, 'delay': 50 });
 	}
 });
 
@@ -917,7 +910,6 @@ demos.view.Demos = wp.Backbone.View.extend({
 			self.parent.page = 0;
 			self.importedDemo();
 			self.render( this );
-			self.parent.initTipTip();
 		} );
 
 		// Update demo count to full result set when available.
@@ -1168,7 +1160,6 @@ demos.Run = {
 
 		// Render results
 		this.view.render();
-		this.view.initTipTip();
 		this.routes();
 
 		Backbone.history.start({
@@ -1431,6 +1422,7 @@ demos.RunInstaller = {
 
 		// Render results
 		this.render();
+		this.tiptip();
 
 		// Start debouncing user searches after Backbone.history.start().
 		this.view.SearchView.doSearch = _.debounce( this.view.SearchView.doSearch, 500 );
@@ -1440,7 +1432,6 @@ demos.RunInstaller = {
 
 		// Render results
 		this.view.render();
-		this.view.initTipTip();
 		this.routes();
 
 		if ( Backbone.History.started ) {
@@ -1451,6 +1442,12 @@ demos.RunInstaller = {
 			pushState: true,
 			hashChange: false
 		});
+	},
+
+	tiptip: function() {
+		$( '#tiptip_holder' ).removeAttr( 'style' );
+		$( '#tiptip_arrow' ).removeAttr( 'style' );
+		$( '.tips' ).tipTip({ 'attribute': 'data-tip', 'fadeIn': 50, 'fadeOut': 50, 'delay': 50, 'defaultPosition': 'top' });
 	},
 
 	routes: function() {
