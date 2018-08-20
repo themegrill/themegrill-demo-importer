@@ -1422,7 +1422,6 @@ demos.RunInstaller = {
 
 		// Render results
 		this.render();
-		this.tiptip();
 
 		// Start debouncing user searches after Backbone.history.start().
 		this.view.SearchView.doSearch = _.debounce( this.view.SearchView.doSearch, 500 );
@@ -1442,12 +1441,6 @@ demos.RunInstaller = {
 			pushState: true,
 			hashChange: false
 		});
-	},
-
-	tiptip: function() {
-		$( '#tiptip_holder' ).removeAttr( 'style' );
-		$( '#tiptip_arrow' ).removeAttr( 'style' );
-		$( '.tips' ).tipTip({ 'attribute': 'data-tip', 'fadeIn': 50, 'fadeOut': 50, 'delay': 50, 'defaultPosition': 'top' });
 	},
 
 	routes: function() {
@@ -1521,6 +1514,13 @@ demos.RunInstaller = {
 // Ready...
 $( document ).ready( function() {
 	demos.RunInstaller.init();
+
+	// Initialize Tooltips.
+	$( document.body ).on( 'init_tooltips', function() {
+		$( '#tiptip_holder' ).removeAttr( 'style' );
+		$( '#tiptip_arrow' ).removeAttr( 'style' );
+		$( '.tips' ).tipTip({ 'attribute': 'data-tip', 'fadeIn': 50, 'fadeOut': 50, 'delay': 50, 'defaultPosition': 'top' });
+	} ).trigger( 'init_tooltips' );
 
 	// Confirm WordPress reset wizard.
 	$( '.themegrill-reset-wordpress' ).on( 'click', function() {
