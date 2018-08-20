@@ -1053,7 +1053,7 @@ demos.view.Search = wp.Backbone.View.extend({
 	},
 
 	// Runs a search on the demo collection.
-	doSearch: _.debounce( function( event ) {
+	doSearch: function( event ) {
 		var options = {};
 
 		this.collection.doSearch( event.target.value.replace( /\+/g, ' ' ) );
@@ -1071,7 +1071,7 @@ demos.view.Search = wp.Backbone.View.extend({
 		} else {
 			demos.router.navigate( demos.router.baseUrl( '' ) );
 		}
-	}, 500 ),
+	},
 
 	pushState: function( event ) {
 		var url = demos.router.baseUrl( '' );
@@ -1106,11 +1106,10 @@ function navigateRouter( url, state ) {
 demos.Router = Backbone.Router.extend({
 
 	routes: {
-		'themes.php?page=demo-importer&demo=:slug': 'demo',
+		'themes.php?page=demo-importer&demo=:slug': 'preview',
+		'themes.php?page=demo-importer&browse=:sort': 'sort',
 		'themes.php?page=demo-importer&search=:query': 'search',
-		'themes.php?page=demo-importer&s=:query': 'search',
-		'themes.php?page=demo-importer': 'demos',
-		'': 'demos'
+		'themes.php?page=demo-importer': 'sort'
 	},
 
 	baseUrl: function( url ) {
@@ -1118,75 +1117,15 @@ demos.Router = Backbone.Router.extend({
 	},
 
 	demoPath: '&demo=',
+	browsePath: '&browse=',
 	searchPath: '&search=',
 
 	search: function( query ) {
-		$( '.wp-filter-search' ).val( query );
-	},
-
-	demos: function() {
-		$( '.wp-filter-search' ).val( '' );
+		$( '.wp-filter-search' ).val( query.replace( /\+/g, ' ' ) );
 	},
 
 	navigate: navigateRouter
 });
-
-// Execute and setup the application
-demos.Run = {
-	init: function() {
-		// Initializes the blog's demo library view
-		// Create a new collection with data
-		this.demos = new demos.Collection( demos.data.demos );
-
-		// Set up the view
-		this.view = new demos.view.Appearance({
-			collection: this.demos
-		});
-
-		this.render();
-	},
-
-	render: function() {
-
-		// Render results
-		this.view.render();
-		this.routes();
-
-		Backbone.history.start({
-			root: demos.data.settings.adminUrl,
-			pushState: true,
-			hashChange: false
-		});
-	},
-
-	routes: function() {
-		var self = this;
-		// Bind to our global thx object
-		// so that the object is available to sub-views
-		demos.router = new demos.Router();
-
-		// Handles demo details route event
-		demos.router.on( 'route:demo', function( slug ) {
-			self.view.view.expand( slug );
-		});
-
-		demos.router.on( 'route:demos', function() {
-			self.demos.doSearch( '' );
-			self.view.trigger( 'demo:close' );
-		});
-
-		// Handles search route event
-		demos.router.on( 'route:search', function() {
-			$( '.wp-filter-search' ).trigger( 'keyup' );
-		});
-
-		this.extraRoutes();
-	},
-
-	extraRoutes: function() {
-		return false;
-	}
-};
 
 // Extend the main Search view
 demos.view.InstallerSearch = demos.view.Search.extend({
@@ -1376,30 +1315,7 @@ demos.view.Installer = demos.view.Appearance.extend({
 	}
 });
 
-demos.InstallerRouter = Backbone.Router.extend({
-
-	routes: {
-		'themes.php?page=demo-importer&demo=:slug': 'preview',
-		'themes.php?page=demo-importer&browse=:sort': 'sort',
-		'themes.php?page=demo-importer&search=:query': 'search',
-		'themes.php?page=demo-importer': 'sort'
-	},
-
-	baseUrl: function( url ) {
-		return 'themes.php?page=demo-importer' + url;
-	},
-
-	demoPath: '&demo=',
-	browsePath: '&browse=',
-	searchPath: '&search=',
-
-	search: function( query ) {
-		$( '.wp-filter-search' ).val( query.replace( /\+/g, ' ' ) );
-	},
-
-	navigate: navigateRouter
-});
-
+// Execute and setup the application
 demos.RunInstaller = {
 
 	init: function() {
@@ -1439,7 +1355,7 @@ demos.RunInstaller = {
 
 		// Bind to our global `wp.demos` object
 		// so that the object is available to sub-views
-		demos.router = new demos.InstallerRouter();
+		demos.router = new demos.Router();
 
 		// Handles `demo` route event
 		// Queries the API for the passed demo slug
