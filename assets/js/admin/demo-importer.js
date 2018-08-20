@@ -657,7 +657,6 @@ demos.view.Preview = wp.Backbone.View.extend({
 		// Restore the previous browse tab if available.
 		if ( demos.router.selectedTab ) {
 			demos.router.navigate( demos.router.baseUrl( '&browse=' + demos.router.selectedTab ) );
-			demos.router.selectedTab = false;
 		} else {
 			demos.router.navigate( demos.router.baseUrl( '' ) );
 		}
@@ -1483,7 +1482,7 @@ demos.RunInstaller = {
 		// Also handles the root URL triggering a sort request
 		// for `all`, the default view
 		demos.router.on( 'route:sort', function( sort ) {
-			var type = $( '.filter-links.pagebuilders li' ).first().find( 'a' ).data( 'type' );
+			var type = demos.router.selectedType ? demos.router.selectedType : $( '.filter-links.pagebuilders li' ).first().find( 'a' ).data( 'type' );
 
 			if ( ! sort || ! $( '[data-sort="' + sort + '"]' ).length ) {
 				sort = 'all';
