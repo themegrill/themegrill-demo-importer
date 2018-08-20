@@ -101,9 +101,9 @@ defined( 'ABSPATH' ) || exit;
 				<# if ( data.isPro ) { #>
 					<a class="button button-primary purchase-now" href="{{ data.homepage }}" target="_blank"><?php _e( 'Buy Now', 'themegrill-demo-importer' ); ?></a>
 				<# } else if ( data.requiredTheme ) { #>
-					<a class="button button-primary hide-if-no-js tips demo-import disabled" href="#" data-name="{{ data.name }}" data-slug="{{ data.id }}" data-tip="<?php echo sprintf( __( '%s theme must be activated to import this demo.', 'themegrill-demo-importer' ), '{{{ data.theme }}}' ); ?>"><?php _e( 'Import', 'themegrill-demo-importer' ); ?></a>
+					<button class="button button-primary preview install-demo-preview"><?php _e( 'Import', 'themegrill-demo-importer' ); ?></button>
 				<# } else if ( data.requiredPlugins ) { #>
-					<a class="button button-primary hide-if-no-js tips demo-import disabled" href="#" data-name="{{ data.name }}" data-slug="{{ data.id }}" data-tip="<?php echo esc_attr__( 'Required Plugins must be activated to import this demo.', 'themegrill-demo-importer' ); ?>"><?php _e( 'Import', 'themegrill-demo-importer' ); ?></a>
+					<button class="button button-primary preview install-demo-preview"><?php _e( 'Import', 'themegrill-demo-importer' ); ?></button>
 				<# } else { #>
 					<?php
 					/* translators: %s: Demo name */
