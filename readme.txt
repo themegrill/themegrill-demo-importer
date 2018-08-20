@@ -66,9 +66,15 @@ Bugs can be reported either in our support forum or preferably on the [GitHub re
 
 Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/themegrill-demo-importer/) :)
 
+== Screenshots ==
+
+1. Theme Demos listing page.
+2. Install and activate the required plugins.
+3. Finally, Import the Demo with just one click.
+
 == Changelog ==
 
-= 1.5.0 - 20-08-2018 =
+= 1.5.0 - 21-08-2018 =
 * Feature - Fetches the demo config from GitHub repo.
 * Feature - Category and pagebuilder routes for views.
 * Fetaure - Install and activate plugins on a single click.
@@ -82,16 +88,4 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 * Deprecated - Upload process for the demo packages.
 * Deprecated - Filter hooks `themegrill_demo_importer_config` and `themegrill_demo_importer_packages`.
 
-= 1.4.3 - 23-04-2018 =
-* Support - Cenote theme.
-
-= 1.4.2 - 25-12-2017 =
-* Fix - Disable WooCommerce setup wizard for demo import.
-* Fix - Styling issue caused by missing `theme-id-container` container.
-
 [See changelog for all versions](https://raw.githubusercontent.com/themegrill/themegrill-demo-importer/master/CHANGELOG.txt).
-
-== Upgrade Notice ==
-
-= 1.4.0 =
-1.4.0 is a major update. Make a full site backup, update your theme and extensions before upgrading.

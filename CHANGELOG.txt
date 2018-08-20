@@ -1,6 +1,6 @@
 == Changelog ==
 
-= 1.5.0 - 20-08-2018 =
+= 1.5.0 - 21-08-2018 =
 * Feature - Fetches the demo config from GitHub repo.
 * Feature - Category and pagebuilder routes for views.
 * Fetaure - Install and activate plugins on a single click.
