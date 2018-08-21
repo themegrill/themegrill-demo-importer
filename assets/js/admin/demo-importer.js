@@ -120,7 +120,7 @@ demos.view.Appearance = wp.Backbone.View.extend({
 		threshold = Math.round( threshold * 0.9 );
 
 		if ( bottom > threshold ) {
-			this.trigger( 'demo:scroll' );
+			// this.trigger( 'demo:scroll' );
 		}
 	}
 });
