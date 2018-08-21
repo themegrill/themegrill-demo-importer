@@ -1251,11 +1251,7 @@ demos.view.Installer = demos.view.Appearance.extend({
 	browse: function( section, builder ) {
 		// Create a new collection with the proper demo data
 		// for each section
-		if ( ! builder ) {
-			this.collection.query( { browse: section } );
-		} else {
-			this.collection.query( { browse: section, builder: builder } );
-		}
+		this.collection.query( { browse: section, builder: builder } );
 	},
 
 	// Sorting navigation
