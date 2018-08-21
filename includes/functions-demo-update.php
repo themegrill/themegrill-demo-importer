@@ -4,7 +4,7 @@
  *
  * Backward compatibility for demo importer configs and options.
  *
- * @package Importer/Functions
+ * @package ThemeGrill_Demo_Importer/Functions
  * @version 1.1.0
  */
 

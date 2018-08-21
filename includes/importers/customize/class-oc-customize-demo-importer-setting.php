@@ -2,7 +2,7 @@
 /**
  * Customize API: OC_Customize_Demo_Importer_Setting class
  *
- * @package Importer/Classes
+ * @package ThemeGrill_Demo_Importer/Classes
  * @version 1.0.0
  */
 

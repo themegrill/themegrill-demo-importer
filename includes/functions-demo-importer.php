@@ -2,7 +2,7 @@
 /**
  * Demo Importer Functions.
  *
- * @package Importer/Functions
+ * @package ThemeGrill_Demo_Importer/Functions
  * @version 1.0.0
  */
 

@@ -2,7 +2,7 @@
 /**
  * Admin View: Notice - Reset Wizard
  *
- * @package Importer
+ * @package ThemeGrill_Demo_Importer
  */
 
 defined( 'ABSPATH' ) || exit;

@@ -9,6 +9,7 @@
  *
  * @since 1.5.0
  * @see WP_Upgrader
+ * @package ThemeGrill_Demo_Importer/Class
  */
 class TG_Demo_Pack_Upgrader extends WP_Upgrader {
 

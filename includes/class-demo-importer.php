@@ -2,7 +2,7 @@
 /**
  * ThemeGrill Demo Importer.
  *
- * @package Importer/Classes
+ * @package ThemeGrill_Demo_Importer/Classes
  * @version 1.0.0
  */
 
