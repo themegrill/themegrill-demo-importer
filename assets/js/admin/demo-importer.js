@@ -329,12 +329,7 @@ demos.Collection = Backbone.Collection.extend({
 			data: {
 				// Request data
 				request: _.extend({
-					per_page: 100,
-					fields: {
-						description: true,
-						pagebuilder: true,
-						requires: true
-					}
+					per_page: 100
 				}, request )
 			},
 
