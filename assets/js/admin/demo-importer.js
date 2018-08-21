@@ -1262,26 +1262,17 @@ demos.view.Installer = demos.view.Appearance.extend({
 	onSort: function( event ) {
 		var $el = $( event.target ),
 			sort = $el.data( 'sort' ),
-			type = $el.data( 'type' ),
-			filter = type ? 'pagebuilders' : 'categories';
+			type = $el.data( 'type' );
 
 		event.preventDefault();
+
+		// Restore the previous browse tab if available.
+		sort = sort ? sort : demos.router.selectedTab;
+		type = type ? type : demos.router.selectedType;
 
 		// Bail if this is already active
 		if ( $el.hasClass( this.activeClass ) ) {
 			return;
-		}
-
-		$( '.filter-links.' + filter + ' li > a' )
-			.removeClass( this.activeClass )
-			.removeAttr( 'aria-current' );
-
-		if ( ! sort ) {
-			sort = demos.router.selectedTab;
-		}
-
-		if ( ! type ) {
-			type = demos.router.selectedType;
 		}
 
 		this.sort( sort, type );
@@ -1296,6 +1287,10 @@ demos.view.Installer = demos.view.Appearance.extend({
 		// Track sorting so we can restore the correct tab when closing preview.
 		demos.router.selectedTab  = sort;
 		demos.router.selectedType = type;
+
+		$( '.filter-links li > a' )
+			.removeClass( this.activeClass )
+			.removeAttr( 'aria-current' );
 
 		$( '[data-sort="' + sort + '"]' )
 			.addClass( this.activeClass )
