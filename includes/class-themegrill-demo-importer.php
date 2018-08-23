@@ -123,7 +123,7 @@ final class ThemeGrill_Demo_Importer {
 		$core_themes = array( 'spacious', 'colormag', 'flash', 'estore', 'ample', 'accelerate', 'colornews', 'foodhunt', 'fitclub', 'radiate', 'freedom', 'himalayas', 'esteem', 'envince', 'suffice', 'explore', 'masonic', 'cenote' );
 
 		// Check for official core themes pro version.
-		$pro_themes = array_diff( $core_themes, array( 'explore', 'masonic', 'cenote' ) );
+		$pro_themes = array_diff( $core_themes, array( 'explore', 'masonic' ) );
 		if ( ! empty( $pro_themes ) ) {
 			$pro_themes = preg_replace( '/$/', '-pro', $pro_themes );
 		}
