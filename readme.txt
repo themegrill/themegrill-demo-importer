@@ -73,6 +73,9 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 
 == Changelog ==
 
+= TBD =
+* Support - Cenote Pro theme.
+
 = 1.5.0 - 21-08-2018 =
 * Feature - Fetches the demo config from GitHub repo.
 * Feature - Category and pagebuilder routes for views.
