@@ -1,5 +1,8 @@
 == Changelog ==
 
+= 1.5.1 - 24-08-2018 =
+* Support - Cenote Pro theme.
+
 = 1.5.0 - 21-08-2018 =
 * Feature - Fetches the demo config from GitHub repo.
 * Feature - Category and pagebuilder routes for views.
