@@ -171,13 +171,10 @@
 						width: 100%;
 						text-align: center;
 
-						&.installed,
-						&.installing,
 						&.updated-message,
 						&.updating-message {
 							&::before {
-								margin-right: 6px;
-								vertical-align: text-bottom;
+								margin-top: 11px;
 							}
 						}
 					}
