@@ -70,6 +70,11 @@ class TG_Customizer_Importer {
 			}
 		}
 
+		// If wp_css is set then import it.
+		if( function_exists( 'wp_update_custom_css_post' ) && isset( $data['wp_css'] ) && '' !== $data['wp_css'] ) {
+			wp_update_custom_css_post( $data['wp_css'] );
+		}
+
 		// Loop through theme mods and update them.
 		if ( ! empty( $data['mods'] ) ) {
 			foreach ( $data['mods'] as $key => $value ) {
