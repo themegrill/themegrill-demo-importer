@@ -132,7 +132,11 @@ defined( 'ABSPATH' ) || exit;
 			<# } else if ( data.requiredPlugins ) { #>
 				<button class="button button-secondary hide-if-no-js plugins-install"><?php _e( 'Install Plugins', 'themegrill-demo-importer' ); ?></button>
 			<# } else { #>
-				<a class="button button-primary hide-if-no-js demo-import" href="#" data-name="{{ data.name }}" data-slug="{{ data.id }}"><?php _e( 'Import Demo', 'themegrill-demo-importer' ); ?></a>
+				<# if ( data.active ) { #>
+					<a class="button button-primary live-preview" target="_blank" href="<?php echo home_url( '/' ); ?>"><?php _e( 'Live Preview', 'themegrill-demo-importer' ); ?></a>
+				<# } else { #>
+					<a class="button button-primary hide-if-no-js demo-import" href="#" data-name="{{ data.name }}" data-slug="{{ data.id }}"><?php _e( 'Import Demo', 'themegrill-demo-importer' ); ?></a>
+				<# } #>
 			<# } #>
 		</div>
 		<div class="wp-full-overlay-sidebar-content">
@@ -216,7 +220,11 @@ defined( 'ABSPATH' ) || exit;
 				<# } else if ( data.requiredPlugins ) { #>
 					<button class="button button-hero button-secondary hide-if-no-js plugins-install"><?php _e( 'Install Plugins', 'themegrill-demo-importer' ); ?></button>
 				<# } else { #>
-					<a class="button button-hero button-primary hide-if-no-js demo-import" href="#" data-name="{{ data.name }}" data-slug="{{ data.id }}"><?php _e( 'Import Demo', 'themegrill-demo-importer' ); ?></a>
+					<# if ( data.active ) { #>
+						<a class="button button-primary live-preview button-hero hide-if-no-js" target="_blank" href="<?php echo home_url( '/' ); ?>"><?php _e( 'Live Preview', 'themegrill-demo-importer' ); ?></a>
+					<# } else { #>
+						<a class="button button-hero button-primary hide-if-no-js demo-import" href="#" data-name="{{ data.name }}" data-slug="{{ data.id }}"><?php _e( 'Import Demo', 'themegrill-demo-importer' ); ?></a>
+					<# } #>
 				<# } #>
 			</div>
 			<button type="button" class="collapse-sidebar button" aria-expanded="true" aria-label="<?php esc_attr_e( 'Collapse Sidebar', 'themegrill-demo-importer' ); ?>">
