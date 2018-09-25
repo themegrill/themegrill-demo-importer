@@ -3,7 +3,7 @@ Contributors: ThemeGrill, shivapoudel
 Tags: themegrill, theme demos, demo, importer, one click import
 Requires at least: 4.7
 Tested up to: 4.9
-Stable tag: 1.5.1
+Stable tag: 1.5.2
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -73,7 +73,7 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 
 == Changelog ==
 
-= TBD =
+= 1.5.2 - 25-09-2018 =
 * Fix - Custom CSS migration on demo import.
 * Fix - Live Preview button when demo is successfully imported in demo preview page.
 
