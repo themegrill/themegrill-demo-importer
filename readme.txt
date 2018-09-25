@@ -75,6 +75,7 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 
 = TBD =
 * Fix - Custom CSS migration on demo import.
+* Fix - Live Preview button when demo is successfully imported in demo preview page.
 
 = 1.5.1 - 24-08-2018 =
 * Support - Cenote Pro theme.
