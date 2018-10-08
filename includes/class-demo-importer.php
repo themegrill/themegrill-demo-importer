@@ -59,6 +59,7 @@ class TG_Demo_Importer {
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_nav_menu_items' ) );
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_elementor_data' ), 10, 2 );
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_siteorigin_data' ), 10, 2 );
+		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_everest_forms_data' ), 10, 2 );
 
 		// Update widget and customizer demo import settings data.
 		add_filter( 'themegrill_widget_demo_import_settings', array( $this, 'update_widget_data' ), 10, 4 );
@@ -1164,6 +1165,37 @@ class TG_Demo_Importer {
 
 						// Update siteorigin panels data.
 						update_post_meta( $page->ID, 'panels_data', $panels_data );
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Update everest forms shortcode data.
+	 *
+	 * @param string $demo_id   Demo ID.
+	 * @param array  $demo_data Demo Data.
+	 */
+	function update_everest_forms_data( $demo_id, $demo_data ) {
+		if ( ! empty( $demo_data['everest_forms_data_update'] ) ) {
+			foreach ( $demo_data['everest_forms_data_update'] as $data_type => $data_value ) {
+				if ( ! empty( $data_value['post_title'] ) ) {
+					$page         = get_page_by_title( $data_value['post_title'] );
+					$contact_page = get_page_by_title( $data_value['everest_form_title'],OBJECT, 'everest_form' );
+
+					if ( is_object( $page ) && $page->ID && $contact_page ) {
+						$page_id         = $page->ID;
+						$page_content    = $page->post_content;
+						$contact_form_id = $contact_page->ID;
+
+						$output = str_replace( '[everest_form id="' . $data_value['everest_form_id'] . '"]', '[everest_form id="' . $contact_form_id . '"]', $page_content );
+
+						// Update the post.
+						wp_update_post( array(
+							'ID'           => $page_id,
+							'post_content' => $output,
+						) );
 					}
 				}
 			}
