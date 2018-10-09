@@ -1132,7 +1132,13 @@ class TG_Demo_Importer {
 										}
 									break;
 									case 'everest_forms':
-										foreach ( $dropdown_data as $widget_id => $widget_data ) {
+										foreach ( $dropdown_data as $everest_form => $everest_form_data ) {
+
+											foreach ( $everest_form_data as $widget_id => $widget_data ) {
+												if ( ! empty( $widget_data[ $instance_id ] ) && $widget_id == $instance_class ) {
+
+												}
+											}
 
 										}
 										break;
