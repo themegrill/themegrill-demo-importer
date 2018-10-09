@@ -1085,7 +1085,7 @@ class TG_Demo_Importer {
 							$instance_class = $widget_instance['panels_info']['class'];
 
 							foreach ( $data_value['data_update']['widgets_data'] as $dropdown_type => $dropdown_data ) {
-								if ( ! in_array( $dropdown_type, array( 'dropdown_pages', 'dropdown_categories' ) ) ) {
+								if ( ! in_array( $dropdown_type, array( 'dropdown_pages', 'dropdown_categories', 'everest_forms' ) ) ) {
 									continue;
 								}
 
@@ -1131,6 +1131,11 @@ class TG_Demo_Importer {
 											}
 										}
 									break;
+									case 'everest_forms':
+										foreach ( $dropdown_data as $widget_id => $widget_data ) {
+
+										}
+										break;
 								}
 							}
 						}
@@ -1182,7 +1187,7 @@ class TG_Demo_Importer {
 			foreach ( $demo_data['everest_forms_data_update'] as $data_type => $data_value ) {
 				if ( ! empty( $data_value['post_title'] ) ) {
 					$page         = get_page_by_title( $data_value['post_title'] );
-					$contact_page = get_page_by_title( $data_value['everest_form_title'],OBJECT, 'everest_form' );
+					$contact_page = get_page_by_title( $data_value['everest_form_title'], OBJECT, 'everest_form' );
 
 					if ( is_object( $page ) && $page->ID && $contact_page ) {
 						$page_id         = $page->ID;
