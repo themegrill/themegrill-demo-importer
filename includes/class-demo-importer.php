@@ -1133,20 +1133,28 @@ class TG_Demo_Importer {
 									break;
 									case 'everest_forms':
 										foreach ( $dropdown_data as $everest_form => $everest_form_data ) {
-
 											foreach ( $everest_form_data as $widget_id => $widget_data ) {
 												if ( ! empty( $widget_data[ $instance_id ] ) && $widget_id == $instance_class ) {
 													$level = isset( $widget_data['level'] ) ? $widget_data['level'] : (int) 0;
 
 													if ( $level == $instance ) {
-														foreach ( $widget_data[ $instance_id ] as $widget_key => $widget_value ) {
-															$contact_page    = get_page_by_title( $widget_data[ $instance_id ]['everest_form_title'], OBJECT, 'everest_form' );
-															$everest_form_id = $widget_data[ $instance_id ]['everest_form_id'];
+														foreach ( $widget_data as $key => $value ) {
 
-															if ( $contact_page ) {
-																$contact_form_id = $contact_page->ID;
+															foreach ( $widget_data[ $instance_id ] as $widget_key => $widget_value ) {
+																$page            = get_page_by_title( $widget_data[ $instance_id ]['post_title'] );
+																$contact_page    = get_page_by_title( $widget_data[ $instance_id ]['everest_form_title'], OBJECT, 'everest_form' );
+																$everest_form_id = $widget_data[ $instance_id ]['everest_form_id'];
+
+																if ( is_object( $page ) && $page->ID && $contact_page ) {
+																	$contact_form_id          = $contact_page->ID;
+																	$page_content             = get_post_meta( $page->ID, 'panels_data', true );
+																	$page_content_widget_data = $page_content['widgets'][$widget_data]['text'];
+
+																	$widget_instance[ $widget_key ] = str_replace( '[everest_form id="' . $everest_form_id . '"]', '[everest_form id="' . $contact_form_id . '"]', $page_content_widget_data );
+																}
 															}
 														}
+
 													}
 												}
 											}
