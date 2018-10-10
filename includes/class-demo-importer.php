@@ -1142,6 +1142,10 @@ class TG_Demo_Importer {
 														foreach ( $widget_data[ $instance_id ] as $widget_key => $widget_value ) {
 															$contact_page    = get_page_by_title( $widget_data[ $instance_id ]['everest_form_title'], OBJECT, 'everest_form' );
 															$everest_form_id = $widget_data[ $instance_id ]['everest_form_id'];
+
+															if ( $contact_page ) {
+																$contact_form_id = $contact_page->ID;
+															}
 														}
 													}
 												}
