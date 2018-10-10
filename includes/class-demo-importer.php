@@ -1136,7 +1136,14 @@ class TG_Demo_Importer {
 
 											foreach ( $everest_form_data as $widget_id => $widget_data ) {
 												if ( ! empty( $widget_data[ $instance_id ] ) && $widget_id == $instance_class ) {
+													$level = isset( $widget_data['level'] ) ? $widget_data['level'] : (int) 0;
 
+													if ( $level == $instance ) {
+														foreach ( $widget_data[ $instance_id ] as $widget_key => $widget_value ) {
+															$contact_page    = get_page_by_title( $widget_data[ $instance_id ]['everest_form_title'], OBJECT, 'everest_form' );
+															$everest_form_id = $widget_data[ $instance_id ]['everest_form_id'];
+														}
+													}
 												}
 											}
 
