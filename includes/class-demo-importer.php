@@ -1148,9 +1148,9 @@ class TG_Demo_Importer {
 																if ( is_object( $page ) && $page->ID && $contact_page ) {
 																	$contact_form_id          = $contact_page->ID;
 																	$page_content             = get_post_meta( $page->ID, 'panels_data', true );
-																	$page_content_widget_data = $page_content['widgets'][$widget_data]['text'];
+																	$page_content_widget_data = $page_content['widgets'][$key]['text'];
 
-																	$widget_instance[ $widget_key ] = str_replace( '[everest_form id="' . $everest_form_id . '"]', '[everest_form id="' . $contact_form_id . '"]', $page_content_widget_data );
+																	$widget_instance[ $key ] = str_replace( '[everest_form id="' . $everest_form_id . '"]', '[everest_form id="' . $contact_form_id . '"]', $page_content_widget_data );
 																}
 															}
 														}
