@@ -1156,7 +1156,6 @@ class TG_Demo_Importer {
 													}
 												}
 											}
-
 										}
 										break;
 								}
