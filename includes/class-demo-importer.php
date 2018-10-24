@@ -1139,7 +1139,6 @@ class TG_Demo_Importer {
 
 													if ( $level == $instance ) {
 														foreach ( $widget_data as $key => $value ) {
-
 															foreach ( $widget_data[ $instance_id ] as $widget_key => $widget_value ) {
 																$page            = get_page_by_title( $widget_data[ $instance_id ]['post_title'] );
 																$contact_page    = get_page_by_title( $widget_data[ $instance_id ]['everest_form_title'], OBJECT, 'everest_form' );
@@ -1154,7 +1153,6 @@ class TG_Demo_Importer {
 																}
 															}
 														}
-
 													}
 												}
 											}
