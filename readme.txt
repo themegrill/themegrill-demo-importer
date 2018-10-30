@@ -73,6 +73,9 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 
 == Changelog ==
 
+= TBD =
+* Support - Modular theme.
+
 = 1.5.2 - 25-09-2018 =
 * Fix - Custom CSS migration on demo import.
 * Fix - Live Preview button when demo is successfully imported in demo preview page.
