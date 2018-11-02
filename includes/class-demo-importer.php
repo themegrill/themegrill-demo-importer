@@ -601,6 +601,7 @@ class TG_Demo_Importer {
 		if ( ! empty( $demo_data ) ) {
 			$this->import_dummy_xml( $slug, $demo_data, $status );
 			$this->import_core_options( $slug, $demo_data );
+			$this->import_elementor_options( $slug, $demo_data );
 			$this->import_customizer_data( $slug, $demo_data, $status );
 			$this->import_widget_settings( $slug, $demo_data, $status );
 
@@ -704,6 +705,41 @@ class TG_Demo_Importer {
 					break;
 					default:
 						update_option( $option_key, sanitize_text_field( $option_value ) );
+					break;
+				}
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Import elementor options from its ID.
+	 *
+	 * @param  string $demo_id
+	 * @param  array  $demo_data
+	 * @return bool
+	 */
+	public function import_elementor_options( $demo_id, $demo_data ) {
+		if ( ! empty( $demo_data['elementor_options'] ) ) {
+			foreach ( $demo_data['elementor_options'] as $option_key => $option_value ) {
+				if ( ! in_array( $option_key, array( 'color', 'typography', 'color-picker' ) ) ) {
+					continue;
+				}
+
+				// Format the value based on option key.
+				switch ( $option_key ) {
+					case 'color':
+						update_option( 'elementor_scheme_' . $option_key, $option_value );
+					break;
+					case 'typography':
+					case 'color-picker':
+						$page = get_page_by_title( $option_value );
+
+						if ( is_object( $page ) && $page->ID ) {
+							update_option( $option_key, $page->ID );
+							update_option( 'show_on_front', 'page' );
+						}
 					break;
 				}
 			}
