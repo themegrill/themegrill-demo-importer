@@ -20,7 +20,7 @@ final class ThemeGrill_Demo_Importer {
 	 *
 	 * @var string
 	 */
-	public $version = '1.5.3';
+	public $version = '1.5.4';
 
 	/**
 	 * Theme single instance of this class.
@@ -120,7 +120,7 @@ final class ThemeGrill_Demo_Importer {
 	 * @return array
 	 */
 	private function get_core_supported_themes() {
-		$core_themes = array( 'spacious', 'colormag', 'flash', 'estore', 'ample', 'accelerate', 'colornews', 'foodhunt', 'fitclub', 'radiate', 'freedom', 'himalayas', 'esteem', 'envince', 'suffice', 'explore', 'masonic', 'cenote', 'modular' );
+		$core_themes = array( 'spacious', 'colormag', 'flash', 'estore', 'ample', 'accelerate', 'colornews', 'foodhunt', 'fitclub', 'radiate', 'freedom', 'himalayas', 'esteem', 'envince', 'suffice', 'explore', 'masonic', 'cenote', 'zakra' );
 
 		// Check for official core themes pro version.
 		$pro_themes = array_diff( $core_themes, array( 'explore', 'masonic' ) );
