@@ -601,7 +601,7 @@ class TG_Demo_Importer {
 		if ( ! empty( $demo_data ) ) {
 			$this->import_dummy_xml( $slug, $demo_data, $status );
 			$this->import_core_options( $slug, $demo_data );
-			$this->import_elementor_options( $slug, $demo_data );
+			$this->import_elementor_schemes( $slug, $demo_data );
 			$this->import_customizer_data( $slug, $demo_data, $status );
 			$this->import_widget_settings( $slug, $demo_data, $status );
 
@@ -714,15 +714,15 @@ class TG_Demo_Importer {
 	}
 
 	/**
-	 * Import elementor options from its ID.
+	 * Import elementor schemes from its ID.
 	 *
 	 * @param string $demo_id Demo ID.
 	 * @param array  $demo_data Demo Data.
 	 * @return bool
 	 */
-	public function import_elementor_options( $demo_id, $demo_data ) {
-		if ( ! empty( $demo_data['elementor_options'] ) ) {
-			foreach ( $demo_data['elementor_options'] as $scheme_key => $scheme_value ) {
+	public function import_elementor_schemes( $demo_id, $demo_data ) {
+		if ( ! empty( $demo_data['elementor_schemes'] ) ) {
+			foreach ( $demo_data['elementor_schemes'] as $scheme_key => $scheme_value ) {
 				if ( ! in_array( $scheme_key, array( 'color', 'typography', 'color-picker' ) ) ) {
 					continue;
 				}
@@ -731,7 +731,6 @@ class TG_Demo_Importer {
 				$scheme_value = array_combine( range( 1, count( $scheme_value ) ), $scheme_value );
 
 				if ( ! empty( $scheme_value ) ) {
-					// echo '<pre>' . print_r( $scheme_value, true ) . '</pre>';
 					update_option( 'elementor_scheme_' . $scheme_key, $scheme_value );
 				}
 			}
