@@ -1,6 +1,12 @@
 == Changelog ==
 
-= TBD =
+= 1.5.5 - 05-11-2018 =
+* Feature - Add support for elementor schemes.
+
+= 1.5.4 - 02-11-2018 =
+* Change Modular to Zakra
+
+= 1.5.3 - 30-10-2018 =
 * Support - Modular theme.
 
 = 1.5.2 - 25-09-2018 =
