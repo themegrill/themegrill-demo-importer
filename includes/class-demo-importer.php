@@ -90,8 +90,7 @@ class TG_Demo_Importer {
 		$template = strtolower( str_replace( '-pro', '', get_option( 'template' ) ) );
 
 		if ( false === $packages || ( isset( $packages->slug ) && $template !== $packages->slug ) ) {
-			// $raw_packages = wp_safe_remote_get( "https://raw.githubusercontent.com/themegrill/themegrill-demo-pack/elementor-options/configs/{$template}.json" );
-			$raw_packages = wp_safe_remote_get( "https://raw.githubusercontent.com/themegrill/themegrill-demo-pack/elementor-options/configs/zakra.json" );
+			$raw_packages = wp_safe_remote_get( "https://raw.githubusercontent.com/themegrill/themegrill-demo-pack/elementor-options/configs/{$template}.json" );
 
 			if ( ! is_wp_error( $raw_packages ) ) {
 				$packages = json_decode( wp_remote_retrieve_body( $raw_packages ) );
