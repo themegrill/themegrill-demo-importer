@@ -90,7 +90,8 @@ class TG_Demo_Importer {
 		$template = strtolower( str_replace( '-pro', '', get_option( 'template' ) ) );
 
 		if ( false === $packages || ( isset( $packages->slug ) && $template !== $packages->slug ) ) {
-			$raw_packages = wp_safe_remote_get( "https://raw.githubusercontent.com/themegrill/themegrill-demo-pack/master/configs/{$template}.json" );
+			// $raw_packages = wp_safe_remote_get( "https://raw.githubusercontent.com/themegrill/themegrill-demo-pack/elementor-options/configs/{$template}.json" );
+			$raw_packages = wp_safe_remote_get( "https://raw.githubusercontent.com/themegrill/themegrill-demo-pack/elementor-options/configs/zakra.json" );
 
 			if ( ! is_wp_error( $raw_packages ) ) {
 				$packages = json_decode( wp_remote_retrieve_body( $raw_packages ) );
@@ -716,31 +717,23 @@ class TG_Demo_Importer {
 	/**
 	 * Import elementor options from its ID.
 	 *
-	 * @param  string $demo_id
-	 * @param  array  $demo_data
+	 * @param string $demo_id Demo ID.
+	 * @param array  $demo_data Demo Data.
 	 * @return bool
 	 */
 	public function import_elementor_options( $demo_id, $demo_data ) {
 		if ( ! empty( $demo_data['elementor_options'] ) ) {
-			foreach ( $demo_data['elementor_options'] as $option_key => $option_value ) {
-				if ( ! in_array( $option_key, array( 'color', 'typography', 'color-picker' ) ) ) {
+			foreach ( $demo_data['elementor_options'] as $scheme_key => $scheme_value ) {
+				if ( ! in_array( $scheme_key, array( 'color', 'typography', 'color-picker' ) ) ) {
 					continue;
 				}
 
-				// Format the value based on option key.
-				switch ( $option_key ) {
-					case 'color':
-						update_option( 'elementor_scheme_' . $option_key, $option_value );
-					break;
-					case 'typography':
-					case 'color-picker':
-						$page = get_page_by_title( $option_value );
+				// Change scheme index to start from 1 instead.
+				$scheme_value = array_combine( range( 1, count( $scheme_value ) ), $scheme_value );
 
-						if ( is_object( $page ) && $page->ID ) {
-							update_option( $option_key, $page->ID );
-							update_option( 'show_on_front', 'page' );
-						}
-					break;
+				if ( ! empty( $scheme_value ) ) {
+					// echo '<pre>' . print_r( $scheme_value, true ) . '</pre>';
+					update_option( 'elementor_scheme_' . $scheme_key, $scheme_value );
 				}
 			}
 		}
