@@ -18,10 +18,10 @@ defined( 'ABSPATH' ) || exit;
 	<hr class="wp-header-end">
 
 	<div class="error hide-if-js">
-		<p><?php _e( 'The Demo Importer screen requires JavaScript.', 'themegrill-demo-importer' ); ?></p>
+		<p><?php esc_html_e( 'The Demo Importer screen requires JavaScript.', 'themegrill-demo-importer' ); ?></p>
 	</div>
 
-	<h2 class="screen-reader-text hide-if-no-js"><?php _e( 'Filter demos list', 'themegrill-demo-importer' ); ?></h2>
+	<h2 class="screen-reader-text hide-if-no-js"><?php esc_html_e( 'Filter demos list', 'themegrill-demo-importer' ); ?></h2>
 
 	<div class="wp-filter hide-if-no-js">
 		<div class="filter-section">
@@ -43,7 +43,7 @@ defined( 'ABSPATH' ) || exit;
 					<?php foreach ( $this->demo_packages->pagebuilders as $slug => $label ) : ?>
 						<?php if ( 'default' !== $slug ) : ?>
 							<li><a href="#" data-type="<?php echo esc_attr( $slug ); ?>" class="pagebuilder-tab"><?php echo esc_html( $label ); ?></a></li>
-						<?php else: ?>
+						<?php else : ?>
 							<li><a href="#" data-type="<?php echo esc_attr( $slug ); ?>" class="pagebuilder-tab tips" data-tip="<?php esc_attr_e( 'Without Page Builder', 'themegrill-demo-importer' ); ?>"><?php echo esc_html( $label ); ?></a></li>
 						<?php endif; ?>
 					<?php endforeach; ?>
@@ -57,7 +57,7 @@ defined( 'ABSPATH' ) || exit;
 	<div class="theme-browser content-filterable"></div>
 	<div class="theme-install-overlay wp-full-overlay expanded"></div>
 
-	<p class="no-themes"><?php _e( 'No demos found. Try a different search.', 'themegrill-demo-importer' ); ?></p>
+	<p class="no-themes"><?php esc_html_e( 'No demos found. Try a different search.', 'themegrill-demo-importer' ); ?></p>
 	<span class="spinner"></span>
 </div>
 
@@ -71,10 +71,10 @@ defined( 'ABSPATH' ) || exit;
 	<# } #>
 
 	<# if ( data.isPro ) { #>
-		<span class="premium-demo-banner"><?php _e( 'Pro', 'themegrill-demo-importer' ); ?></span>
+		<span class="premium-demo-banner"><?php esc_html_e( 'Pro', 'themegrill-demo-importer' ); ?></span>
 	<# } #>
 
-	<span class="more-details"><?php _ex( 'Details &amp; Preview', 'demo', 'themegrill-demo-importer' ); ?></span>
+	<span class="more-details"><?php echo esc_html_x( 'Details &amp; Preview', 'demo', 'themegrill-demo-importer' ); ?></span>
 	<div class="theme-author">
 		<?php
 		/* translators: %s: Demo author name */

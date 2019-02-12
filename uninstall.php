@@ -4,7 +4,7 @@
  *
  * Uninstalls the plugin and associated data.
  *
- * @package Importer/Unistaller
+ * @package Importer\Unistaller
  * @version 1.3.4
  */
 

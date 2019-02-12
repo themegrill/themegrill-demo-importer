@@ -4,7 +4,7 @@
  *
  * Code adapted from the "Customizer Export/Import" plugin.
  *
- * @package ThemeGrill_Demo_Importer/Classes
+ * @package ThemeGrill_Demo_Importer\Classes
  * @version 1.0.0
  */
 
@@ -60,11 +60,15 @@ class TG_Customizer_Importer {
 			include_once dirname( __FILE__ ) . '/customize/class-oc-customize-demo-importer-setting.php';
 
 			foreach ( $data['options'] as $option_key => $option_value ) {
-				$option = new OC_Customize_Demo_Importer_Setting( $wp_customize, $option_key, array(
-					'default'    => '',
-					'type'       => 'option',
-					'capability' => 'edit_theme_options',
-				) );
+				$option = new OC_Customize_Demo_Importer_Setting(
+					$wp_customize,
+					$option_key,
+					array(
+						'default'    => '',
+						'type'       => 'option',
+						'capability' => 'edit_theme_options',
+					)
+				);
 
 				$option->import( $option_value );
 			}
@@ -141,7 +145,7 @@ class TG_Customizer_Importer {
 		if ( ! empty( $file ) ) {
 			// Set variables for storage, fix file filename for query strings.
 			preg_match( '/[^\?]+\.(jpe?g|jpe|gif|png)\b/i', $file, $matches );
-			$file_array = array();
+			$file_array         = array();
 			$file_array['name'] = basename( $matches[0] );
 
 			// Download file to temp location.

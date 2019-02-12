@@ -2,14 +2,14 @@
 /**
  * Demo Importer Functions.
  *
- * @package ThemeGrill_Demo_Importer/Functions
+ * @package ThemeGrill_Demo_Importer\Functions
  * @version 1.0.0
  */
 
 defined( 'ABSPATH' ) || exit;
 
 // Include core functions (available in both admin and frontend).
-include_once TGDM_ABSPATH . 'includes/functions-demo-update.php';
+require_once TGDM_ABSPATH . 'includes/functions-demo-update.php';
 
 /**
  * Ajax handler for installing a required plugin.
@@ -24,11 +24,13 @@ function tg_ajax_install_required_plugin() {
 	check_ajax_referer( 'updates' );
 
 	if ( empty( $_POST['plugin'] ) || empty( $_POST['slug'] ) ) {
-		wp_send_json_error( array(
-			'slug'         => '',
-			'errorCode'    => 'no_plugin_specified',
-			'errorMessage' => __( 'No plugin specified.', 'themegrill-demo-importer' ),
-		) );
+		wp_send_json_error(
+			array(
+				'slug'         => '',
+				'errorCode'    => 'no_plugin_specified',
+				'errorMessage' => __( 'No plugin specified.', 'themegrill-demo-importer' ),
+			)
+		);
 	}
 
 	$slug   = sanitize_key( wp_unslash( $_POST['slug'] ) );
@@ -43,8 +45,8 @@ function tg_ajax_install_required_plugin() {
 		wp_send_json_error( $status );
 	}
 
-	include_once( ABSPATH . 'wp-admin/includes/class-wp-upgrader.php' );
-	include_once( ABSPATH . 'wp-admin/includes/plugin-install.php' );
+	include_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
+	include_once ABSPATH . 'wp-admin/includes/plugin-install.php';
 
 	// Looks like a plugin is installed, but not active.
 	if ( file_exists( WP_PLUGIN_DIR . '/' . $slug ) ) {
@@ -65,12 +67,15 @@ function tg_ajax_install_required_plugin() {
 		}
 	}
 
-	$api = plugins_api( 'plugin_information', array(
-		'slug'   => sanitize_key( wp_unslash( $_POST['slug'] ) ),
-		'fields' => array(
-			'sections' => false,
-		),
-	) );
+	$api = plugins_api(
+		'plugin_information',
+		array(
+			'slug'   => sanitize_key( wp_unslash( $_POST['slug'] ) ),
+			'fields' => array(
+				'sections' => false,
+			),
+		)
+	);
 
 	if ( is_wp_error( $api ) ) {
 		$status['errorMessage'] = $api->get_error_message();
@@ -243,24 +248,27 @@ if ( class_exists( 'WooCommerce' ) ) {
 function tg_set_wc_pages( $demo_id ) {
 	global $wpdb;
 
-	$wc_pages = apply_filters( 'themegrill_wc_' . $demo_id . '_pages', array(
-		'shop' => array(
-			'name'  => 'shop',
-			'title' => 'Shop',
-		),
-		'cart' => array(
-			'name'  => 'cart',
-			'title' => 'Cart',
-		),
-		'checkout' => array(
-			'name'  => 'checkout',
-			'title' => 'Checkout',
-		),
-		'myaccount' => array(
-			'name'  => 'my-account',
-			'title' => 'My Account',
-		),
-	) );
+	$wc_pages = apply_filters(
+		'themegrill_wc_' . $demo_id . '_pages',
+		array(
+			'shop'      => array(
+				'name'  => 'shop',
+				'title' => 'Shop',
+			),
+			'cart'      => array(
+				'name'  => 'cart',
+				'title' => 'Cart',
+			),
+			'checkout'  => array(
+				'name'  => 'checkout',
+				'title' => 'Checkout',
+			),
+			'myaccount' => array(
+				'name'  => 'my-account',
+				'title' => 'My Account',
+			),
+		)
+	);
 
 	// Set WC pages properly.
 	foreach ( $wc_pages as $key => $wc_page ) {
@@ -270,7 +278,7 @@ function tg_set_wc_pages( $demo_id ) {
 
 		if ( ! is_null( $page_ids ) ) {
 			$page_id    = 0;
-			$delete_ids	= array();
+			$delete_ids = array();
 
 			// Retrieve page with greater id and delete others.
 			if ( sizeof( $page_ids ) > 1 ) {
@@ -297,7 +305,12 @@ function tg_set_wc_pages( $demo_id ) {
 			// Update WC page.
 			if ( $page_id > 0 ) {
 				update_option( 'woocommerce_' . $key . '_page_id', $page_id );
-				wp_update_post( array( 'ID' => $page_id, 'post_name' => sanitize_title( $wc_page['name'] ) ) );
+				wp_update_post(
+					array(
+						'ID'        => $page_id,
+						'post_name' => sanitize_title( $wc_page['name'] ),
+					)
+				);
 			}
 		}
 	}

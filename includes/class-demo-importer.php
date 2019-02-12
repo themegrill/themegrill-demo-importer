@@ -2,7 +2,7 @@
 /**
  * ThemeGrill Demo Importer.
  *
- * @package ThemeGrill_Demo_Importer/Classes
+ * @package ThemeGrill_Demo_Importer\Classes
  * @version 1.0.0
  */
 
@@ -166,47 +166,55 @@ class TG_Demo_Importer {
 		if ( 'appearance_page_demo-importer' === $screen_id ) {
 			wp_enqueue_style( 'tg-demo-importer' );
 			wp_enqueue_script( 'tg-demo-importer' );
-			wp_localize_script( 'tg-demo-updates', '_demoUpdatesSettings', array(
-				'l10n' => array(
-					'importing'             => __( 'Importing...', 'themegrill-demo-importer' ),
-					'demoImportingLabel'    => _x( 'Importing %s...', 'demo', 'themegrill-demo-importer' ), // no ellipsis
-					'importingMsg'          => __( 'Importing... please wait.', 'themegrill-demo-importer' ),
-					'importedMsg'           => __( 'Import completed successfully.', 'themegrill-demo-importer' ),
-					'importFailedShort'     => __( 'Import Failed!', 'themegrill-demo-importer' ),
-					'importFailed'          => __( 'Import failed: %s', 'themegrill-demo-importer' ),
-					'demoImportedLabel'     => _x( '%s imported!', 'demo', 'themegrill-demo-importer' ),
-					'demoImportFailedLabel' => _x( '%s import failed', 'demo', 'themegrill-demo-importer' ),
-					'livePreview'           => __( 'Live Preview', 'themegrill-demo-importer' ),
-					'livePreviewLabel'      => _x( 'Live Preview %s', 'demo', 'themegrill-demo-importer' ),
-					'imported'              => __( 'Imported!', 'themegrill-demo-importer' ),
-					'statusTextLink'        => '<a href="https://docs.themegrill.com/knowledgebase/demo-import-process-failed/" target="_blank">' . __( 'Try this solution!', 'themegrill-demo-importer' ) . '</a>',
-				),
-			) );
-			wp_localize_script( 'tg-demo-importer', '_demoImporterSettings', array(
-				'demos'    => $this->ajax_query_demos( true ),
-				'settings' => array(
-					'isNew'          => false,
-					'ajaxUrl'        => admin_url( 'admin-ajax.php' ),
-					'adminUrl'       => parse_url( self_admin_url(), PHP_URL_PATH ),
-					'suggestURI'     => apply_filters( 'themegrill_demo_importer_suggest_new', 'https://themegrill.com/contact/' ),
-					'confirmReset'   => __( 'It is strongly recommended that you backup your database before proceeding. Are you sure you wish to run the reset wizard now?', 'themegrill-demo-importer' ),
-					'confirmImport'  => __( "Importing demo data will ensure that your site will look similar as theme demo. It makes you easy to modify the content instead of creating them from scratch. Also consider before importing theme demo: \n\n1. You need to import demo on fresh WordPress install to exactly replicate the theme demo. \n\n2. None of the posts, pages, attachments or any other data already existing in your site will be deleted or modified. \n\n3. Copyright images will get replaced with other placeholder images. \n\n4. It will take some time to import the theme demo.", 'themegrill-demo-importer' ),
-				),
-				'l10n' => array(
-					'search'              => __( 'Search Demos', 'themegrill-demo-importer' ),
-					'searchPlaceholder'   => __( 'Search demos...', 'themegrill-demo-importer' ), // placeholder (no ellipsis)
-					/* translators: %s: support forums URL */
-					'error'               => sprintf( __( 'An unexpected error occurred. Something may be wrong with ThemeGrill demo server&#8217;s configuration. If you continue to have problems, please try the <a href="%s">support forums</a>.', 'themegrill-demo-importer' ), 'https://wordpress.org/support/plugin/themegrill-demo-importer' ),
-					'tryAgain'            => __( 'Try Again', 'themegrill-demo-importer' ),
-					'suggestNew'          => __( 'Please suggest us!', 'themegrill-demo-importer' ),
-					'demosFound'          => __( 'Number of Demos found: %d', 'themegrill-demo-importer' ),
-					'noDemosFound'        => __( 'No demos found. Try a different search.', 'themegrill-demo-importer' ),
-					'collapseSidebar'     => __( 'Collapse Sidebar', 'themegrill-demo-importer' ),
-					'expandSidebar'       => __( 'Expand Sidebar', 'themegrill-demo-importer' ),
-					/* translators: accessibility text */
-					'selectFeatureFilter' => __( 'Select one or more Demo features to filter by', 'themegrill-demo-importer' ),
-				),
-			) );
+			wp_localize_script(
+				'tg-demo-updates',
+				'_demoUpdatesSettings',
+				array(
+					'l10n' => array(
+						'importing'             => __( 'Importing...', 'themegrill-demo-importer' ),
+						'demoImportingLabel'    => _x( 'Importing %s...', 'demo', 'themegrill-demo-importer' ), // no ellipsis
+						'importingMsg'          => __( 'Importing... please wait.', 'themegrill-demo-importer' ),
+						'importedMsg'           => __( 'Import completed successfully.', 'themegrill-demo-importer' ),
+						'importFailedShort'     => __( 'Import Failed!', 'themegrill-demo-importer' ),
+						'importFailed'          => __( 'Import failed: %s', 'themegrill-demo-importer' ),
+						'demoImportedLabel'     => _x( '%s imported!', 'demo', 'themegrill-demo-importer' ),
+						'demoImportFailedLabel' => _x( '%s import failed', 'demo', 'themegrill-demo-importer' ),
+						'livePreview'           => __( 'Live Preview', 'themegrill-demo-importer' ),
+						'livePreviewLabel'      => _x( 'Live Preview %s', 'demo', 'themegrill-demo-importer' ),
+						'imported'              => __( 'Imported!', 'themegrill-demo-importer' ),
+						'statusTextLink'        => '<a href="https://docs.themegrill.com/knowledgebase/demo-import-process-failed/" target="_blank">' . __( 'Try this solution!', 'themegrill-demo-importer' ) . '</a>',
+					),
+				)
+			);
+			wp_localize_script(
+				'tg-demo-importer',
+				'_demoImporterSettings',
+				array(
+					'demos'    => $this->ajax_query_demos( true ),
+					'settings' => array(
+						'isNew'         => false,
+						'ajaxUrl'       => admin_url( 'admin-ajax.php' ),
+						'adminUrl'      => parse_url( self_admin_url(), PHP_URL_PATH ),
+						'suggestURI'    => apply_filters( 'themegrill_demo_importer_suggest_new', 'https://themegrill.com/contact/' ),
+						'confirmReset'  => __( 'It is strongly recommended that you backup your database before proceeding. Are you sure you wish to run the reset wizard now?', 'themegrill-demo-importer' ),
+						'confirmImport' => __( "Importing demo data will ensure that your site will look similar as theme demo. It makes you easy to modify the content instead of creating them from scratch. Also consider before importing theme demo: \n\n1. You need to import demo on fresh WordPress install to exactly replicate the theme demo. \n\n2. None of the posts, pages, attachments or any other data already existing in your site will be deleted or modified. \n\n3. Copyright images will get replaced with other placeholder images. \n\n4. It will take some time to import the theme demo.", 'themegrill-demo-importer' ),
+					),
+					'l10n'     => array(
+						'search'              => __( 'Search Demos', 'themegrill-demo-importer' ),
+						'searchPlaceholder'   => __( 'Search demos...', 'themegrill-demo-importer' ), // placeholder (no ellipsis)
+						   /* translators: %s: support forums URL */
+						'error'               => sprintf( __( 'An unexpected error occurred. Something may be wrong with ThemeGrill demo server&#8217;s configuration. If you continue to have problems, please try the <a href="%s">support forums</a>.', 'themegrill-demo-importer' ), 'https://wordpress.org/support/plugin/themegrill-demo-importer' ),
+						'tryAgain'            => __( 'Try Again', 'themegrill-demo-importer' ),
+						'suggestNew'          => __( 'Please suggest us!', 'themegrill-demo-importer' ),
+						'demosFound'          => __( 'Number of Demos found: %d', 'themegrill-demo-importer' ),
+						'noDemosFound'        => __( 'No demos found. Try a different search.', 'themegrill-demo-importer' ),
+						'collapseSidebar'     => __( 'Collapse Sidebar', 'themegrill-demo-importer' ),
+						'expandSidebar'       => __( 'Expand Sidebar', 'themegrill-demo-importer' ),
+						/* translators: accessibility text */
+						'selectFeatureFilter' => __( 'Select one or more Demo features to filter by', 'themegrill-demo-importer' ),
+					),
+				)
+			);
 		}
 	}
 
@@ -251,13 +259,14 @@ class TG_Demo_Importer {
 			return;
 		}
 
-		$screen->add_help_tab( array(
-			'id'        => 'themegrill_demo_importer_support_tab',
-			'title'     => __( 'Help &amp; Support', 'themegrill-demo-importer' ),
-			'content'   =>
-				'<h2>' . __( 'Help &amp; Support', 'themegrill-demo-importer' ) . '</h2>' .
+		$screen->add_help_tab(
+			array(
+				'id'      => 'themegrill_demo_importer_support_tab',
+				'title'   => __( 'Help &amp; Support', 'themegrill-demo-importer' ),
+				'content' =>
+					'<h2>' . __( 'Help &amp; Support', 'themegrill-demo-importer' ) . '</h2>' .
 				'<p>' . sprintf(
-					__( 'Should you need help understanding, using, or extending ThemeGrill Demo Importer, <a href="%s">please read our documentation</a>. You will find all kinds of resources including snippets, tutorials and much more.' , 'themegrill-demo-importer' ),
+					__( 'Should you need help understanding, using, or extending ThemeGrill Demo Importer, <a href="%s">please read our documentation</a>. You will find all kinds of resources including snippets, tutorials and much more.', 'themegrill-demo-importer' ),
 					'https://themegrill.com/docs/themegrill-demo-importer/'
 				) . '</p>' .
 				'<p>' . sprintf(
@@ -265,27 +274,32 @@ class TG_Demo_Importer {
 					'https://wordpress.org/support/plugin/themegrill-demo-importer',
 					'https://themegrill.com/support-forum/'
 				) . '</p>' .
-				'<p><a href="' . 'https://wordpress.org/support/plugin/themegrill-demo-importer' . '" class="button button-primary">' . __( 'Community forum', 'themegrill-demo-importer' ) . '</a> <a href="' . 'https://themegrill.com/support-forum/' . '" class="button">' . __( 'ThemeGrill Support', 'themegrill-demo-importer' ) . '</a></p>',
-		) );
+					'<p><a href="' . 'https://wordpress.org/support/plugin/themegrill-demo-importer' . '" class="button button-primary">' . __( 'Community forum', 'themegrill-demo-importer' ) . '</a> <a href="' . 'https://themegrill.com/support-forum/' . '" class="button">' . __( 'ThemeGrill Support', 'themegrill-demo-importer' ) . '</a></p>',
+			)
+		);
 
-		$screen->add_help_tab( array(
-			'id'        => 'themegrill_demo_importer_bugs_tab',
-			'title'     => __( 'Found a bug?', 'themegrill-demo-importer' ),
-			'content'   =>
-				'<h2>' . __( 'Found a bug?', 'themegrill-demo-importer' ) . '</h2>' .
-				'<p>' . sprintf( __( 'If you find a bug within ThemeGrill Demo Importer you can create a ticket via <a href="%1$s">Github issues</a>. Ensure you read the <a href="%2$s">contribution guide</a> prior to submitting your report. To help us solve your issue, please be as descriptive as possible.', 'themegrill-demo-importer' ), 'https://github.com/themegrill/themegrill-demo-importer/issues?state=open', 'https://github.com/themegrill/themegrill-demo-importer/blob/master/.github/CONTRIBUTING.md' ) . '</p>' .
-				'<p><a href="' . 'https://github.com/themegrill/themegrill-demo-importer/issues?state=open' . '" class="button button-primary">' . __( 'Report a bug', 'themegrill-demo-importer' ) . '</a></p>',
+		$screen->add_help_tab(
+			array(
+				'id'      => 'themegrill_demo_importer_bugs_tab',
+				'title'   => __( 'Found a bug?', 'themegrill-demo-importer' ),
+				'content' =>
+					'<h2>' . __( 'Found a bug?', 'themegrill-demo-importer' ) . '</h2>' .
+					'<p>' . sprintf( __( 'If you find a bug within ThemeGrill Demo Importer you can create a ticket via <a href="%1$s">Github issues</a>. Ensure you read the <a href="%2$s">contribution guide</a> prior to submitting your report. To help us solve your issue, please be as descriptive as possible.', 'themegrill-demo-importer' ), 'https://github.com/themegrill/themegrill-demo-importer/issues?state=open', 'https://github.com/themegrill/themegrill-demo-importer/blob/master/.github/CONTRIBUTING.md' ) . '</p>' .
+					'<p><a href="' . 'https://github.com/themegrill/themegrill-demo-importer/issues?state=open' . '" class="button button-primary">' . __( 'Report a bug', 'themegrill-demo-importer' ) . '</a></p>',
 
-		) );
+			)
+		);
 
-		$screen->add_help_tab( array(
-			'id'        => 'themegrill_demo_importer_reset_tab',
-			'title'     => __( 'Reset wizard', 'themegrill-demo-importer' ),
-			'content'   =>
-				'<h2>' . __( 'Reset wizard', 'themegrill-demo-importer' ) . '</h2>' .
-				'<p>' . __( 'If you need to reset the WordPress back to default again, please click on the button below.', 'themegrill-demo-importer' ) . '</p>' .
-				'<p><a href="' . esc_url( add_query_arg( 'do_reset_wordpress', 'true', admin_url( 'themes.php?page=demo-importer' ) ) ) . '" class="button button-primary themegrill-reset-wordpress">' . __( 'Reset wizard', 'themegrill-demo-importer' ) . '</a></p>',
-		) );
+		$screen->add_help_tab(
+			array(
+				'id'      => 'themegrill_demo_importer_reset_tab',
+				'title'   => __( 'Reset wizard', 'themegrill-demo-importer' ),
+				'content' =>
+					'<h2>' . __( 'Reset wizard', 'themegrill-demo-importer' ) . '</h2>' .
+					'<p>' . __( 'If you need to reset the WordPress back to default again, please click on the button below.', 'themegrill-demo-importer' ) . '</p>' .
+					'<p><a href="' . esc_url( add_query_arg( 'do_reset_wordpress', 'true', admin_url( 'themes.php?page=demo-importer' ) ) ) . '" class="button button-primary themegrill-reset-wordpress">' . __( 'Reset wizard', 'themegrill-demo-importer' ) . '</a></p>',
+			)
+		);
 
 		$screen->set_help_sidebar(
 			'<p><strong>' . __( 'For more information:', 'themegrill-demo-importer' ) . '</strong></p>' .
@@ -371,7 +385,14 @@ class TG_Demo_Importer {
 			$result = wp_install( $blogname, $user->user_login, $user->user_email, $blog_public );
 
 			// Updates the user password with a old one.
-			$wpdb->update( $wpdb->users, array( 'user_pass' => $user->user_pass, 'user_activation_key' => '' ), array( 'ID' => $result['user_id'] ) );
+			$wpdb->update(
+				$wpdb->users,
+				array(
+					'user_pass'           => $user->user_pass,
+					'user_activation_key' => '',
+				),
+				array( 'ID' => $result['user_id'] )
+			);
 
 			// Set up the Password change nag.
 			$default_password_nag = get_user_option( 'default_password_nag', $result['user_id'] );
@@ -440,9 +461,12 @@ class TG_Demo_Importer {
 		}
 
 		if ( ! $return ) {
-			$request = wp_parse_args( wp_unslash( $_REQUEST['request'] ), array(
-				'browse' => 'all',
-			) );
+			$request = wp_parse_args(
+				wp_unslash( $_REQUEST['request'] ),
+				array(
+					'browse' => 'all',
+				)
+			);
 		} else {
 			$request = array(
 				'browse' => 'all',
@@ -511,14 +535,16 @@ class TG_Demo_Importer {
 			return $prepared_demos;
 		}
 
-		wp_send_json_success( array(
-			'info' => array(
-				'page'    => 1,
-				'pages'   => 1,
-				'results' => count( $prepared_demos ),
-			),
-			'demos' => array_filter( $prepared_demos ),
-		) );
+		wp_send_json_success(
+			array(
+				'info'  => array(
+					'page'    => 1,
+					'pages'   => 1,
+					'results' => count( $prepared_demos ),
+				),
+				'demos' => array_filter( $prepared_demos ),
+			)
+		);
 	}
 
 	/**
@@ -532,11 +558,13 @@ class TG_Demo_Importer {
 		check_ajax_referer( 'updates' );
 
 		if ( empty( $_POST['slug'] ) ) {
-			wp_send_json_error( array(
-				'slug'         => '',
-				'errorCode'    => 'no_demo_specified',
-				'errorMessage' => __( 'No demo specified.', 'themegrill-demo-importer' ),
-			) );
+			wp_send_json_error(
+				array(
+					'slug'         => '',
+					'errorCode'    => 'no_demo_specified',
+					'errorMessage' => __( 'No demo specified.', 'themegrill-demo-importer' ),
+				)
+			);
 		}
 
 		$slug   = sanitize_key( wp_unslash( $_POST['slug'] ) );
@@ -554,8 +582,8 @@ class TG_Demo_Importer {
 			wp_send_json_error( $status );
 		}
 
-		include_once( ABSPATH . 'wp-admin/includes/class-wp-upgrader.php' );
-		include_once( dirname( __FILE__ ) . '/admin/class-demo-pack-upgrader.php' );
+		include_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
+		include_once dirname( __FILE__ ) . '/admin/class-demo-pack-upgrader.php';
 
 		$skin     = new WP_Ajax_Upgrader_Skin();
 		$upgrader = new TG_Demo_Pack_Upgrader( $skin );
@@ -655,7 +683,7 @@ class TG_Demo_Importer {
 
 		// Import XML file demo content.
 		if ( is_file( $import_file ) ) {
-			$wp_import = new TG_WXR_Importer();
+			$wp_import                    = new TG_WXR_Importer();
 			$wp_import->fetch_attachments = true;
 
 			ob_start();
@@ -693,7 +721,7 @@ class TG_Demo_Importer {
 						if ( in_array( $option_value, array( 'posts', 'page' ) ) ) {
 							update_option( 'show_on_front', $option_value );
 						}
-					break;
+						break;
 					case 'page_on_front':
 					case 'page_for_posts':
 						$page = get_page_by_title( $option_value );
@@ -702,10 +730,10 @@ class TG_Demo_Importer {
 							update_option( $option_key, $page->ID );
 							update_option( 'show_on_front', 'page' );
 						}
-					break;
+						break;
 					default:
 						update_option( $option_key, sanitize_text_field( $option_value ) );
-					break;
+						break;
 				}
 			}
 		}
@@ -854,7 +882,7 @@ class TG_Demo_Importer {
 								}
 							}
 						}
-					break;
+						break;
 					case 'dropdown_categories':
 						foreach ( $dropdown_data as $taxonomy => $taxonomy_data ) {
 							if ( ! taxonomy_exists( $taxonomy ) ) {
@@ -873,7 +901,7 @@ class TG_Demo_Importer {
 								}
 							}
 						}
-					break;
+						break;
 				}
 			}
 		}
@@ -907,7 +935,7 @@ class TG_Demo_Importer {
 								}
 							}
 						}
-					break;
+						break;
 					case 'categories':
 						foreach ( $data_value as $taxonomy => $taxonomy_data ) {
 							if ( ! taxonomy_exists( $taxonomy ) ) {
@@ -924,7 +952,7 @@ class TG_Demo_Importer {
 								}
 							}
 						}
-					break;
+						break;
 					case 'nav_menu_locations':
 						$nav_menus = wp_get_nav_menus();
 
@@ -939,7 +967,7 @@ class TG_Demo_Importer {
 								}
 							}
 						}
-					break;
+						break;
 				}
 			}
 		}
@@ -960,7 +988,7 @@ class TG_Demo_Importer {
 
 		// Recursively update elementor data.
 		foreach ( $elementor_data as $element_id => $element_data ) {
-			if ( ! empty( $element_data['elements' ] ) ) {
+			if ( ! empty( $element_data['elements'] ) ) {
 				foreach ( $element_data['elements'] as $el_key => $el_data ) {
 					if ( ! empty( $el_data['elements'] ) ) {
 						foreach ( $el_data['elements'] as $el_child_key => $child_el_data ) {
@@ -1002,7 +1030,7 @@ class TG_Demo_Importer {
 									}
 
 									// Update the elementor data.
-									$elementor_data[ $element_id ][ 'elements' ][ $el_key ]['elements'][ $el_child_key ]['settings']['categories_selected'] = $categories_selected;
+									$elementor_data[ $element_id ]['elements'][ $el_key ]['elements'][ $el_child_key ]['settings']['categories_selected'] = $categories_selected;
 								}
 							}
 						}
@@ -1075,10 +1103,10 @@ class TG_Demo_Importer {
 													if ( 0 !== $attachment_id ) {
 														$grid_instance['style'][ $style_key ] = $attachment_id;
 													}
-												break;
+													break;
 												default:
 													$grid_instance['style'][ $style_key ] = $style_value;
-												break;
+													break;
 											}
 										}
 									}
@@ -1088,13 +1116,13 @@ class TG_Demo_Importer {
 
 						// Update panel grids data.
 						$panels_data['grids'][ $instance_id ] = $grid_instance;
-				   }
-				break;
+					}
+					break;
 
 				case 'widgets':
 					foreach ( $panel_data as $instance_id => $widget_instance ) {
 						if ( isset( $widget_instance['panels_data']['widgets'] ) ) {
-							$instance = $instance + 1;
+							$instance          = $instance + 1;
 							$child_panels_data = $widget_instance['panels_data'];
 							$panels_data['widgets'][ $instance_id ]['panels_data'] = $this->siteorigin_recursive_update( $child_panels_data, $data_type, $data_value );
 							$instance = $instance - 1;
@@ -1133,7 +1161,7 @@ class TG_Demo_Importer {
 												}
 											}
 										}
-									break;
+										break;
 									case 'dropdown_categories':
 										foreach ( $dropdown_data as $taxonomy => $taxonomy_data ) {
 											if ( ! taxonomy_exists( $taxonomy ) ) {
@@ -1156,14 +1184,14 @@ class TG_Demo_Importer {
 												}
 											}
 										}
-									break;
+										break;
 								}
 							}
 						}
 
 						$panels_data['widgets'][ $instance_id ] = $widget_instance;
 					}
-				break;
+					break;
 			}
 		}
 

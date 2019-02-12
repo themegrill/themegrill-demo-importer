@@ -110,7 +110,7 @@ module.exports = function( grunt ){
 				files: [
 					'<%= dirs.css %>/*.scss'
 				],
-				tasks: ['sass', 'rtlcss', 'cssmin']
+				tasks: ['sass', 'rtlcss', 'postcss', 'cssmin']
 			},
 			js: {
 				files: [
@@ -192,8 +192,7 @@ module.exports = function( grunt ){
 		// PHP Code Sniffer.
 		phpcs: {
 			options: {
-				bin: 'vendor/bin/phpcs',
-				standard: './phpcs.ruleset.xml'
+				bin: 'vendor/bin/phpcs'
 			},
 			dist: {
 				src:  [
@@ -226,7 +225,7 @@ module.exports = function( grunt ){
 		}
 	});
 
-	// Load NPM tasks to be used here
+	// Load NPM tasks to be used here.
 	grunt.loadNpmTasks( 'grunt-sass' );
 	grunt.loadNpmTasks( 'grunt-phpcs' );
 	grunt.loadNpmTasks( 'grunt-rtlcss' );

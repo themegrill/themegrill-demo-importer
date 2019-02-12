@@ -9,7 +9,7 @@
  *
  * @since 1.5.0
  * @see WP_Upgrader
- * @package ThemeGrill_Demo_Importer/Class
+ * @package ThemeGrill_Demo_Importer\Class
  */
 class TG_Demo_Pack_Upgrader extends WP_Upgrader {
 
@@ -35,13 +35,13 @@ class TG_Demo_Pack_Upgrader extends WP_Upgrader {
 		$this->strings['no_package'] = __( 'Install package not available.', 'themegrill-demo-importer' );
 		/* translators: %s: package URL */
 		$this->strings['downloading_package'] = __( 'Downloading install package from <span class="code">%s</span>&#8230;', 'themegrill-demo-importer' );
-		$this->strings['unpack_package'] = __( 'Unpacking the package&#8230;', 'themegrill-demo-importer' );
-		$this->strings['remove_old'] = __( 'Removing the old version of the demo&#8230;', 'themegrill-demo-importer' );
-		$this->strings['remove_old_failed'] = __( 'Could not remove the old demo.', 'themegrill-demo-importer' );
-		$this->strings['installing_package'] = __( 'Installing the demo&#8230;', 'themegrill-demo-importer' );
-		$this->strings['no_files'] = __( 'The demo contains no files.', 'themegrill-demo-importer' );
-		$this->strings['process_failed'] = __( 'Demo install failed.', 'themegrill-demo-importer' );
-		$this->strings['process_success'] = __( 'Demo installed successfully.', 'themegrill-demo-importer' );
+		$this->strings['unpack_package']      = __( 'Unpacking the package&#8230;', 'themegrill-demo-importer' );
+		$this->strings['remove_old']          = __( 'Removing the old version of the demo&#8230;', 'themegrill-demo-importer' );
+		$this->strings['remove_old_failed']   = __( 'Could not remove the old demo.', 'themegrill-demo-importer' );
+		$this->strings['installing_package']  = __( 'Installing the demo&#8230;', 'themegrill-demo-importer' );
+		$this->strings['no_files']            = __( 'The demo contains no files.', 'themegrill-demo-importer' );
+		$this->strings['process_failed']      = __( 'Demo install failed.', 'themegrill-demo-importer' );
+		$this->strings['process_success']     = __( 'Demo installed successfully.', 'themegrill-demo-importer' );
 	}
 
 	/**
@@ -59,7 +59,7 @@ class TG_Demo_Pack_Upgrader extends WP_Upgrader {
 	 */
 	public function install( $package, $args = array() ) {
 
-		$defaults = array(
+		$defaults    = array(
 			'clear_update_cache' => true,
 		);
 		$parsed_args = wp_parse_args( $args, $defaults );
@@ -69,16 +69,18 @@ class TG_Demo_Pack_Upgrader extends WP_Upgrader {
 
 		add_filter( 'upgrader_source_selection', array( $this, 'check_package' ) );
 
-		$this->run( array(
-			'package' => $package,
-			'destination' => TGDM_DEMO_DIR,
-			'clear_destination' => true, // Do overwrite files.
-			'clear_working' => true,
-			'hook_extra' => array(
-				'type' => 'demo',
-				'action' => 'install',
-			),
-		) );
+		$this->run(
+			array(
+				'package'           => $package,
+				'destination'       => TGDM_DEMO_DIR,
+				'clear_destination' => true, // Do overwrite files.
+				'clear_working'     => true,
+				'hook_extra'        => array(
+					'type'   => 'demo',
+					'action' => 'install',
+				),
+			)
+		);
 
 		remove_filter( 'upgrader_source_selection', array( $this, 'check_package' ) );
 
@@ -110,8 +112,9 @@ class TG_Demo_Pack_Upgrader extends WP_Upgrader {
 
 		// Check the folder contains a valid demo.
 		$working_directory = str_replace( $wp_filesystem->wp_content_dir(), trailingslashit( WP_CONTENT_DIR ), $source );
-		if ( ! is_dir( $working_directory ) ) // Sanity check, if the above fails, let's not prevent installation.
+		if ( ! is_dir( $working_directory ) ) { // Sanity check, if the above fails, let's not prevent installation.
 			return $source;
+		}
 
 		// Check the folder contains at least 1 valid demo.
 		if ( ! file_exists( $working_directory . 'screenshot.jpg' ) ) {
