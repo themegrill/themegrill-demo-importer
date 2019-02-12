@@ -74,7 +74,6 @@ defined( 'ABSPATH' ) || exit;
 		<span class="premium-demo-banner"><?php esc_html_e( 'Pro', 'themegrill-demo-importer' ); ?></span>
 	<# } #>
 
-	<span class="more-details"><?php echo esc_html_x( 'Details &amp; Preview', 'demo', 'themegrill-demo-importer' ); ?></span>
 	<div class="theme-author">
 		<?php
 		/* translators: %s: Demo author name */
