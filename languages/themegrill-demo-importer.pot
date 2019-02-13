@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: ThemeGrill Demo Importer 1.6.0\n"
 "Report-Msgid-Bugs-To: "
 "https://github.com/themegrill/themegrill-demo-importer/issues\n"
-"POT-Creation-Date: 2019-02-12 10:25:44+00:00\n"
+"POT-Creation-Date: 2019-02-13 10:59:27+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -87,103 +87,97 @@ msgid "No demos found. Try a different search."
 msgstr ""
 
 #: includes/admin/views/html-admin-page-importer.php:74
-#: includes/admin/views/html-admin-page-importer.php:147
+#: includes/admin/views/html-admin-page-importer.php:178
 msgid "Pro"
 msgstr ""
 
-#: includes/admin/views/html-admin-page-importer.php:81
-#: includes/admin/views/html-admin-page-importer.php:154
+#: includes/admin/views/html-admin-page-importer.php:80
+#: includes/admin/views/html-admin-page-importer.php:185
 #. translators: %s: Demo author name
 msgid "By %s"
 msgstr ""
 
-#: includes/admin/views/html-admin-page-importer.php:90
+#: includes/admin/views/html-admin-page-importer.php:89
 #. translators: %s: Demo name
 msgid "<span>Imported:</span> %s"
 msgstr ""
 
-#: includes/admin/views/html-admin-page-importer.php:99
-#: includes/admin/views/html-admin-page-importer.php:136
-#: includes/admin/views/html-admin-page-importer.php:224
+#: includes/admin/views/html-admin-page-importer.php:98
+#: includes/admin/views/html-admin-page-importer.php:167
+#: includes/admin/views/html-admin-page-importer.php:254
 #: includes/class-demo-importer.php:182
 msgid "Live Preview"
 msgstr ""
 
-#: includes/admin/views/html-admin-page-importer.php:102
-#: includes/admin/views/html-admin-page-importer.php:129
-#: includes/admin/views/html-admin-page-importer.php:217
+#: includes/admin/views/html-admin-page-importer.php:101
+#: includes/admin/views/html-admin-page-importer.php:162
+#: includes/admin/views/html-admin-page-importer.php:249
 msgid "Buy Now"
 msgstr ""
 
-#: includes/admin/views/html-admin-page-importer.php:104
-#: includes/admin/views/html-admin-page-importer.php:110
+#: includes/admin/views/html-admin-page-importer.php:107
 msgid "Import"
 msgstr ""
 
-#: includes/admin/views/html-admin-page-importer.php:112
-#: includes/admin/views/html-admin-page-importer.php:250
+#: includes/admin/views/html-admin-page-importer.php:109
+#: includes/admin/views/html-admin-page-importer.php:280
 msgid "Preview"
 msgstr ""
 
-#: includes/admin/views/html-admin-page-importer.php:125
+#: includes/admin/views/html-admin-page-importer.php:119
+#: includes/admin/views/html-admin-page-importer.php:210
+msgid "Plugins Information"
+msgstr ""
+
+#: includes/admin/views/html-admin-page-importer.php:124
+#: includes/admin/views/html-admin-page-importer.php:215
+msgid "Required Plugins"
+msgstr ""
+
+#: includes/admin/views/html-admin-page-importer.php:147
+#: includes/admin/views/html-admin-page-importer.php:238
+msgid "No plugins are required for this demo."
+msgstr ""
+
+#: includes/admin/views/html-admin-page-importer.php:158
 msgid "Close"
 msgstr ""
 
-#: includes/admin/views/html-admin-page-importer.php:131
-#: includes/admin/views/html-admin-page-importer.php:138
-#: includes/admin/views/html-admin-page-importer.php:219
-#: includes/admin/views/html-admin-page-importer.php:226
+#: includes/admin/views/html-admin-page-importer.php:164
+#: includes/admin/views/html-admin-page-importer.php:169
+#: includes/admin/views/html-admin-page-importer.php:251
+#: includes/admin/views/html-admin-page-importer.php:256
 msgid "Import Demo"
 msgstr ""
 
-#: includes/admin/views/html-admin-page-importer.php:133
-#: includes/admin/views/html-admin-page-importer.php:221
-msgid "Install Plugins"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-importer.php:163
+#: includes/admin/views/html-admin-page-importer.php:196
+#. translators: %s: Theme Name
 msgid "%s theme is not active."
 msgstr ""
 
-#: includes/admin/views/html-admin-page-importer.php:165
-msgid "Required Plugins must be activated."
-msgstr ""
-
-#: includes/admin/views/html-admin-page-importer.php:171
+#: includes/admin/views/html-admin-page-importer.php:203
 #. translators: %s: Demo version
 msgid "Version: %s"
 msgstr ""
 
-#: includes/admin/views/html-admin-page-importer.php:178
-msgid "Plugins Information"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-importer.php:183
-msgid "Required Plugins"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-importer.php:206
-msgid "No plugins are required for this demo."
-msgstr ""
-
-#: includes/admin/views/html-admin-page-importer.php:230
+#: includes/admin/views/html-admin-page-importer.php:260
 #: includes/class-demo-importer.php:211
 msgid "Collapse Sidebar"
 msgstr ""
 
-#: includes/admin/views/html-admin-page-importer.php:232
+#: includes/admin/views/html-admin-page-importer.php:262
 msgid "Collapse"
 msgstr ""
 
-#: includes/admin/views/html-admin-page-importer.php:237
+#: includes/admin/views/html-admin-page-importer.php:267
 msgid "Enter desktop preview mode"
 msgstr ""
 
-#: includes/admin/views/html-admin-page-importer.php:240
+#: includes/admin/views/html-admin-page-importer.php:270
 msgid "Enter tablet preview mode"
 msgstr ""
 
-#: includes/admin/views/html-admin-page-importer.php:243
+#: includes/admin/views/html-admin-page-importer.php:273
 msgid "Enter mobile preview mode"
 msgstr ""
 
@@ -255,7 +249,10 @@ msgid ""
 "\n"
 "3. Copyright images will get replaced with other placeholder images. \n"
 "\n"
-"4. It will take some time to import the theme demo."
+"4. It will take some time to import the theme demo.\n"
+"\n"
+"5. It will install the required plugin within your site for installing "
+"theme demo."
 msgstr ""
 
 #: includes/class-demo-importer.php:203
@@ -420,15 +417,15 @@ msgstr ""
 msgid "Unable to connect to the filesystem. Please confirm your credentials."
 msgstr ""
 
-#: includes/class-demo-importer.php:697
+#: includes/class-demo-importer.php:695
 msgid "The XML file dummy content is missing."
 msgstr ""
 
-#: includes/class-demo-importer.php:788
+#: includes/class-demo-importer.php:786
 msgid "The DAT file customizer data is missing."
 msgstr ""
 
-#: includes/class-demo-importer.php:813
+#: includes/class-demo-importer.php:811
 msgid "The WIE file widget content is missing."
 msgstr ""
 
@@ -750,18 +747,13 @@ msgstr ""
 msgid "https://themegrill.com"
 msgstr ""
 
-#: includes/admin/views/html-admin-page-importer.php:77
-msgctxt "demo"
-msgid "Details &amp; Preview"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-importer.php:108
+#: includes/admin/views/html-admin-page-importer.php:105
 #. translators: %s: Demo name
 msgctxt "demo"
 msgid "Import %s"
 msgstr ""
 
-#: includes/admin/views/html-admin-page-importer.php:118
+#: includes/admin/views/html-admin-page-importer.php:115
 msgctxt "demo"
 msgid "Imported"
 msgstr ""
@@ -786,12 +778,12 @@ msgctxt "demo"
 msgid "Live Preview %s"
 msgstr ""
 
-#: includes/admin/views/html-admin-page-importer.php:126
+#: includes/admin/views/html-admin-page-importer.php:159
 msgctxt "Button label for a demo"
 msgid "Previous"
 msgstr ""
 
-#: includes/admin/views/html-admin-page-importer.php:127
+#: includes/admin/views/html-admin-page-importer.php:160
 msgctxt "Button label for a demo"
 msgid "Next"
 msgstr ""

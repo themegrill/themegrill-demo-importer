@@ -100,7 +100,11 @@ defined( 'ABSPATH' ) || exit;
 				<# if ( data.isPro ) { #>
 					<a class="button button-primary purchase-now" href="{{ data.homepage }}" target="_blank"><?php esc_html_e( 'Buy Now', 'themegrill-demo-importer' ); ?></a>
 				<# } else { #>
-					<button class="button button-primary preview install-demo-preview"><?php esc_html_e( 'Import', 'themegrill-demo-importer' ); ?></button>
+					<?php
+					/* translators: %s: Demo name */
+					$aria_label = sprintf( esc_html_x( 'Import %s', 'demo', 'themegrill-demo-importer' ), '{{ data.name }}' );
+					?>
+					<a class="button button-primary hide-if-no-js demo-import" href="#" data-name="{{ data.name }}" data-slug="{{ data.id }}" aria-label="<?php echo esc_attr( $aria_label ); ?>"><?php esc_html_e( 'Import', 'themegrill-demo-importer' ); ?></a>
 				<# } #>
 				<button class="button preview install-demo-preview"><?php esc_html_e( 'Preview', 'themegrill-demo-importer' ); ?></button>
 			<# } #>
@@ -110,6 +114,42 @@ defined( 'ABSPATH' ) || exit;
 	<# if ( data.imported ) { #>
 		<div class="notice notice-success notice-alt"><p><?php echo esc_html_x( 'Imported', 'demo', 'themegrill-demo-importer' ); ?></p></div>
 	<# } #>
+
+	<div class="plugins-details" style="display:none">
+		<h4 class="plugins-info"><?php esc_html_e( 'Plugins Information', 'themegrill-demo-importer' ); ?></h4>
+
+		<table class="plugins-list-table widefat striped">
+			<thead>
+				<tr>
+					<th scope="col" class="manage-column required-plugins" colspan="2"><?php esc_html_e( 'Required Plugins', 'themegrill-demo-importer' ); ?></th>
+				</tr>
+			</thead>
+			<tbody id="the-list">
+				<# if ( ! _.isEmpty( data.plugins ) ) { #>
+					<# _.each( data.plugins, function( plugin, slug ) { #>
+						<tr class="plugin<# if ( ! plugin.is_active ) { #> inactive<# } #>" data-slug="{{ slug }}" data-plugin="{{ plugin.slug }}" data-name="{{ plugin.name }}">
+							<td class="plugin-name">
+								<a href="<?php printf( esc_url( 'https://wordpress.org/plugins/%s' ), '{{ slug }}' ); ?>" target="_blank">{{ plugin.name }}</a>
+							</td>
+							<td class="plugin-status">
+								<# if ( plugin.is_active && plugin.is_install ) { #>
+									<span class="active"></span>
+								<# } else if ( plugin.is_install ) { #>
+									<span class="activate-now<# if ( ! data.requiredPlugins ) { #> active<# } #>"></span>
+								<# } else { #>
+									<span class="install-now<# if ( ! data.requiredPlugins ) { #> active<# } #>"></span>
+								<# } #>
+							</td>
+						</tr>
+					<# }); #>
+				<# } else { #>
+					<tr class="no-items">
+						<td class="colspanchange" colspan="4"><?php esc_html_e( 'No plugins are required for this demo.', 'themegrill-demo-importer' ); ?></td>
+					</tr>
+				<# } #>
+			</tbody>
+		</table>
+	</div>
 </script>
 
 <script id="tmpl-demo-preview" type="text/template">

@@ -556,11 +556,12 @@ demos.view.Demo = wp.Backbone.View.extend({
 	},
 
 	importDemo: function( event ) {
-		var _this = this,
-			$target = $( event.target );
+		var _this         = this,
+			$target       = $( event.target ),
+			pluginsList   = $( '.plugins-list-table' ).find( '#the-list tr' );
 		event.preventDefault();
 
-		if ( $target.hasClass( 'disabled' ) ) {
+		if ( $target.hasClass( 'disabled' ) || $target.hasClass( 'updating-message' ) ) {
 			return;
 		}
 
@@ -568,7 +569,40 @@ demos.view.Demo = wp.Backbone.View.extend({
 			return;
 		}
 
+		// Bail if there were required plugins.
+		if ( pluginsList.length ) {
+			if ( $target.html() !== wp.updates.l10n.installing ) {
+				$target.data( 'originaltext', $target.html() );
+			}
+
+			$target
+				.addClass( 'updating-message' )
+				.text( wp.updates.l10n.installing );
+			wp.a11y.speak( wp.updates.l10n.installingMsg, 'polite' );
+		}
+
 		wp.updates.maybeRequestFilesystemCredentials( event );
+
+		$( document ).trigger( 'wp-plugin-bulk-install', pluginsList );
+
+		// Find all the plugins which are required.
+		pluginsList.each( function( index, element ) {
+			var $itemRow = $( element );
+
+			// Only add inactive items to the update queue.
+			if ( ! $itemRow.hasClass( 'inactive' ) || $itemRow.find( 'notice-error' ).length ) {
+				return;
+			}
+
+			// Add it to the queue.
+			wp.updates.queue.push( {
+				action: 'install-plugin',
+				data:   {
+					plugin: $itemRow.data( 'plugin' ),
+					slug: $itemRow.data( 'slug' )
+				}
+			} );
+		} );
 
 		$( document ).on( 'wp-demo-import-success', function( event, response ) {
 			if ( _this.model.get( 'id' ) === response.slug ) {
@@ -576,9 +610,16 @@ demos.view.Demo = wp.Backbone.View.extend({
 			}
 		} );
 
-		wp.updates.importDemo( {
-			slug: $target.data( 'slug' )
+		// Add it to the queue.
+		wp.updates.queue.push( {
+			action: 'import-demo',
+			data: {
+				slug: $target.data( 'slug' )
+			}
 		} );
+
+		// Check the queue, now that the event handlers have been added.
+		wp.updates.queueChecker();
 	}
 });
 
@@ -596,7 +637,7 @@ demos.view.Preview = wp.Backbone.View.extend({
 		'click .previous-theme': 'previousDemo',
 		'click .next-theme': 'nextDemo',
 		'keyup': 'keyEvent',
-		'click .demo-import': 'importDemo',
+		'click .demo-import': 'importDemo'
 	},
 
 	// The HTML template for the demo preview
@@ -722,7 +763,7 @@ demos.view.Preview = wp.Backbone.View.extend({
 	importDemo: function( event ) {
 		var _this = this,
 			pluginsList   = $( '.plugins-list-table' ).find( '#the-list tr' ),
-			$target       = $( '.demo-import' );
+			$target       = $( '.demo-import' ),
 			success       = 0,
 			error         = 0,
 			errorMessages = [];
@@ -739,8 +780,6 @@ demos.view.Preview = wp.Backbone.View.extend({
 
 		// Bail if there were required plugins.
 		if ( pluginsList.length ) {
-			$( '.wp-full-overlay-sidebar-content' ).animate( { scrollTop: $( document ).height() } );
-
 			if ( $target.html() !== wp.updates.l10n.installing ) {
 				$target.data( 'originaltext', $target.html() );
 			}
@@ -775,6 +814,11 @@ demos.view.Preview = wp.Backbone.View.extend({
 					slug: $itemRow.data( 'slug' )
 				}
 			} );
+		} );
+
+		// Scroll to bulk plugin install area.
+		$( document ).on( 'wp-plugin-bulk-installing', function() {
+			$( '.wp-full-overlay-sidebar-content' ).animate( { scrollTop: $( document ).height() } );
 		} );
 
 		// Display bulk notification for install of plugin.
@@ -824,11 +868,6 @@ demos.view.Preview = wp.Backbone.View.extend({
 
 					// Disable the next and previous demo.
 					$( '.theme-install-overlay' ).find( '.next-theme, .previous-theme' ).addClass( 'disabled' );
-
-					// Start importing demo.
-					wp.updates.importDemo( {
-						slug: $target.data( 'slug' )
-					} );
 				}
 			}
 		} );
@@ -840,8 +879,16 @@ demos.view.Preview = wp.Backbone.View.extend({
 
 		$( document ).on( 'wp-demo-import-success', function( event, response ) {
 			if ( _this.model.get( 'id' ) === response.slug ) {
-				_this.model.set( { 'imported': true } );
 				// _this.render();
+				_this.model.set( { 'imported': true } );
+			}
+		} );
+
+		// Add it to the queue.
+		wp.updates.queue.push( {
+			action: 'import-demo',
+			data: {
+				slug: $target.data( 'slug' )
 			}
 		} );
 
