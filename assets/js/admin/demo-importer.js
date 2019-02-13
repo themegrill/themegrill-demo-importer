@@ -597,7 +597,6 @@ demos.view.Preview = wp.Backbone.View.extend({
 		'click .next-theme': 'nextDemo',
 		'keyup': 'keyEvent',
 		'click .demo-import': 'importDemo',
-		'click .plugins-install': 'installPlugins'
 	},
 
 	// The HTML template for the demo preview
@@ -722,37 +721,8 @@ demos.view.Preview = wp.Backbone.View.extend({
 
 	importDemo: function( event ) {
 		var _this = this,
-			$target = $( event.target );
-		event.preventDefault();
-
-		if ( $target.hasClass( 'disabled' ) || $target.hasClass( 'updating-message' ) ) {
-			return;
-		}
-
-		if ( ! window.confirm( wp.demos.data.settings.confirmImport ) ) {
-			return;
-		}
-
-		wp.updates.maybeRequestFilesystemCredentials( event );
-
-		// Disable the next and previous demo.
-		$( '.theme-install-overlay' ).find( '.next-theme, .previous-theme' ).addClass( 'disabled' );
-
-		$( document ).on( 'wp-demo-import-success', function( event, response ) {
-			if ( _this.model.get( 'id' ) === response.slug ) {
-				_this.model.set( { 'imported': true } );
-			}
-		} );
-
-		wp.updates.importDemo( {
-			slug: $target.data( 'slug' )
-		} );
-	},
-
-	installPlugins: function( event ) {
-		var _this         = this,
 			pluginsList   = $( '.plugins-list-table' ).find( '#the-list tr' ),
-			$target       = $( '.plugins-install' ),
+			$target       = $( '.demo-import' );
 			success       = 0,
 			error         = 0,
 			errorMessages = [];
@@ -760,6 +730,10 @@ demos.view.Preview = wp.Backbone.View.extend({
 		event.preventDefault();
 
 		if ( $target.hasClass( 'disabled' ) || $target.hasClass( 'updating-message' ) ) {
+			return;
+		}
+
+		if ( ! window.confirm( wp.demos.data.settings.confirmImport ) ) {
 			return;
 		}
 
@@ -847,10 +821,14 @@ demos.view.Preview = wp.Backbone.View.extend({
 						.text( $target.data( 'originaltext' ) );
 				} else {
 					_this.model.set( { requiredPlugins: false } );
-					_this.render();
 
 					// Disable the next and previous demo.
 					$( '.theme-install-overlay' ).find( '.next-theme, .previous-theme' ).addClass( 'disabled' );
+
+					// Start importing demo.
+					wp.updates.importDemo( {
+						slug: $target.data( 'slug' )
+					} );
 				}
 			}
 		} );
@@ -858,6 +836,13 @@ demos.view.Preview = wp.Backbone.View.extend({
 		// Reset admin notice template after #bulk-action-notice was added.
 		$( document ).on( 'wp-updates-notice-added', function() {
 			wp.updates.adminNotice = wp.template( 'wp-updates-admin-notice' );
+		} );
+
+		$( document ).on( 'wp-demo-import-success', function( event, response ) {
+			if ( _this.model.get( 'id' ) === response.slug ) {
+				_this.model.set( { 'imported': true } );
+				// _this.render();
+			}
 		} );
 
 		// Check the queue, now that the event handlers have been added.
