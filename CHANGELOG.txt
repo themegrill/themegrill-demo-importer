@@ -1,5 +1,10 @@
 == Changelog ==
 
+= 1.5.6 - 13-02-2019 =
+* Fetaure - Install plugins and import demo on a single click.
+* Tweak - Remove the more details on demo preview hover.
+* Dev - Improve Coding standard with husky compatibility.
+
 = 1.5.5 - 05-11-2018 =
 * Feature - Add support for elementor schemes.
 
