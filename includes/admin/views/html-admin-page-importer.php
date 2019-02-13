@@ -99,14 +99,8 @@ defined( 'ABSPATH' ) || exit;
 			<# } else { #>
 				<# if ( data.isPro ) { #>
 					<a class="button button-primary purchase-now" href="{{ data.homepage }}" target="_blank"><?php esc_html_e( 'Buy Now', 'themegrill-demo-importer' ); ?></a>
-				<# } else if ( data.requiredTheme || data.requiredPlugins ) { #>
-					<button class="button button-primary preview install-demo-preview"><?php esc_html_e( 'Import', 'themegrill-demo-importer' ); ?></button>
 				<# } else { #>
-					<?php
-					/* translators: %s: Demo name */
-					$aria_label = sprintf( esc_html_x( 'Import %s', 'demo', 'themegrill-demo-importer' ), '{{ data.name }}' );
-					?>
-					<a class="button button-primary hide-if-no-js demo-import" href="#" data-name="{{ data.name }}" data-slug="{{ data.id }}" aria-label="<?php echo esc_attr( $aria_label ); ?>"><?php esc_html_e( 'Import', 'themegrill-demo-importer' ); ?></a>
+					<button class="button button-primary preview install-demo-preview"><?php esc_html_e( 'Import', 'themegrill-demo-importer' ); ?></button>
 				<# } #>
 				<button class="button preview install-demo-preview"><?php esc_html_e( 'Preview', 'themegrill-demo-importer' ); ?></button>
 			<# } #>
@@ -128,8 +122,6 @@ defined( 'ABSPATH' ) || exit;
 				<a class="button button-primary purchase-now" href="{{ data.homepage }}" target="_blank"><?php esc_html_e( 'Buy Now', 'themegrill-demo-importer' ); ?></a>
 			<# } else if ( data.requiredTheme ) { #>
 				<button class="button button-primary hide-if-no-js disabled"><?php esc_html_e( 'Import Demo', 'themegrill-demo-importer' ); ?></button>
-			<# } else if ( data.requiredPlugins ) { #>
-				<button class="button button-secondary hide-if-no-js plugins-install"><?php esc_html_e( 'Install Plugins', 'themegrill-demo-importer' ); ?></button>
 			<# } else { #>
 				<# if ( data.active ) { #>
 					<a class="button button-primary live-preview" target="_blank" href="<?php echo esc_url_raw( home_url( '/' ) ); ?>"><?php esc_html_e( 'Live Preview', 'themegrill-demo-importer' ); ?></a>
@@ -157,17 +149,13 @@ defined( 'ABSPATH' ) || exit;
 				<img class="theme-screenshot" src="{{ data.screenshot_url }}" alt="" />
 
 				<div class="theme-details">
-					<# if ( ! data.isPro ) { #>
-						<# if ( data.requiredTheme ) { #>
-							<div class="demo-message notice notice-error notice-alt"><p>
-							<?php
-							/* translators: %s: Theme Name */
-							printf( esc_html__( '%s theme is not active.', 'themegrill-demo-importer' ), '<strong>{{{ data.theme }}}</strong>' );
-							?>
-							</p></div>
-						<# } else if ( data.requiredPlugins ) { #>
-							<div class="demo-message notice notice-info notice-alt"><p><?php esc_html_e( 'Required Plugins must be activated.', 'themegrill-demo-importer' ); ?></p></div>
-						<# } #>
+					<# if ( ! data.isPro && data.requiredTheme ) { #>
+						<div class="demo-message notice notice-error notice-alt"><p>
+						<?php
+						/* translators: %s: Theme Name */
+						printf( esc_html__( '%s theme is not active.', 'themegrill-demo-importer' ), '<strong>{{{ data.theme }}}</strong>' );
+						?>
+						</p></div>
 					<# } #>
 					<div class="theme-version">
 						<?php
@@ -221,8 +209,6 @@ defined( 'ABSPATH' ) || exit;
 					<a class="button button-hero button-primary purchase-now" href="{{ data.homepage }}" target="_blank"><?php esc_html_e( 'Buy Now', 'themegrill-demo-importer' ); ?></a>
 				<# } else if ( data.requiredTheme ) { #>
 					<button class="button button-hero button-primary hide-if-no-js disabled"><?php esc_html_e( 'Import Demo', 'themegrill-demo-importer' ); ?></button>
-				<# } else if ( data.requiredPlugins ) { #>
-					<button class="button button-hero button-secondary hide-if-no-js plugins-install"><?php esc_html_e( 'Install Plugins', 'themegrill-demo-importer' ); ?></button>
 				<# } else { #>
 					<# if ( data.active ) { #>
 						<a class="button button-primary live-preview button-hero hide-if-no-js" target="_blank" href="<?php echo esc_url_raw( home_url( '/' ) ); ?>"><?php esc_html_e( 'Live Preview', 'themegrill-demo-importer' ); ?></a>
