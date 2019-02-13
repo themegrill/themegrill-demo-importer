@@ -202,7 +202,7 @@ class TG_Demo_Importer {
 					'l10n'     => array(
 						'search'              => __( 'Search Demos', 'themegrill-demo-importer' ),
 						'searchPlaceholder'   => __( 'Search demos...', 'themegrill-demo-importer' ), // placeholder (no ellipsis)
-						   /* translators: %s: support forums URL */
+						/* translators: %s: support forums URL */
 						'error'               => sprintf( __( 'An unexpected error occurred. Something may be wrong with ThemeGrill demo server&#8217;s configuration. If you continue to have problems, please try the <a href="%s">support forums</a>.', 'themegrill-demo-importer' ), 'https://wordpress.org/support/plugin/themegrill-demo-importer' ),
 						'tryAgain'            => __( 'Try Again', 'themegrill-demo-importer' ),
 						'suggestNew'          => __( 'Please suggest us!', 'themegrill-demo-importer' ),
@@ -634,8 +634,7 @@ class TG_Demo_Importer {
 			$this->import_widget_settings( $slug, $demo_data, $status );
 
 			// Update imported demo ID.
-			update_option( 'themegrill_demo_importer_activated_id', $slug );
-
+			// update_option( 'themegrill_demo_importer_activated_id', $slug );
 			do_action( 'themegrill_ajax_demo_imported', $slug, $demo_data );
 		}
 
