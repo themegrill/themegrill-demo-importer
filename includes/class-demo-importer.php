@@ -166,55 +166,47 @@ class TG_Demo_Importer {
 		if ( 'appearance_page_demo-importer' === $screen_id ) {
 			wp_enqueue_style( 'tg-demo-importer' );
 			wp_enqueue_script( 'tg-demo-importer' );
-			wp_localize_script(
-				'tg-demo-updates',
-				'_demoUpdatesSettings',
-				array(
-					'l10n' => array(
-						'importing'             => __( 'Importing...', 'themegrill-demo-importer' ),
-						'demoImportingLabel'    => _x( 'Importing %s...', 'demo', 'themegrill-demo-importer' ), // no ellipsis
-						'importingMsg'          => __( 'Importing... please wait.', 'themegrill-demo-importer' ),
-						'importedMsg'           => __( 'Import completed successfully.', 'themegrill-demo-importer' ),
-						'importFailedShort'     => __( 'Import Failed!', 'themegrill-demo-importer' ),
-						'importFailed'          => __( 'Import failed: %s', 'themegrill-demo-importer' ),
-						'demoImportedLabel'     => _x( '%s imported!', 'demo', 'themegrill-demo-importer' ),
-						'demoImportFailedLabel' => _x( '%s import failed', 'demo', 'themegrill-demo-importer' ),
-						'livePreview'           => __( 'Live Preview', 'themegrill-demo-importer' ),
-						'livePreviewLabel'      => _x( 'Live Preview %s', 'demo', 'themegrill-demo-importer' ),
-						'imported'              => __( 'Imported!', 'themegrill-demo-importer' ),
-						'statusTextLink'        => '<a href="https://docs.themegrill.com/knowledgebase/demo-import-process-failed/" target="_blank">' . __( 'Try this solution!', 'themegrill-demo-importer' ) . '</a>',
-					),
-				)
-			);
-			wp_localize_script(
-				'tg-demo-importer',
-				'_demoImporterSettings',
-				array(
-					'demos'    => $this->ajax_query_demos( true ),
-					'settings' => array(
-						'isNew'         => false,
-						'ajaxUrl'       => admin_url( 'admin-ajax.php' ),
-						'adminUrl'      => parse_url( self_admin_url(), PHP_URL_PATH ),
-						'suggestURI'    => apply_filters( 'themegrill_demo_importer_suggest_new', 'https://themegrill.com/contact/' ),
-						'confirmReset'  => __( 'It is strongly recommended that you backup your database before proceeding. Are you sure you wish to run the reset wizard now?', 'themegrill-demo-importer' ),
-						'confirmImport' => __( "Importing demo data will ensure that your site will look similar as theme demo. It makes you easy to modify the content instead of creating them from scratch. Also consider before importing theme demo: \n\n1. You need to import demo on fresh WordPress install to exactly replicate the theme demo. \n\n2. None of the posts, pages, attachments or any other data already existing in your site will be deleted or modified. \n\n3. Copyright images will get replaced with other placeholder images. \n\n4. It will take some time to import the theme demo.", 'themegrill-demo-importer' ),
-					),
-					'l10n'     => array(
-						'search'              => __( 'Search Demos', 'themegrill-demo-importer' ),
-						'searchPlaceholder'   => __( 'Search demos...', 'themegrill-demo-importer' ), // placeholder (no ellipsis)
-						   /* translators: %s: support forums URL */
-						'error'               => sprintf( __( 'An unexpected error occurred. Something may be wrong with ThemeGrill demo server&#8217;s configuration. If you continue to have problems, please try the <a href="%s">support forums</a>.', 'themegrill-demo-importer' ), 'https://wordpress.org/support/plugin/themegrill-demo-importer' ),
-						'tryAgain'            => __( 'Try Again', 'themegrill-demo-importer' ),
-						'suggestNew'          => __( 'Please suggest us!', 'themegrill-demo-importer' ),
-						'demosFound'          => __( 'Number of Demos found: %d', 'themegrill-demo-importer' ),
-						'noDemosFound'        => __( 'No demos found. Try a different search.', 'themegrill-demo-importer' ),
-						'collapseSidebar'     => __( 'Collapse Sidebar', 'themegrill-demo-importer' ),
-						'expandSidebar'       => __( 'Expand Sidebar', 'themegrill-demo-importer' ),
-						/* translators: accessibility text */
-						'selectFeatureFilter' => __( 'Select one or more Demo features to filter by', 'themegrill-demo-importer' ),
-					),
-				)
-			);
+			wp_localize_script( 'tg-demo-updates', '_demoUpdatesSettings', array(
+				'l10n' => array(
+					'importing'             => __( 'Importing...', 'themegrill-demo-importer' ),
+					'demoImportingLabel'    => _x( 'Importing %s...', 'demo', 'themegrill-demo-importer' ), // no ellipsis
+					'importingMsg'          => __( 'Importing... please wait.', 'themegrill-demo-importer' ),
+					'importedMsg'           => __( 'Import completed successfully.', 'themegrill-demo-importer' ),
+					'importFailedShort'     => __( 'Import Failed!', 'themegrill-demo-importer' ),
+					'importFailed'          => __( 'Import failed: %s', 'themegrill-demo-importer' ),
+					'demoImportedLabel'     => _x( '%s imported!', 'demo', 'themegrill-demo-importer' ),
+					'demoImportFailedLabel' => _x( '%s import failed', 'demo', 'themegrill-demo-importer' ),
+					'livePreview'           => __( 'Live Preview', 'themegrill-demo-importer' ),
+					'livePreviewLabel'      => _x( 'Live Preview %s', 'demo', 'themegrill-demo-importer' ),
+					'imported'              => __( 'Imported!', 'themegrill-demo-importer' ),
+					'statusTextLink'        => '<a href="https://docs.themegrill.com/knowledgebase/demo-import-process-failed/" target="_blank">' . __( 'Try this solution!', 'themegrill-demo-importer' ) . '</a>',
+				),
+			) );
+			wp_localize_script( 'tg-demo-importer', '_demoImporterSettings', array(
+				'demos'    => $this->ajax_query_demos( true ),
+				'settings' => array(
+					'isNew'          => false,
+					'ajaxUrl'        => admin_url( 'admin-ajax.php' ),
+					'adminUrl'       => parse_url( self_admin_url(), PHP_URL_PATH ),
+					'suggestURI'     => apply_filters( 'themegrill_demo_importer_suggest_new', 'https://themegrill.com/contact/' ),
+					'confirmReset'   => __( 'It is strongly recommended that you backup your database before proceeding. Are you sure you wish to run the reset wizard now?', 'themegrill-demo-importer' ),
+					'confirmImport'  => __( "Importing demo data will ensure that your site will look similar as theme demo. It makes you easy to modify the content instead of creating them from scratch. Also consider before importing theme demo: \n\n1. You need to import demo on fresh WordPress install to exactly replicate the theme demo. \n\n2. None of the posts, pages, attachments or any other data already existing in your site will be deleted or modified. \n\n3. Copyright images will get replaced with other placeholder images. \n\n4. It will take some time to import the theme demo.\n\n5. It will install the required plugin within your site for installing theme demo.", 'themegrill-demo-importer' ),
+				),
+				'l10n' => array(
+					'search'              => __( 'Search Demos', 'themegrill-demo-importer' ),
+					'searchPlaceholder'   => __( 'Search demos...', 'themegrill-demo-importer' ), // placeholder (no ellipsis)
+					/* translators: %s: support forums URL */
+					'error'               => sprintf( __( 'An unexpected error occurred. Something may be wrong with ThemeGrill demo server&#8217;s configuration. If you continue to have problems, please try the <a href="%s">support forums</a>.', 'themegrill-demo-importer' ), 'https://wordpress.org/support/plugin/themegrill-demo-importer' ),
+					'tryAgain'            => __( 'Try Again', 'themegrill-demo-importer' ),
+					'suggestNew'          => __( 'Please suggest us!', 'themegrill-demo-importer' ),
+					'demosFound'          => __( 'Number of Demos found: %d', 'themegrill-demo-importer' ),
+					'noDemosFound'        => __( 'No demos found. Try a different search.', 'themegrill-demo-importer' ),
+					'collapseSidebar'     => __( 'Collapse Sidebar', 'themegrill-demo-importer' ),
+					'expandSidebar'       => __( 'Expand Sidebar', 'themegrill-demo-importer' ),
+					/* translators: accessibility text */
+					'selectFeatureFilter' => __( 'Select one or more Demo features to filter by', 'themegrill-demo-importer' ),
+				),
+			) );
 		}
 	}
 
