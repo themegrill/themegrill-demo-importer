@@ -627,13 +627,14 @@ class TG_Demo_Importer {
 		do_action( 'themegrill_ajax_before_demo_import' );
 
 		if ( ! empty( $demo_data ) ) {
-			// $this->import_dummy_xml( $slug, $demo_data, $status );
-			// $this->import_core_options( $slug, $demo_data );
-			// $this->import_elementor_schemes( $slug, $demo_data );
-			// $this->import_customizer_data( $slug, $demo_data, $status );
-			// $this->import_widget_settings( $slug, $demo_data, $status );
+			$this->import_dummy_xml( $slug, $demo_data, $status );
+			$this->import_core_options( $slug, $demo_data );
+			$this->import_elementor_schemes( $slug, $demo_data );
+			$this->import_customizer_data( $slug, $demo_data, $status );
+			$this->import_widget_settings( $slug, $demo_data, $status );
+
 			// Update imported demo ID.
-			// update_option( 'themegrill_demo_importer_activated_id', $slug );
+			update_option( 'themegrill_demo_importer_activated_id', $slug );
 			do_action( 'themegrill_ajax_demo_imported', $slug, $demo_data );
 		}
 
