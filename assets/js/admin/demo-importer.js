@@ -558,7 +558,7 @@ demos.view.Demo = wp.Backbone.View.extend({
 	importDemo: function( event ) {
 		var _this         = this,
 			$target       = $( event.target ),
-			pluginsList   = $( '.plugins-list-table' ).find( '#the-list tr' );
+			pluginsList   = $( event.target ).data( 'plugins' );
 		event.preventDefault();
 
 		if ( $target.hasClass( 'disabled' ) || $target.hasClass( 'updating-message' ) ) {
@@ -570,7 +570,7 @@ demos.view.Demo = wp.Backbone.View.extend({
 		}
 
 		// Bail if there were required plugins.
-		if ( pluginsList.length ) {
+		if ( ! $.isEmptyObject( pluginsList ) ) {
 			if ( $target.html() !== wp.updates.l10n.installing ) {
 				$target.data( 'originaltext', $target.html() );
 			}
@@ -586,22 +586,17 @@ demos.view.Demo = wp.Backbone.View.extend({
 		$( document ).trigger( 'wp-plugin-bulk-install', pluginsList );
 
 		// Find all the plugins which are required.
-		pluginsList.each( function( index, element ) {
-			var $itemRow = $( element );
-
-			// Only add inactive items to the update queue.
-			if ( ! $itemRow.hasClass( 'inactive' ) || $itemRow.find( 'notice-error' ).length ) {
-				return;
+		$.each( pluginsList, function( plugin_slug, plugin_data ) {
+			if ( ! plugin_data.is_active ) {
+				// Add it to the queue.
+				wp.updates.queue.push( {
+					action: 'install-plugin',
+					data:   {
+						plugin: plugin_data.slug,
+						slug: plugin_slug
+					}
+				} );
 			}
-
-			// Add it to the queue.
-			wp.updates.queue.push( {
-				action: 'install-plugin',
-				data:   {
-					plugin: $itemRow.data( 'plugin' ),
-					slug: $itemRow.data( 'slug' )
-				}
-			} );
 		} );
 
 		$( document ).on( 'wp-demo-import-success', function( event, response ) {

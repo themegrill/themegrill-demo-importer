@@ -73,7 +73,7 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 
 == Changelog ==
 
-= 1.5.6 - 13-02-2019 =
+= 1.5.6 - XX-02-2019 =
 * Fetaure - Install plugins and import demo on a single click.
 * Tweak - Remove the more details on demo preview hover.
 * Dev - Improve Coding standard with husky compatibility.
