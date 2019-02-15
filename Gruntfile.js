@@ -222,6 +222,32 @@ module.exports = function( grunt ){
 					'<%= dirs.css %>/*.css'
 				]
 			}
+		},
+
+		// Compress files and folders.
+		compress: {
+			options: {
+				archive: 'themegrill-demo-importer.zip'
+			},
+			files: {
+				src: [
+					'**',
+					'!.*',
+					'!*.md',
+					'!*.zip',
+					'!.*/**',
+					'!vendor/**',
+					'!phpcs.xml',
+					'!Gruntfile.js',
+					'!package.json',
+					'!composer.json',
+					'!composer.lock',
+					'!node_modules/**',
+					'!package-lock.json'
+				],
+				dest: 'themegrill-demo-importer',
+				expand: true
+			}
 		}
 	});
 
@@ -237,6 +263,7 @@ module.exports = function( grunt ){
 	grunt.loadNpmTasks( 'grunt-contrib-uglify' );
 	grunt.loadNpmTasks( 'grunt-contrib-cssmin' );
 	grunt.loadNpmTasks( 'grunt-contrib-watch' );
+	grunt.loadNpmTasks( 'grunt-contrib-compress' );
 
 	// Register tasks
 	grunt.registerTask( 'default', [
@@ -260,6 +287,11 @@ module.exports = function( grunt ){
 	// Only an alias to 'default' task.
 	grunt.registerTask( 'dev', [
 		'default'
+	]);
+
+	grunt.registerTask( 'zip', [
+		'dev',
+		'compress'
 	]);
 
 	grunt.registerTask( 'i18n', [
