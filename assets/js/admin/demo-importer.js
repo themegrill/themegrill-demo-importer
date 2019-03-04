@@ -571,6 +571,7 @@ demos.view.Demo = wp.Backbone.View.extend({
 
 		// Bail if there were required plugins.
 		if ( ! $.isEmptyObject( pluginsList ) ) {
+			$target.parents( '.theme' ).addClass( 'focus' );
 			if ( $target.html() !== wp.updates.l10n.installing ) {
 				$target.data( 'originaltext', $target.html() );
 			}
@@ -580,6 +581,8 @@ demos.view.Demo = wp.Backbone.View.extend({
 				.text( wp.updates.l10n.installing );
 			wp.a11y.speak( wp.updates.l10n.installingMsg, 'polite' );
 		}
+
+
 
 		wp.updates.maybeRequestFilesystemCredentials( event );
 
