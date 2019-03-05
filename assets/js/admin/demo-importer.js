@@ -583,7 +583,7 @@ demos.view.Demo = wp.Backbone.View.extend({
 						plugin: plugin_data.slug,
 						name: plugin_data.name,
 						slug: plugin_slug,
-						demo: $target.data( 'slug' ),
+						demo: $target.data( 'slug' )
 					}
 				} );
 			}
@@ -785,7 +785,7 @@ demos.view.Preview = wp.Backbone.View.extend({
 				data:   {
 					plugin: $itemRow.data( 'plugin' ),
 					slug: $itemRow.data( 'slug' ),
-					demo: $target.data( 'slug' ),
+					demo: $target.data( 'slug' )
 				}
 			} );
 		} );
