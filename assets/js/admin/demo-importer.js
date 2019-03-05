@@ -582,8 +582,6 @@ demos.view.Demo = wp.Backbone.View.extend({
 			wp.a11y.speak( wp.updates.l10n.installingMsg, 'polite' );
 		}
 
-
-
 		wp.updates.maybeRequestFilesystemCredentials( event );
 
 		$( document ).trigger( 'wp-plugin-bulk-install', pluginsList );
@@ -886,7 +884,7 @@ demos.view.Preview = wp.Backbone.View.extend({
 		wp.updates.queue.push( {
 			action: 'import-demo',
 			data: {
-				slug: $target.data( 'slug' )
+				slug: $( event.target ).data( 'slug' )
 			}
 		} );
 
