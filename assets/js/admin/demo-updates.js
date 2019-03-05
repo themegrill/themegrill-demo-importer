@@ -153,7 +153,7 @@
 	 *                     decorated with an abort() method.
 	 */
 	wp.updates.bulkInstallPlugin = function( args ) {
-		var $pluginRow, $message;
+		var $pluginRow, $message, message;
 
 		args = _.extend( {
 			success: wp.updates.bulkInstallPluginSuccess,
@@ -162,19 +162,25 @@
 
 		if ( $document.find( 'body' ).hasClass( 'full-overlay-active' ) ) {
 			$pluginRow = $( 'tr[data-slug="' + args.slug + '"]' );
-			$message   = $pluginRow.find( '.plugin-status span' );
+			$message   = $( '.demo-import[data-slug="' + args.demo + '"]' );
+			message    = wp.updates.l10n.pluginInstallingLabel.replace( '%s', $pluginRow.data( 'name' ) );
+			$pluginRow.find( '.plugin-status span' )
+				.addClass( 'updating-message' )
+				.attr( 'aria-label', wp.updates.l10n.pluginInstallingLabel.replace( '%s', $pluginRow.data( 'name' ) ) )
+				.text( wp.updates.l10n.installing );
 		} else {
-			$pluginRow = $message = $( '.demo-import[data-slug="' + args.demo + '"]' );
+			$message = $( '.demo-import[data-slug="' + args.demo + '"]' );
+			message  = wp.updates.l10n.pluginInstallingLabel.replace( '%s', args.name );
+			$message.parents( '.theme' ).addClass( 'focus' );
 		}
 
-		$message.parents( '.theme' ).addClass( 'focus' );
 		if ( $message.html() !== wp.updates.l10n.installing ) {
 			$message.data( 'originaltext', $message.html() );
 		}
 
 		$message
+			.attr( 'aria-label', message )
 			.addClass( 'updating-message' )
-			.attr( 'aria-label', wp.updates.l10n.pluginInstallingLabel.replace( '%s', $pluginRow.data( 'name' ) ) )
 			.text( wp.updates.l10n.installing );
 
 		wp.a11y.speak( wp.updates.l10n.installingMsg, 'polite' );
