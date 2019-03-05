@@ -153,14 +153,22 @@
 	 *                     decorated with an abort() method.
 	 */
 	wp.updates.bulkInstallPlugin = function( args ) {
-		var $pluginRow = $( 'tr[data-slug="' + args.slug + '"]' ),
-			$message   = $pluginRow.find( '.plugin-status span' );
+		var $pluginRow, $message;
 
 		args = _.extend( {
 			success: wp.updates.bulkInstallPluginSuccess,
 			error: wp.updates.bulkInstallPluginError
 		}, args );
 
+		if ( $document.find( 'body' ).hasClass( 'full-overlay-active' ) ) {
+			$message   = $pluginRow.find( '.plugin-status span' );
+			$pluginRow = $( 'tr[data-slug="' + args.slug + '"]' ),
+		} else {
+			$message   = $( '.demo-import[data-slug="' + args.demo + '"]' );
+			$pluginRow = $message;
+		}
+
+		$message.parents( '.theme' ).addClass( 'focus' );
 		if ( $message.html() !== wp.updates.l10n.installing ) {
 			$message.data( 'originaltext', $message.html() );
 		}

@@ -556,9 +556,9 @@ demos.view.Demo = wp.Backbone.View.extend({
 	},
 
 	importDemo: function( event ) {
-		var _this         = this,
-			$target       = $( event.target ),
-			pluginsList   = $( event.target ).data( 'plugins' );
+		var _this       = this,
+			$target     = $( event.target ),
+			pluginsList = $( event.target ).data( 'plugins' );
 		event.preventDefault();
 
 		if ( $target.hasClass( 'disabled' ) || $target.hasClass( 'updating-message' ) ) {
@@ -567,19 +567,6 @@ demos.view.Demo = wp.Backbone.View.extend({
 
 		if ( ! window.confirm( wp.demos.data.settings.confirmImport ) ) {
 			return;
-		}
-
-		// Bail if there were required plugins.
-		if ( ! $.isEmptyObject( pluginsList ) ) {
-			$target.parents( '.theme' ).addClass( 'focus' );
-			if ( $target.html() !== wp.updates.l10n.installing ) {
-				$target.data( 'originaltext', $target.html() );
-			}
-
-			$target
-				.addClass( 'updating-message' )
-				.text( wp.updates.l10n.installing );
-			wp.a11y.speak( wp.updates.l10n.installingMsg, 'polite' );
 		}
 
 		wp.updates.maybeRequestFilesystemCredentials( event );
@@ -594,7 +581,8 @@ demos.view.Demo = wp.Backbone.View.extend({
 					action: 'install-plugin',
 					data:   {
 						plugin: plugin_data.slug,
-						slug: plugin_slug
+						slug: plugin_slug,
+						demo: $target.data( 'slug' ),
 					}
 				} );
 			}
