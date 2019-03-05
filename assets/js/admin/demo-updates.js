@@ -161,11 +161,10 @@
 		}, args );
 
 		if ( $document.find( 'body' ).hasClass( 'full-overlay-active' ) ) {
+			$pluginRow = $( 'tr[data-slug="' + args.slug + '"]' );
 			$message   = $pluginRow.find( '.plugin-status span' );
-			$pluginRow = $( 'tr[data-slug="' + args.slug + '"]' ),
 		} else {
-			$message   = $( '.demo-import[data-slug="' + args.demo + '"]' );
-			$pluginRow = $message;
+			$pluginRow = $message = $( '.demo-import[data-slug="' + args.demo + '"]' );
 		}
 
 		$message.parents( '.theme' ).addClass( 'focus' );

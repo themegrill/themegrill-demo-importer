@@ -746,8 +746,8 @@ demos.view.Preview = wp.Backbone.View.extend({
 
 	importDemo: function( event ) {
 		var _this = this,
+			$target       = $( event.target ),
 			pluginsList   = $( '.plugins-list-table' ).find( '#the-list tr' ),
-			$target       = $( '.demo-import' ),
 			success       = 0,
 			error         = 0,
 			errorMessages = [];
@@ -762,22 +762,10 @@ demos.view.Preview = wp.Backbone.View.extend({
 			return;
 		}
 
-		// Bail if there were required plugins.
-		if ( pluginsList.length ) {
-			if ( $target.html() !== wp.updates.l10n.installing ) {
-				$target.data( 'originaltext', $target.html() );
-			}
-
-			$target
-				.addClass( 'updating-message' )
-				.text( wp.updates.l10n.installing );
-			wp.a11y.speak( wp.updates.l10n.installingMsg, 'polite' );
-
-			// Disable the next and previous demo.
-			$( '.theme-install-overlay' ).find( '.next-theme, .previous-theme' ).addClass( 'disabled' );
-		}
-
 		wp.updates.maybeRequestFilesystemCredentials( event );
+
+		// Disable the next and previous demo.
+		$( '.theme-install-overlay' ).find( '.next-theme, .previous-theme' ).addClass( 'disabled' );
 
 		$( document ).trigger( 'wp-plugin-bulk-install', pluginsList );
 
@@ -795,7 +783,7 @@ demos.view.Preview = wp.Backbone.View.extend({
 				action: 'install-plugin',
 				data:   {
 					plugin: $itemRow.data( 'plugin' ),
-					slug: $itemRow.data( 'slug' )
+					slug: $itemRow.data( 'slug' ),
 				}
 			} );
 		} );
@@ -863,7 +851,6 @@ demos.view.Preview = wp.Backbone.View.extend({
 
 		$( document ).on( 'wp-demo-import-success', function( event, response ) {
 			if ( _this.model.get( 'id' ) === response.slug ) {
-				// _this.render();
 				_this.model.set( { 'imported': true } );
 			}
 		} );
@@ -872,7 +859,7 @@ demos.view.Preview = wp.Backbone.View.extend({
 		wp.updates.queue.push( {
 			action: 'import-demo',
 			data: {
-				slug: $( event.target ).data( 'slug' )
+				slug: $target.data( 'slug' )
 			}
 		} );
 
