@@ -591,6 +591,7 @@ demos.view.Demo = wp.Backbone.View.extend({
 
 		$( document ).on( 'wp-demo-import-success', function( event, response ) {
 			if ( _this.model.get( 'id' ) === response.slug ) {
+				_this.render();
 				_this.model.set( { 'imported': true } );
 			}
 		} );

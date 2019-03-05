@@ -162,7 +162,7 @@
 
 		if ( $document.find( 'body' ).hasClass( 'full-overlay-active' ) ) {
 			$pluginRow = $( 'tr[data-slug="' + args.slug + '"]' );
-			$message   = $( '.demo-import[data-slug="' + args.demo + '"]' );
+			$message   = $( '.theme-install-overlay .demo-import[data-slug="' + args.demo + '"]' );
 			message    = wp.updates.l10n.pluginInstallingLabel.replace( '%s', $pluginRow.data( 'name' ) );
 			$pluginRow.find( '.plugin-status span' )
 				.addClass( 'updating-message' )
