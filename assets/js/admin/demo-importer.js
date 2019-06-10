@@ -783,7 +783,7 @@ demos.view.Preview = wp.Backbone.View.extend({
 					text: wp.demos.data.l10n.confirmMsg,
 					keys: ['enter'],
 					action: function(){
-						_this.processImport( $target, pluginsList, success, error, errorMessages );
+						_this.processImport( $target, pluginsList, success, error, errorMessages, _this );
 					}
 				},
 				cancel: function() {
@@ -793,7 +793,7 @@ demos.view.Preview = wp.Backbone.View.extend({
 		} );
 	},
 
-	processImport: function ( $target, pluginsList, success, error, errorMessages ) {
+	processImport: function ( $target, pluginsList, success, error, errorMessages, _this ) {
 		wp.updates.maybeRequestFilesystemCredentials( event );
 
 		// Disable the next and previous demo.
