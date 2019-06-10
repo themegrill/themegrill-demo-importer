@@ -152,24 +152,22 @@ class TG_Demo_Importer {
 		$assets_path = tgdm()->plugin_url() . '/assets/';
 
 		// Register admin styles.
-		wp_register_style( 'tg-demo-importer', $assets_path . 'css/demo-importer.css', array(), TGDM_VERSION );
 		wp_register_style( 'jquery-confirm', $assets_path . 'css/jquery-confirm/jquery-confirm.css', array(), TGDM_VERSION );
+		wp_register_style( 'tg-demo-importer', $assets_path . 'css/demo-importer.css', array( 'jquery-confirm' ), TGDM_VERSION );
 
 		// Add RTL support for admin styles.
 		wp_style_add_data( 'tg-demo-importer', 'rtl', 'replace' );
 
 		// Register admin scripts.
 		wp_register_script( 'jquery-tiptip', $assets_path . 'js/jquery-tiptip/jquery.tipTip' . $suffix . '.js', array( 'jquery' ), '1.3', true );
-		wp_register_script( 'tg-demo-updates', $assets_path . 'js/admin/demo-updates' . $suffix . '.js', array( 'jquery', 'updates' ), TGDM_VERSION, true );
-		wp_register_script( 'tg-demo-importer', $assets_path . 'js/admin/demo-importer' . $suffix . '.js', array( 'jquery', 'jquery-tiptip', 'wp-backbone', 'wp-a11y', 'tg-demo-updates' ), TGDM_VERSION, true );
 		wp_register_script( 'jquery-confirm', $assets_path . 'js/jquery-confirm/jquery-confirm' . $suffix . '.js', array( 'jquery' ), TGDM_VERSION, true );
+		wp_register_script( 'tg-demo-updates', $assets_path . 'js/admin/demo-updates' . $suffix . '.js', array( 'jquery', 'updates' ), TGDM_VERSION, true );
+		wp_register_script( 'tg-demo-importer', $assets_path . 'js/admin/demo-importer' . $suffix . '.js', array( 'jquery', 'jquery-tiptip', 'wp-backbone', 'wp-a11y', 'tg-demo-updates', 'jquery-confirm' ), TGDM_VERSION, true );
 
 		// Demo Importer appearance page.
 		if ( 'appearance_page_demo-importer' === $screen_id ) {
 			wp_enqueue_style( 'tg-demo-importer' );
 			wp_enqueue_script( 'tg-demo-importer' );
-			wp_enqueue_style( 'jquery-confirm' );
-			wp_enqueue_script( 'jquery-confirm' );
 			wp_localize_script(
 				'tg-demo-updates',
 				'_demoUpdatesSettings',
@@ -216,6 +214,7 @@ class TG_Demo_Importer {
 						'expandSidebar'       => __( 'Expand Sidebar', 'themegrill-demo-importer' ),
 						/* translators: accessibility text */
 						'selectFeatureFilter' => __( 'Select one or more Demo features to filter by', 'themegrill-demo-importer' ),
+						'confirmMsg'          => __( 'Confirm!', 'themegrill-demo-importer' ),
 					),
 				)
 			);

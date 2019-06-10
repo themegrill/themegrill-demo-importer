@@ -565,10 +565,25 @@ demos.view.Demo = wp.Backbone.View.extend({
 			return;
 		}
 
-		if ( ! window.confirm( wp.demos.data.settings.confirmImport ) ) {
-			return;
-		}
+		$.confirm( {
+			title : '',
+			content: wp.demos.data.settings.confirmImport,
+			buttons: {
+				confirm: {
+					text: wp.demos.data.l10n.confirmMsg,
+					keys: ['enter'],
+					action: function(){
+						_this.processImport( $target, pluginsList );
+					}
+				},
+				cancel: function() {
+					return;
+				}
+			}
+		} );
 
+	},
+	processImport: function ( $target, pluginsList ) {
 		wp.updates.maybeRequestFilesystemCredentials( event );
 
 		$( document ).trigger( 'wp-plugin-bulk-install', pluginsList );
@@ -760,10 +775,25 @@ demos.view.Preview = wp.Backbone.View.extend({
 			return;
 		}
 
-		if ( ! window.confirm( wp.demos.data.settings.confirmImport ) ) {
-			return;
-		}
+		$.confirm( {
+			title : '',
+			content: wp.demos.data.settings.confirmImport,
+			buttons: {
+				confirm: {
+					text: wp.demos.data.l10n.confirmMsg,
+					keys: ['enter'],
+					action: function(){
+						_this.processImport( $target, pluginsList, success, error, errorMessages );
+					}
+				},
+				cancel: function() {
+					return;
+				}
+			}
+		} );
+	},
 
+	processImport: function ( $target, pluginsList, success, error, errorMessages ) {
 		wp.updates.maybeRequestFilesystemCredentials( event );
 
 		// Disable the next and previous demo.
@@ -799,7 +829,7 @@ demos.view.Preview = wp.Backbone.View.extend({
 		// Display bulk notification for install of plugin.
 		$( document ).on( 'wp-plugin-bulk-install-success wp-plugin-bulk-install-error', function( event, response ) {
 			var $itemRow = $( '[data-slug="' + response.slug + '"]' ),
-				$bulkActionNotice, itemName;
+			    $bulkActionNotice, itemName;
 
 			if ( 'wp-' + response.install + '-bulk-install-success' === event.type ) {
 				success++;
