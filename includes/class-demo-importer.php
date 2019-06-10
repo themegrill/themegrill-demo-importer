@@ -199,7 +199,23 @@ class TG_Demo_Importer {
 						'adminUrl'      => parse_url( self_admin_url(), PHP_URL_PATH ),
 						'suggestURI'    => apply_filters( 'themegrill_demo_importer_suggest_new', 'https://themegrill.com/contact/' ),
 						'confirmReset'  => __( 'It is strongly recommended that you backup your database before proceeding. Are you sure you wish to run the reset wizard now?', 'themegrill-demo-importer' ),
-						'confirmImport' => __( "Importing demo data will ensure that your site will look similar as theme demo. It makes you easy to modify the content instead of creating them from scratch. Also consider before importing theme demo: \n\n1. It will install the required plugin as well as activate them for installing theme demo. \n\n2. You need to import demo on fresh WordPress install to exactly replicate the theme demo. \n\n3. None of the posts, pages, attachments or any other data already existing in your site will be deleted or modified. \n\n4. Copyright images will get replaced with other placeholder images. \n\n5. It will take some time to import the theme demo.", 'themegrill-demo-importer' ),
+						'confirmImport' => sprintf(
+
+							__( 'Importing demo data will ensure that your site will look similar as theme demo. It makes you easy to modify the content instead of creating them from scratch. Also, consider before importing the demo: %1$s %2$s %3$s %4$s %5$s %6$s', 'themegrill-demo-importer' ),
+
+							'<ol><li class="warning">' . __( 'Importing the demo on the site if you have already added the content is highly discouraged.', 'themegrill-demo-importer' ) . '</li>',
+
+							'<li>' . __( 'You need to import demo on fresh WordPress install to exactly replicate the theme demo.', 'themegrill-demo-importer' ) . '</li>',
+
+							'<li>' . __( 'It will install the required plugins as well as activate them for installing the required theme demo within your site.', 'themegrill-demo-importer' ) . '</li>',
+
+							'<li>' . __( 'Copyright images will get replaced with other placeholder images.', 'themegrill-demo-importer' ) . '</li>',
+
+							'<li>' . __( 'None of the posts, pages, attachments or any other data already existing in your site will be deleted or modified.', 'themegrill-demo-importer' ) . '</li>',
+
+							'<li>' . __( 'It will take some time to import the theme demo.', 'themegrill-demo-importer' ) . '</li></ol>'
+
+							)
 					),
 					'l10n'     => array(
 						'search'              => __( 'Search Demos', 'themegrill-demo-importer' ),
