@@ -573,7 +573,7 @@ demos.view.Demo = wp.Backbone.View.extend({
 					text: wp.demos.data.l10n.confirmMsg,
 					keys: ['enter'],
 					action: function(){
-						_this.processImport( $target, pluginsList );
+						_this.processImport( $target, pluginsList, _this );
 					}
 				},
 				cancel: function() {
@@ -583,7 +583,7 @@ demos.view.Demo = wp.Backbone.View.extend({
 		} );
 
 	},
-	processImport: function ( $target, pluginsList ) {
+	processImport: function ( $target, pluginsList, _this ) {
 		wp.updates.maybeRequestFilesystemCredentials( event );
 
 		$( document ).trigger( 'wp-plugin-bulk-install', pluginsList );
