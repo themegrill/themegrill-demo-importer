@@ -152,15 +152,17 @@ class TG_Demo_Importer {
 		$assets_path = tgdm()->plugin_url() . '/assets/';
 
 		// Register admin styles.
-		wp_register_style( 'tg-demo-importer', $assets_path . 'css/demo-importer.css', array(), TGDM_VERSION );
+		wp_register_style( 'jquery-confirm', $assets_path . 'css/jquery-confirm/jquery-confirm.css', array(), TGDM_VERSION );
+		wp_register_style( 'tg-demo-importer', $assets_path . 'css/demo-importer.css', array( 'jquery-confirm' ), TGDM_VERSION );
 
 		// Add RTL support for admin styles.
 		wp_style_add_data( 'tg-demo-importer', 'rtl', 'replace' );
 
 		// Register admin scripts.
 		wp_register_script( 'jquery-tiptip', $assets_path . 'js/jquery-tiptip/jquery.tipTip' . $suffix . '.js', array( 'jquery' ), '1.3', true );
+		wp_register_script( 'jquery-confirm', $assets_path . 'js/jquery-confirm/jquery-confirm' . $suffix . '.js', array( 'jquery' ), TGDM_VERSION, true );
 		wp_register_script( 'tg-demo-updates', $assets_path . 'js/admin/demo-updates' . $suffix . '.js', array( 'jquery', 'updates' ), TGDM_VERSION, true );
-		wp_register_script( 'tg-demo-importer', $assets_path . 'js/admin/demo-importer' . $suffix . '.js', array( 'jquery', 'jquery-tiptip', 'wp-backbone', 'wp-a11y', 'tg-demo-updates' ), TGDM_VERSION, true );
+		wp_register_script( 'tg-demo-importer', $assets_path . 'js/admin/demo-importer' . $suffix . '.js', array( 'jquery', 'jquery-tiptip', 'wp-backbone', 'wp-a11y', 'tg-demo-updates', 'jquery-confirm' ), TGDM_VERSION, true );
 
 		// Demo Importer appearance page.
 		if ( 'appearance_page_demo-importer' === $screen_id ) {
@@ -197,7 +199,23 @@ class TG_Demo_Importer {
 						'adminUrl'      => parse_url( self_admin_url(), PHP_URL_PATH ),
 						'suggestURI'    => apply_filters( 'themegrill_demo_importer_suggest_new', 'https://themegrill.com/contact/' ),
 						'confirmReset'  => __( 'It is strongly recommended that you backup your database before proceeding. Are you sure you wish to run the reset wizard now?', 'themegrill-demo-importer' ),
-						'confirmImport' => __( "Importing demo data will ensure that your site will look similar as theme demo. It makes you easy to modify the content instead of creating them from scratch. Also consider before importing theme demo: \n\n1. It will install the required plugin as well as activate them for installing theme demo. \n\n2. You need to import demo on fresh WordPress install to exactly replicate the theme demo. \n\n3. None of the posts, pages, attachments or any other data already existing in your site will be deleted or modified. \n\n4. Copyright images will get replaced with other placeholder images. \n\n5. It will take some time to import the theme demo.", 'themegrill-demo-importer' ),
+						'confirmImport' => sprintf(
+
+							__( 'Importing demo data will ensure that your site will look similar as theme demo. It makes you easy to modify the content instead of creating them from scratch. Also, consider before importing the demo: %1$s %2$s %3$s %4$s %5$s %6$s', 'themegrill-demo-importer' ),
+
+							'<ol><li class="warning">' . __( 'Importing the demo on the site if you have already added the content is highly discouraged.', 'themegrill-demo-importer' ) . '</li>',
+
+							'<li>' . __( 'You need to import demo on fresh WordPress install to exactly replicate the theme demo.', 'themegrill-demo-importer' ) . '</li>',
+
+							'<li>' . __( 'It will install the required plugins as well as activate them for installing the required theme demo within your site.', 'themegrill-demo-importer' ) . '</li>',
+
+							'<li>' . __( 'Copyright images will get replaced with other placeholder images.', 'themegrill-demo-importer' ) . '</li>',
+
+							'<li>' . __( 'None of the posts, pages, attachments or any other data already existing in your site will be deleted or modified.', 'themegrill-demo-importer' ) . '</li>',
+
+							'<li>' . __( 'It will take some time to import the theme demo.', 'themegrill-demo-importer' ) . '</li></ol>'
+
+							)
 					),
 					'l10n'     => array(
 						'search'              => __( 'Search Demos', 'themegrill-demo-importer' ),
@@ -212,6 +230,7 @@ class TG_Demo_Importer {
 						'expandSidebar'       => __( 'Expand Sidebar', 'themegrill-demo-importer' ),
 						/* translators: accessibility text */
 						'selectFeatureFilter' => __( 'Select one or more Demo features to filter by', 'themegrill-demo-importer' ),
+						'confirmMsg'          => __( 'Confirm!', 'themegrill-demo-importer' ),
 					),
 				)
 			);

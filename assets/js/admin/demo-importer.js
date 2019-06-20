@@ -565,10 +565,31 @@ demos.view.Demo = wp.Backbone.View.extend({
 			return;
 		}
 
-		if ( ! window.confirm( wp.demos.data.settings.confirmImport ) ) {
-			return;
-		}
+		$.confirm( {
+			title : '',
+			content: '<div class="demo-import-confirm-message">' + wp.demos.data.settings.confirmImport + '</div>',
+			boxWidth: '50%',
+			useBootstrap: false,
+			buttons: {
+				confirm: {
+					text: wp.demos.data.l10n.confirmMsg,
+					keys: ['enter'],
+					btnClass: 'demo-import-confirm-button',
+					action: function(){
+						_this.processImport( $target, pluginsList, _this );
+					}
+				},
+				cancel: {
+					btnClass: 'demo-import-cancel-button',
+					action: function() {
+						return;
+					}
+				}
+			}
+		} );
 
+	},
+	processImport: function ( $target, pluginsList, _this ) {
 		wp.updates.maybeRequestFilesystemCredentials( event );
 
 		$( document ).trigger( 'wp-plugin-bulk-install', pluginsList );
@@ -760,10 +781,37 @@ demos.view.Preview = wp.Backbone.View.extend({
 			return;
 		}
 
-		if ( ! window.confirm( wp.demos.data.settings.confirmImport ) ) {
-			return;
-		}
+		$.confirm( {
+			title : '',
+			content: '<div class="demo-import-confirm-message">' + wp.demos.data.settings.confirmImport + '</div>',
+			boxWidth: '50%',
+			useBootstrap: false,
+			buttons: {
+				confirm: {
+					text: wp.demos.data.l10n.confirmMsg,
+					keys: ['enter'],
+					btnClass: 'demo-import-confirm-button',
+					action: function(){
+						_this.processImport( $target, pluginsList, success, error, errorMessages, _this );
+					}
+				},
+				cancel: {
+					btnClass: 'demo-import-cancel-button',
+					action: function() {
+						return;
+					}
+				}
+			},
+			onContentReady: function () {
+				$( 'body' ).addClass( 'demo-import-message-popup' );
+			},
+			onDestroy: function () {
+				$( 'body' ).removeClass( 'demo-import-message-popup' );
+			}
+		} );
+	},
 
+	processImport: function ( $target, pluginsList, success, error, errorMessages, _this ) {
 		wp.updates.maybeRequestFilesystemCredentials( event );
 
 		// Disable the next and previous demo.
@@ -799,7 +847,7 @@ demos.view.Preview = wp.Backbone.View.extend({
 		// Display bulk notification for install of plugin.
 		$( document ).on( 'wp-plugin-bulk-install-success wp-plugin-bulk-install-error', function( event, response ) {
 			var $itemRow = $( '[data-slug="' + response.slug + '"]' ),
-				$bulkActionNotice, itemName;
+			    $bulkActionNotice, itemName;
 
 			if ( 'wp-' + response.install + '-bulk-install-success' === event.type ) {
 				success++;

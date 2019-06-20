@@ -283,3 +283,41 @@ img.tips {
 	margin-right: -6px;
 }
 */
+
+/**
+ * Demo Import message CSS.
+ */
+.demo-import-confirm-message {
+	font-size: 14px;
+	padding: 10px 10px 0;
+
+	ol {
+		margin-left: 20px;
+
+		.warning {
+			color: #f00000;
+		}
+	}
+}
+
+.jconfirm-buttons {
+
+	.demo-import-confirm-button {
+		background: #f00000;
+		color: #ffffff;
+	}
+
+	.demo-import-cancel-button {
+		background: #eeeeee;
+		border-color: #999999;
+		color: #23282d;
+	}
+}
+
+body {
+
+	&.demo-import-message-popup {
+		overflow: visible;
+		visibility: visible;
+	}
+}
