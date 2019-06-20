@@ -1,5 +1,8 @@
 == Changelog ==
 
+= 1.5.8 - 20-06-2019 =
+* Tweak - Update demo import message.
+
 = 1.5.7 - 06-03-2019 =
 * Fix - Demo preview overlay not importing specific demo.
 
