@@ -313,3 +313,11 @@ img.tips {
 		color: #23282d;
 	}
 }
+
+body {
+
+	&.demo-import-message-popup {
+		overflow: visible;
+		visibility: visible;
+	}
+}

@@ -801,6 +801,12 @@ demos.view.Preview = wp.Backbone.View.extend({
 						return;
 					}
 				}
+			},
+			onContentReady: function () {
+				$( 'body' ).addClass( 'demo-import-message-popup' );
+			},
+			onDestroy: function () {
+				$( 'body' ).removeClass( 'demo-import-message-popup' );
 			}
 		} );
 	},
