@@ -567,17 +567,23 @@ demos.view.Demo = wp.Backbone.View.extend({
 
 		$.confirm( {
 			title : '',
-			content: wp.demos.data.settings.confirmImport,
+			content: '<div class="demo-import-confirm-message">' + wp.demos.data.settings.confirmImport + '</div>',
+			boxWidth: '50%',
+			useBootstrap: false,
 			buttons: {
 				confirm: {
 					text: wp.demos.data.l10n.confirmMsg,
 					keys: ['enter'],
+					btnClass: 'demo-import-confirm-button',
 					action: function(){
 						_this.processImport( $target, pluginsList, _this );
 					}
 				},
-				cancel: function() {
-					return;
+				cancel: {
+					btnClass: 'demo-import-cancel-button',
+					action: function() {
+						return;
+					}
 				}
 			}
 		} );
@@ -777,17 +783,23 @@ demos.view.Preview = wp.Backbone.View.extend({
 
 		$.confirm( {
 			title : '',
-			content: wp.demos.data.settings.confirmImport,
+			content: '<div class="demo-import-confirm-message">' + wp.demos.data.settings.confirmImport + '</div>',
+			boxWidth: '50%',
+			useBootstrap: false,
 			buttons: {
 				confirm: {
 					text: wp.demos.data.l10n.confirmMsg,
 					keys: ['enter'],
+					btnClass: 'demo-import-confirm-button',
 					action: function(){
 						_this.processImport( $target, pluginsList, success, error, errorMessages, _this );
 					}
 				},
-				cancel: function() {
-					return;
+				cancel: {
+					btnClass: 'demo-import-cancel-button',
+					action: function() {
+						return;
+					}
 				}
 			}
 		} );
