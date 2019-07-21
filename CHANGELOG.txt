@@ -1,5 +1,8 @@
 == Changelog ==
 
+= 1.5.9 - 22-07-2019 =
+* Tweak - Display all available theme demos on main demo import page.
+
 = 1.5.8 - 20-06-2019 =
 * Tweak - Update demo import message.
 
