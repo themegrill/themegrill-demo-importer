@@ -208,11 +208,11 @@ demos.Collection = Backbone.Collection.extend({
 	// that slices the collection
 	paginate: function( instance ) {
 		var collection = this;
-		instance = instance || 0;
-
-		// Demos per instance are set at 20
-		collection = _( collection.rest( 20 * instance ) );
-		collection = _( collection.first( 20 ) );
+		// instance = instance || 0;
+		//
+		// // Demos per instance are set at 20
+		// collection = _( collection.rest( 20 * instance ) );
+		// collection = _( collection.first( 20 ) );
 
 		return collection;
 	},
