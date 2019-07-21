@@ -72,6 +72,8 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 3. Finally, Import the Demo with just one click.
 
 == Changelog ==
+= TBD =
+* Tweak - Display all available theme demos on main demo import page.
 
 = 1.5.8 - 20-06-2019 =
 * Tweak - Update demo import message.
