@@ -90,7 +90,7 @@ class TG_Demo_Importer {
 		$template = strtolower( str_replace( '-pro', '', get_option( 'template' ) ) );
 
 		if ( false === $packages || ( isset( $packages->slug ) && $template !== $packages->slug ) ) {
-			$raw_packages = wp_safe_remote_get( "https://raw.githubusercontent.com/themegrill/themegrill-demo-pack/master/configs/{$template}.json" );
+			$raw_packages = wp_safe_remote_get( "https://raw.githubusercontent.com/themegrill/themegrill-demo-pack/zakra-pro-import/configs/{$template}.json" );
 
 			if ( ! is_wp_error( $raw_packages ) ) {
 				$packages = json_decode( wp_remote_retrieve_body( $raw_packages ) );
@@ -495,7 +495,7 @@ class TG_Demo_Importer {
 		if ( isset( $available_packages->demos ) ) {
 			foreach ( $available_packages->demos as $package_slug => $package_data ) {
 				$plugins_list   = isset( $package_data->plugins_list ) ? $package_data->plugins_list : array();
-				$screenshot_url = "https://raw.githubusercontent.com/themegrill/themegrill-demo-pack/master/resources/{$available_packages->slug}/{$package_slug}/screenshot.jpg";
+				$screenshot_url = "https://github.com/themegrill/themegrill-demo-pack/raw/zakra-pro-import/resources/{$available_packages->slug}/{$package_slug}/screenshot.jpg";
 
 				if ( isset( $request['browse'], $package_data->category ) && ! in_array( $request['browse'], $package_data->category, true ) ) {
 					continue;
@@ -608,7 +608,7 @@ class TG_Demo_Importer {
 		$upgrader = new TG_Demo_Pack_Upgrader( $skin );
 		$template = strtolower( str_replace( '-pro', '', get_option( 'template' ) ) );
 		$packages = isset( $this->demo_packages->demos ) ? json_decode( wp_json_encode( $this->demo_packages->demos ), true ) : array();
-		$result   = $upgrader->install( "https://github.com/themegrill/themegrill-demo-pack/raw/master/packages/{$template}/{$slug}.zip" );
+		$result   = $upgrader->install( "https://github.com/themegrill/themegrill-demo-pack/raw/zakra-pro-import/packages/{$template}/{$slug}.zip" );
 
 		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 			$status['debug'] = $skin->get_upgrade_messages();
