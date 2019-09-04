@@ -457,6 +457,19 @@ class TG_Demo_Importer {
 	}
 
 	/**
+	 * Check for Zakra theme plan.
+	 */
+	public function zakra_theme_plan() {
+
+		if ( is_plugin_active( 'zakra-pro/zakra-pro.php' ) && is_plugin_active( 'companion-elementor/companion-elementor.php') ) {
+			return true;
+		}
+
+		return false;
+
+	}
+
+	/**
 	 * Ajax handler for getting demos from github.
 	 */
 	public function ajax_query_demos( $return = true ) {
@@ -526,6 +539,7 @@ class TG_Demo_Importer {
 					'name'            => $package_data->title,
 					'theme'           => $is_pro_theme_demo ? sprintf( esc_html__( '%s Pro', 'themegrill-demo-importer' ), $available_packages->name ) : $available_packages->name,
 					'isPro'           => $is_pro_theme_demo ? false : isset( $package_data->isPro ),
+					'isPersonalPlus'  => ! $this->zakra_theme_plan() ? false : isset( $package_data->isPersonalPlus ),
 					'active'          => $package_slug === $demo_activated_id,
 					'author'          => isset( $package_data->author ) ? $package_data->author : __( 'ThemeGrill', 'themegrill-demo-importer' ),
 					'version'         => isset( $package_data->version ) ? $package_data->version : $available_packages->version,

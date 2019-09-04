@@ -70,6 +70,10 @@ defined( 'ABSPATH' ) || exit;
 		<div class="theme-screenshot blank"></div>
 	<# } #>
 
+	<# if ( data.isPersonalPlus ) { #>
+		<span class="premium-demo-banner"><?php esc_html_e( 'Personal Plus', 'themegrill-demo-importer' ); ?></span>
+	<# } #>
+
 	<# if ( data.isPro ) { #>
 		<span class="premium-demo-banner"><?php esc_html_e( 'Pro', 'themegrill-demo-importer' ); ?></span>
 	<# } #>
@@ -97,7 +101,9 @@ defined( 'ABSPATH' ) || exit;
 			<# if ( data.active ) { #>
 				<a class="button button-primary live-preview" target="_blank" href="<?php echo esc_url_raw( home_url( '/' ) ); ?>"><?php esc_html_e( 'Live Preview', 'themegrill-demo-importer' ); ?></a>
 			<# } else { #>
-				<# if ( data.isPro ) { #>
+				<# if ( data.isPersonalPlus ) { #>
+					<a class="button button-primary purchase-now" href="{{ data.homepage }}" target="_blank"><?php esc_html_e( 'Buy Now', 'themegrill-demo-importer' ); ?></a>
+				<# } else if ( data.isPro ) { #>
 					<a class="button button-primary purchase-now" href="{{ data.homepage }}" target="_blank"><?php esc_html_e( 'Buy Now', 'themegrill-demo-importer' ); ?></a>
 				<# } else { #>
 					<?php
@@ -122,7 +128,9 @@ defined( 'ABSPATH' ) || exit;
 			<button class="close-full-overlay"><span class="screen-reader-text"><?php esc_html_e( 'Close', 'themegrill-demo-importer' ); ?></span></button>
 			<button class="previous-theme"><span class="screen-reader-text"><?php echo esc_html_x( 'Previous', 'Button label for a demo', 'themegrill-demo-importer' ); ?></span></button>
 			<button class="next-theme"><span class="screen-reader-text"><?php echo esc_html_x( 'Next', 'Button label for a demo', 'themegrill-demo-importer' ); ?></span></button>
-			<# if ( data.isPro ) { #>
+			<# if ( data.isPersonalPlus ) { #>
+				<a class="button button-primary purchase-now" href="{{ data.homepage }}" target="_blank"><?php esc_html_e( 'Buy Now', 'themegrill-demo-importer' ); ?></a>
+			<# } else if ( data.isPro ) { #>
 				<a class="button button-primary purchase-now" href="{{ data.homepage }}" target="_blank"><?php esc_html_e( 'Buy Now', 'themegrill-demo-importer' ); ?></a>
 			<# } else if ( data.requiredTheme ) { #>
 				<button class="button button-primary hide-if-no-js disabled"><?php esc_html_e( 'Import Demo', 'themegrill-demo-importer' ); ?></button>
@@ -138,6 +146,10 @@ defined( 'ABSPATH' ) || exit;
 			<div class="install-theme-info">
 				<h3 class="theme-name">
 					{{ data.name }}
+					<# if ( data.isPersonalPlus ) { #>
+						<span class="premium-demo-tag"><?php esc_html_e( 'Pro', 'themegrill-demo-importer' ); ?></span>
+					<# } #>
+
 					<# if ( data.isPro ) { #>
 						<span class="premium-demo-tag"><?php esc_html_e( 'Pro', 'themegrill-demo-importer' ); ?></span>
 					<# } #>
@@ -153,6 +165,15 @@ defined( 'ABSPATH' ) || exit;
 				<img class="theme-screenshot" src="{{ data.screenshot_url }}" alt="" />
 
 				<div class="theme-details">
+					<# if ( ! data.isPersonalPlus && data.requiredTheme ) { #>
+						<div class="demo-message notice notice-error notice-alt"><p>
+							<?php
+							/* translators: %s: Theme Name */
+							printf( esc_html__( '%s theme is not active.', 'themegrill-demo-importer' ), '<strong>{{{ data.theme }}}</strong>' );
+							?>
+						</p></div>
+					<# } #>
+
 					<# if ( ! data.isPro && data.requiredTheme ) { #>
 						<div class="demo-message notice notice-error notice-alt"><p>
 						<?php
@@ -209,7 +230,9 @@ defined( 'ABSPATH' ) || exit;
 		</div>
 		<div class="wp-full-overlay-footer">
 			<div class="demo-import-actions">
-				<# if ( data.isPro ) { #>
+				<# if ( data.isPersonalPlus ) { #>
+					<a class="button button-hero button-primary purchase-now" href="{{ data.homepage }}" target="_blank"><?php esc_html_e( 'Buy Now', 'themegrill-demo-importer' ); ?></a>
+				<# } else if ( data.isPro ) { #>
 					<a class="button button-hero button-primary purchase-now" href="{{ data.homepage }}" target="_blank"><?php esc_html_e( 'Buy Now', 'themegrill-demo-importer' ); ?></a>
 				<# } else if ( data.requiredTheme ) { #>
 					<button class="button button-hero button-primary hide-if-no-js disabled"><?php esc_html_e( 'Import Demo', 'themegrill-demo-importer' ); ?></button>
