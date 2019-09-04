@@ -70,8 +70,8 @@ defined( 'ABSPATH' ) || exit;
 		<div class="theme-screenshot blank"></div>
 	<# } #>
 
-	<# if ( data.isPersonalPlus ) { #>
-		<span class="premium-demo-banner"><?php esc_html_e( 'Personal Plus', 'themegrill-demo-importer' ); ?></span>
+	<# if ( data.isPremium ) { #>
+		<span class="premium-demo-banner"><?php esc_html_e( 'Premium', 'themegrill-demo-importer' ); ?></span>
 	<# } #>
 
 	<# if ( data.isPro ) { #>
@@ -101,7 +101,7 @@ defined( 'ABSPATH' ) || exit;
 			<# if ( data.active ) { #>
 				<a class="button button-primary live-preview" target="_blank" href="<?php echo esc_url_raw( home_url( '/' ) ); ?>"><?php esc_html_e( 'Live Preview', 'themegrill-demo-importer' ); ?></a>
 			<# } else { #>
-				<# if ( data.isPersonalPlus ) { #>
+				<# if ( data.isPremium ) { #>
 					<a class="button button-primary purchase-now" href="{{ data.homepage }}" target="_blank"><?php esc_html_e( 'Buy Now', 'themegrill-demo-importer' ); ?></a>
 				<# } else if ( data.isPro ) { #>
 					<a class="button button-primary purchase-now" href="{{ data.homepage }}" target="_blank"><?php esc_html_e( 'Buy Now', 'themegrill-demo-importer' ); ?></a>
@@ -128,7 +128,7 @@ defined( 'ABSPATH' ) || exit;
 			<button class="close-full-overlay"><span class="screen-reader-text"><?php esc_html_e( 'Close', 'themegrill-demo-importer' ); ?></span></button>
 			<button class="previous-theme"><span class="screen-reader-text"><?php echo esc_html_x( 'Previous', 'Button label for a demo', 'themegrill-demo-importer' ); ?></span></button>
 			<button class="next-theme"><span class="screen-reader-text"><?php echo esc_html_x( 'Next', 'Button label for a demo', 'themegrill-demo-importer' ); ?></span></button>
-			<# if ( data.isPersonalPlus ) { #>
+			<# if ( data.isPremium ) { #>
 				<a class="button button-primary purchase-now" href="{{ data.homepage }}" target="_blank"><?php esc_html_e( 'Buy Now', 'themegrill-demo-importer' ); ?></a>
 			<# } else if ( data.isPro ) { #>
 				<a class="button button-primary purchase-now" href="{{ data.homepage }}" target="_blank"><?php esc_html_e( 'Buy Now', 'themegrill-demo-importer' ); ?></a>
@@ -146,8 +146,8 @@ defined( 'ABSPATH' ) || exit;
 			<div class="install-theme-info">
 				<h3 class="theme-name">
 					{{ data.name }}
-					<# if ( data.isPersonalPlus ) { #>
-						<span class="premium-demo-tag"><?php esc_html_e( 'Personal Plus', 'themegrill-demo-importer' ); ?></span>
+					<# if ( data.isPremium ) { #>
+						<span class="premium-demo-tag"><?php esc_html_e( 'Premium', 'themegrill-demo-importer' ); ?></span>
 					<# } #>
 
 					<# if ( data.isPro ) { #>
@@ -165,7 +165,7 @@ defined( 'ABSPATH' ) || exit;
 				<img class="theme-screenshot" src="{{ data.screenshot_url }}" alt="" />
 
 				<div class="theme-details">
-					<# if ( ! data.isPersonalPlus && data.requiredTheme ) { #>
+					<# if ( ! data.isPremium && data.requiredTheme ) { #>
 						<div class="demo-message notice notice-error notice-alt"><p>
 							<?php
 							/* translators: %s: Theme Name */
@@ -230,7 +230,7 @@ defined( 'ABSPATH' ) || exit;
 		</div>
 		<div class="wp-full-overlay-footer">
 			<div class="demo-import-actions">
-				<# if ( data.isPersonalPlus ) { #>
+				<# if ( data.isPremium ) { #>
 					<a class="button button-hero button-primary purchase-now" href="{{ data.homepage }}" target="_blank"><?php esc_html_e( 'Buy Now', 'themegrill-demo-importer' ); ?></a>
 				<# } else if ( data.isPro ) { #>
 					<a class="button button-hero button-primary purchase-now" href="{{ data.homepage }}" target="_blank"><?php esc_html_e( 'Buy Now', 'themegrill-demo-importer' ); ?></a>

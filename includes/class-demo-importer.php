@@ -539,7 +539,7 @@ class TG_Demo_Importer {
 					'name'            => $package_data->title,
 					'theme'           => $is_pro_theme_demo ? sprintf( esc_html__( '%s Pro', 'themegrill-demo-importer' ), $available_packages->name ) : $available_packages->name,
 					'isPro'           => $is_pro_theme_demo ? false : isset( $package_data->isPro ),
-					'isPersonalPlus'  => $this->zakra_personal_plus_theme_plan() ? false : isset( $package_data->isPersonalPlus ),
+					'isPremium'       => $this->zakra_personal_plus_theme_plan() ? false : isset( $package_data->isPremium ),
 					'active'          => $package_slug === $demo_activated_id,
 					'author'          => isset( $package_data->author ) ? $package_data->author : __( 'ThemeGrill', 'themegrill-demo-importer' ),
 					'version'         => isset( $package_data->version ) ? $package_data->version : $available_packages->version,
