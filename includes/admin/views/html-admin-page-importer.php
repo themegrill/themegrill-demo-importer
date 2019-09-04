@@ -147,7 +147,7 @@ defined( 'ABSPATH' ) || exit;
 				<h3 class="theme-name">
 					{{ data.name }}
 					<# if ( data.isPersonalPlus ) { #>
-						<span class="premium-demo-tag"><?php esc_html_e( 'Pro', 'themegrill-demo-importer' ); ?></span>
+						<span class="premium-demo-tag"><?php esc_html_e( 'Personal Plus', 'themegrill-demo-importer' ); ?></span>
 					<# } #>
 
 					<# if ( data.isPro ) { #>
