@@ -1,5 +1,5 @@
 == Changelog ==
-= TBD =
+= 1.6.0 - 10-09-2019 =
 * Tweak - Support for Zakra Premium version demo import.
 
 = 1.5.9 - 22-07-2019 =

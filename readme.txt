@@ -2,8 +2,8 @@
 Contributors: ThemeGrill, shivapoudel
 Tags: themegrill, theme demos, demo, importer, one click import
 Requires at least: 4.7
-Tested up to: 5.2.2
-Stable tag: 1.5.9
+Tested up to: 5.2.3
+Stable tag: 1.6.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -72,7 +72,7 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 3. Finally, Import the Demo with just one click.
 
 == Changelog ==
-= TBD =
+= 1.6.0 - 10-09-2019 =
 * Tweak - Support for Zakra Premium version demo import.
 
 = 1.5.9 - 22-07-2019 =
