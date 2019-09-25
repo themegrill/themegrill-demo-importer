@@ -37,12 +37,12 @@ class TG_Pro_Theme_Notice {
 
 	public function pro_theme_notice_markup() {
 
-		if ( get_option( 'tg_pro_theme_notice_start_time' ) > strtotime( '-30 day' ) ) {
+		if ( get_option( 'tg_pro_theme_notice_start_time' ) > strtotime( '-1 min' ) ) {
 			return;
 		}
 		?>
 
-		<div class="updated pro-theme-notice" style="position:relative;">
+		<div class="updated pro-theme-notice">
 			<p>
 				<?php
 
