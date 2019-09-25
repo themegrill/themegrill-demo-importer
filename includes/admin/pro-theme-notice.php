@@ -43,9 +43,7 @@ class TG_Pro_Theme_Notice {
 
 	public function pro_theme_notice_markup() {
 
-		error_log( print_r( $this->current_user_data, true ) );
-
-		if ( get_option( 'tg_pro_theme_notice_start_time' ) > strtotime( '-1 min' ) ) {
+		if ( get_option( 'tg_pro_theme_notice_start_time' ) > strtotime( '-1 min' ) || get_user_meta( $this->current_user_data->ID, 'tg_nag_pro_theme_notice_partial_ignore', true ) > strtotime( '-1 min' ) ) {
 			return;
 		}
 		?>
