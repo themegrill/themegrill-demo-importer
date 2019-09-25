@@ -17,6 +17,12 @@ class TG_Pro_Theme_Notice {
 
 	public function pro_theme_notice() {
 
+		$option = get_option( 'tg_pro_theme_notice_start_time' );
+
+		if ( ! $option ) {
+			update_option( 'tg_pro_theme_notice_start_time', time() );
+		}
+
 		add_action( 'admin_notices', array( $this, 'pro_theme_notice_markup' ), 0 );
 
 	}
@@ -30,6 +36,10 @@ class TG_Pro_Theme_Notice {
 	}
 
 	public function pro_theme_notice_markup() {
+
+		if ( get_option( 'tg_pro_theme_notice_start_time' ) > strtotime( '-30 day' ) ) {
+			return;
+		}
 		?>
 
 		<div class="updated pro-theme-notice" style="position:relative;">
@@ -44,7 +54,6 @@ class TG_Pro_Theme_Notice {
 					),
 					$this->active_theme,
 					$pro_link
-
 				);
 				?>
 			</p>
