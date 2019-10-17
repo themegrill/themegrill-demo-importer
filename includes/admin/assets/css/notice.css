@@ -2,6 +2,29 @@
 	position: relative;
 }
 
+.pro-theme-notice p {
+	font-size: 16px;
+}
+
+.pro-theme-notice .links {
+	margin: 10px 0;
+}
+
+.pro-theme-notice .links a {
+	height: auto;
+	padding: 3px 15px;
+	margin-left: 10px;
+	text-transform: uppercase;
+}
+
+.pro-theme-notice .links a .dashicons {
+	line-height: 1.2;
+}
+
+.pro-theme-notice .links a.button-primary {
+	margin-left: 0;
+}
+
 .pro-theme-notice .notice-dismiss {
 	text-decoration: none;
 }
