@@ -1,6 +1,6 @@
 <?php
 /**
- * Class to display the `Upgrade to Pro` admin notice.
+ * Class to display the `Upgrade To Pro` admin notice.
  *
  * @package ThemeGrill_Demo_Importer
  * @since   1.6.1
@@ -15,10 +15,25 @@ defined( 'ABSPATH' ) || exit;
  */
 class TG_Pro_Theme_Notice {
 
+	/**
+	 * Currently active theme in the site.
+	 *
+	 * @var \WP_Theme
+	 */
 	protected $active_theme;
 
+	/**
+	 * Current user id.
+	 *
+	 * @var int Current user id.
+	 */
 	protected $current_user_data;
 
+	/**
+	 * Constructor function for `Upgrade To Pro` admin notice.
+	 *
+	 * TG_Pro_Theme_Notice constructor.
+	 */
 	public function __construct() {
 
 		add_action( 'after_setup_theme', array( $this, 'pro_theme_notice' ) );
@@ -41,6 +56,9 @@ class TG_Pro_Theme_Notice {
 
 	}
 
+	/**
+	 * Set upgrade time and display the admin notice as required.
+	 */
 	public function pro_theme_notice() {
 
 		global $current_user;
@@ -57,6 +75,9 @@ class TG_Pro_Theme_Notice {
 
 	}
 
+	/**
+	 * Enqueue the required scripts.
+	 */
 	public function enqueue_scripts() {
 
 		$assets_path = tgdm()->plugin_url() . '/includes/admin/assets/';
@@ -65,6 +86,9 @@ class TG_Pro_Theme_Notice {
 		wp_enqueue_style( 'tg-demo-importer-notice' );
 	}
 
+	/**
+	 * Display the `Upgrade To Pro` admin notice.
+	 */
 	public function pro_theme_notice_markup() {
 
 		if ( get_option( 'tg_pro_theme_notice_start_time' ) > strtotime( '-1 min' ) || get_user_meta( $this->current_user_data->ID, 'tg_nag_pro_theme_notice_partial_ignore', true ) > strtotime( '-1 min' ) ) {
@@ -93,6 +117,9 @@ class TG_Pro_Theme_Notice {
 		<?php
 	}
 
+	/**
+	 * Set the nag for partially ignored users.
+	 */
 	public function pro_theme_notice_partial_ignore() {
 
 		$user_id = $this->current_user_data->ID;

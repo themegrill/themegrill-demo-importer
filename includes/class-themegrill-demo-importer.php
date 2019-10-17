@@ -103,6 +103,7 @@ final class ThemeGrill_Demo_Importer {
 		// Register activation hook.
 		register_activation_hook( TGDM_PLUGIN_FILE, array( $this, 'install' ) );
 
+		// Register deactivation hook.
 		register_deactivation_hook( TGDM_PLUGIN_FILE, array( $this, 'deactivate' ) );
 
 		// Check with Official ThemeGrill theme is installed.
@@ -178,9 +179,13 @@ final class ThemeGrill_Demo_Importer {
 		set_transient( '_tg_demo_importer_activation_redirect', 1, 30 );
 	}
 
+	/**
+	 * Deactivation hook.
+	 */
 	function deactivate() {
 
 		include_once dirname( __FILE__ ) . '/class-demo-importer-deactivator.php';
+
 		TG_Demo_Importer_Deactivator::deactivate();
 
 	}
