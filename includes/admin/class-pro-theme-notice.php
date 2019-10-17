@@ -117,6 +117,11 @@ class TG_Pro_Theme_Notice {
 			return;
 		}
 
+		// Return if `Zakra Pro` plugin is installed.
+		if ( is_plugin_active( 'zakra-pro/zakra-pro.php' ) ) {
+			return;
+		}
+
 		if ( get_option( 'tg_pro_theme_notice_start_time' ) > strtotime( '-1 min' ) || $ignore_notice_partially > strtotime( '-1 min' ) ) {
 			return;
 		}
