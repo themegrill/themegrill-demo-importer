@@ -51,22 +51,22 @@ class TG_Pro_Theme_Notice {
 	public static function get_theme_lists() {
 
 		$theme_lists = array(
-			'spacious',
-			'colormag',
-			'estore',
-			'ample',
-			'accelerate',
-			'colornews',
-			'foodhunt',
-			'fitclub',
-			'radiate',
-			'freedom',
-			'himalayas',
-			'esteem',
-			'envince',
-			'suffice',
-			'cenote',
-			'zakra',
+			'spacious'   => 'https://themegrill.com/pricing/?pid=958&vid=1221792',
+			'colormag'   => 'https://themegrill.com/pricing/?pid=1183000&vid=1219398',
+			'estore'     => 'https://themegrill.com/pricing/?pid=1242738&vid=1242847',
+			'ample'      => 'https://themegrill.com/pricing/?pid=774550&vid=1219401',
+			'accelerate' => 'https://themegrill.com/pricing/?pid=7394&vid=1221785',
+			'colornews'  => 'https://themegrill.com/pricing/?pid=1198835&vid=1219395',
+			'foodhunt'   => 'https://themegrill.com/pricing/?pid=1246665&vid=1246668',
+			'fitclub'    => 'https://themegrill.com/pricing/?pid=1242755&vid=1242761',
+			'radiate'    => 'https://themegrill.com/pricing/?pid=179&vid=1221773',
+			'freedom'    => 'https://themegrill.com/pricing/?pid=12287&vid=1221795',
+			'himalayas'  => 'https://themegrill.com/pricing/?pid=1199493&vid=1219392',
+			'esteem'     => 'https://themegrill.com/pricing/?pid=14083&vid=1221789',
+			'envince'    => 'https://themegrill.com/pricing/?pid=1256403&vid=1256406',
+			'suffice'    => 'https://themegrill.com/pricing/?pid=1307844&vid=1307847',
+			'cenote'     => 'https://themegrill.com/pricing/?pid=1383257&vid=1383267',
+			'zakra'      => 'https://zakratheme.com/pricing/',
 		);
 
 		return $theme_lists;
@@ -113,7 +113,7 @@ class TG_Pro_Theme_Notice {
 		$ignore_notice_partially = get_user_meta( $this->current_user_data->ID, 'tg_nag_pro_theme_notice_partial_ignore', true );
 
 		// Return if the theme is not available in theme lists.
-		if ( ! in_array( $current_theme, $theme_lists, true ) ) {
+		if ( ! array_key_exists( $current_theme, $theme_lists ) ) {
 			return;
 		}
 
