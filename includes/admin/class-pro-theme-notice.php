@@ -142,16 +142,17 @@ class TG_Pro_Theme_Notice {
 		<div class="notice updated pro-theme-notice">
 			<p>
 				<?php
-				$pro_link = '<a target="_blank" href=" ' . esc_url( $theme_lists[ $current_theme ] ) . ' ">' . esc_html( 'Go Pro' ) . ' </a>';
+				$pro_link = '<a target="_blank" href=" ' . esc_url( $theme_lists[ $current_theme ] ) . ' ">' . esc_html( 'upgrade to pro' ) . ' </a>';
 
 				printf(
 					esc_html__(
-						/* Translators: %1$s current user display name., %2$s Currently activated theme., %3$s Pro theme link. */
-						'Howdy, %1$s! You\'ve been using %2$s for a while now, and we hope you\'re happy with it. If you need more options and want to get access to the Premium features, you can %3$s ', 'themegrill-demo-importer'
+						/* Translators: %1$s current user display name., %2$s Currently activated theme., %3$s Pro theme link., %4$s Coupon code. */
+						'Howdy, %1$s! You\'ve been using %2$s theme for a while now, and we hope you\'re happy with it. If you need more options and want to get access to the Premium features, you can %3$s. Also, you can use the coupon code %4$s to get 15 percent discount while making the purchase. Enjoy!', 'themegrill-demo-importer'
 					),
 					'<strong>' . esc_html( $this->current_user_data->display_name ) . '</strong>',
 					$this->active_theme,
-					$pro_link
+					$pro_link,
+					'<code>upgrade15</code>'
 				);
 				?>
 			</p>
