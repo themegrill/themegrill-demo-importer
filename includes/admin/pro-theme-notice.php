@@ -50,7 +50,25 @@ class TG_Pro_Theme_Notice {
 	 */
 	public static function get_theme_lists() {
 
-		$theme_lists = array( 'spacious', 'colormag', 'flash', 'estore', 'ample', 'accelerate', 'colornews', 'foodhunt', 'fitclub', 'radiate', 'freedom', 'himalayas', 'esteem', 'envince', 'suffice', 'cenote', 'zakra' );
+		$theme_lists = array(
+			'spacious',
+			'colormag',
+			'flash',
+			'estore',
+			'ample',
+			'accelerate',
+			'colornews',
+			'foodhunt',
+			'fitclub',
+			'radiate',
+			'freedom',
+			'himalayas',
+			'esteem',
+			'envince',
+			'suffice',
+			'cenote',
+			'zakra',
+		);
 
 		return $theme_lists;
 
