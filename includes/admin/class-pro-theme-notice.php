@@ -37,6 +37,7 @@ class TG_Pro_Theme_Notice {
 	public function __construct() {
 
 		add_action( 'after_setup_theme', array( $this, 'pro_theme_notice' ) );
+		add_action( 'switch_theme', array( 'ThemeGrill_Demo_Importer', 'deactivate' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 
 		$this->active_theme = wp_get_theme();
