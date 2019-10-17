@@ -111,6 +111,7 @@ class TG_Pro_Theme_Notice {
 
 		$theme_lists             = self::get_theme_lists();
 		$current_theme           = strtolower( $this->active_theme );
+		$theme_notice_start_time = get_option( 'tg_pro_theme_notice_start_time' );
 		$pre_sales_query_link    = ( 'zakra' !== $current_theme ) ? 'https://themegrill.com/contact/' : 'https://zakratheme.com/support/';
 		$ignore_notice_permanent = get_user_meta( $this->current_user_data->ID, 'tg_nag_pro_theme_notice_ignore', true );
 		$ignore_notice_partially = get_user_meta( $this->current_user_data->ID, 'tg_nag_pro_theme_notice_partial_ignore', true );
@@ -132,7 +133,7 @@ class TG_Pro_Theme_Notice {
 		 * 2. If the user has ignored the message partially for 30 days.
 		 * 3. Dismiss always if clicked on 'Dismiss' button.
 		 */
-		if ( get_option( 'tg_pro_theme_notice_start_time' ) > strtotime( '-1 min' ) || $ignore_notice_partially > strtotime( '-1 min' ) || $ignore_notice_permanent > strtotime( '-1 min' ) ) {
+		if ( ( $theme_notice_start_time > strtotime( '-1 min' ) ) || ( $ignore_notice_partially > strtotime( '-1 min' ) ) || ( $ignore_notice_permanent ) ) {
 			return;
 		}
 		?>
@@ -140,7 +141,7 @@ class TG_Pro_Theme_Notice {
 		<div class="notice updated pro-theme-notice">
 			<p>
 				<?php
-				$pro_link = '<a target="_blank" href=" ' . esc_url( "https://zakratheme.com/pricing/" ) . ' ">' . esc_html( 'Go Pro' ) . ' </a>';
+				$pro_link = '<a target="_blank" href=" ' . esc_url( $theme_lists[ $current_theme ] ) . ' ">' . esc_html( 'Go Pro' ) . ' </a>';
 
 				printf(
 					esc_html__(
@@ -161,7 +162,7 @@ class TG_Pro_Theme_Notice {
 					<span><?php esc_html_e( 'Upgrade To Pro', 'themegrill-demo-importer' ); ?></span>
 				</a>
 
-				<a href="?tg_nag_pro_theme_notice_partial_ignore=0" class="btn button-secondary">
+				<a href="?tg_nag_pro_theme_notice_partial_ignore=1" class="btn button-secondary">
 					<span class="dashicons dashicons-calendar"></span>
 					<span><?php esc_html_e( 'Maybe later', 'themegrill-demo-importer' ); ?></span>
 				</a>

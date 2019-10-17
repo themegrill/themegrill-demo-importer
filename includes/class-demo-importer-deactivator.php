@@ -29,11 +29,11 @@ class TG_Demo_Importer_Deactivator {
 	 */
 	public static function pro_upgrade_notice() {
 
-		$get_all_users                = get_users();
-		$theme_notice_start_time_time = get_option( 'tg_pro_theme_notice_start_time' );
+		$get_all_users           = get_users();
+		$theme_notice_start_time = get_option( 'tg_pro_theme_notice_start_time' );
 
 		// Delete the time set on `wp_options`.
-		if ( $theme_notice_start_time_time ) {
+		if ( $theme_notice_start_time ) {
 			delete_option( 'tg_pro_theme_notice_start_time' );
 		}
 
