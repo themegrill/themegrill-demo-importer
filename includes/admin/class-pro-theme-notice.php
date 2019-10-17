@@ -118,7 +118,7 @@ class TG_Pro_Theme_Notice {
 		}
 
 		// Return if `Zakra Pro` plugin is installed.
-		if ( is_plugin_active( 'zakra-pro/zakra-pro.php' ) ) {
+		if ( is_plugin_active( 'zakra-pro/zakra-pro.php' ) && 'zakra' === $current_theme ) {
 			return;
 		}
 
