@@ -122,20 +122,22 @@ class TG_Pro_Theme_Notice {
 		}
 		?>
 
-		<div class="updated pro-theme-notice">
+		<div class="notice updated pro-theme-notice">
 			<p>
 				<?php
 				$pro_link = '<a target="_blank" href=" ' . esc_url( "https://zakratheme.com/pricing/" ) . ' ">' . esc_html( 'Go Pro' ) . ' </a>';
 
 				printf(
 					esc_html__(
-						'Howdy, You\'ve been using %1$s for a while now, and we hope you\'re happy with it. If you need more options and want to get access to the Premium features, you can %2$s ', 'themegrill-demo-importer'
+						'Howdy %1$s!, You\'ve been using %2$s for a while now, and we hope you\'re happy with it. If you need more options and want to get access to the Premium features, you can %3$s ', 'themegrill-demo-importer'
 					),
+					'<strong>' . esc_html( $this->current_user_data->display_name ) . '</strong>',
 					$this->active_theme,
 					$pro_link
 				);
 				?>
 			</p>
+
 			<a class="notice-dismiss" href="?tg_nag_pro_theme_notice_partial_ignore=1"></a>
 		</div>
 
