@@ -109,7 +109,16 @@ class TG_Pro_Theme_Notice {
 	 */
 	public function pro_theme_notice_markup() {
 
-		if ( get_option( 'tg_pro_theme_notice_start_time' ) > strtotime( '-1 min' ) || get_user_meta( $this->current_user_data->ID, 'tg_nag_pro_theme_notice_partial_ignore', true ) > strtotime( '-1 min' ) ) {
+		$theme_lists             = self::get_theme_lists();
+		$current_theme           = strtolower( $this->active_theme );
+		$ignore_notice_partially = get_user_meta( $this->current_user_data->ID, 'tg_nag_pro_theme_notice_partial_ignore', true );
+
+		// Return if the theme is not available in theme lists.
+		if ( ! in_array( $current_theme, $theme_lists, true ) ) {
+			return;
+		}
+
+		if ( get_option( 'tg_pro_theme_notice_start_time' ) > strtotime( '-1 min' ) || $ignore_notice_partially > strtotime( '-1 min' ) ) {
 			return;
 		}
 		?>
@@ -117,7 +126,6 @@ class TG_Pro_Theme_Notice {
 		<div class="updated pro-theme-notice">
 			<p>
 				<?php
-
 				$pro_link = '<a target="_blank" href=" ' . esc_url( "https://zakratheme.com/pricing/" ) . ' ">' . esc_html( 'Go Pro' ) . ' </a>';
 
 				printf(
