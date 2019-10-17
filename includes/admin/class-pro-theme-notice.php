@@ -66,7 +66,7 @@ class TG_Pro_Theme_Notice {
 			'envince'    => 'https://themegrill.com/pricing/?pid=1256403&vid=1256406&utm_source=envince-dashboard-message&utm_medium=view-pricing-link&utm_campaign=upgrade',
 			'suffice'    => 'https://themegrill.com/pricing/?pid=1307844&vid=1307847&utm_source=suffice-dashboard-message&utm_medium=view-pricing-link&utm_campaign=upgrade',
 			'cenote'     => 'https://themegrill.com/pricing/?pid=1383257&vid=1383267&utm_source=cenote-dashboard-message&utm_medium=view-pricing-link&utm_campaign=upgrade',
-			'zakra'      => 'https://zakratheme.com/pricing/utm_source=zakra-dashboard-message&utm_medium=view-pricing-link&utm_campaign=upgrade',
+			'zakra'      => 'https://zakratheme.com/pricing/?utm_source=zakra-dashboard-message&utm_medium=view-pricing-link&utm_campaign=upgrade',
 		);
 
 		return $theme_lists;
@@ -89,6 +89,7 @@ class TG_Pro_Theme_Notice {
 
 		add_action( 'admin_notices', array( $this, 'pro_theme_notice_markup' ), 0 );
 		add_action( 'admin_init', array( $this, 'pro_theme_notice_partial_ignore' ), 0 );
+		add_action( 'admin_init', array( $this, 'pro_theme_notice_ignore' ), 0 );
 
 	}
 
@@ -110,6 +111,8 @@ class TG_Pro_Theme_Notice {
 
 		$theme_lists             = self::get_theme_lists();
 		$current_theme           = strtolower( $this->active_theme );
+		$pre_sales_query_link    = ( 'zakra' !== $current_theme ) ? 'https://themegrill.com/contact/' : 'https://zakratheme.com/support/';
+		$ignore_notice_permanent = get_user_meta( $this->current_user_data->ID, 'tg_nag_pro_theme_notice_ignore', true );
 		$ignore_notice_partially = get_user_meta( $this->current_user_data->ID, 'tg_nag_pro_theme_notice_partial_ignore', true );
 
 		// Return if the theme is not available in theme lists.
@@ -122,7 +125,14 @@ class TG_Pro_Theme_Notice {
 			return;
 		}
 
-		if ( get_option( 'tg_pro_theme_notice_start_time' ) > strtotime( '-1 min' ) || $ignore_notice_partially > strtotime( '-1 min' ) ) {
+		/**
+		 * Return from notice display if:
+		 *
+		 * 1. The theme installed is less than 30 days ago.
+		 * 2. If the user has ignored the message partially for 30 days.
+		 * 3. Dismiss always if clicked on 'Dismiss' button.
+		 */
+		if ( get_option( 'tg_pro_theme_notice_start_time' ) > strtotime( '-1 min' ) || $ignore_notice_partially > strtotime( '-1 min' ) || $ignore_notice_permanent > strtotime( '-1 min' ) ) {
 			return;
 		}
 		?>
@@ -134,7 +144,8 @@ class TG_Pro_Theme_Notice {
 
 				printf(
 					esc_html__(
-						'Howdy %1$s!, You\'ve been using %2$s for a while now, and we hope you\'re happy with it. If you need more options and want to get access to the Premium features, you can %3$s ', 'themegrill-demo-importer'
+						/* Translators: %1$s current user display name., %2$s Currently activated theme., %3$s Pro theme link. */
+						'Howdy, %1$s! You\'ve been using %2$s for a while now, and we hope you\'re happy with it. If you need more options and want to get access to the Premium features, you can %3$s ', 'themegrill-demo-importer'
 					),
 					'<strong>' . esc_html( $this->current_user_data->display_name ) . '</strong>',
 					$this->active_theme,
@@ -143,7 +154,26 @@ class TG_Pro_Theme_Notice {
 				?>
 			</p>
 
-			<a class="notice-dismiss" href="?tg_nag_pro_theme_notice_partial_ignore=1"></a>
+			<div class="links">
+				<a href="<?php echo esc_url( $theme_lists[ $current_theme ] ); ?>" class="btn button-primary"
+				   target="_blank">
+					<span class="dashicons dashicons-thumbs-up"></span>
+					<span><?php esc_html_e( 'Upgrade To Pro', 'themegrill-demo-importer' ); ?></span>
+				</a>
+
+				<a href="?tg_nag_pro_theme_notice_partial_ignore=0" class="btn button-secondary">
+					<span class="dashicons dashicons-calendar"></span>
+					<span><?php esc_html_e( 'Maybe later', 'themegrill-demo-importer' ); ?></span>
+				</a>
+
+				<a href="<?php echo esc_url( $pre_sales_query_link ); ?>"
+				   class="btn button-secondary" target="_blank">
+					<span class="dashicons dashicons-edit"></span>
+					<span><?php esc_html_e( 'Got pre sales queries?', 'themegrill-demo-importer' ); ?></span>
+				</a>
+			</div>
+
+			<a class="notice-dismiss" href="?tg_nag_pro_theme_notice_ignore=1"></a>
 		</div>
 
 		<?php
@@ -158,6 +188,19 @@ class TG_Pro_Theme_Notice {
 
 		if ( isset( $_GET['tg_nag_pro_theme_notice_partial_ignore'] ) && '1' == $_GET['tg_nag_pro_theme_notice_partial_ignore'] ) {
 			update_user_meta( $user_id, 'tg_nag_pro_theme_notice_partial_ignore', time() );
+		}
+
+	}
+
+	/**
+	 * Set the nag for permanently ignored users.
+	 */
+	public function pro_theme_notice_ignore() {
+
+		$user_id = $this->current_user_data->ID;
+
+		if ( isset( $_GET['tg_nag_pro_theme_notice_ignore'] ) && '1' == $_GET['tg_nag_pro_theme_notice_ignore'] ) {
+			update_user_meta( $user_id, 'tg_nag_pro_theme_notice_ignore', time() );
 		}
 
 	}
