@@ -1,7 +1,18 @@
 <?php
+/**
+ * Class to display the `Upgrade to Pro` admin notice.
+ *
+ * @package ThemeGrill_Demo_Importer
+ * @since   1.6.1
+ */
 
 defined( 'ABSPATH' ) || exit;
 
+/**
+ * Class to display the `Upgrade to Pro` admin notice.
+ *
+ * Class TG_Pro_Theme_Notice
+ */
 class TG_Pro_Theme_Notice {
 
 	protected $active_theme;
@@ -14,6 +25,19 @@ class TG_Pro_Theme_Notice {
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 
 		$this->active_theme = wp_get_theme();
+
+	}
+
+	/**
+	 * Function to hold the available themes, which have pro version available.
+	 *
+	 * @return array Theme lists.
+	 */
+	public static function get_theme_lists() {
+
+		$theme_lists = array( 'spacious', 'colormag', 'flash', 'estore', 'ample', 'accelerate', 'colornews', 'foodhunt', 'fitclub', 'radiate', 'freedom', 'himalayas', 'esteem', 'envince', 'suffice', 'cenote', 'zakra' );
+
+		return $theme_lists;
 
 	}
 
