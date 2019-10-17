@@ -51,22 +51,22 @@ class TG_Pro_Theme_Notice {
 	public static function get_theme_lists() {
 
 		$theme_lists = array(
-			'spacious'   => 'https://themegrill.com/pricing/?pid=958&vid=1221792',
-			'colormag'   => 'https://themegrill.com/pricing/?pid=1183000&vid=1219398',
-			'estore'     => 'https://themegrill.com/pricing/?pid=1242738&vid=1242847',
-			'ample'      => 'https://themegrill.com/pricing/?pid=774550&vid=1219401',
-			'accelerate' => 'https://themegrill.com/pricing/?pid=7394&vid=1221785',
-			'colornews'  => 'https://themegrill.com/pricing/?pid=1198835&vid=1219395',
-			'foodhunt'   => 'https://themegrill.com/pricing/?pid=1246665&vid=1246668',
-			'fitclub'    => 'https://themegrill.com/pricing/?pid=1242755&vid=1242761',
-			'radiate'    => 'https://themegrill.com/pricing/?pid=179&vid=1221773',
-			'freedom'    => 'https://themegrill.com/pricing/?pid=12287&vid=1221795',
-			'himalayas'  => 'https://themegrill.com/pricing/?pid=1199493&vid=1219392',
-			'esteem'     => 'https://themegrill.com/pricing/?pid=14083&vid=1221789',
-			'envince'    => 'https://themegrill.com/pricing/?pid=1256403&vid=1256406',
-			'suffice'    => 'https://themegrill.com/pricing/?pid=1307844&vid=1307847',
-			'cenote'     => 'https://themegrill.com/pricing/?pid=1383257&vid=1383267',
-			'zakra'      => 'https://zakratheme.com/pricing/',
+			'spacious'   => 'https://themegrill.com/pricing/?pid=958&vid=1221792&utm_source=spacious-dashboard-message&utm_medium=view-pricing-link&utm_campaign=upgrade',
+			'colormag'   => 'https://themegrill.com/pricing/?pid=1183000&vid=1219398&utm_source=colormag-dashboard-message&utm_medium=view-pricing-link&utm_campaign=upgrade',
+			'estore'     => 'https://themegrill.com/pricing/?pid=1242738&vid=1242847&utm_source=estore-dashboard-message&utm_medium=view-pricing-link&utm_campaign=upgrade',
+			'ample'      => 'https://themegrill.com/pricing/?pid=774550&vid=1219401&utm_source=ample-dashboard-message&utm_medium=view-pricing-link&utm_campaign=upgrade',
+			'accelerate' => 'https://themegrill.com/pricing/?pid=7394&vid=1221785&utm_source=accelerate-dashboard-message&utm_medium=view-pricing-link&utm_campaign=upgrade',
+			'colornews'  => 'https://themegrill.com/pricing/?pid=1198835&vid=1219395&utm_source=colornews-dashboard-message&utm_medium=view-pricing-link&utm_campaign=upgrade',
+			'foodhunt'   => 'https://themegrill.com/pricing/?pid=1246665&vid=1246668&utm_source=foodhunt-dashboard-message&utm_medium=view-pricing-link&utm_campaign=upgrade',
+			'fitclub'    => 'https://themegrill.com/pricing/?pid=1242755&vid=1242761&utm_source=fitclub-dashboard-message&utm_medium=view-pricing-link&utm_campaign=upgrade',
+			'radiate'    => 'https://themegrill.com/pricing/?pid=179&vid=1221773&utm_source=radiate-dashboard-message&utm_medium=view-pricing-link&utm_campaign=upgrade',
+			'freedom'    => 'https://themegrill.com/pricing/?pid=12287&vid=1221795&utm_source=freedom-dashboard-message&utm_medium=view-pricing-link&utm_campaign=upgrade',
+			'himalayas'  => 'https://themegrill.com/pricing/?pid=1199493&vid=1219392&utm_source=himalayas-dashboard-message&utm_medium=view-pricing-link&utm_campaign=upgrade',
+			'esteem'     => 'https://themegrill.com/pricing/?pid=14083&vid=1221789&utm_source=esteem-dashboard-message&utm_medium=view-pricing-link&utm_campaign=upgrade',
+			'envince'    => 'https://themegrill.com/pricing/?pid=1256403&vid=1256406&utm_source=envince-dashboard-message&utm_medium=view-pricing-link&utm_campaign=upgrade',
+			'suffice'    => 'https://themegrill.com/pricing/?pid=1307844&vid=1307847&utm_source=suffice-dashboard-message&utm_medium=view-pricing-link&utm_campaign=upgrade',
+			'cenote'     => 'https://themegrill.com/pricing/?pid=1383257&vid=1383267&utm_source=cenote-dashboard-message&utm_medium=view-pricing-link&utm_campaign=upgrade',
+			'zakra'      => 'https://zakratheme.com/pricing/utm_source=zakra-dashboard-message&utm_medium=view-pricing-link&utm_campaign=upgrade',
 		);
 
 		return $theme_lists;
