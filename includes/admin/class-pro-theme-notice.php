@@ -112,7 +112,7 @@ class TG_Pro_Theme_Notice {
 		$theme_lists             = self::get_theme_lists();
 		$current_theme           = strtolower( $this->active_theme );
 		$theme_notice_start_time = get_option( 'tg_pro_theme_notice_start_time' );
-		$pre_sales_query_link    = ( 'zakra' !== $current_theme ) ? 'https://themegrill.com/contact/' : 'https://zakratheme.com/support/';
+		$pre_sales_query_link    = ( 'zakra' !== $current_theme ) ? "https://themegrill.com/contact/?utm_source={$current_theme}-dashboard-message&utm_medium=button-link&utm_campaign=pre-sales" : "https://zakratheme.com/support/?utm_source={$current_theme}-dashboard-message&utm_medium=button-link&utm_campaign=pre-sales";
 		$ignore_notice_permanent = get_user_meta( $this->current_user_data->ID, 'tg_nag_pro_theme_notice_ignore', true );
 		$ignore_notice_partially = get_user_meta( $this->current_user_data->ID, 'tg_nag_pro_theme_notice_partial_ignore', true );
 
