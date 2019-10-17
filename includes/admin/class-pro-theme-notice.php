@@ -53,7 +53,6 @@ class TG_Pro_Theme_Notice {
 		$theme_lists = array(
 			'spacious',
 			'colormag',
-			'flash',
 			'estore',
 			'ample',
 			'accelerate',
