@@ -37,7 +37,7 @@ class TG_Pro_Theme_Notice {
 	public function __construct() {
 
 		add_action( 'after_setup_theme', array( $this, 'pro_theme_notice' ) );
-		add_action( 'switch_theme', array( 'ThemeGrill_Demo_Importer', 'deactivate' ) );
+		add_action( 'switch_theme', array( $this, 'delete_pro_notice_datas' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 
 		$this->active_theme = wp_get_theme();
@@ -205,6 +205,17 @@ class TG_Pro_Theme_Notice {
 		if ( isset( $_GET['tg_nag_pro_theme_notice_ignore'] ) && '1' == $_GET['tg_nag_pro_theme_notice_ignore'] ) {
 			update_user_meta( $user_id, 'tg_nag_pro_theme_notice_ignore', time() );
 		}
+
+	}
+
+	/**
+	 * Delete the pro notice datas if theme is switched.
+	 */
+	public function delete_pro_notice_datas() {
+
+		include_once TGDM_ABSPATH . 'includes/class-demo-importer-deactivator.php';
+
+		TG_Demo_Importer_Deactivator::pro_upgrade_notice();
 
 	}
 
