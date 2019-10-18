@@ -134,11 +134,11 @@ class TG_Pro_Theme_Notice {
 		/**
 		 * Return from notice display if:
 		 *
-		 * 1. The theme installed is less than 30 days ago.
-		 * 2. If the user has ignored the message partially for 30 days.
+		 * 1. The theme installed is less than 20 days ago.
+		 * 2. If the user has ignored the message partially for 2 days.
 		 * 3. Dismiss always if clicked on 'Dismiss' button.
 		 */
-		if ( ( $theme_notice_start_time > strtotime( '-1 min' ) ) || ( $ignore_notice_partially > strtotime( '-1 min' ) ) || ( $ignore_notice_permanent ) ) {
+		if ( ( $theme_notice_start_time > strtotime( '-10 day' ) ) || ( $ignore_notice_partially > strtotime( '-2 day' ) ) || ( $ignore_notice_permanent ) ) {
 			return;
 		}
 		?>
