@@ -40,8 +40,6 @@ class TG_Pro_Theme_Notice {
 		add_action( 'switch_theme', array( $this, 'delete_pro_notice_datas' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 
-		$this->active_theme = wp_get_theme();
-
 	}
 
 	/**
@@ -81,6 +79,12 @@ class TG_Pro_Theme_Notice {
 
 		global $current_user;
 		$this->current_user_data = $current_user;
+		$this->active_theme      = wp_get_theme();
+
+		// In case user is using child theme, we need to show `Upgrade To Pro` notice too.
+		if ( is_child_theme() ) {
+			$this->active_theme = wp_get_theme()->parent()->get( 'Name' );
+		}
 
 		$option = get_option( 'tg_pro_theme_notice_start_time' );
 
