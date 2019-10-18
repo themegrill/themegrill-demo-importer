@@ -2,10 +2,10 @@
 # This file is distributed under the GPLv3 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: ThemeGrill Demo Importer 1.6.0\n"
+"Project-Id-Version: ThemeGrill Demo Importer 1.6.1\n"
 "Report-Msgid-Bugs-To: "
 "https://github.com/themegrill/themegrill-demo-importer/issues\n"
-"POT-Creation-Date: 2019-09-10 04:33:13+00:00\n"
+"POT-Creation-Date: 2019-10-18 07:08:31+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -55,9 +55,27 @@ msgstr ""
 msgid "No valid demos were found."
 msgstr ""
 
+#: includes/admin/class-pro-theme-notice.php:149
+msgid "upgrade to pro"
+msgstr ""
+
+#: includes/admin/class-pro-theme-notice.php:168
+#. Translators: %1$s current user display name., %2$s Currently activated
+#. theme., %3$s Pro theme link., %4$s Coupon code.
+msgid "Upgrade To Pro"
+msgstr ""
+
+#: includes/admin/class-pro-theme-notice.php:173
+msgid "Maybe later"
+msgstr ""
+
+#: includes/admin/class-pro-theme-notice.php:179
+msgid "Got pre sales queries?"
+msgstr ""
+
 #: includes/admin/views/html-admin-page-importer.php:12
 #: includes/class-demo-importer.php:121
-#: includes/class-themegrill-demo-importer.php:223
+#: includes/class-themegrill-demo-importer.php:237
 msgid "Demo Importer"
 msgstr ""
 
@@ -459,31 +477,31 @@ msgstr ""
 msgid "The WIE file widget content is missing."
 msgstr ""
 
-#: includes/class-themegrill-demo-importer.php:223
+#: includes/class-themegrill-demo-importer.php:237
 msgid "View Demo Importer"
 msgstr ""
 
-#: includes/class-themegrill-demo-importer.php:239
+#: includes/class-themegrill-demo-importer.php:253
 msgid "View Demo Importer Documentation"
 msgstr ""
 
-#: includes/class-themegrill-demo-importer.php:239
+#: includes/class-themegrill-demo-importer.php:253
 msgid "Docs"
 msgstr ""
 
-#: includes/class-themegrill-demo-importer.php:240
+#: includes/class-themegrill-demo-importer.php:254
 msgid "Visit Free Customer Support Forum"
 msgstr ""
 
-#: includes/class-themegrill-demo-importer.php:240
+#: includes/class-themegrill-demo-importer.php:254
 msgid "Free Support"
 msgstr ""
 
-#: includes/class-themegrill-demo-importer.php:256
+#: includes/class-themegrill-demo-importer.php:270
 msgid "This plugin requires %s to be activated to work."
 msgstr ""
 
-#: includes/class-themegrill-demo-importer.php:256
+#: includes/class-themegrill-demo-importer.php:270
 msgid "Official ThemeGrill Theme"
 msgstr ""
 

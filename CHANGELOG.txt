@@ -1,4 +1,7 @@
 == Changelog ==
+= 1.6.1 - 18-10-2019 =
+* Tweak - Add admin notice for `Upgrade To Pro`.
+
 = 1.6.0 - 10-09-2019 =
 * Tweak - Support for Zakra Premium version demo import.
 
