@@ -103,6 +103,9 @@ final class ThemeGrill_Demo_Importer {
 		// Register activation hook.
 		register_activation_hook( TGDM_PLUGIN_FILE, array( $this, 'install' ) );
 
+		// Register deactivation hook.
+		register_deactivation_hook( TGDM_PLUGIN_FILE, array( $this, 'deactivate' ) );
+
 		// Check with Official ThemeGrill theme is installed.
 		if ( in_array( get_option( 'template' ), $this->get_core_supported_themes(), true ) ) {
 			$this->includes();
@@ -121,7 +124,6 @@ final class ThemeGrill_Demo_Importer {
 	 */
 	private function get_core_supported_themes() {
 		$core_themes = array( 'spacious', 'colormag', 'flash', 'estore', 'ample', 'accelerate', 'colornews', 'foodhunt', 'fitclub', 'radiate', 'freedom', 'himalayas', 'esteem', 'envince', 'suffice', 'explore', 'masonic', 'cenote', 'zakra' );
-
 		// Check for official core themes pro version.
 		$pro_themes = array_diff( $core_themes, array( 'explore', 'masonic' ) );
 		if ( ! empty( $pro_themes ) ) {
@@ -137,6 +139,7 @@ final class ThemeGrill_Demo_Importer {
 	private function includes() {
 		include_once TGDM_ABSPATH . 'includes/class-demo-importer.php';
 		include_once TGDM_ABSPATH . 'includes/functions-demo-importer.php';
+		include_once TGDM_ABSPATH . 'includes/admin/class-pro-theme-notice.php';
 
 		// Backward compatibility for demo packages config.
 		if ( file_exists( TGDM_DEMO_DIR . 'tg-demo-config.php' ) ) {
@@ -174,6 +177,17 @@ final class ThemeGrill_Demo_Importer {
 
 		// Redirect to demo importer page.
 		set_transient( '_tg_demo_importer_activation_redirect', 1, 30 );
+	}
+
+	/**
+	 * Deactivation hook.
+	 */
+	function deactivate() {
+
+		include_once dirname( __FILE__ ) . '/class-demo-importer-deactivator.php';
+
+		TG_Demo_Importer_Deactivator::deactivate();
+
 	}
 
 	/**
