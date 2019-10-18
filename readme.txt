@@ -72,51 +72,10 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 3. Finally, Import the Demo with just one click.
 
 == Changelog ==
+= TBD =
+* Tweak - Add admin notice for `Upgrade To Pro`.
+
 = 1.6.0 - 10-09-2019 =
 * Tweak - Support for Zakra Premium version demo import.
-
-= 1.5.9 - 22-07-2019 =
-* Tweak - Display all available theme demos on main demo import page.
-
-= 1.5.8 - 20-06-2019 =
-* Tweak - Update demo import message.
-
-= 1.5.7 - 06-03-2019 =
-* Fix - Demo preview overlay not importing specific demo.
-
-= 1.5.6 - 15-02-2019 =
-* Fetaure - Install plugins and import demo on a single click.
-* Tweak - Remove the more details on demo preview hover.
-* Dev - Improve Coding standard with husky compatibility.
-
-= 1.5.5 - 05-11-2018 =
-* Feature - Add support for elementor schemes.
-
-= 1.5.4 - 02-11-2018 =
-* Change Modular to Zakra
-
-= 1.5.3 - 30-10-2018 =
-* Support - Modular theme.
-
-= 1.5.2 - 25-09-2018 =
-* Fix - Custom CSS migration on demo import.
-* Fix - Live Preview button when demo is successfully imported in demo preview page.
-
-= 1.5.1 - 24-08-2018 =
-* Support - Cenote Pro theme.
-
-= 1.5.0 - 21-08-2018 =
-* Feature - Fetches the demo config from GitHub repo.
-* Feature - Category and pagebuilder routes for views.
-* Fetaure - Install and activate plugins on a single click.
-* Fix - Slashes to be stripped from imported comments.
-* Fix - Importing export files with multiline term meta data.
-* Fix - Deprecation notices including `wp_get_http()` and `screen_icon()`.
-* Tweak - Demo preview is supported via iframe.
-* Tweak - Different device preview is possible for a demo.
-* Tweak - Only store single demo package files in upload directory.
-* Dev - Improve PHP7 compatibility.
-* Deprecated - Upload process for the demo packages.
-* Deprecated - Filter hooks `themegrill_demo_importer_config` and `themegrill_demo_importer_packages`.
 
 [See changelog for all versions](https://raw.githubusercontent.com/themegrill/themegrill-demo-importer/master/CHANGELOG.txt).
