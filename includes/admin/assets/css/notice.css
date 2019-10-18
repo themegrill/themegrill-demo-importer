@@ -6,6 +6,10 @@
 	font-size: 16px;
 }
 
+.pro-theme-notice code {
+	display: inline-block;
+}
+
 .pro-theme-notice .links {
 	margin: 12px 0;
 }

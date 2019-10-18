@@ -134,7 +134,7 @@ class TG_Pro_Theme_Notice {
 		/**
 		 * Return from notice display if:
 		 *
-		 * 1. The theme installed is less than 20 days ago.
+		 * 1. The theme installed is less than 10 days ago.
 		 * 2. If the user has ignored the message partially for 2 days.
 		 * 3. Dismiss always if clicked on 'Dismiss' button.
 		 */
