@@ -72,7 +72,7 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 3. Finally, Import the Demo with just one click.
 
 == Changelog ==
-= 1.6.1 - 18-10-2019 =
+= 1.6.1 - 12-11-2019 =
 * Tweak - Add admin notice for `Upgrade To Pro`.
 
 = 1.6.0 - 10-09-2019 =
