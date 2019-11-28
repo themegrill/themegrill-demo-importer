@@ -140,6 +140,7 @@ final class ThemeGrill_Demo_Importer {
 		include_once TGDM_ABSPATH . 'includes/class-demo-importer.php';
 		include_once TGDM_ABSPATH . 'includes/functions-demo-importer.php';
 		include_once TGDM_ABSPATH . 'includes/admin/class-pro-theme-notice.php';
+		include_once TGDM_ABSPATH . 'includes/admin/promo/promo-notice.php';
 
 		// Backward compatibility for demo packages config.
 		if ( file_exists( TGDM_DEMO_DIR . 'tg-demo-config.php' ) ) {
