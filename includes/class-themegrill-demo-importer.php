@@ -63,7 +63,9 @@ final class ThemeGrill_Demo_Importer {
 	 * Initialize the plugin.
 	 */
 	private function __construct() {
+
 		$this->define_constants();
+		include_once TGDM_ABSPATH . 'includes/utils.php';
 		$this->init_hooks();
 
 		do_action( 'themegrill_demo_importer_loaded' );
@@ -107,7 +109,7 @@ final class ThemeGrill_Demo_Importer {
 		register_deactivation_hook( TGDM_PLUGIN_FILE, array( $this, 'deactivate' ) );
 
 		// Check with Official ThemeGrill theme is installed.
-		if ( in_array( get_option( 'template' ), $this->get_core_supported_themes(), true ) ) {
+		if ( in_array( get_option( 'template' ), TG_Demo_Importer_Utils::get_theme_supported_themes(), true ) ) {
 			$this->includes();
 
 			add_filter( 'plugin_action_links_' . TGDM_PLUGIN_BASENAME, array( $this, 'plugin_action_links' ) );
@@ -115,22 +117,6 @@ final class ThemeGrill_Demo_Importer {
 		} else {
 			add_action( 'admin_notices', array( $this, 'theme_support_missing_notice' ) );
 		}
-	}
-
-	/**
-	 * Get core supported themes.
-	 *
-	 * @return array
-	 */
-	private function get_core_supported_themes() {
-		$core_themes = array( 'spacious', 'colormag', 'flash', 'estore', 'ample', 'accelerate', 'colornews', 'foodhunt', 'fitclub', 'radiate', 'freedom', 'himalayas', 'esteem', 'envince', 'suffice', 'explore', 'masonic', 'cenote', 'zakra' );
-		// Check for official core themes pro version.
-		$pro_themes = array_diff( $core_themes, array( 'explore', 'masonic' ) );
-		if ( ! empty( $pro_themes ) ) {
-			$pro_themes = preg_replace( '/$/', '-pro', $pro_themes );
-		}
-
-		return array_merge( $core_themes, $pro_themes );
 	}
 
 	/**
@@ -265,7 +251,7 @@ final class ThemeGrill_Demo_Importer {
 	 * Theme support fallback notice.
 	 */
 	public function theme_support_missing_notice() {
-		$themes_url = array_intersect( array_keys( wp_get_themes() ), $this->get_core_supported_themes() ) ? admin_url( 'themes.php?search=themegrill' ) : admin_url( 'theme-install.php?search=themegrill' );
+		$themes_url = array_intersect( array_keys( wp_get_themes() ), TG_Demo_Importer_Utils::get_theme_supported_themes() ) ? admin_url( 'themes.php?search=themegrill' ) : admin_url( 'theme-install.php?search=themegrill' );
 
 		/* translators: %s: official ThemeGrill themes URL */
 		echo '<div class="error notice is-dismissible"><p><strong>' . esc_html__( 'ThemeGrill Demo Importer', 'themegrill-demo-importer' ) . '</strong> &#8211; ' . sprintf( esc_html__( 'This plugin requires %s to be activated to work.', 'themegrill-demo-importer' ), '<a href="' . esc_url( $themes_url ) . '">' . esc_html__( 'Official ThemeGrill Theme', 'themegrill-demo-importer' ) . '</a>' ) . '</p></div>';

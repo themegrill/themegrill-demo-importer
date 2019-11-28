@@ -1,4 +1,5 @@
 <?php
+defined( 'ABSPATH' ) || exit; // Exit if accessed directly.
 
 class TG_Demo_Importer_Promo_Notice {
 
@@ -10,6 +11,25 @@ class TG_Demo_Importer_Promo_Notice {
 	public function promo_notices() {
 		$ignored_notice = get_user_meta( get_current_user_id(), 'tg_demo_importer_ignore_promo', true );
 		if ( $ignored_notice ) {
+			error_log( print_r( 'zero', true ) );
+			return;
+		}
+
+		$theme_lists   = TG_Demo_Importer_Utils::get_theme_supported_themes();
+		$current_theme = wp_get_theme();
+		$current_theme = strtolower( $current_theme->get( 'Name' ) );
+
+//		error_log( print_r( in_array( array('a', 'b'), array( array('a', 'b'), 'c', 'd' ) ), true ) );
+		error_log( print_r( in_array(array( 'zakra', 'masonic', 'explore' ), $theme_lists, false), true ) );
+//		error_log( print_r( array( $current_theme, 'masonic', 'explore' ), true ) );
+
+		if ( ! in_array( array( $current_theme, 'masonic', 'explore' ), $theme_lists ) || strpos( $current_theme, '-pro' ) ) {
+//			error_log( print_r( ! in_array( array( $current_theme, 'masonic', 'explore' ), $theme_lists, true ), true ) );
+			return;
+		}
+
+		if ( is_plugin_active( 'zakra-pro/zakra-pro.php' ) && 'zakra' === $current_theme ) {
+			error_log( print_r( 'two', true ) );
 			return;
 		}
 		?>
