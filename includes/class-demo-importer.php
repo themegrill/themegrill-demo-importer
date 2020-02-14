@@ -377,6 +377,10 @@ class TG_Demo_Importer {
 	public function reset_wizard_actions() {
 		global $wpdb, $current_user;
 
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( __( 'Cheatin&#8217; huh?', 'themegrill-demo-importer' ) );
+		}
+		
 		if ( ! empty( $_GET['do_reset_wordpress'] ) ) {
 			require_once ABSPATH . '/wp-admin/includes/upgrade.php';
 
