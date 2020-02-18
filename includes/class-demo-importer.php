@@ -382,7 +382,8 @@ class TG_Demo_Importer {
 	public function reset_wizard_actions() {
 		global $wpdb, $current_user;
 
-		if ( ! empty( $_GET['do_reset_wordpress'] ) ) {
+
+		if ( isset( $_GET['themegrill_demo_importer_reset_nonce'], $_GET['do_reset_wordpress'] ) ) {
 			if ( ! wp_verify_nonce( wp_unslash( $_GET['themegrill_demo_importer_reset_nonce'] ), 'themegrill_demo_importer_reset' ) ) { // WPCS: input var ok, sanitization ok.
 				wp_die( esc_html__( 'Action failed. Please refresh the page and retry.', 'everest-forms' ) );
 			}
