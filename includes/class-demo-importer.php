@@ -272,7 +272,12 @@ class TG_Demo_Importer {
 	 * Add Contextual help tabs.
 	 */
 	public function add_help_tabs() {
-		$screen = get_current_screen();
+		$screen    = get_current_screen();
+		$reset_url = wp_nonce_url(
+			add_query_arg( 'do_reset_wordpress', 'true', admin_url( 'themes.php?page=demo-importer' ) ),
+			'themegrill_demo_importer_reset',
+			'themegrill_demo_importer_reset_nonce'
+		);
 
 		if ( ! $screen || ! in_array( $screen->id, array( 'appearance_page_demo-importer' ) ) ) {
 			return;
@@ -316,7 +321,7 @@ class TG_Demo_Importer {
 				'content' =>
 					'<h2>' . __( 'Reset wizard', 'themegrill-demo-importer' ) . '</h2>' .
 					'<p>' . __( 'If you need to reset the WordPress back to default again, please click on the button below.', 'themegrill-demo-importer' ) . '</p>' .
-					'<p><a href="' . esc_url( add_query_arg( 'do_reset_wordpress', 'true', admin_url( 'themes.php?page=demo-importer' ) ) ) . '" class="button button-primary themegrill-reset-wordpress">' . __( 'Reset wizard', 'themegrill-demo-importer' ) . '</a></p>',
+					'<p><a href="' . esc_url( $reset_url ) . '" class="button button-primary themegrill-reset-wordpress">' . __( 'Reset wizard', 'themegrill-demo-importer' ) . '</a></p>',
 			)
 		);
 
@@ -377,11 +382,15 @@ class TG_Demo_Importer {
 	public function reset_wizard_actions() {
 		global $wpdb, $current_user;
 
-		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( __( 'Cheatin&#8217; huh?', 'themegrill-demo-importer' ) );
-		}
-		
 		if ( ! empty( $_GET['do_reset_wordpress'] ) ) {
+			if ( ! wp_verify_nonce( wp_unslash( $_GET['themegrill_demo_importer_reset_nonce'] ), 'themegrill_demo_importer_reset' ) ) { // WPCS: input var ok, sanitization ok.
+				wp_die( esc_html__( 'Action failed. Please refresh the page and retry.', 'everest-forms' ) );
+			}
+
+			if ( ! current_user_can( 'manage_options' ) ) {
+				wp_die( esc_html__( 'You don&#8217;t have permission to do this.', 'themegrill-demo-importer' ) );
+			}
+
 			require_once ABSPATH . '/wp-admin/includes/upgrade.php';
 
 			$template     = get_option( 'template' );
@@ -390,7 +399,7 @@ class TG_Demo_Importer {
 			$blog_public  = get_option( 'blog_public' );
 			$footer_rated = get_option( 'themegrill_demo_importer_admin_footer_text_rated' );
 
-			if ( 'admin' != $current_user->user_login ) {
+			if ( 'admin' !== $current_user->user_login ) {
 				$user = get_user_by( 'login', 'admin' );
 			}
 
