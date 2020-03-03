@@ -30,10 +30,10 @@ if ( ! class_exists( 'ThemeGrill_Demo_Importer' ) ) {
 /**
  * Main instance of ThemeGrill Demo importer.
  *
- * Returns the main instance of TGDM to prevent the need to use globals.
+ * Returns the main instance of ThemeGrill_Demo_Importer to prevent the need to use globals.
  *
+ * @return object A single instance of class ThemeGrill_Demo_Importer
  * @since  1.3.4
- * @return ThemeGrill_Demo_Importer
  */
 function tgdm() {
 	return ThemeGrill_Demo_Importer::instance();
