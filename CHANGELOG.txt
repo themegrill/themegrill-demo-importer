@@ -1,4 +1,10 @@
 == Changelog ==
+= 1.6.3 - 18-02-2020 =
+* Enhancement - Secure reset button with nonce check.
+
+= 1.6.2 - 15-02-2020 =
+* Fix - Unauthenticated user vulnerability. Thanks webarxsecurity team
+
 = 1.6.1 - 12-11-2019 =
 * Tweak - Add admin notice for `Upgrade To Pro`.
 

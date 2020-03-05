@@ -72,6 +72,9 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 3. Finally, Import the Demo with just one click.
 
 == Changelog ==
+= TBD =
+* Fix - `Live Preview` button link on successful demo import message in WordPress multisite install.
+
 = 1.6.3 - 18-02-2020 =
 * Enhancement - Secure reset button with nonce check.
 

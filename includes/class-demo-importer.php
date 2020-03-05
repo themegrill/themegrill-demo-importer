@@ -671,7 +671,7 @@ class TG_Demo_Importer {
 
 		$demo_data            = $packages[ $slug ];
 		$status['demoName']   = $demo_data['title'];
-		$status['previewUrl'] = get_home_url( '/' );
+		$status['previewUrl'] = get_site_url( null, '/' );
 
 		do_action( 'themegrill_ajax_before_demo_import' );
 
