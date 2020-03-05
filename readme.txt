@@ -73,6 +73,7 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 
 == Changelog ==
 = TBD =
+* Fix - `WooCommerce Setup Wizard` disabled when the plugin is active.
 * Fix - `Live Preview` button link on successful demo import message in WordPress multisite install.
 
 = 1.6.3 - 18-02-2020 =
