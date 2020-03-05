@@ -48,7 +48,7 @@ class TG_Demo_Importer {
 		add_filter( 'admin_footer_text', array( $this, 'admin_footer_text' ), 1 );
 
 		// Disable WooCommerce setup wizard.
-		add_filter( 'woocommerce_enable_setup_wizard', '__return_false', 1 );
+		add_action( 'current_screen', array( $this, 'woocommerce_disable_setup_wizard' ) );
 
 		// AJAX Events to query demo, import demo and update rating footer.
 		add_action( 'wp_ajax_query-demos', array( $this, 'ajax_query_demos' ) );
@@ -461,6 +461,19 @@ class TG_Demo_Importer {
 			wp_safe_redirect( admin_url( 'themes.php?page=demo-importer&browse=all&reset=true' ) );
 			exit();
 		}
+	}
+
+	/**
+	 * Disable the WooCommerce Setup Wizard on `ThemeGrill Demo Importer` page only.
+	 */
+	public function woocommerce_disable_setup_wizard() {
+
+		$screen = get_current_screen();
+
+		if ( 'appearance_page_demo-importer' === $screen->id ) {
+			add_filter( 'woocommerce_enable_setup_wizard', '__return_false', 1 );
+		}
+
 	}
 
 	/**
