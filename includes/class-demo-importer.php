@@ -502,11 +502,19 @@ class TG_Demo_Importer {
 	 * Ajax handler for getting demos from github.
 	 */
 	public function ajax_query_demos( $return = true ) {
-		$prepared_demos     = array();
-		$current_template   = get_option( 'template' );
-		$is_pro_theme_demo  = strpos( $current_template, '-pro' ) !== false;
-		$demo_activated_id  = get_option( 'themegrill_demo_importer_activated_id' );
-		$available_packages = $this->demo_packages;
+		$prepared_demos        = array();
+		$current_template      = get_option( 'template' );
+		$current_theme         = wp_get_theme()->get( 'Name' );
+		$current_theme_version = wp_get_theme()->get( 'Version' );
+		$is_pro_theme_demo     = strpos( $current_template, '-pro' ) !== false;
+		$demo_activated_id     = get_option( 'themegrill_demo_importer_activated_id' );
+		$available_packages    = $this->demo_packages;
+
+		// Condition if child theme is being used.
+		if ( is_child_theme() ) {
+			$current_theme         = wp_get_theme()->parent()->get( 'Name' );
+			$current_theme_version = wp_get_theme()->parent()->get( 'Version' );
+		}
 
 		/**
 		 * Filters demo data before it is prepared for JavaScript.
