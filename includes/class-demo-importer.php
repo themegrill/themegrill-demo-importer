@@ -504,7 +504,7 @@ class TG_Demo_Importer {
 	public function ajax_query_demos( $return = true ) {
 		$prepared_demos        = array();
 		$current_template      = get_option( 'template' );
-		$current_theme         = wp_get_theme()->get( 'Name' );
+		$current_theme_name    = wp_get_theme()->get( 'Name' );
 		$current_theme_version = wp_get_theme()->get( 'Version' );
 		$is_pro_theme_demo     = strpos( $current_template, '-pro' ) !== false;
 		$demo_activated_id     = get_option( 'themegrill_demo_importer_activated_id' );
@@ -512,7 +512,7 @@ class TG_Demo_Importer {
 
 		// Condition if child theme is being used.
 		if ( is_child_theme() ) {
-			$current_theme         = wp_get_theme()->parent()->get( 'Name' );
+			$current_theme_name    = wp_get_theme()->parent()->get( 'Name' );
 			$current_theme_version = wp_get_theme()->parent()->get( 'Version' );
 		}
 
@@ -570,23 +570,34 @@ class TG_Demo_Importer {
 					}
 				}
 
+				// Get the required theme versions.
+				$required_theme_version_installed = false;
+				if ( isset( $package_data->minimum_theme_version ) && is_object( $package_data->minimum_theme_version ) ) {
+					foreach ( $package_data->minimum_theme_version as $theme => $minimum_theme_version ) {
+						if ( $current_template === $theme && version_compare( $minimum_theme_version, $current_theme_version, '>' ) ) {
+							$required_theme_version_installed = true;
+						}
+					}
+				}
+
 				// Prepare all demos.
 				$prepared_demos[ $package_slug ] = array(
-					'slug'            => $package_slug,
-					'name'            => $package_data->title,
-					'theme'           => $is_pro_theme_demo ? sprintf( esc_html__( '%s Pro', 'themegrill-demo-importer' ), $available_packages->name ) : $available_packages->name,
-					'isPro'           => $is_pro_theme_demo ? false : isset( $package_data->isPro ),
-					'isPremium'       => $this->zakra_is_premium_theme_plan() ? false : isset( $package_data->isPremium ),
-					'active'          => $package_slug === $demo_activated_id,
-					'author'          => isset( $package_data->author ) ? $package_data->author : __( 'ThemeGrill', 'themegrill-demo-importer' ),
-					'version'         => isset( $package_data->version ) ? $package_data->version : $available_packages->version,
-					'description'     => isset( $package_data->description ) ? $package_data->description : '',
-					'homepage'        => $available_packages->homepage,
-					'preview_url'     => set_url_scheme( $package_data->preview ),
-					'screenshot_url'  => $screenshot_url,
-					'plugins'         => $plugins_list,
-					'requiredTheme'   => isset( $package_data->template ) && ! in_array( $current_template, $package_data->template, true ),
-					'requiredPlugins' => wp_list_filter( json_decode( wp_json_encode( $plugins_list ), true ), array( 'is_active' => false ) ) ? true : false,
+					'slug'                 => $package_slug,
+					'name'                 => $package_data->title,
+					'theme'                => $is_pro_theme_demo ? sprintf( esc_html__( '%s Pro', 'themegrill-demo-importer' ), $available_packages->name ) : $available_packages->name,
+					'isPro'                => $is_pro_theme_demo ? false : isset( $package_data->isPro ),
+					'isPremium'            => $this->zakra_is_premium_theme_plan() ? false : isset( $package_data->isPremium ),
+					'active'               => $package_slug === $demo_activated_id,
+					'author'               => isset( $package_data->author ) ? $package_data->author : __( 'ThemeGrill', 'themegrill-demo-importer' ),
+					'version'              => isset( $package_data->version ) ? $package_data->version : $available_packages->version,
+					'description'          => isset( $package_data->description ) ? $package_data->description : '',
+					'homepage'             => $available_packages->homepage,
+					'preview_url'          => set_url_scheme( $package_data->preview ),
+					'screenshot_url'       => $screenshot_url,
+					'plugins'              => $plugins_list,
+					'requiredTheme'        => isset( $package_data->template ) && ! in_array( $current_template, $package_data->template, true ),
+					'requiredPlugins'      => wp_list_filter( json_decode( wp_json_encode( $plugins_list ), true ), array( 'is_active' => false ) ) ? true : false,
+					'requiredThemeVersion' => $required_theme_version_installed,
 				);
 			}
 		}
