@@ -105,6 +105,8 @@ defined( 'ABSPATH' ) || exit;
 					<a class="button button-primary purchase-now" href="{{ data.homepage }}" target="_blank"><?php esc_html_e( 'Buy Now', 'themegrill-demo-importer' ); ?></a>
 				<# } else if ( data.isPro ) { #>
 					<a class="button button-primary purchase-now" href="{{ data.homepage }}" target="_blank"><?php esc_html_e( 'Buy Now', 'themegrill-demo-importer' ); ?></a>
+				<# } else if ( data.requiredThemeVersion ) { #>
+					<a class="button button-primary" href="#" title="{{ data.updateThemeNotice }}"><?php esc_html_e( 'Update Theme', 'themegrill-demo-importer' ); ?></a>
 				<# } else { #>
 					<?php
 					/* translators: %s: Demo name */
@@ -134,6 +136,8 @@ defined( 'ABSPATH' ) || exit;
 				<a class="button button-primary purchase-now" href="{{ data.homepage }}" target="_blank"><?php esc_html_e( 'Buy Now', 'themegrill-demo-importer' ); ?></a>
 			<# } else if ( data.requiredTheme ) { #>
 				<button class="button button-primary hide-if-no-js disabled"><?php esc_html_e( 'Import Demo', 'themegrill-demo-importer' ); ?></button>
+			<# } else if ( data.requiredThemeVersion ) { #>
+				<a class="button button-primary" href="#" title="{{ data.updateThemeNotice }}"><?php esc_html_e( 'Update Theme', 'themegrill-demo-importer' ); ?></a>
 			<# } else { #>
 				<# if ( data.active ) { #>
 					<a class="button button-primary live-preview" target="_blank" href="<?php echo esc_url( get_site_url( null, '/' ) ); ?>"><?php esc_html_e( 'Live Preview', 'themegrill-demo-importer' ); ?></a>
@@ -236,6 +240,8 @@ defined( 'ABSPATH' ) || exit;
 					<a class="button button-hero button-primary purchase-now" href="{{ data.homepage }}" target="_blank"><?php esc_html_e( 'Buy Now', 'themegrill-demo-importer' ); ?></a>
 				<# } else if ( data.requiredTheme ) { #>
 					<button class="button button-hero button-primary hide-if-no-js disabled"><?php esc_html_e( 'Import Demo', 'themegrill-demo-importer' ); ?></button>
+				<# } else if ( data.requiredThemeVersion ) { #>
+					<a class="button button-hero button-primary" href="#" title="{{ data.updateThemeNotice }}"><?php esc_html_e( 'Update Theme', 'themegrill-demo-importer' ); ?></a>
 				<# } else { #>
 					<# if ( data.active ) { #>
 						<a class="button button-primary live-preview button-hero hide-if-no-js" target="_blank" href="<?php echo esc_url( get_site_url( null, '/' ) ); ?>"><?php esc_html_e( 'Live Preview', 'themegrill-demo-importer' ); ?></a>
