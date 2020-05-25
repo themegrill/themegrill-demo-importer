@@ -575,6 +575,7 @@ class TG_Demo_Importer {
 				if ( isset( $package_data->minimum_theme_version ) && is_object( $package_data->minimum_theme_version ) ) {
 					foreach ( $package_data->minimum_theme_version as $theme => $minimum_theme_version ) {
 						if ( $current_template === $theme && version_compare( $minimum_theme_version, $current_theme_version, '>' ) ) {
+							$required_theme_version           = $minimum_theme_version;
 							$required_theme_version_installed = true;
 						}
 					}
@@ -598,7 +599,10 @@ class TG_Demo_Importer {
 					'requiredTheme'        => isset( $package_data->template ) && ! in_array( $current_template, $package_data->template, true ),
 					'requiredPlugins'      => wp_list_filter( json_decode( wp_json_encode( $plugins_list ), true ), array( 'is_active' => false ) ) ? true : false,
 					'requiredThemeVersion' => $required_theme_version_installed,
+					'updateThemeNotice'    => $required_theme_version ? sprintf( esc_html__( 'This demo requires %1$s version of %2$s theme to get imported', 'themegrill-demo-importer' ), $required_theme_version, $current_theme_name ) : false,
 				);
+
+				unset( $required_theme_version );
 			}
 		}
 
