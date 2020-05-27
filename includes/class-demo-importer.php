@@ -572,6 +572,7 @@ class TG_Demo_Importer {
 
 				// Get the required theme versions.
 				$required_theme_version_installed = false;
+				$required_theme_version           = false;
 				if ( isset( $package_data->minimum_theme_version ) && is_object( $package_data->minimum_theme_version ) ) {
 					foreach ( $package_data->minimum_theme_version as $theme => $minimum_theme_version ) {
 						if ( $current_template === $theme && version_compare( $minimum_theme_version, $current_theme_version, '>' ) ) {
