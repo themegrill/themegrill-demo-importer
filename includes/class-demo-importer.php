@@ -614,18 +614,72 @@ class TG_Demo_Importer {
 				$required_message = false;
 				if ( 'zakra' === $current_template ) {
 					if ( $required_version ) {
-						$required_message = $required_version ? sprintf( esc_html__( 'This demo requires %1$s version of %2$s theme to get imported', 'themegrill-demo-importer' ), $required_version, $current_theme_name ) : false;
+						$required_message = sprintf( esc_html__( 'This demo requires %1$s version of %2$s theme to get imported', 'themegrill-demo-importer' ), $required_version, $current_theme_name );
 					}
 
 					if ( $zakra_pro_required_version ) {
-						$required_message .= $zakra_pro_required_version ? sprintf( esc_html__( 'This demo requires %1$s version of %2$s plugin to get imported', 'themegrill-demo-importer' ), $zakra_pro_required_version, esc_html__( 'Zakra Pro', 'themegrill-demo-importer' ) ) : false;
+						if ( $required_version && $companion_elementor_required_version ) {
+							$required_message = sprintf(
+								esc_html__( 'This demo requires %1$s version of %2$s theme and %3$s version of %4$s as well as %5$s version of %6$s plugins to get imported', 'themegrill-demo-importer' ),
+								$required_version,
+								$current_theme_name,
+								$zakra_pro_required_version,
+								esc_html__( 'Zakra Pro', 'themegrill-demo-importer' ),
+								$companion_elementor_required_version,
+								esc_html__( 'Companion Elementor', 'themegrill-demo-importer' )
+							);
+						} elseif ( $required_version ) {
+							$required_message = sprintf(
+								esc_html__( 'This demo requires %1$s version of %2$s theme and %3$s version of %4$s plugin to get imported', 'themegrill-demo-importer' ),
+								$required_version,
+								$current_theme_name,
+								$zakra_pro_required_version,
+								esc_html__( 'Zakra Pro', 'themegrill-demo-importer' )
+							);
+						} else {
+							$required_message = sprintf(
+								esc_html__( 'This demo requires %1$s version of %2$s plugin to get imported', 'themegrill-demo-importer' ),
+								$zakra_pro_required_version,
+								esc_html__( 'Zakra Pro', 'themegrill-demo-importer' )
+							);
+						}
 					}
 
 					if ( $companion_elementor_required_version ) {
-						$required_message .= $companion_elementor_required_version ? sprintf( esc_html__( 'This demo requires %1$s version of %2$s plugin to get imported', 'themegrill-demo-importer' ), $companion_elementor_required_version, esc_html__( 'Companion Elementor', 'themegrill-demo-importer' ) ) : false;
+						if ( $required_version && $zakra_pro_required_version ) {
+							$required_message = sprintf(
+								esc_html__( 'This demo requires %1$s version of %2$s theme and %3$s version of %4$s as well as %5$s version of %6$s plugins to get imported', 'themegrill-demo-importer' ),
+								$required_version,
+								$current_theme_name,
+								$zakra_pro_required_version,
+								esc_html__( 'Zakra Pro', 'themegrill-demo-importer' ),
+								$companion_elementor_required_version,
+								esc_html__( 'Companion Elementor', 'themegrill-demo-importer' )
+							);
+						} elseif ( $required_version ) {
+							$required_message = sprintf(
+								esc_html__( 'This demo requires %1$s version of %2$s theme and %3$s version of %4$s plugin to get imported', 'themegrill-demo-importer' ),
+								$required_version,
+								$current_theme_name,
+								$companion_elementor_required_version,
+								esc_html__( 'Companion Elementor', 'themegrill-demo-importer' )
+							);
+						} else {
+							$required_message = sprintf(
+								esc_html__( 'This demo requires %1$s version of %2$s plugin to get imported', 'themegrill-demo-importer' ),
+								$companion_elementor_required_version,
+								esc_html__( 'Companion Elementor', 'themegrill-demo-importer' )
+							);
+						}
 					}
 				} else {
-					$required_message = $required_version ? sprintf( esc_html__( 'This demo requires %1$s version of %2$s theme to get imported', 'themegrill-demo-importer' ), $required_version, $current_theme_name ) : false;
+					if ( $required_version ) {
+						$required_message = sprintf(
+							esc_html__( 'This demo requires %1$s version of %2$s theme to get imported', 'themegrill-demo-importer' ),
+							$required_version,
+							$current_theme_name
+						);
+					}
 				}
 
 				// Prepare all demos.
