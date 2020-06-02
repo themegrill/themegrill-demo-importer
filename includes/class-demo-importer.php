@@ -510,6 +510,10 @@ class TG_Demo_Importer {
 		$demo_activated_id     = get_option( 'themegrill_demo_importer_activated_id' );
 		$available_packages    = $this->demo_packages;
 
+		// Condition for Zakra Pro.
+		$zakra_pro_plugin_version        = ZAKRA_PRO_VERSION;
+		$companion_elementor_plugin_name = COMPANION_ELEMENTOR_VERSION;
+
 		// Condition if child theme is being used.
 		if ( is_child_theme() ) {
 			$current_theme_name    = wp_get_theme()->parent()->get( 'Name' );
@@ -571,39 +575,137 @@ class TG_Demo_Importer {
 				}
 
 				// Get the required theme versions.
-				$required_theme_version_installed = false;
-				$required_theme_version           = false;
-				if ( isset( $package_data->minimum_theme_version ) && is_object( $package_data->minimum_theme_version ) ) {
-					foreach ( $package_data->minimum_theme_version as $theme => $minimum_theme_version ) {
-						if ( $current_template === $theme && version_compare( $minimum_theme_version, $current_theme_version, '>' ) ) {
-							$required_theme_version           = $minimum_theme_version;
-							$required_theme_version_installed = true;
+				$required_version_installed           = false;
+				$required_version                     = false;
+				$zakra_pro_required_version           = false;
+				$companion_elementor_required_version = false;
+				if ( isset( $package_data->minimum_version ) && is_object( $package_data->minimum_version ) ) {
+					foreach ( $package_data->minimum_version as $theme => $minimum_version ) {
+						if ( 'zakra' === $current_template ) {
+							if (
+								version_compare( $minimum_version, $current_theme_version, '>' ) ||
+								( 'zakra-pro' === $theme && version_compare( $minimum_version, $zakra_pro_plugin_version, '>' ) ) ||
+								( 'companion-elementor' === $theme && version_compare( $minimum_version, $companion_elementor_plugin_name, '>' ) )
+							) {
+								$required_version_installed = true;
+
+								if ( 'zakra' === $theme ) {
+									$required_version = $minimum_version;
+								}
+
+								if ( 'zakra-pro' === $theme ) {
+									$zakra_pro_required_version = $minimum_version;
+								}
+
+								if ( 'companion-elementor' === $theme ) {
+									$companion_elementor_required_version = $minimum_version;
+								}
+							}
+						} else {
+							if ( $current_template === $theme && version_compare( $minimum_version, $current_theme_version, '>' ) ) {
+								$required_version           = $minimum_version;
+								$required_version_installed = true;
+							}
 						}
+					}
+				}
+
+				// For required message.
+				$required_message = false;
+				if ( 'zakra' === $current_template ) {
+					if ( $required_version ) {
+						$required_message = sprintf( esc_html__( 'This demo requires %1$s version of %2$s theme to get imported', 'themegrill-demo-importer' ), $required_version, $current_theme_name );
+					}
+
+					if ( $zakra_pro_required_version ) {
+						if ( $required_version && $companion_elementor_required_version ) {
+							$required_message = sprintf(
+								esc_html__( 'This demo requires %1$s version of %2$s theme and %3$s version of %4$s as well as %5$s version of %6$s plugins to get imported', 'themegrill-demo-importer' ),
+								$required_version,
+								$current_theme_name,
+								$zakra_pro_required_version,
+								esc_html__( 'Zakra Pro', 'themegrill-demo-importer' ),
+								$companion_elementor_required_version,
+								esc_html__( 'Companion Elementor', 'themegrill-demo-importer' )
+							);
+						} elseif ( $required_version ) {
+							$required_message = sprintf(
+								esc_html__( 'This demo requires %1$s version of %2$s theme and %3$s version of %4$s plugin to get imported', 'themegrill-demo-importer' ),
+								$required_version,
+								$current_theme_name,
+								$zakra_pro_required_version,
+								esc_html__( 'Zakra Pro', 'themegrill-demo-importer' )
+							);
+						} else {
+							$required_message = sprintf(
+								esc_html__( 'This demo requires %1$s version of %2$s plugin to get imported', 'themegrill-demo-importer' ),
+								$zakra_pro_required_version,
+								esc_html__( 'Zakra Pro', 'themegrill-demo-importer' )
+							);
+						}
+					}
+
+					if ( $companion_elementor_required_version ) {
+						if ( $required_version && $zakra_pro_required_version ) {
+							$required_message = sprintf(
+								esc_html__( 'This demo requires %1$s version of %2$s theme and %3$s version of %4$s as well as %5$s version of %6$s plugins to get imported', 'themegrill-demo-importer' ),
+								$required_version,
+								$current_theme_name,
+								$zakra_pro_required_version,
+								esc_html__( 'Zakra Pro', 'themegrill-demo-importer' ),
+								$companion_elementor_required_version,
+								esc_html__( 'Companion Elementor', 'themegrill-demo-importer' )
+							);
+						} elseif ( $required_version ) {
+							$required_message = sprintf(
+								esc_html__( 'This demo requires %1$s version of %2$s theme and %3$s version of %4$s plugin to get imported', 'themegrill-demo-importer' ),
+								$required_version,
+								$current_theme_name,
+								$companion_elementor_required_version,
+								esc_html__( 'Companion Elementor', 'themegrill-demo-importer' )
+							);
+						} else {
+							$required_message = sprintf(
+								esc_html__( 'This demo requires %1$s version of %2$s plugin to get imported', 'themegrill-demo-importer' ),
+								$companion_elementor_required_version,
+								esc_html__( 'Companion Elementor', 'themegrill-demo-importer' )
+							);
+						}
+					}
+				} else {
+					if ( $required_version ) {
+						$required_message = sprintf(
+							esc_html__( 'This demo requires %1$s version of %2$s theme to get imported', 'themegrill-demo-importer' ),
+							$required_version,
+							$current_theme_name
+						);
 					}
 				}
 
 				// Prepare all demos.
 				$prepared_demos[ $package_slug ] = array(
-					'slug'                 => $package_slug,
-					'name'                 => $package_data->title,
-					'theme'                => $is_pro_theme_demo ? sprintf( esc_html__( '%s Pro', 'themegrill-demo-importer' ), $available_packages->name ) : $available_packages->name,
-					'isPro'                => $is_pro_theme_demo ? false : isset( $package_data->isPro ),
-					'isPremium'            => $this->zakra_is_premium_theme_plan() ? false : isset( $package_data->isPremium ),
-					'active'               => $package_slug === $demo_activated_id,
-					'author'               => isset( $package_data->author ) ? $package_data->author : __( 'ThemeGrill', 'themegrill-demo-importer' ),
-					'version'              => isset( $package_data->version ) ? $package_data->version : $available_packages->version,
-					'description'          => isset( $package_data->description ) ? $package_data->description : '',
-					'homepage'             => $available_packages->homepage,
-					'preview_url'          => set_url_scheme( $package_data->preview ),
-					'screenshot_url'       => $screenshot_url,
-					'plugins'              => $plugins_list,
-					'requiredTheme'        => isset( $package_data->template ) && ! in_array( $current_template, $package_data->template, true ),
-					'requiredPlugins'      => wp_list_filter( json_decode( wp_json_encode( $plugins_list ), true ), array( 'is_active' => false ) ) ? true : false,
-					'requiredThemeVersion' => $required_theme_version_installed,
-					'updateThemeNotice'    => $required_theme_version ? sprintf( esc_html__( 'This demo requires %1$s version of %2$s theme to get imported', 'themegrill-demo-importer' ), $required_theme_version, $current_theme_name ) : false,
+					'slug'              => $package_slug,
+					'name'              => $package_data->title,
+					'theme'             => $is_pro_theme_demo ? sprintf( esc_html__( '%s Pro', 'themegrill-demo-importer' ), $available_packages->name ) : $available_packages->name,
+					'isPro'             => $is_pro_theme_demo ? false : isset( $package_data->isPro ),
+					'isPremium'         => $this->zakra_is_premium_theme_plan() ? false : isset( $package_data->isPremium ),
+					'active'            => $package_slug === $demo_activated_id,
+					'author'            => isset( $package_data->author ) ? $package_data->author : __( 'ThemeGrill', 'themegrill-demo-importer' ),
+					'version'           => isset( $package_data->version ) ? $package_data->version : $available_packages->version,
+					'description'       => isset( $package_data->description ) ? $package_data->description : '',
+					'homepage'          => $available_packages->homepage,
+					'preview_url'       => set_url_scheme( $package_data->preview ),
+					'screenshot_url'    => $screenshot_url,
+					'plugins'           => $plugins_list,
+					'requiredTheme'     => isset( $package_data->template ) && ! in_array( $current_template, $package_data->template, true ),
+					'requiredPlugins'   => wp_list_filter( json_decode( wp_json_encode( $plugins_list ), true ), array( 'is_active' => false ) ) ? true : false,
+					'requiredVersion'   => $required_version_installed,
+					'updateThemeNotice' => $required_message,
 				);
 
-				unset( $required_theme_version );
+				unset( $required_version );
+				unset( $zakra_pro_required_version );
+				unset( $companion_elementor_required_version );
 			}
 		}
 
