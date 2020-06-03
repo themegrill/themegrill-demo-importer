@@ -67,11 +67,11 @@ class TG_Demo_Importer_Deactivator {
 	public static function plugin_review_notice() {
 
 		$get_all_users         = get_users();
-		$plugin_installed_time = get_option( 'tg_demo_importer_plugin_installed_time' );
+		$plugin_installed_time = get_option( 'tg_demo_importer_plugin_review_installed_time' );
 
 		// Delete options data.
 		if ( $plugin_installed_time ) {
-			delete_option( 'tg_demo_importer_plugin_installed_time' );
+			delete_option( 'tg_demo_importer_plugin_review_installed_time' );
 		}
 
 		// Delete user meta data for theme review notice.
