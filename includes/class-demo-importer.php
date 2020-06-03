@@ -511,8 +511,8 @@ class TG_Demo_Importer {
 		$available_packages    = $this->demo_packages;
 
 		// Condition for Zakra Pro.
-		$zakra_pro_plugin_version        = ZAKRA_PRO_VERSION;
-		$companion_elementor_plugin_name = COMPANION_ELEMENTOR_VERSION;
+		$zakra_pro_plugin_version        = is_plugin_active( 'zakra-pro/zakra-pro.php' ) ? ZAKRA_PRO_VERSION : false;
+		$companion_elementor_plugin_name = is_plugin_active( 'companion-elementor/companion-elementor.php' ) ? COMPANION_ELEMENTOR_VERSION : false;
 
 		// Condition if child theme is being used.
 		if ( is_child_theme() ) {
