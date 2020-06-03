@@ -63,6 +63,9 @@ class TG_Demo_Importer {
 		// Update widget and customizer demo import settings data.
 		add_filter( 'themegrill_widget_demo_import_settings', array( $this, 'update_widget_data' ), 10, 4 );
 		add_filter( 'themegrill_customizer_demo_import_settings', array( $this, 'update_customizer_data' ), 10, 2 );
+
+		// Refresh demos.
+		add_action( 'admin_init', array( $this, 'refresh_demo_lists' ) );
 	}
 
 	/**
@@ -1408,6 +1411,24 @@ class TG_Demo_Importer {
 						update_post_meta( $page->ID, 'panels_data', $panels_data );
 					}
 				}
+			}
+		}
+	}
+
+	/**
+	 * Refreshes the demo lists.
+	 */
+	public function refresh_demo_lists() {
+		// Reset the transient if user has clicked on the `Refresh Demos` button.
+		if ( isset( $_GET['refresh-demo-packages'] ) && isset( $_GET['_refresh_demo_packages_nonce'] ) ) {
+			if ( ! wp_verify_nonce( $_GET['_refresh_demo_packages_nonce'], 'refresh_demo_packages' ) ) {
+				wp_die( __( 'Action failed. Please refresh the page and retry.', 'themegrill-demo-importer' ) );
+			}
+
+			$demo_packages = get_transient( 'themegrill_demo_importer_packages' );
+
+			if ( $demo_packages ) {
+				delete_transient( 'themegrill_demo_importer_packages' );
 			}
 		}
 	}
