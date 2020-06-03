@@ -21,7 +21,7 @@ class TG_Demo_Importer_Plugin_Deactivate_Notice {
 	 * TG_Demo_Importer_Plugin_Deactivate_Notice constructor.
 	 */
 	public function __construct() {
-		add_action( 'admin_notices', array( $this, 'review_notice_markup' ), 0 );
+		add_action( 'admin_notices', array( $this, 'deactivate_notice_markup' ), 0 );
 		add_action( 'admin_init', array( $this, 'deactivate_plugin' ), 0 );
 		add_action( 'admin_init', array( $this, 'ignore_plugin_deactivate_notice' ), 0 );
 	}
@@ -29,7 +29,7 @@ class TG_Demo_Importer_Plugin_Deactivate_Notice {
 	/**
 	 * Show HTML markup if conditions meet.
 	 */
-	public function review_notice_markup() {
+	public function deactivate_notice_markup() {
 		$current_user             = wp_get_current_user();
 		$demo_imported            = get_option( 'themegrill_demo_importer_activated_id' );
 		$ignore_deactivate_notice = get_option( 'tg_demo_importer_plugin_deactivate_notice' );
@@ -69,7 +69,7 @@ class TG_Demo_Importer_Plugin_Deactivate_Notice {
 			</div> <!-- /.links -->
 
 			<a class="notice-dismiss" href="?nag_tg_demo_importer_plugin_deactivate_notice=0"></a>
-		</div> <!-- /.theme-review-notice -->
+		</div> <!-- /.plugin-deactivate-notice -->
 		<?php
 	}
 

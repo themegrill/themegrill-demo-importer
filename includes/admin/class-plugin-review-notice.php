@@ -118,7 +118,7 @@ class TG_Demo_Importer_Review_Notice {
 			</div> <!-- /.links -->
 
 			<a class="notice-dismiss" href="?nag_tg_demo_importer_plugin_review_notice=0"></a>
-		</div> <!-- /.theme-review-notice -->
+		</div> <!-- /.plugin-review-notice -->
 		<?php
 	}
 
