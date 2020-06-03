@@ -48,6 +48,7 @@
 
 .tg-demo-importer-notice .links a > span {
 	vertical-align: middle;
+	text-transform: uppercase;
 }
 
 .tg-demo-importer-notice .notice-dismiss {

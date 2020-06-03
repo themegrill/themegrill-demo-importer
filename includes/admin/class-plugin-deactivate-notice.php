@@ -21,16 +21,26 @@ class TG_Demo_Importer_Plugin_Deactivate_Notice {
 	 * TG_Demo_Importer_Plugin_Deactivate_Notice constructor.
 	 */
 	public function __construct() {
+		add_action( 'admin_init', array( $this, 'deactivate_notice' ) );
 		add_action( 'admin_notices', array( $this, 'deactivate_notice_markup' ), 0 );
 		add_action( 'admin_init', array( $this, 'deactivate_plugin' ), 0 );
 		add_action( 'admin_init', array( $this, 'ignore_plugin_deactivate_notice' ), 0 );
 	}
 
 	/**
+	 * Set the required option value as needed for plugin deactivate notice.
+	 */
+	public function deactivate_notice() {
+		// Set the installed time in `tg_demo_importer_plugin_deactivate_installed_time` option table.
+		if ( ! get_option( 'tg_demo_importer_plugin_deactivate_installed_time' ) ) {
+			update_option( 'tg_demo_importer_plugin_deactivate_installed_time', time() );
+		}
+	}
+
+	/**
 	 * Show HTML markup if conditions meet.
 	 */
 	public function deactivate_notice_markup() {
-		$current_user             = wp_get_current_user();
 		$demo_imported            = get_option( 'themegrill_demo_importer_activated_id' );
 		$ignore_deactivate_notice = get_option( 'tg_demo_importer_plugin_deactivate_notice' );
 
@@ -41,17 +51,32 @@ class TG_Demo_Importer_Plugin_Deactivate_Notice {
 		 * 2. User does not have the access to deactivate the plugin.
 		 * 3. User does have no intention to deactivate the plugin.
 		 */
-		if ( ! $demo_imported || ! current_user_can( 'deactivate_plugin' ) || $ignore_deactivate_notice ) {
-			return;
+		if ( ! $demo_imported ) {
+			if ( current_user_can( 'deactivate_plugin' ) && ( ( get_option( 'tg_demo_importer_plugin_deactivate_installed_time' ) > strtotime( '-15 day' ) ) || $ignore_deactivate_notice ) ) {
+				return;
+			}
+		} else {
+			if ( ! current_user_can( 'deactivate_plugin' ) || ( $ignore_deactivate_notice && current_user_can( 'deactivate_plugin' ) ) ) {
+				return;
+			}
 		}
 		?>
 		<div class="notice notice-success tg-demo-importer-notice plugin-deactivate-notice" style="position:relative;">
 			<p>
 				<?php
-				esc_html_e(
-					'It seems you\'ve imported the theme demo successfully. Now, the purpose of this plugin is fulfilled and it has no more use. So, if you\'re satisfied with this import, you can safely deactivate it by clicking the button.',
+				$message = esc_html__(
+					'The purpose of this plugin is to import the theme demo in your site. If you do not want to import the theme demo then, you can safely deactivate this plugin. And if you want it later, then you can reactivate it to import the required demo.',
 					'themegrill-demo-importer'
 				);
+
+				if ( $demo_imported ) {
+					$message = esc_html__(
+						'It seems you\'ve imported the theme demo successfully. Now, the purpose of this plugin is fulfilled and it has no more use. So, if you\'re satisfied with this import, you can safely deactivate it by clicking the button.',
+						'themegrill-demo-importer'
+					);
+				}
+
+				echo $message;
 				?>
 			</p>
 
