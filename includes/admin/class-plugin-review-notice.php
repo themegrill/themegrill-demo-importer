@@ -124,29 +124,11 @@ class TG_Demo_Importer_Review_Notice {
 	 * Remove the data set after the plugin has been deactivated.
 	 */
 	public function review_notice_data_remove() {
-		$get_all_users         = get_users();
-		$plugin_installed_time = get_option( 'tg_demo_importer_plugin_installed_time' );
 
-		// Delete options data.
-		if ( $plugin_installed_time ) {
-			delete_option( 'tg_demo_importer_plugin_installed_time' );
-		}
+		include_once TGDM_ABSPATH . 'includes/class-demo-importer-deactivator.php';
 
-		// Delete user meta data for theme review notice.
-		foreach ( $get_all_users as $user ) {
-			$ignored_notice           = get_user_meta( $user->ID, 'tg_demo_importer_plugin_review_notice', true );
-			$ignored_notice_partially = get_user_meta( $user->ID, 'nag_tg_demo_importer_plugin_review_notice_partially', true );
+		TG_Demo_Importer_Deactivator::plugin_review_notice();
 
-			// Delete permanent notice remove data.
-			if ( $ignored_notice ) {
-				delete_user_meta( $user->ID, 'tg_demo_importer_plugin_review_notice' );
-			}
-
-			// Delete partial notice remove data.
-			if ( $ignored_notice_partially ) {
-				delete_user_meta( $user->ID, 'nag_tg_demo_importer_plugin_review_notice_partially' );
-			}
-		}
 	}
 
 }
