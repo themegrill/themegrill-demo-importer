@@ -48,13 +48,9 @@ class TG_Demo_Importer_Plugin_Deactivate_Notice {
 		<div class="notice notice-success tg-demo-importer-notice plugin-deactivate-notice" style="position:relative;">
 			<p>
 				<?php
-				printf(
-					/* Translators: %1$s current user display name. */
-					esc_html__(
-						'Howdy, %1$s! It seems that you have imported the theme demo in your site already, which this plugin is for. So, if you think that your requirement is fulfilled then, you can safely deactivate it from your site.',
-						'themegrill-demo-importer'
-					),
-					'<strong>' . esc_html( $current_user->display_name ) . '</strong>'
+				esc_html_e(
+					'It seems you\'ve imported the theme demo successfully. Now, the purpose of this plugin is fulfilled and it has no more use. So, if you\'re satisfied with this import, you can safely deactivate it by clicking the button.',
+					'themegrill-demo-importer'
 				);
 				?>
 			</p>
