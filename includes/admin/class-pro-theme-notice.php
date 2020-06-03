@@ -38,7 +38,6 @@ class TG_Pro_Theme_Notice {
 
 		add_action( 'after_setup_theme', array( $this, 'pro_theme_notice' ) );
 		add_action( 'switch_theme', array( $this, 'delete_pro_notice_datas' ) );
-		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 
 	}
 
@@ -96,17 +95,6 @@ class TG_Pro_Theme_Notice {
 		add_action( 'admin_init', array( $this, 'pro_theme_notice_partial_ignore' ), 0 );
 		add_action( 'admin_init', array( $this, 'pro_theme_notice_ignore' ), 0 );
 
-	}
-
-	/**
-	 * Enqueue the required scripts.
-	 */
-	public function enqueue_scripts() {
-
-		$assets_path = tgdm()->plugin_url() . '/includes/admin/assets/';
-
-		wp_register_style( 'tg-demo-importer-notice', $assets_path . 'css/notice.css', array(), TGDM_VERSION );
-		wp_enqueue_style( 'tg-demo-importer-notice' );
 	}
 
 	/**
