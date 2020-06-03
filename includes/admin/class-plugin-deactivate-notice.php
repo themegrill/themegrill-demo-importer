@@ -35,23 +35,13 @@ class TG_Demo_Importer_Plugin_Deactivate_Notice {
 		$ignore_deactivate_notice = get_option( 'tg_demo_importer_plugin_deactivate_notice' );
 
 		/**
-		 * Return from notice display if demo is not installed.
+		 * Return from notice display if:
+		 *
+		 * 1. Demo is not installed.
+		 * 2. User does not have the access to deactivate the plugin.
+		 * 3. User does have no intention to deactivate the plugin.
 		 */
-		if ( ! $demo_imported ) {
-			return;
-		}
-
-		/**
-		 * Return from notice display if user does not have the access to deactivate the plugin.
-		 */
-		if ( ! current_user_can( 'deactivate_plugin' ) ) {
-			return;
-		}
-
-		/**
-		 * Return from notice display if user does have no intention to deactivate the plugin.
-		 */
-		if ( $ignore_deactivate_notice ) {
+		if ( ! $demo_imported || ! current_user_can( 'deactivate_plugin' ) || $ignore_deactivate_notice ) {
 			return;
 		}
 		?>
