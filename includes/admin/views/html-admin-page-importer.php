@@ -13,7 +13,7 @@ defined( 'ABSPATH' ) || exit;
 
 	<a href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'refresh-demo-packages', 'true' ), 'refresh_demo_packages', '_refresh_demo_packages_nonce' ) ); ?>"
 	   class="page-title-action"
-	   title="<?php esc_html_e( 'If you do not see the new demos on the demo lists to import, please use this button to refresh the available demo lists.', 'themegrill-demo-importer' ); ?>"
+	   title="<?php esc_html_e( 'If you do not see the new demos on the list, please click this button to fetch all the available demos.', 'themegrill-demo-importer' ); ?>"
 	>
 		<?php esc_html_e( 'Refresh Demos', 'themegrill-demo-importer' ); ?>
 	</a>
