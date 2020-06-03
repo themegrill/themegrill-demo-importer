@@ -11,6 +11,13 @@ defined( 'ABSPATH' ) || exit;
 <div class="wrap demo-importer">
 	<h1 class="wp-heading-inline"><?php esc_html_e( 'Demo Importer', 'themegrill-demo-importer' ); ?></h1>
 
+	<a href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'refresh-demo-packages', 'true' ), 'refresh_demo_packages', '_refresh_demo_packages_nonce' ) ); ?>"
+	   class="page-title-action"
+	   title="<?php esc_html_e( 'If you do not see the new demos on the list, please click this button to fetch all the available demos.', 'themegrill-demo-importer' ); ?>"
+	>
+		<?php esc_html_e( 'Refresh Demos', 'themegrill-demo-importer' ); ?>
+	</a>
+
 	<?php if ( apply_filters( 'themegrill_demo_importer_upcoming_demos', false ) ) : ?>
 		<a href="<?php echo esc_url( 'https://themegrill.com/upcoming-demos' ); ?>" class="page-title-action" target="_blank"><?php esc_html_e( 'Upcoming Demos', 'themegrill-demo-importer' ); ?></a>
 	<?php endif; ?>
