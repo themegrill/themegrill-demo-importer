@@ -1430,6 +1430,9 @@ class TG_Demo_Importer {
 			if ( $demo_packages ) {
 				delete_transient( 'themegrill_demo_importer_packages' );
 			}
+
+			// Redirect to demo import page once the transient is clear, since on first click, none of the demo is shown up in lists.
+			wp_safe_redirect( admin_url( 'themes.php?page=demo-importer&browse=all' ) );
 		}
 	}
 }
