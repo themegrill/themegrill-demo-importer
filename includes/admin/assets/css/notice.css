@@ -32,3 +32,24 @@
 .pro-theme-notice .notice-dismiss {
 	text-decoration: none;
 }
+
+.tg-demo-importer-notice {
+	position: relative;
+	padding: 6px 40px 6px 12px;
+}
+
+.tg-demo-importer-notice .links {
+	margin: 0.5em 0;
+}
+
+.tg-demo-importer-notice .links a {
+	margin: 2px;
+}
+
+.tg-demo-importer-notice .links a > span {
+	vertical-align: middle;
+}
+
+.tg-demo-importer-notice .notice-dismiss {
+	text-decoration: none;
+}
