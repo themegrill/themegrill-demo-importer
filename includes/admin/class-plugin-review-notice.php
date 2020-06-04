@@ -31,9 +31,9 @@ class TG_Demo_Importer_Review_Notice {
 	 * Set the required option value as needed for plugin review notice.
 	 */
 	public function review_notice() {
-		// Set the installed time in `tg_demo_importer_plugin_installed_time` option table.
-		if ( ! get_option( 'tg_demo_importer_plugin_installed_time' ) ) {
-			update_option( 'tg_demo_importer_plugin_installed_time', time() );
+		// Set the installed time in `tg_demo_importer_plugin_review_installed_time` option table.
+		if ( ! get_option( 'tg_demo_importer_plugin_review_installed_time' ) ) {
+			update_option( 'tg_demo_importer_plugin_review_installed_time', time() );
 		}
 	}
 
@@ -57,7 +57,7 @@ class TG_Demo_Importer_Review_Notice {
 		 * 3. Dismiss always if clicked on 'I Already Did' button.
 		 */
 		if ( ! $demo_imported ) {
-			if ( ( get_option( 'tg_demo_importer_plugin_installed_time' ) > strtotime( '-15 day' ) ) || ( $ignored_notice_partially > strtotime( '-15 day' ) ) || ( $ignored_notice ) ) {
+			if ( ( get_option( 'tg_demo_importer_plugin_review_installed_time' ) > strtotime( '-15 day' ) ) || ( $ignored_notice_partially > strtotime( '-15 day' ) ) || ( $ignored_notice ) ) {
 				return;
 			}
 		} else {
@@ -66,7 +66,7 @@ class TG_Demo_Importer_Review_Notice {
 			}
 		}
 		?>
-		<div class="notice notice-success tg-demo-importer-notice theme-review-notice" style="position:relative;">
+		<div class="notice notice-success tg-demo-importer-notice plugin-review-notice" style="position:relative;">
 			<p>
 				<?php
 				$message = sprintf(
@@ -118,7 +118,7 @@ class TG_Demo_Importer_Review_Notice {
 			</div> <!-- /.links -->
 
 			<a class="notice-dismiss" href="?nag_tg_demo_importer_plugin_review_notice=0"></a>
-		</div> <!-- /.theme-review-notice -->
+		</div> <!-- /.plugin-review-notice -->
 		<?php
 	}
 
@@ -140,17 +140,6 @@ class TG_Demo_Importer_Review_Notice {
 		if ( isset( $_GET['nag_tg_demo_importer_plugin_review_notice_partially'] ) && '0' == $_GET['nag_tg_demo_importer_plugin_review_notice_partially'] ) {
 			update_user_meta( get_current_user_id(), 'nag_tg_demo_importer_plugin_review_notice_partially', time() );
 		}
-	}
-
-	/**
-	 * Remove the data set after the plugin has been deactivated.
-	 */
-	public function review_notice_data_remove() {
-
-		include_once TGDM_ABSPATH . 'includes/class-demo-importer-deactivator.php';
-
-		TG_Demo_Importer_Deactivator::plugin_review_notice();
-
 	}
 
 }

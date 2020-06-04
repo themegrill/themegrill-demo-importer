@@ -158,6 +158,10 @@ class TG_Demo_Importer {
 		wp_register_style( 'jquery-confirm', $assets_path . 'css/jquery-confirm/jquery-confirm.css', array(), TGDM_VERSION );
 		wp_register_style( 'tg-demo-importer', $assets_path . 'css/demo-importer.css', array( 'jquery-confirm' ), TGDM_VERSION );
 
+		// Register and enqueue admin notice files.
+		wp_register_style( 'tg-demo-importer-notice', tgdm()->plugin_url() . '/includes/admin/assets/css/notice.css', array(), TGDM_VERSION );
+		wp_enqueue_style( 'tg-demo-importer-notice' );
+
 		// Add RTL support for admin styles.
 		wp_style_add_data( 'tg-demo-importer', 'rtl', 'replace' );
 
