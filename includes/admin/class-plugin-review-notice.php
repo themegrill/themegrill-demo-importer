@@ -21,20 +21,9 @@ class TG_Demo_Importer_Review_Notice {
 	 * TG_Demo_Importer_Review_Notice constructor.
 	 */
 	public function __construct() {
-		add_action( 'admin_init', array( $this, 'review_notice' ) );
 		add_action( 'admin_notices', array( $this, 'review_notice_markup' ), 0 );
 		add_action( 'admin_init', array( $this, 'ignore_plugin_review_notice' ), 0 );
 		add_action( 'admin_init', array( $this, 'ignore_plugin_review_notice_partially' ), 0 );
-	}
-
-	/**
-	 * Set the required option value as needed for plugin review notice.
-	 */
-	public function review_notice() {
-		// Set the installed time in `tg_demo_importer_plugin_review_installed_time` option table.
-		if ( ! get_option( 'tg_demo_importer_plugin_review_installed_time' ) ) {
-			update_option( 'tg_demo_importer_plugin_review_installed_time', time() );
-		}
 	}
 
 	/**
@@ -52,44 +41,25 @@ class TG_Demo_Importer_Review_Notice {
 		/**
 		 * Return from notice display if:
 		 *
-		 * 1. The plugin installed is less than 15 days ago.
+		 * 1. The demo is not imported.
 		 * 2. If the user has ignored the message partially for 15 days.
-		 * 3. Dismiss always if clicked on 'I Already Did' button.
+		 * 3. Dismiss always if clicked on 'I Already Did' and `Dismiss` button.
 		 */
-		if ( ! $demo_imported ) {
-			if ( ( get_option( 'tg_demo_importer_plugin_review_installed_time' ) > strtotime( '-15 day' ) ) || ( $ignored_notice_partially > strtotime( '-15 day' ) ) || ( $ignored_notice ) ) {
-				return;
-			}
-		} else {
-			if ( ( $ignored_notice_partially > strtotime( '-15 day' ) ) || ( $ignored_notice ) ) {
-				return;
-			}
+		if ( ! $demo_imported || ( $ignored_notice_partially > strtotime( '-15 day' ) ) || $ignored_notice ) {
+			return;
 		}
 		?>
 		<div class="notice notice-success tg-demo-importer-notice plugin-review-notice" style="position:relative;">
 			<p>
 				<?php
-				$message = sprintf(
+				printf(
 					/* Translators: %1$s current user display name. */
 					esc_html__(
-						'Howdy, %1$s! It seems that you have been using this plugin for more than 15 days. We hope you are happy with everything that the plugin has to offer. If you can spare a minute, please help us by leaving a 5-star review on WordPress.org.  By spreading the love, we can continue to develop new amazing features in the future, for free!',
+						'Howdy, %1$s! It seems that you have imported the theme demo in your site. We hope that you are happy with it and if you can spare a minute, please help us by leaving a 5-star review on WordPress.org.',
 						'themegrill-demo-importer'
 					),
 					'<strong>' . esc_html( $current_user->display_name ) . '</strong>'
 				);
-
-				if ( $demo_imported ) {
-					$message = sprintf(
-						/* Translators: %1$s current user display name. */
-						esc_html__(
-							'Howdy, %1$s! It seems that you have imported the theme demo in your site. We hope that you are happy with it and if you can spare a minute, please help us by leaving a 5-star review on WordPress.org.',
-							'themegrill-demo-importer'
-						),
-						'<strong>' . esc_html( $current_user->display_name ) . '</strong>'
-					);
-				}
-
-				echo $message;
 				?>
 			</p>
 
