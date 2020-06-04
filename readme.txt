@@ -73,12 +73,13 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 
 == Changelog ==
 = TBD =
-* Fix   - `WooCommerce Setup Wizard` disabled when the plugin is active.
-* Fix   - `Live Preview` button link on successful demo import message in WordPress multisite install.
-* Tweak - Add admin notice for `Plugin Review`.
-* Tweak - Add admin notice for `Plugin Deactivate` if demo is already imported in their site.
-* Tweak - Add refresh demo lists feature.
-* Tweak - Add feature to restrict demo import process for specific demos to fix unwanted issues for unsupported demos.
+* Fix       - `WooCommerce Setup Wizard` disabled when the plugin is active.
+* Fix       - `Live Preview` button link on successful demo import message in WordPress multisite install.
+* Tweak     - Add admin notice for `Plugin Review`.
+* Tweak     - Add admin notice for `Plugin Deactivate` if demo is already imported in their site.
+* Tweak     - Add refresh demo lists feature.
+* Tweak     - Add feature to restrict demo import process for specific demos to fix unwanted issues for unsupported demos.
+* Deprecate - `Upgrade to Pro` admin notice.
 
 = 1.6.3 - 18-02-2020 =
 * Enhancement - Secure reset button with nonce check.

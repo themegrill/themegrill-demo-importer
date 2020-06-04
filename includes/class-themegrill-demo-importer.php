@@ -139,7 +139,6 @@ final class ThemeGrill_Demo_Importer {
 	private function includes() {
 		include_once TGDM_ABSPATH . 'includes/class-demo-importer.php';
 		include_once TGDM_ABSPATH . 'includes/functions-demo-importer.php';
-		include_once TGDM_ABSPATH . 'includes/admin/class-pro-theme-notice.php';
 		include_once TGDM_ABSPATH . 'includes/admin/class-plugin-review-notice.php';
 		include_once TGDM_ABSPATH . 'includes/admin/class-plugin-deactivate-notice.php';
 
@@ -184,12 +183,10 @@ final class ThemeGrill_Demo_Importer {
 	/**
 	 * Deactivation hook.
 	 */
-	function deactivate() {
-
+	public function deactivate() {
 		include_once dirname( __FILE__ ) . '/class-demo-importer-deactivator.php';
 
 		TG_Demo_Importer_Deactivator::deactivate();
-
 	}
 
 	/**
