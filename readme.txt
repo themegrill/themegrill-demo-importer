@@ -2,8 +2,8 @@
 Contributors: ThemeGrill, shivapoudel
 Tags: themegrill, theme demos, demo, importer, one click import
 Requires at least: 4.7
-Tested up to: 5.3
-Stable tag: 1.6.3
+Tested up to: 5.4
+Stable tag: 1.6.4
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -72,7 +72,7 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 3. Finally, Import the Demo with just one click.
 
 == Changelog ==
-= TBD =
+= 1.6.4 - 04-06-2020 =
 * Fix       - `WooCommerce Setup Wizard` disabled when the plugin is active.
 * Fix       - `Live Preview` button link on successful demo import message in WordPress multisite install.
 * Tweak     - Add admin notice for `Plugin Review`.
