@@ -72,6 +72,9 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 3. Finally, Import the Demo with just one click.
 
 == Changelog ==
+= TBD =
+* Fix - Demo not importing completely in certain conditions.
+
 = 1.6.4 - 04-06-2020 =
 * Fix       - `WooCommerce Setup Wizard` disabled when the plugin is active.
 * Fix       - `Live Preview` button link on successful demo import message in WordPress multisite install.
