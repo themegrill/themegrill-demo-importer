@@ -20,8 +20,8 @@ if ( ! class_exists( 'WP_Importer' ) ) {
 /** Display verbose errors */
 define( 'IMPORT_DEBUG', false );
 
-// Include WXR file parsers.
-require dirname( __FILE__ ) . '/class-wxr-parsers.php';
+/** WXR_Parser_SimpleXML class */
+require dirname( __FILE__ ) . '/class-wxr-parser.php';
 
 /** WXR_Parser_SimpleXML class */
 require dirname( __FILE__ ) . '/class-wxr-parser-simplexml.php';
@@ -1240,7 +1240,7 @@ class TG_WXR_Importer extends WP_Importer {
 	 * @return array Information gathered from the WXR file
 	 */
 	function parse( $file ) {
-		$parser = new WXR_Parser();
+		$parser = new TG_WXR_Parser();
 		return $parser->parse( $file );
 	}
 
