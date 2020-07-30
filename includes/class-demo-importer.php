@@ -42,7 +42,6 @@ class TG_Demo_Importer {
 		// Reset Wizard.
 		add_action( 'wp_loaded', array( $this, 'hide_reset_notice' ) );
 		add_action( 'admin_init', array( $this, 'reset_wizard_actions' ) );
-		add_action( 'admin_notices', array( $this, 'reset_wizard_notice' ) );
 
 		// Footer rating text.
 		add_filter( 'admin_footer_text', array( $this, 'admin_footer_text' ), 1 );
@@ -340,26 +339,6 @@ class TG_Demo_Importer {
 			'<p><a href="' . 'https://themegrill.com/wordpress-themes/' . '" target="_blank">' . __( 'Official themes', 'themegrill-demo-importer' ) . '</a></p>' .
 			'<p><a href="' . 'https://themegrill.com/plugins/' . '" target="_blank">' . __( 'Official plugins', 'themegrill-demo-importer' ) . '</a></p>'
 		);
-	}
-
-	/**
-	 * Reset wizard notice.
-	 */
-	public function reset_wizard_notice() {
-		$screen              = get_current_screen();
-		$demo_activated_id   = get_option( 'themegrill_demo_importer_activated_id' );
-		$demo_notice_dismiss = get_option( 'themegrill_demo_importer_reset_notice' );
-
-		if ( ! $screen || ! in_array( $screen->id, array( 'appearance_page_demo-importer' ) ) ) {
-			return;
-		}
-
-		// Output reset wizard notice.
-		if ( ! $demo_notice_dismiss && $demo_activated_id ) {
-			include_once dirname( __FILE__ ) . '/admin/views/html-notice-reset-wizard.php';
-		} elseif ( isset( $_GET['reset'] ) && 'true' === $_GET['reset'] ) {
-			include_once dirname( __FILE__ ) . '/admin/views/html-notice-reset-wizard-success.php';
-		}
 	}
 
 	/**
