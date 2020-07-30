@@ -39,11 +39,6 @@ class TG_Demo_Importer {
 			add_action( 'current_screen', array( $this, 'add_help_tabs' ), 50 );
 		}
 
-		// Reset Wizard.
-		add_action( 'wp_loaded', array( $this, 'hide_reset_notice' ) );
-		add_action( 'admin_init', array( $this, 'reset_wizard_actions' ) );
-		add_action( 'admin_notices', array( $this, 'reset_wizard_notice' ) );
-
 		// Footer rating text.
 		add_filter( 'admin_footer_text', array( $this, 'admin_footer_text' ), 1 );
 
@@ -205,7 +200,6 @@ class TG_Demo_Importer {
 						'ajaxUrl'       => admin_url( 'admin-ajax.php' ),
 						'adminUrl'      => parse_url( self_admin_url(), PHP_URL_PATH ),
 						'suggestURI'    => apply_filters( 'themegrill_demo_importer_suggest_new', 'https://themegrill.com/contact/' ),
-						'confirmReset'  => __( 'It is strongly recommended that you backup your database before proceeding. Are you sure you wish to run the reset wizard now?', 'themegrill-demo-importer' ),
 						'confirmImport' => sprintf(
 
 							__( 'Importing demo data will ensure that your site will look similar as theme demo. It makes you easy to modify the content instead of creating them from scratch. Also, consider before importing the demo: %1$s %2$s %3$s %4$s %5$s %6$s', 'themegrill-demo-importer' ),
@@ -279,12 +273,7 @@ class TG_Demo_Importer {
 	 * Add Contextual help tabs.
 	 */
 	public function add_help_tabs() {
-		$screen    = get_current_screen();
-		$reset_url = wp_nonce_url(
-			add_query_arg( 'do_reset_wordpress', 'true', admin_url( 'themes.php?page=demo-importer' ) ),
-			'themegrill_demo_importer_reset',
-			'themegrill_demo_importer_reset_nonce'
-		);
+		$screen = get_current_screen();
 
 		if ( ! $screen || ! in_array( $screen->id, array( 'appearance_page_demo-importer' ) ) ) {
 			return;
@@ -321,17 +310,6 @@ class TG_Demo_Importer {
 			)
 		);
 
-		$screen->add_help_tab(
-			array(
-				'id'      => 'themegrill_demo_importer_reset_tab',
-				'title'   => __( 'Reset wizard', 'themegrill-demo-importer' ),
-				'content' =>
-					'<h2>' . __( 'Reset wizard', 'themegrill-demo-importer' ) . '</h2>' .
-					'<p>' . __( 'If you need to reset the WordPress back to default again, please click on the button below.', 'themegrill-demo-importer' ) . '</p>' .
-					'<p><a href="' . esc_url( $reset_url ) . '" class="button button-primary themegrill-reset-wordpress">' . __( 'Reset wizard', 'themegrill-demo-importer' ) . '</a></p>',
-			)
-		);
-
 		$screen->set_help_sidebar(
 			'<p><strong>' . __( 'For more information:', 'themegrill-demo-importer' ) . '</strong></p>' .
 			'<p><a href="' . 'https://themegrill.com/demo-importer/' . '" target="_blank">' . __( 'About Demo Importer', 'themegrill-demo-importer' ) . '</a></p>' .
@@ -340,134 +318,6 @@ class TG_Demo_Importer {
 			'<p><a href="' . 'https://themegrill.com/wordpress-themes/' . '" target="_blank">' . __( 'Official themes', 'themegrill-demo-importer' ) . '</a></p>' .
 			'<p><a href="' . 'https://themegrill.com/plugins/' . '" target="_blank">' . __( 'Official plugins', 'themegrill-demo-importer' ) . '</a></p>'
 		);
-	}
-
-	/**
-	 * Reset wizard notice.
-	 */
-	public function reset_wizard_notice() {
-		$screen              = get_current_screen();
-		$demo_activated_id   = get_option( 'themegrill_demo_importer_activated_id' );
-		$demo_notice_dismiss = get_option( 'themegrill_demo_importer_reset_notice' );
-
-		if ( ! $screen || ! in_array( $screen->id, array( 'appearance_page_demo-importer' ) ) ) {
-			return;
-		}
-
-		// Output reset wizard notice.
-		if ( ! $demo_notice_dismiss && $demo_activated_id ) {
-			include_once dirname( __FILE__ ) . '/admin/views/html-notice-reset-wizard.php';
-		} elseif ( isset( $_GET['reset'] ) && 'true' === $_GET['reset'] ) {
-			include_once dirname( __FILE__ ) . '/admin/views/html-notice-reset-wizard-success.php';
-		}
-	}
-
-	/**
-	 * Hide a notice if the GET variable is set.
-	 */
-	public function hide_reset_notice() {
-		if ( isset( $_GET['themegrill-demo-importer-hide-notice'] ) && isset( $_GET['_themegrill_demo_importer_notice_nonce'] ) ) {
-			if ( ! wp_verify_nonce( $_GET['_themegrill_demo_importer_notice_nonce'], 'themegrill_demo_importer_hide_notice_nonce' ) ) {
-				wp_die( __( 'Action failed. Please refresh the page and retry.', 'themegrill-demo-importer' ) );
-			}
-
-			if ( ! current_user_can( 'manage_options' ) ) {
-				wp_die( __( 'Cheatin&#8217; huh?', 'themegrill-demo-importer' ) );
-			}
-
-			$hide_notice = sanitize_text_field( $_GET['themegrill-demo-importer-hide-notice'] );
-
-			if ( ! empty( $hide_notice ) && 'reset_notice' == $hide_notice ) {
-				update_option( 'themegrill_demo_importer_reset_notice', 1 );
-			}
-		}
-	}
-
-	/**
-	 * Reset actions when a reset button is clicked.
-	 */
-	public function reset_wizard_actions() {
-		global $wpdb, $current_user;
-
-
-		if ( isset( $_GET['themegrill_demo_importer_reset_nonce'], $_GET['do_reset_wordpress'] ) ) {
-			if ( ! wp_verify_nonce( wp_unslash( $_GET['themegrill_demo_importer_reset_nonce'] ), 'themegrill_demo_importer_reset' ) ) { // WPCS: input var ok, sanitization ok.
-				wp_die( esc_html__( 'Action failed. Please refresh the page and retry.', 'themegrill-demo-importer' ) );
-			}
-
-			if ( ! current_user_can( 'manage_options' ) ) {
-				wp_die( esc_html__( 'You don&#8217;t have permission to do this.', 'themegrill-demo-importer' ) );
-			}
-
-			require_once ABSPATH . '/wp-admin/includes/upgrade.php';
-
-			$template     = get_option( 'template' );
-			$blogname     = get_option( 'blogname' );
-			$admin_email  = get_option( 'admin_email' );
-			$blog_public  = get_option( 'blog_public' );
-			$footer_rated = get_option( 'themegrill_demo_importer_admin_footer_text_rated' );
-
-			if ( 'admin' !== $current_user->user_login ) {
-				$user = get_user_by( 'login', 'admin' );
-			}
-
-			if ( empty( $user->user_level ) || $user->user_level < 10 ) {
-				$user = $current_user;
-			}
-
-			// Drop tables.
-			$drop_tables = $wpdb->get_col( sprintf( "SHOW TABLES LIKE '%s%%'", str_replace( '_', '\_', $wpdb->prefix ) ) );
-			foreach ( $drop_tables as $table ) {
-				$wpdb->query( "DROP TABLE IF EXISTS $table" );
-			}
-
-			// Installs the site.
-			$result = wp_install( $blogname, $user->user_login, $user->user_email, $blog_public );
-
-			// Updates the user password with a old one.
-			$wpdb->update(
-				$wpdb->users,
-				array(
-					'user_pass'           => $user->user_pass,
-					'user_activation_key' => '',
-				),
-				array( 'ID' => $result['user_id'] )
-			);
-
-			// Set up the Password change nag.
-			$default_password_nag = get_user_option( 'default_password_nag', $result['user_id'] );
-			if ( $default_password_nag ) {
-				update_user_option( $result['user_id'], 'default_password_nag', false, true );
-			}
-
-			// Update footer text.
-			if ( $footer_rated ) {
-				update_option( 'themegrill_demo_importer_admin_footer_text_rated', $footer_rated );
-			}
-
-			// Switch current theme.
-			$current_theme = wp_get_theme( $template );
-			if ( $current_theme->exists() ) {
-				switch_theme( $template );
-			}
-
-			// Activate required plugins.
-			$required_plugins = (array) apply_filters( 'themegrill_demo_importer_' . $template . '_required_plugins', array() );
-			if ( is_array( $required_plugins ) ) {
-				if ( ! in_array( TGDM_PLUGIN_BASENAME, $required_plugins ) ) {
-					$required_plugins = array_merge( $required_plugins, array( TGDM_PLUGIN_BASENAME ) );
-				}
-				activate_plugins( $required_plugins, '', is_network_admin(), true );
-			}
-
-			// Update the cookies.
-			wp_clear_auth_cookie();
-			wp_set_auth_cookie( $result['user_id'] );
-
-			// Redirect to demo importer page to display reset success notice.
-			wp_safe_redirect( admin_url( 'themes.php?page=demo-importer&browse=all&reset=true' ) );
-			exit();
-		}
 	}
 
 	/**

@@ -17,8 +17,7 @@ defined( 'ABSPATH' ) || exit;
  */
 function tg_update_demo_importer_options() {
 	$migrate_options = array(
-		'themegrill_demo_imported_id'             => 'themegrill_demo_importer_activated_id',
-		'themegrill_demo_imported_notice_dismiss' => 'themegrill_demo_importer_reset_notice',
+		'themegrill_demo_imported_id' => 'themegrill_demo_importer_activated_id',
 	);
 
 	foreach ( $migrate_options as $old_option => $new_option ) {
