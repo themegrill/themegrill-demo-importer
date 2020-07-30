@@ -40,7 +40,6 @@ class TG_Demo_Importer {
 		}
 
 		// Reset Wizard.
-		add_action( 'wp_loaded', array( $this, 'hide_reset_notice' ) );
 		add_action( 'admin_init', array( $this, 'reset_wizard_actions' ) );
 
 		// Footer rating text.
@@ -323,27 +322,6 @@ class TG_Demo_Importer {
 			'<p><a href="' . 'https://themegrill.com/wordpress-themes/' . '" target="_blank">' . __( 'Official themes', 'themegrill-demo-importer' ) . '</a></p>' .
 			'<p><a href="' . 'https://themegrill.com/plugins/' . '" target="_blank">' . __( 'Official plugins', 'themegrill-demo-importer' ) . '</a></p>'
 		);
-	}
-
-	/**
-	 * Hide a notice if the GET variable is set.
-	 */
-	public function hide_reset_notice() {
-		if ( isset( $_GET['themegrill-demo-importer-hide-notice'] ) && isset( $_GET['_themegrill_demo_importer_notice_nonce'] ) ) {
-			if ( ! wp_verify_nonce( $_GET['_themegrill_demo_importer_notice_nonce'], 'themegrill_demo_importer_hide_notice_nonce' ) ) {
-				wp_die( __( 'Action failed. Please refresh the page and retry.', 'themegrill-demo-importer' ) );
-			}
-
-			if ( ! current_user_can( 'manage_options' ) ) {
-				wp_die( __( 'Cheatin&#8217; huh?', 'themegrill-demo-importer' ) );
-			}
-
-			$hide_notice = sanitize_text_field( $_GET['themegrill-demo-importer-hide-notice'] );
-
-			if ( ! empty( $hide_notice ) && 'reset_notice' == $hide_notice ) {
-				update_option( 'themegrill_demo_importer_reset_notice', 1 );
-			}
-		}
 	}
 
 	/**
