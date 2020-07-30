@@ -278,12 +278,7 @@ class TG_Demo_Importer {
 	 * Add Contextual help tabs.
 	 */
 	public function add_help_tabs() {
-		$screen    = get_current_screen();
-		$reset_url = wp_nonce_url(
-			add_query_arg( 'do_reset_wordpress', 'true', admin_url( 'themes.php?page=demo-importer' ) ),
-			'themegrill_demo_importer_reset',
-			'themegrill_demo_importer_reset_nonce'
-		);
+		$screen = get_current_screen();
 
 		if ( ! $screen || ! in_array( $screen->id, array( 'appearance_page_demo-importer' ) ) ) {
 			return;
@@ -317,17 +312,6 @@ class TG_Demo_Importer {
 					'<p>' . sprintf( __( 'If you find a bug within ThemeGrill Demo Importer you can create a ticket via <a href="%1$s">Github issues</a>. Ensure you read the <a href="%2$s">contribution guide</a> prior to submitting your report. To help us solve your issue, please be as descriptive as possible.', 'themegrill-demo-importer' ), 'https://github.com/themegrill/themegrill-demo-importer/issues?state=open', 'https://github.com/themegrill/themegrill-demo-importer/blob/master/.github/CONTRIBUTING.md' ) . '</p>' .
 					'<p><a href="' . 'https://github.com/themegrill/themegrill-demo-importer/issues?state=open' . '" class="button button-primary">' . __( 'Report a bug', 'themegrill-demo-importer' ) . '</a></p>',
 
-			)
-		);
-
-		$screen->add_help_tab(
-			array(
-				'id'      => 'themegrill_demo_importer_reset_tab',
-				'title'   => __( 'Reset wizard', 'themegrill-demo-importer' ),
-				'content' =>
-					'<h2>' . __( 'Reset wizard', 'themegrill-demo-importer' ) . '</h2>' .
-					'<p>' . __( 'If you need to reset the WordPress back to default again, please click on the button below.', 'themegrill-demo-importer' ) . '</p>' .
-					'<p><a href="' . esc_url( $reset_url ) . '" class="button button-primary themegrill-reset-wordpress">' . __( 'Reset wizard', 'themegrill-demo-importer' ) . '</a></p>',
 			)
 		);
 
