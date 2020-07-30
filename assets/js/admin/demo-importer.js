@@ -1468,11 +1468,6 @@ $( document ).ready( function() {
 		$( '.tips' ).tipTip({ 'attribute': 'data-tip', 'defaultPosition': 'top', 'fadeIn': 50, 'fadeOut': 50, 'delay': 50 });
 	} ).trigger( 'init_tooltips' );
 
-	// Confirm WordPress reset wizard.
-	$( '.themegrill-reset-wordpress' ).on( 'click', function() {
-		return window.confirm( _demoImporterSettings.settings.confirmReset );
-	});
-
 	// Change the footer text when rating link is clicked.
 	$( '.themegrill-demo-importer-rating-link' ).on( 'click', function() {
 		var $this_el = $( this );
