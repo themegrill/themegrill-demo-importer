@@ -26,3 +26,6 @@ Thumbs.db
 
 # Composer
 /vendor/
+
+# Dist
+themegrill-demo-importer.zip
