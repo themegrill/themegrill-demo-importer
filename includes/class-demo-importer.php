@@ -76,6 +76,7 @@ class TG_Demo_Importer {
 	public function includes() {
 		include_once dirname( __FILE__ ) . '/importers/class-widget-importer.php';
 		include_once dirname( __FILE__ ) . '/importers/class-customizer-importer.php';
+		include_once dirname( __FILE__ ) . '/admin/class-demo-importer-status.php';
 	}
 
 	/**

@@ -31,9 +31,11 @@ $tabs        = apply_filters( 'themegrill_demo_importer_status_tabs', $tabs );
 	<?php
 	switch ( $current_tab ) {
 		case 'status':
+			TG_Demo_Importer_Status::system_status();
 			break;
 
 		case 'faq':
+			TG_Demo_Importer_Status::demo_import_faqs();
 			break;
 
 		default:
