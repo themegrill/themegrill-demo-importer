@@ -30,11 +30,6 @@ defined( 'ABSPATH' ) || exit;
 			<td></td>
 		</tr>
 		<tr>
-			<td><?php esc_html_e( 'MySQL Version', 'themegrill-demo-importer' ); ?></td>
-			<td><?php echo esc_html( get_mysql_version() ); ?></td>
-			<td></td>
-		</tr>
-		<tr>
 			<td><?php esc_html_e( 'PHP Version', 'themegrill-demo-importer' ); ?></td>
 			<td><?php echo esc_html( PHP_VERSION ); ?></td>
 			<td></td>
