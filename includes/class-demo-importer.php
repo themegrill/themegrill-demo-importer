@@ -117,7 +117,7 @@ class TG_Demo_Importer {
 	 */
 	public function admin_menu() {
 		add_theme_page( __( 'Demo Importer', 'themegrill-demo-importer' ), __( 'Demo Importer', 'themegrill-demo-importer' ), 'switch_themes', 'demo-importer', array( $this, 'demo_importer' ) );
-		add_theme_page( __( 'Demo Importer Status', 'themegrill-demo-importer' ), __( 'Status', 'themegrill-demo-importer' ), 'switch_themes', 'status-menu', array( $this, 'status_menu' ) );
+		add_theme_page( __( 'Demo Importer Status', 'themegrill-demo-importer' ), __( 'Status', 'themegrill-demo-importer' ), 'switch_themes', 'demo-importer-status', array( $this, 'status_menu' ) );
 	}
 
 	/**
