@@ -142,6 +142,11 @@ $gd_data   = function_exists( 'gd_info' ) ? gd_info() : false;
 		</tr>
 		<tr>
 			<td><?php esc_html_e( 'Memory Limit:', 'themegrill-demo-importer' ); ?></td>
+			<td><?php echo esc_html( WP_MEMORY_LIMIT ); ?></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td><?php esc_html_e( 'Max Memory Limit:', 'themegrill-demo-importer' ); ?></td>
 			<td><?php echo esc_html( WP_MAX_MEMORY_LIMIT ); ?></td>
 			<td></td>
 		</tr>
