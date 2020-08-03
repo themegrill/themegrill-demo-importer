@@ -64,4 +64,21 @@ class TG_Demo_Importer_Status {
 
 		return esc_html( $output );
 	}
+
+	/**
+	 * Get lists of active plugins.
+	 *
+	 * @return array
+	 */
+	public static function get_active_plugins() {
+		// Ensure get_plugins function is loaded.
+		if ( ! function_exists( 'get_plugins' ) ) {
+			include ABSPATH . '/wp-admin/includes/plugin.php';
+		}
+
+		$active_plugins = get_option( 'active_plugins' );
+		$active_plugins = array_intersect_key( get_plugins(), array_flip( $active_plugins ) );
+
+		return $active_plugins;
+	}
 }
