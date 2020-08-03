@@ -71,6 +71,11 @@ global $wpdb;
 			<td><?php echo esc_html( extension_loaded( 'gd' ) ? __( 'Yes', 'themegrill-demo-importer' ) : __( 'No', 'themegrill-demo-importer' ) ); ?></td>
 			<td></td>
 		</tr>
+		<tr>
+			<td><?php esc_html_e( 'Write Permission:', 'themegrill-demo-importer' ); ?></td>
+			<td><?php echo TG_Demo_Importer_Status::get_write_permission(); ?></td>
+			<td></td>
+		</tr>
 		</tbody>
 	</table>
 </div>
