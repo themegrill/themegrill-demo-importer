@@ -244,4 +244,40 @@ $theme     = wp_get_theme();
 		<?php endif; ?>
 		</tbody>
 	</table>
+
+
+	<table class="demo-importer-status-table widefat">
+		<thead>
+		<tr>
+			<th><?php esc_html_e( 'Active Plugins', 'themegrill-demo-importer' ); ?></th>
+			<th></th>
+			<th></th>
+		</tr>
+		</thead>
+		<tbody>
+		<tr>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		</tbody>
+	</table>
+
+
+	<table class="demo-importer-status-table widefat">
+		<thead>
+		<tr>
+			<th><?php esc_html_e( 'Inactive Plugins', 'themegrill-demo-importer' ); ?></th>
+			<th></th>
+			<th></th>
+		</tr>
+		</thead>
+		<tbody>
+		<tr>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		</tbody>
+	</table>
 </div>
