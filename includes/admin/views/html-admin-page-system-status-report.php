@@ -7,7 +7,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-global $wpdb;
+global $wpdb, $wp_rewrite;;
 $curl_data = function_exists( 'curl_version' ) ? curl_version() : false;
 $gd_data   = function_exists( 'gd_info' ) ? gd_info() : false;
 ?>
@@ -70,7 +70,7 @@ $gd_data   = function_exists( 'gd_info' ) ? gd_info() : false;
 		</tr>
 		<tr>
 			<td><?php esc_html_e( 'cURL Installed:', 'themegrill-demo-importer' ); ?></td>
-			<td><?php echo esc_html( esc_html( extension_loaded( 'curl' ) ? __( 'Yes', 'themegrill-demo-importer' ) : __( 'No', 'themegrill-demo-importer' ) ) ); ?></td>
+			<td><?php extension_loaded( 'curl' ) ? esc_html_e( 'Yes', 'themegrill-demo-importer' ) : esc_html_e( 'No', 'themegrill-demo-importer' ); ?></td>
 			<td></td>
 		</tr>
 		<?php if ( $curl_data ) : ?>
@@ -82,7 +82,7 @@ $gd_data   = function_exists( 'gd_info' ) ? gd_info() : false;
 		<?php endif; ?>
 		<tr>
 			<td><?php esc_html_e( 'GD Installed:', 'themegrill-demo-importer' ); ?></td>
-			<td><?php echo esc_html( extension_loaded( 'gd' ) ? __( 'Yes', 'themegrill-demo-importer' ) : __( 'No', 'themegrill-demo-importer' ) ); ?></td>
+			<td><?php extension_loaded( 'gd' ) ? esc_html_e( 'Yes', 'themegrill-demo-importer' ) : esc_html_e( 'No', 'themegrill-demo-importer' ); ?></td>
 			<td></td>
 		</tr>
 		<?php if ( $gd_data ) : ?>
@@ -118,6 +118,51 @@ $gd_data   = function_exists( 'gd_info' ) ? gd_info() : false;
 		<tr>
 			<td><?php esc_html_e( 'Version:', 'themegrill-demo-importer' ); ?></td>
 			<td><?php echo esc_html( get_bloginfo( 'version' ) ); ?></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td><?php esc_html_e( 'Site URL:', 'themegrill-demo-importer' ); ?></td>
+			<td><?php echo esc_html( get_site_url() ); ?></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td><?php esc_html_e( 'Home URL:', 'themegrill-demo-importer' ); ?></td>
+			<td><?php echo esc_html( get_home_url() ); ?></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td><?php esc_html_e( 'Multisite:', 'themegrill-demo-importer' ); ?></td>
+			<td><?php is_multisite() ? esc_html_e( 'Yes', 'themegrill-demo-importer' ) : esc_html_e( 'No', 'themegrill-demo-importer' ); ?></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td><?php esc_html_e( 'Max Upload Size:', 'themegrill-demo-importer' ); ?></td>
+			<td><?php echo esc_html( size_format( wp_max_upload_size() ) ); ?></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td><?php esc_html_e( 'Memory Limit:', 'themegrill-demo-importer' ); ?></td>
+			<td><?php echo esc_html( WP_MAX_MEMORY_LIMIT ); ?></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td><?php esc_html_e( 'Permalink Structure:', 'themegrill-demo-importer' ); ?></td>
+			<td><?php echo '' !== $wp_rewrite->permalink_structure ? esc_html( $wp_rewrite->permalink_structure ) : esc_html__( 'Plain', 'themegrill-demo-importer' ); ?></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td><?php esc_html_e( 'Language:', 'themegrill-demo-importer' ); ?></td>
+			<td><?php echo esc_html( get_bloginfo( 'language' ) ); ?></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td><?php esc_html_e( 'Debug Mode Enabled:', 'themegrill-demo-importer' ); ?></td>
+			<td><?php WP_DEBUG ? esc_html_e( 'Yes', 'themegrill-demo-importer' ) : esc_html_e( 'No', 'themegrill-demo-importer' ); ?></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td><?php esc_html_e( 'Script Debug Mode Enabled:', 'themegrill-demo-importer' ); ?></td>
+			<td><?php SCRIPT_DEBUG ? esc_html_e( 'Yes', 'themegrill-demo-importer' ) : esc_html_e( 'No', 'themegrill-demo-importer' ); ?></td>
 			<td></td>
 		</tr>
 		</tbody>
