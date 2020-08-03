@@ -8,7 +8,8 @@
 defined( 'ABSPATH' ) || exit;
 
 global $wpdb;
-$curl_data = curl_version();
+$curl_data = function_exists( 'curl_version' ) ? curl_version() : false;
+$gd_data   = function_exists( 'gd_info' ) ? gd_info() : false;
 ?>
 <div class="demo-importer-system-status">
 	<h2><?php esc_html_e( 'System Status', 'themegrill-demo-importer' ); ?></h2>
@@ -68,15 +69,29 @@ $curl_data = curl_version();
 			<td></td>
 		</tr>
 		<tr>
-			<td><?php esc_html_e( 'cURL version:', 'themegrill-demo-importer' ); ?></td>
-			<td><?php echo esc_html( $curl_data['version'] ); ?></td>
+			<td><?php esc_html_e( 'cURL Installed:', 'themegrill-demo-importer' ); ?></td>
+			<td><?php echo esc_html( esc_html( extension_loaded( 'curl' ) ? __( 'Yes', 'themegrill-demo-importer' ) : __( 'No', 'themegrill-demo-importer' ) ) ); ?></td>
 			<td></td>
 		</tr>
+		<?php if ( $curl_data ) : ?>
+			<tr>
+				<td><?php esc_html_e( 'cURL version:', 'themegrill-demo-importer' ); ?></td>
+				<td><?php echo esc_html( $curl_data['version'] ); ?></td>
+				<td></td>
+			</tr>
+		<?php endif; ?>
 		<tr>
 			<td><?php esc_html_e( 'GD Installed:', 'themegrill-demo-importer' ); ?></td>
 			<td><?php echo esc_html( extension_loaded( 'gd' ) ? __( 'Yes', 'themegrill-demo-importer' ) : __( 'No', 'themegrill-demo-importer' ) ); ?></td>
 			<td></td>
 		</tr>
+		<?php if ( $gd_data ) : ?>
+			<tr>
+				<td><?php esc_html_e( 'GD version:', 'themegrill-demo-importer' ); ?></td>
+				<td><?php echo esc_html( $gd_data['GD Version'] ); ?></td>
+				<td></td>
+			</tr>
+		<?php endif; ?>
 		<tr>
 			<td><?php esc_html_e( 'Write Permission:', 'themegrill-demo-importer' ); ?></td>
 			<td><?php echo TG_Demo_Importer_Status::get_write_permission(); ?></td>
