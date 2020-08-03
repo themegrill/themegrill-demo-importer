@@ -8,6 +8,7 @@
 defined( 'ABSPATH' ) || exit;
 
 global $wpdb;
+$curl_data = curl_version();
 ?>
 <div class="demo-importer-system-status">
 	<h2><?php esc_html_e( 'System Status', 'themegrill-demo-importer' ); ?></h2>
@@ -64,6 +65,11 @@ global $wpdb;
 		<tr>
 			<td><?php esc_html_e( 'PHP Memory Limit:', 'themegrill-demo-importer' ); ?></td>
 			<td><?php echo esc_html( ini_get( 'memory_limit' ) ); ?></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td><?php esc_html_e( 'cURL version:', 'themegrill-demo-importer' ); ?></td>
+			<td><?php echo esc_html( $curl_data['version'] ); ?></td>
 			<td></td>
 		</tr>
 		<tr>
