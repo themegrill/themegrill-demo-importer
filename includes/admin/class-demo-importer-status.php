@@ -45,4 +45,23 @@ class TG_Demo_Importer_Status {
 
 		return esc_html( $output );
 	}
+
+	/**
+	 * Check if we can connect to GitHub server for demo import feature.
+	 *
+	 * @return string
+	 */
+	public static function get_demo_server_connection_status() {
+		$output              = '';
+		$package_file_server = wp_remote_get( 'https://github.com/' );
+		$http_response_code  = wp_remote_retrieve_response_code( $package_file_server );
+
+		if ( is_wp_error( $package_file_server ) || 200 !== (int) $http_response_code ) {
+			$output = __( 'There is connection issue of your site to our demo pack services.', 'themegrill-demo-importer' );
+		} else {
+			$output = __( 'Connected', 'themegrill-demo-importer' );
+		}
+
+		return esc_html( $output );
+	}
 }

@@ -76,6 +76,11 @@ global $wpdb;
 			<td><?php echo TG_Demo_Importer_Status::get_write_permission(); ?></td>
 			<td></td>
 		</tr>
+		<tr>
+			<td><?php esc_html_e( 'Demo Pack Server Connection:', 'themegrill-demo-importer' ); ?></td>
+			<td><?php echo TG_Demo_Importer_Status::get_demo_server_connection_status(); ?></td>
+			<td></td>
+		</tr>
 		</tbody>
 	</table>
 </div>
