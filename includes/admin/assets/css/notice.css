@@ -18,3 +18,11 @@
 .tg-demo-importer-notice .notice-dismiss {
 	text-decoration: none;
 }
+
+.demo-importer-system-status .demo-importer-status-table  {
+	margin-bottom: 1em;
+}
+
+.demo-importer-system-status .demo-importer-status-table tbody td:first-child {
+	width: 25%;
+}

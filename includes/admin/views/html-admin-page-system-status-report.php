@@ -14,7 +14,7 @@ $gd_data   = function_exists( 'gd_info' ) ? gd_info() : false;
 <div class="demo-importer-system-status">
 	<h2><?php esc_html_e( 'System Status', 'themegrill-demo-importer' ); ?></h2>
 
-	<table class="widefat">
+	<table class="demo-importer-status-table widefat">
 		<thead>
 		<tr>
 			<th><?php esc_html_e( 'System Info', 'themegrill-demo-importer' ); ?></th>
@@ -29,7 +29,7 @@ $gd_data   = function_exists( 'gd_info' ) ? gd_info() : false;
 			<td></td>
 		</tr>
 		<tr>
-			<td><?php esc_html_e( 'Serve:r', 'themegrill-demo-importer' ); ?></td>
+			<td><?php esc_html_e( 'Server:', 'themegrill-demo-importer' ); ?></td>
 			<td><?php echo esc_html( wp_unslash( $_SERVER['SERVER_SOFTWARE'] ) ); ?></td>
 			<td></td>
 		</tr>
@@ -100,6 +100,24 @@ $gd_data   = function_exists( 'gd_info' ) ? gd_info() : false;
 		<tr>
 			<td><?php esc_html_e( 'Demo Pack Server Connection:', 'themegrill-demo-importer' ); ?></td>
 			<td><?php echo TG_Demo_Importer_Status::get_demo_server_connection_status(); ?></td>
+			<td></td>
+		</tr>
+		</tbody>
+	</table>
+
+
+	<table class="demo-importer-status-table widefat">
+		<thead>
+		<tr>
+			<th><?php esc_html_e( 'WordPress Info', 'themegrill-demo-importer' ); ?></th>
+			<th></th>
+			<th></th>
+		</tr>
+		</thead>
+		<tbody>
+		<tr>
+			<td><?php esc_html_e( 'Version:', 'themegrill-demo-importer' ); ?></td>
+			<td><?php echo esc_html( get_bloginfo( 'version' ) ); ?></td>
 			<td></td>
 		</tr>
 		</tbody>
