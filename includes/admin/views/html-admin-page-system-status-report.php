@@ -10,6 +10,7 @@ defined( 'ABSPATH' ) || exit;
 global $wpdb, $wp_rewrite;;
 $curl_data = function_exists( 'curl_version' ) ? curl_version() : false;
 $gd_data   = function_exists( 'gd_info' ) ? gd_info() : false;
+$theme     = wp_get_theme();
 ?>
 <div class="demo-importer-system-status">
 	<h2><?php esc_html_e( 'System Status', 'themegrill-demo-importer' ); ?></h2>
@@ -171,5 +172,76 @@ $gd_data   = function_exists( 'gd_info' ) ? gd_info() : false;
 			<td></td>
 		</tr>
 		</tbody>
+
+
+		<table class="demo-importer-status-table widefat">
+			<thead>
+			<tr>
+				<th><?php esc_html_e( 'Theme Info', 'themegrill-demo-importer' ); ?></th>
+				<th></th>
+				<th></th>
+			</tr>
+			</thead>
+			<tbody>
+			<tr>
+				<td><?php esc_html_e( 'Name:', 'themegrill-demo-importer' ); ?></td>
+				<td><?php echo esc_html( $theme->get( 'Name' ) ); ?></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td><?php esc_html_e( 'Version:', 'themegrill-demo-importer' ); ?></td>
+				<td><?php echo esc_html( $theme->get( 'Version' ) ); ?></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td><?php esc_html_e( 'Author:', 'themegrill-demo-importer' ); ?></td>
+				<td><?php echo esc_html( $theme->get( 'Author' ) ); ?></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td><?php esc_html_e( 'Author URL:', 'themegrill-demo-importer' ); ?></td>
+				<td><?php echo esc_html( $theme->get( 'AuthorURI' ) ); ?></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td><?php esc_html_e( 'Child Theme:', 'themegrill-demo-importer' ); ?></td>
+				<td><?php is_child_theme() ? esc_html_e( 'Yes', 'themegrill-demo-importer' ) : esc_html_e( 'No', 'themegrill-demo-importer' ); ?></td>
+				<td>
+					<?php
+					if ( ! is_child_theme() ) :
+						printf(
+							/* translators: 1. Opening anchor tag for ThemeGrill Child Tutorial, 2. Closing the anchor tag */
+							esc_html__( 'If you want to modify the features of the theme then, we recommend you to use %1$s child theme. %2$s', 'themegrill-demo-importer' ),
+							'<a href="https://themegrill.com/blog/tutorial-creating-wordpress-child-theme/" target="_blank">',
+							'</a>'
+						);
+					endif;
+					?>
+				</td>
+			</tr>
+			<?php if ( is_child_theme() ) : ?>
+				<tr>
+					<td><?php esc_html_e( 'Parent Theme Name:', 'themegrill-demo-importer' ); ?></td>
+					<td><?php echo esc_html( $theme->parent()->get( 'Name' ) ); ?></td>
+					<td></td>
+				</tr>
+				<tr>
+					<td><?php esc_html_e( 'Parent Theme Version:', 'themegrill-demo-importer' ); ?></td>
+					<td><?php echo esc_html( $theme->parent()->get( 'Version' ) ); ?></td>
+					<td></td>
+				</tr>
+				<tr>
+					<td><?php esc_html_e( 'Parent Theme Author:', 'themegrill-demo-importer' ); ?></td>
+					<td><?php echo esc_html( $theme->parent()->get( 'Author' ) ); ?></td>
+					<td></td>
+				</tr>
+				<tr>
+					<td><?php esc_html_e( 'Parent Theme Author URL:', 'themegrill-demo-importer' ); ?></td>
+					<td><?php echo esc_html( $theme->parent()->get( 'AuthorURI' ) ); ?></td>
+					<td></td>
+				</tr>
+			<?php endif; ?>
+			</tbody>
+		</table>
 	</table>
 </div>
