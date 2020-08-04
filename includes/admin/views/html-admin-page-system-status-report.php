@@ -347,5 +347,11 @@ $theme     = wp_get_theme();
 		<div id="system-status-report">
 			<textarea readonly="readonly"></textarea>
 		</div>
+
+		<p class="submit">
+			<button id="copy-system-status" class="button-primary">
+				<?php esc_html_e( 'Copy System Status', 'themegrill-demo-importer' ); ?>
+			</button>
+		</p>
 	</div>
 </div>
