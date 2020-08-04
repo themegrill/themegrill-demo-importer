@@ -338,4 +338,14 @@ $theme     = wp_get_theme();
 		?>
 		</tbody>
 	</table>
+
+
+	<h2><?php esc_html_e( 'Copy &amp; Paste', 'themegrill-demo-importer' ); ?></h2>
+
+	<div class="demo-importer-status-report">
+		<p><?php esc_html_e( 'While creating support request, please provide us the details generated below within the support request. It might help us to tackle on the issue more conviniently.', 'themegrill-demo-importer' ); ?></p>
+		<div id="system-status-report">
+			<textarea readonly="readonly"></textarea>
+		</div>
+	</div>
 </div>
