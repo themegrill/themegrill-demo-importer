@@ -302,11 +302,40 @@ $theme     = wp_get_theme();
 		</tr>
 		</thead>
 		<tbody>
-		<tr>
-			<td></td>
-			<td></td>
-			<td></td>
-		</tr>
+		<?php
+		$inactive_plugin_lists = TG_Demo_Importer_Status::get_inactive_plugins();
+
+		// Display the inactive plugin lists.
+		foreach ( $inactive_plugin_lists as $inactive_plugin_list ) :
+			echo '<tr>';
+			echo '<td>';
+			if ( $inactive_plugin_list['PluginURI'] ) :
+				$plugin_name = '<a href="' . $inactive_plugin_list['PluginURI'] . '" target="_blank">' . $inactive_plugin_list['Name'] . '</a>';
+			else :
+				$plugin_name = $inactive_plugin_list['Name'];
+			endif;
+
+			if ( $inactive_plugin_list['Version'] ) :
+				$plugin_name .= ' - ' . $inactive_plugin_list['Version'];
+			endif;
+
+			echo $plugin_name;
+			echo '</td>';
+
+			echo '<td>';
+			if ( $inactive_plugin_list['Author'] ) :
+				printf(
+				/* translators: 1. Plugin author name. */
+					esc_html__( 'By %s', 'themegrill-demo-importer' ),
+					esc_html( $inactive_plugin_list['Author'] )
+				);
+			endif;
+			echo '</td>';
+
+			echo '<td></td>';
+			echo '</tr>';
+		endforeach;
+		?>
 		</tbody>
 	</table>
 </div>
