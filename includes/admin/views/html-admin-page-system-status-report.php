@@ -171,6 +171,11 @@ $theme     = wp_get_theme();
 			<td><?php SCRIPT_DEBUG ? esc_html_e( 'Yes', 'themegrill-demo-importer' ) : esc_html_e( 'No', 'themegrill-demo-importer' ); ?></td>
 			<td></td>
 		</tr>
+		<tr>
+			<td><?php esc_html_e( 'ThemeGrill Demo Importer Version:', 'themegrill-demo-importer' ); ?></td>
+			<td><?php echo esc_html( TGDM_VERSION ); ?></td>
+			<td></td>
+		</tr>
 		</tbody>
 	</table>
 
