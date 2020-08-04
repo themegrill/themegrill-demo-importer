@@ -349,7 +349,7 @@ $theme     = wp_get_theme();
 		</div>
 
 		<p class="submit">
-			<button id="copy-system-status" class="button-primary">
+			<button id="copy-system-status-report" class="button-primary">
 				<?php esc_html_e( 'Copy System Status', 'themegrill-demo-importer' ); ?>
 			</button>
 		</p>

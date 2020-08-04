@@ -11,6 +11,9 @@ jQuery(
 
 				// Select every codes added inside textarea.
 				$( '#system-status-report' ).on( 'click', this.selectDetails );
+
+				// Select every codes added inside the textarea and copy the content inside.
+				$( '#copy-system-status-report' ).on( 'click', this.selectCopyDetails );
 			},
 
 			generateReport: function () {
@@ -39,7 +42,12 @@ jQuery(
 
 			selectDetails: function () {
 				$( '#system-status-report' ).find( 'textarea' ).focus().select();
-			}
+			},
+
+			selectCopyDetails: function () {
+				$( '#system-status-report' ).find( 'textarea' ).focus().select();
+				document.execCommand( 'copy' );
+			},
 		};
 
 		demoImporterSystemStatus.init();

@@ -32,3 +32,8 @@
 	height: 350px;
 	padding: 1em;
 }
+
+.demo-importer-status-report .submit {
+	margin: 1em 0 0;
+	padding: 0;
+}
