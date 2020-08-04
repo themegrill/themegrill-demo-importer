@@ -8,6 +8,9 @@ jQuery(
 			init: function () {
 				// Generate system report.
 				$( '#system-status-report', this.generateReport );
+
+				// Select every codes added inside textarea.
+				$( '#system-status-report' ).on( 'click', this.selectDetails );
 			},
 
 			generateReport: function () {
@@ -33,6 +36,10 @@ jQuery(
 
 				$( '#system-status-report' ).find( 'textarea' ).val( report );
 			},
+
+			selectDetails: function () {
+				$( '#system-status-report' ).find( 'textarea' ).focus().select();
+			}
 		};
 
 		demoImporterSystemStatus.init();
