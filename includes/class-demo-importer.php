@@ -158,6 +158,8 @@ class TG_Demo_Importer {
 		// Register and enqueue admin notice files.
 		wp_register_style( 'tg-demo-importer-notice', tgdm()->plugin_url() . '/includes/admin/assets/css/notice.css', array(), TGDM_VERSION );
 		wp_enqueue_style( 'tg-demo-importer-notice' );
+		wp_register_script( 'tg-demo-importer-notice', tgdm()->plugin_url() . '/includes/admin/assets/js/notice.js', array( 'jquery' ), TGDM_VERSION, true );
+		wp_enqueue_script( 'tg-demo-importer-notice' );
 
 		// Add RTL support for admin styles.
 		wp_style_add_data( 'tg-demo-importer', 'rtl', 'replace' );
