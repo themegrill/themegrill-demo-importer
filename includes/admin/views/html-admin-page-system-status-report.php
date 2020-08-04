@@ -255,11 +255,40 @@ $theme     = wp_get_theme();
 		</tr>
 		</thead>
 		<tbody>
-		<tr>
-			<td></td>
-			<td></td>
-			<td></td>
-		</tr>
+		<?php
+		$active_plugin_lists = TG_Demo_Importer_Status::get_active_plugins();
+
+		// Display the active plugin lists.
+		foreach ( $active_plugin_lists as $active_plugin_list ) :
+			echo '<tr>';
+			echo '<td>';
+			if ( $active_plugin_list['PluginURI'] ) :
+				$plugin_name = '<a href="' . $active_plugin_list['PluginURI'] . '" target="_blank">' . $active_plugin_list['Name'] . '</a>';
+			else :
+				$plugin_name = $active_plugin_list['Name'];
+			endif;
+
+			if ( $active_plugin_list['Version'] ) :
+				$plugin_name .= ' - ' . $active_plugin_list['Version'];
+			endif;
+
+			echo $plugin_name;
+			echo '</td>';
+
+			echo '<td>';
+			if ( $active_plugin_list['Author'] ) :
+				printf(
+					/* translators: 1. Plugin author name. */
+					esc_html__( 'By %s', 'themegrill-demo-importer' ),
+					esc_html( $active_plugin_list['Author'] )
+				);
+			endif;
+			echo '</td>';
+
+			echo '<td></td>';
+			echo '</tr>';
+		endforeach;
+		?>
 		</tbody>
 	</table>
 
