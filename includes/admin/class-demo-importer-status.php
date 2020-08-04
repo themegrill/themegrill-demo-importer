@@ -81,4 +81,13 @@ class TG_Demo_Importer_Status {
 
 		return $active_plugins;
 	}
+
+	/**
+	 * Get lists of inactive plugins.
+	 *
+	 * @return array
+	 */
+	public static function get_inactive_plugins() {
+		return array_diff_key( get_plugins(), self::get_active_plugins() );
+	}
 }
