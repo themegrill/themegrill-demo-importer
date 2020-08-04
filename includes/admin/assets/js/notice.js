@@ -17,11 +17,14 @@ jQuery(
 					function () {
 						if ( $( this ).is( 'thead' ) ) {
 							let theadLabel = $( this ).text();
-							report = report + '\n== ' + $.trim( theadLabel ) + ' ==\n\n';
+							report = report + '\n== ' + $.trim( theadLabel ) + ' ==\n';
 						} else {
 							$( 'tr', $( this ) ).each(
 								function () {
 									let tbodyLabel = $( this ).find( 'td:eq(0)' ).text();
+									let tbodyValue = $( this ).find( 'td:eq(1)' ).text();
+
+									report = report + '\t' + $.trim( tbodyLabel ) + ' ' + $.trim( tbodyValue ) + '\n';
 								}
 							);
 						}
