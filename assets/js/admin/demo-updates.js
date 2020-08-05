@@ -292,9 +292,7 @@
 				break;
 		}
 
-		if ( errorMessage ) {
-			errorMessage = errorMessage.replace( '%s', error );
-		}
+		errorMessage = errorMessage.replace( '%s', error );
 
 		// Add admin notice.
 		wp.updates.addAdminNotice( {
