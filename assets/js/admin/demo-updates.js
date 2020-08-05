@@ -17,6 +17,11 @@
 	 */
 	wp.updates.l10n = _.extend( wp.updates.l10n, settings.l10n || {} );
 
+	// Check for WordPress 5.5 version.
+	if ( 'undefined' === typeof wp.updates.l10n ) {
+		wp.updates.l10n = settings.l10n || {};
+	}
+
 	/**
 	 * Sends an Ajax request to the server to import a demo.
 	 *
@@ -287,7 +292,9 @@
 				break;
 		}
 
-		errorMessage = errorMessage.replace( '%s', error );
+		if ( errorMessage ) {
+			errorMessage = errorMessage.replace( '%s', error );
+		}
 
 		// Add admin notice.
 		wp.updates.addAdminNotice( {
