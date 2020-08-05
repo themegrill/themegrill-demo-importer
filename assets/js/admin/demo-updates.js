@@ -290,6 +290,10 @@
 			case 'import':
 				errorMessage = wp.updates.l10n.importFailed;
 				break;
+
+			case 'install':
+				errorMessage = wp.updates.l10n.installFailed;
+				break;
 		}
 
 		errorMessage = errorMessage.replace( '%s', error );
