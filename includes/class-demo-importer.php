@@ -168,6 +168,9 @@ class TG_Demo_Importer {
 
 		// Demo Importer appearance page.
 		if ( 'appearance_page_demo-importer' === $screen_id ) {
+			/**
+			 * Default ThemeGrill Demo Importer update strings.
+			 */
 			$demo_update_settings['l10n'] = array(
 				'importing'             => __( 'Importing...', 'themegrill-demo-importer' ),
 				'demoImportingLabel'    => _x( 'Importing %s...', 'demo', 'themegrill-demo-importer' ), // no ellipsis
@@ -183,6 +186,13 @@ class TG_Demo_Importer {
 				'statusTextLink'        => '<a href="https://docs.themegrill.com/knowledgebase/demo-import-process-failed/" target="_blank">' . __( 'Try this solution!', 'themegrill-demo-importer' ) . '</a>',
 			);
 
+			/**
+			 * Update strings from WordPress.
+			 *
+			 * Added since WordPress 5.5 has removed them causing demo import issues.
+			 *
+			 * @since 1.6.6
+			 */
 			if ( version_compare( $GLOBALS['wp_version'], '5.5', '>=' ) ) {
 				$demo_update_settings_wordpress_translations = array(
 					/* translators: %s: Search query. */
