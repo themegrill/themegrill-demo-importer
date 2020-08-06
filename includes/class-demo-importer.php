@@ -76,6 +76,7 @@ class TG_Demo_Importer {
 	public function includes() {
 		include_once dirname( __FILE__ ) . '/importers/class-widget-importer.php';
 		include_once dirname( __FILE__ ) . '/importers/class-customizer-importer.php';
+		include_once dirname( __FILE__ ) . '/admin/class-demo-importer-status.php';
 	}
 
 	/**
@@ -117,6 +118,7 @@ class TG_Demo_Importer {
 	 */
 	public function admin_menu() {
 		add_theme_page( __( 'Demo Importer', 'themegrill-demo-importer' ), __( 'Demo Importer', 'themegrill-demo-importer' ), 'switch_themes', 'demo-importer', array( $this, 'demo_importer' ) );
+		add_theme_page( __( 'Demo Importer Status', 'themegrill-demo-importer' ), __( 'Demo Importer Status', 'themegrill-demo-importer' ), 'switch_themes', 'demo-importer-status', array( $this, 'status_menu' ) );
 	}
 
 	/**
@@ -156,6 +158,8 @@ class TG_Demo_Importer {
 		// Register and enqueue admin notice files.
 		wp_register_style( 'tg-demo-importer-notice', tgdm()->plugin_url() . '/includes/admin/assets/css/notice.css', array(), TGDM_VERSION );
 		wp_enqueue_style( 'tg-demo-importer-notice' );
+		wp_register_script( 'tg-demo-importer-notice', tgdm()->plugin_url() . '/includes/admin/assets/js/notice.js', array( 'jquery' ), TGDM_VERSION, true );
+		wp_enqueue_script( 'tg-demo-importer-notice' );
 
 		// Add RTL support for admin styles.
 		wp_style_add_data( 'tg-demo-importer', 'rtl', 'replace' );
@@ -435,6 +439,13 @@ class TG_Demo_Importer {
 	 */
 	public function demo_importer() {
 		include_once dirname( __FILE__ ) . '/admin/views/html-admin-page-importer.php';
+	}
+
+	/**
+	 * Demo Importer status page output.
+	 */
+	public function status_menu() {
+		include_once dirname( __FILE__ ) . '/admin/views/html-admin-page-status.php';
 	}
 
 	/**

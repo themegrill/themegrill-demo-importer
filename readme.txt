@@ -73,8 +73,9 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 
 == Changelog ==
 = TBD =
-* Tweak  - Added compatibility with WordPress v5.5
-* Remove - `Reset wizard` feature to reset the site to fresh WordPress install.
+* Introduce - Demo Importer Status page
+* Tweak     - Added compatibility with WordPress v5.5
+* Remove    - `Reset wizard` feature to reset the site to fresh WordPress install.
 
 = 1.6.5 - 23-07-2020 =
 * Fix - Demo not importing completely in certain conditions.
