@@ -25,7 +25,7 @@ defined( 'ABSPATH' ) || exit;
 	// If error, show them.
 	if ( is_wp_error( $faq_rss ) ) {
 		if ( is_admin() || current_user_can( 'switch_theme' ) ) {
-			echo '<p><strong>' . __( 'RSS Error:', 'themegrill-demo-importer' ) . '</strong> ' . $faq_rss->get_error_message() . '</p>';
+			echo '<p><strong>' . __( 'Error fetching the FAQ\'s', 'themegrill-demo-importer' ) . '</strong> ' . $faq_rss->get_error_message() . '</p>';
 		}
 
 		return;
@@ -33,7 +33,7 @@ defined( 'ABSPATH' ) || exit;
 
 	// Return if empty quantity from RSS feed.
 	if ( ! $faq_rss->get_item_quantity() ) {
-		echo '<ul><li>' . __( 'An error has occurred, which probably means the feed is down. Try again later.', 'themegrill-demo-importer' ) . '</li></ul>';
+		echo '<p>' . __( 'An error has occurred, which probably means our server is down. Try again later.', 'themegrill-demo-importer' ) . '</p>>';
 		$faq_rss->__destruct();
 		unset( $faq_rss );
 
@@ -49,8 +49,8 @@ defined( 'ABSPATH' ) || exit;
 
 		echo '<div class="faq">';
 		echo '<h3><a href="' . esc_url( strip_tags( $link ) ) . '" target="_blank">' . esc_html( strip_tags( $title ) ) . '</a></h3>';
-		echo '<p>' . esc_html( $description ) . '</div>';
-		echo '</p>';
+		echo '<p>' . esc_html( $description ) . '</p>';
+		echo '</div>';
 	}
 	echo '</div>';
 
