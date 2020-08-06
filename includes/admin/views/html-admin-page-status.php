@@ -11,7 +11,7 @@ defined( 'ABSPATH' ) || exit;
 $current_tab = ! empty( $_REQUEST['tab'] ) ? sanitize_title( $_REQUEST['tab'] ) : 'status';
 $tabs        = array(
 	'status' => esc_html__( 'System Status', 'themegrill-demo-importer' ),
-	'faq'    => esc_html__( 'FAQ', 'themegrill-demo-importer' ),
+	'faq'    => esc_html__( 'FAQ\'s', 'themegrill-demo-importer' ),
 );
 $tabs        = apply_filters( 'themegrill_demo_importer_status_tabs', $tabs );
 ?>
