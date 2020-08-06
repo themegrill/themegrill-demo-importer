@@ -57,7 +57,7 @@ class TG_Demo_Importer_Status {
 		$http_response_code  = wp_remote_retrieve_response_code( $package_file_server );
 
 		if ( is_wp_error( $package_file_server ) || 200 !== (int) $http_response_code ) {
-			$output = __( 'There is connection issue of your site to our demo pack services.', 'themegrill-demo-importer' );
+			$output = __( 'There is a connection issue of your site to our demo pack services.', 'themegrill-demo-importer' );
 		} else {
 			$output = __( 'Connected', 'themegrill-demo-importer' );
 		}
