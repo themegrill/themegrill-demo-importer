@@ -3,7 +3,7 @@ Contributors: ThemeGrill, shivapoudel
 Tags: themegrill, theme demos, demo, importer, one click import
 Requires at least: 4.7
 Tested up to: 5.5
-Stable tag: 1.6.5
+Stable tag: 1.6.6
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -72,7 +72,7 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 3. Finally, Import the Demo with just one click.
 
 == Changelog ==
-= TBD =
+= 1.6.6 - 06-08-2020 =
 * Introduce - Demo Importer Status page
 * Tweak     - Added compatibility with WordPress v5.5
 * Remove    - `Reset wizard` feature to reset the site to fresh WordPress install.
