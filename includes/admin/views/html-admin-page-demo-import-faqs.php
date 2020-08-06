@@ -59,5 +59,5 @@ defined( 'ABSPATH' ) || exit;
 	unset( $faq_rss );
 	?>
 
-	<a class="button button-primary button-hero" href="https://docs.themegrill.com/themegrill-demo-importer/docs-category/faqs/" target="_blank"><?php esc_html_e( 'View More FAQ\'s' ); ?></a>
+	<a class="button button-primary button-hero" href="https://docs.themegrill.com/themegrill-demo-importer/docs-category/faqs/" target="_blank"><?php esc_html_e( 'View More FAQ\'s', 'themegrill-demo-importer' ); ?></a>
 </div>
