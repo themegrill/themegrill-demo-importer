@@ -17,6 +17,11 @@
 	 */
 	wp.updates.l10n = _.extend( wp.updates.l10n, settings.l10n || {} );
 
+	// Check for WordPress 5.5 version.
+	if ( 'undefined' === typeof wp.updates.l10n ) {
+		wp.updates.l10n = settings.l10n || {};
+	}
+
 	/**
 	 * Sends an Ajax request to the server to import a demo.
 	 *
@@ -284,6 +289,10 @@
 		switch ( action ) {
 			case 'import':
 				errorMessage = wp.updates.l10n.importFailed;
+				break;
+
+			case 'install':
+				errorMessage = wp.updates.l10n.installFailed;
 				break;
 		}
 

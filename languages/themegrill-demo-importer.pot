@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: ThemeGrill Demo Importer 1.6.5\n"
 "Report-Msgid-Bugs-To: "
 "https://github.com/themegrill/themegrill-demo-importer/issues\n"
-"POT-Creation-Date: 2020-07-30 04:02:45+00:00\n"
+"POT-Creation-Date: 2020-08-05 06:20:26+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -67,7 +67,7 @@ msgid "Deactivate"
 msgstr ""
 
 #: includes/admin/class-plugin-deactivate-notice.php:78
-#: includes/class-demo-importer.php:1279
+#: includes/class-demo-importer.php:1376
 msgid "Action failed. Please refresh the page and retry."
 msgstr ""
 
@@ -132,7 +132,7 @@ msgid "Themes list"
 msgstr ""
 
 #: includes/admin/views/html-admin-page-importer.php:67
-#: includes/class-demo-importer.php:229
+#: includes/class-demo-importer.php:326
 msgid "No demos found. Try a different search."
 msgstr ""
 
@@ -160,7 +160,7 @@ msgstr ""
 #: includes/admin/views/html-admin-page-importer.php:109
 #: includes/admin/views/html-admin-page-importer.php:150
 #: includes/admin/views/html-admin-page-importer.php:254
-#: includes/class-demo-importer.php:186
+#: includes/class-demo-importer.php:183 includes/class-demo-importer.php:262
 msgid "Live Preview"
 msgstr ""
 
@@ -176,6 +176,7 @@ msgstr ""
 #: includes/admin/views/html-admin-page-importer.php:116
 #: includes/admin/views/html-admin-page-importer.php:147
 #: includes/admin/views/html-admin-page-importer.php:251
+#: includes/class-demo-importer.php:206
 msgid "Update"
 msgstr ""
 
@@ -223,7 +224,7 @@ msgid "No plugins are required for this demo."
 msgstr ""
 
 #: includes/admin/views/html-admin-page-importer.php:260
-#: includes/class-demo-importer.php:230
+#: includes/class-demo-importer.php:327
 msgid "Collapse Sidebar"
 msgstr ""
 
@@ -243,35 +244,189 @@ msgstr ""
 msgid "Enter mobile preview mode"
 msgstr ""
 
-#: includes/class-demo-importer.php:178
+#: includes/class-demo-importer.php:175
 msgid "Importing..."
 msgstr ""
 
-#: includes/class-demo-importer.php:180
+#: includes/class-demo-importer.php:177
 msgid "Importing... please wait."
 msgstr ""
 
-#: includes/class-demo-importer.php:181
+#: includes/class-demo-importer.php:178
 msgid "Import completed successfully."
 msgstr ""
 
-#: includes/class-demo-importer.php:182
+#: includes/class-demo-importer.php:179
 msgid "Import Failed!"
 msgstr ""
 
-#: includes/class-demo-importer.php:183
+#: includes/class-demo-importer.php:180
 msgid "Import failed: %s"
 msgstr ""
 
-#: includes/class-demo-importer.php:188
+#: includes/class-demo-importer.php:185
 msgid "Imported!"
 msgstr ""
 
-#: includes/class-demo-importer.php:189
+#: includes/class-demo-importer.php:186
 msgid "Try this solution!"
 msgstr ""
 
-#: includes/class-demo-importer.php:205
+#: includes/class-demo-importer.php:199
+#. translators: %s: Search query.
+msgid "Search results for &#8220;%s&#8221;"
+msgstr ""
+
+#: includes/class-demo-importer.php:200
+msgid "Search Results"
+msgstr ""
+
+#: includes/class-demo-importer.php:201
+msgid "You do not appear to have any plugins available at this time."
+msgstr ""
+
+#: includes/class-demo-importer.php:202
+msgid "Please select at least one item to perform this action on."
+msgstr ""
+
+#: includes/class-demo-importer.php:203
+msgid "Updating..."
+msgstr ""
+
+#: includes/class-demo-importer.php:207
+msgid "Update Now"
+msgstr ""
+
+#: includes/class-demo-importer.php:210
+msgid "Update Failed!"
+msgstr ""
+
+#: includes/class-demo-importer.php:212
+#. translators: %s: Error string for a failed update.
+msgid "Update Failed: %s"
+msgstr ""
+
+#: includes/class-demo-importer.php:220
+#. translators: Accessibility text.
+msgid "Updating... please wait."
+msgstr ""
+
+#: includes/class-demo-importer.php:222
+#. translators: Accessibility text.
+msgid "Update completed successfully."
+msgstr ""
+
+#: includes/class-demo-importer.php:224
+#. translators: Accessibility text.
+msgid "Update canceled."
+msgstr ""
+
+#: includes/class-demo-importer.php:225
+msgid "Updates may not complete if you navigate away from this page."
+msgstr ""
+
+#: includes/class-demo-importer.php:226
+msgid "Install Now"
+msgstr ""
+
+#: includes/class-demo-importer.php:229
+msgid "Installing..."
+msgstr ""
+
+#: includes/class-demo-importer.php:232
+msgid "Installation Failed!"
+msgstr ""
+
+#: includes/class-demo-importer.php:234
+#. translators: %s: Error string for a failed installation.
+msgid "Installation failed: %s"
+msgstr ""
+
+#: includes/class-demo-importer.php:247
+msgid "Installing... please wait."
+msgstr ""
+
+#: includes/class-demo-importer.php:248
+msgid "Installation completed successfully."
+msgstr ""
+
+#: includes/class-demo-importer.php:250
+#. translators: %s: Activation URL.
+msgid "Importer installed successfully. <a href=\"%s\">Run importer</a>"
+msgstr ""
+
+#: includes/class-demo-importer.php:252
+#. translators: %s: Theme name.
+msgid "Are you sure you want to delete %s?"
+msgstr ""
+
+#: includes/class-demo-importer.php:254
+#. translators: %s: Plugin name.
+msgid "Are you sure you want to delete %s and its data?"
+msgstr ""
+
+#: includes/class-demo-importer.php:255
+msgid "Are you sure you want to delete the selected plugins and their data?"
+msgstr ""
+
+#: includes/class-demo-importer.php:256
+msgid ""
+"Caution: These themes may be active on other sites in the network. Are you "
+"sure you want to proceed?"
+msgstr ""
+
+#: includes/class-demo-importer.php:257
+msgid "Deleting..."
+msgstr ""
+
+#: includes/class-demo-importer.php:259
+#. translators: %s: Error string for a failed deletion.
+msgid "Deletion failed: %s"
+msgstr ""
+
+#: includes/class-demo-importer.php:263
+msgid "Network Activate"
+msgstr ""
+
+#: includes/class-demo-importer.php:263 includes/class-demo-importer.php:264
+msgid "Activate"
+msgstr ""
+
+#: includes/class-demo-importer.php:264
+msgid "Network Enable"
+msgstr ""
+
+#: includes/class-demo-importer.php:269
+msgid "Run Importer"
+msgstr ""
+
+#: includes/class-demo-importer.php:271
+#. translators: %s: Importer name.
+msgid "Run %s"
+msgstr ""
+
+#: includes/class-demo-importer.php:272
+msgid "Something went wrong."
+msgstr ""
+
+#: includes/class-demo-importer.php:273
+msgid "Connection lost or the server is busy. Please try again later."
+msgstr ""
+
+#: includes/class-demo-importer.php:274
+msgid "An error has occurred. Please reload the page and try again."
+msgstr ""
+
+#: includes/class-demo-importer.php:276
+#. translators: %s: Number of plugins.
+msgid "Number of plugins found: %d"
+msgstr ""
+
+#: includes/class-demo-importer.php:277
+msgid "No plugins found. Try a different search."
+msgstr ""
+
+#: includes/class-demo-importer.php:302
 msgid ""
 "Importing demo data will ensure that your site will look similar as theme "
 "demo. It makes you easy to modify the content instead of creating them from "
@@ -279,47 +434,47 @@ msgid ""
 "%6$s"
 msgstr ""
 
-#: includes/class-demo-importer.php:207
+#: includes/class-demo-importer.php:304
 msgid ""
 "Importing the demo on the site if you have already added the content is "
 "highly discouraged."
 msgstr ""
 
-#: includes/class-demo-importer.php:209
+#: includes/class-demo-importer.php:306
 msgid ""
 "You need to import demo on fresh WordPress install to exactly replicate the "
 "theme demo."
 msgstr ""
 
-#: includes/class-demo-importer.php:211
+#: includes/class-demo-importer.php:308
 msgid ""
 "It will install the required plugins as well as activate them for "
 "installing the required theme demo within your site."
 msgstr ""
 
-#: includes/class-demo-importer.php:213
+#: includes/class-demo-importer.php:310
 msgid "Copyright images will get replaced with other placeholder images."
 msgstr ""
 
-#: includes/class-demo-importer.php:215
+#: includes/class-demo-importer.php:312
 msgid ""
 "None of the posts, pages, attachments or any other data already existing in "
 "your site will be deleted or modified."
 msgstr ""
 
-#: includes/class-demo-importer.php:217
+#: includes/class-demo-importer.php:314
 msgid "It will take some time to import the theme demo."
 msgstr ""
 
-#: includes/class-demo-importer.php:222
+#: includes/class-demo-importer.php:319
 msgid "Search Demos"
 msgstr ""
 
-#: includes/class-demo-importer.php:223
+#: includes/class-demo-importer.php:320
 msgid "Search demos..."
 msgstr ""
 
-#: includes/class-demo-importer.php:225
+#: includes/class-demo-importer.php:322
 #. translators: %s: support forums URL
 msgid ""
 "An unexpected error occurred. Something may be wrong with ThemeGrill demo "
@@ -327,32 +482,32 @@ msgid ""
 "the <a href=\"%s\">support forums</a>."
 msgstr ""
 
-#: includes/class-demo-importer.php:226
+#: includes/class-demo-importer.php:323
 msgid "Try Again"
 msgstr ""
 
-#: includes/class-demo-importer.php:227
+#: includes/class-demo-importer.php:324
 msgid "Please suggest us!"
 msgstr ""
 
-#: includes/class-demo-importer.php:228
+#: includes/class-demo-importer.php:325
 msgid "Number of Demos found: %d"
 msgstr ""
 
-#: includes/class-demo-importer.php:231
+#: includes/class-demo-importer.php:328
 msgid "Expand Sidebar"
 msgstr ""
 
-#: includes/class-demo-importer.php:233
+#: includes/class-demo-importer.php:330
 #. translators: accessibility text
 msgid "Select one or more Demo features to filter by"
 msgstr ""
 
-#: includes/class-demo-importer.php:234
+#: includes/class-demo-importer.php:331
 msgid "Confirm!"
 msgstr ""
 
-#: includes/class-demo-importer.php:260
+#: includes/class-demo-importer.php:357
 #. translators: 1: ThemeGrill Demo Importer 2: five stars
 msgid "If you like %1$s please leave us a %2$s rating. A huge thanks in advance!"
 msgstr ""
@@ -361,45 +516,45 @@ msgstr ""
 msgid "ThemeGrill Demo Importer"
 msgstr ""
 
-#: includes/class-demo-importer.php:262
+#: includes/class-demo-importer.php:359
 msgid "Thanks :)"
 msgstr ""
 
-#: includes/class-demo-importer.php:265
+#: includes/class-demo-importer.php:362
 msgid "Thank you for importing with ThemeGrill Demo Importer."
 msgstr ""
 
-#: includes/class-demo-importer.php:285 includes/class-demo-importer.php:287
+#: includes/class-demo-importer.php:382 includes/class-demo-importer.php:384
 msgid "Help &amp; Support"
 msgstr ""
 
-#: includes/class-demo-importer.php:289
+#: includes/class-demo-importer.php:386
 msgid ""
 "Should you need help understanding, using, or extending ThemeGrill Demo "
 "Importer, <a href=\"%s\">please read our documentation</a>. You will find "
 "all kinds of resources including snippets, tutorials and much more."
 msgstr ""
 
-#: includes/class-demo-importer.php:293
+#: includes/class-demo-importer.php:390
 msgid ""
 "For further assistance with ThemeGrill Demo Importer core you can use the "
 "<a href=\"%1$s\">community forum</a>. If you need help with premium themes "
 "sold by ThemeGrill, please <a href=\"%2$s\">use our free support forum</a>."
 msgstr ""
 
-#: includes/class-demo-importer.php:297
+#: includes/class-demo-importer.php:394
 msgid "Community forum"
 msgstr ""
 
-#: includes/class-demo-importer.php:297
+#: includes/class-demo-importer.php:394
 msgid "ThemeGrill Support"
 msgstr ""
 
-#: includes/class-demo-importer.php:304 includes/class-demo-importer.php:306
+#: includes/class-demo-importer.php:401 includes/class-demo-importer.php:403
 msgid "Found a bug?"
 msgstr ""
 
-#: includes/class-demo-importer.php:307
+#: includes/class-demo-importer.php:404
 msgid ""
 "If you find a bug within ThemeGrill Demo Importer you can create a ticket "
 "via <a href=\"%1$s\">Github issues</a>. Ensure you read the <a "
@@ -407,65 +562,65 @@ msgid ""
 "help us solve your issue, please be as descriptive as possible."
 msgstr ""
 
-#: includes/class-demo-importer.php:308
+#: includes/class-demo-importer.php:405
 msgid "Report a bug"
 msgstr ""
 
-#: includes/class-demo-importer.php:314
+#: includes/class-demo-importer.php:411
 msgid "For more information:"
 msgstr ""
 
-#: includes/class-demo-importer.php:315
+#: includes/class-demo-importer.php:412
 msgid "About Demo Importer"
 msgstr ""
 
-#: includes/class-demo-importer.php:316
+#: includes/class-demo-importer.php:413
 msgid "WordPress.org project"
 msgstr ""
 
-#: includes/class-demo-importer.php:317
+#: includes/class-demo-importer.php:414
 msgid "Github project"
 msgstr ""
 
-#: includes/class-demo-importer.php:318
+#: includes/class-demo-importer.php:415
 msgid "Official themes"
 msgstr ""
 
-#: includes/class-demo-importer.php:319
+#: includes/class-demo-importer.php:416
 msgid "Official plugins"
 msgstr ""
 
-#: includes/class-demo-importer.php:474 includes/class-demo-importer.php:535
+#: includes/class-demo-importer.php:571 includes/class-demo-importer.php:632
 msgid "This demo requires %1$s version of %2$s theme to get imported"
 msgstr ""
 
-#: includes/class-demo-importer.php:480 includes/class-demo-importer.php:508
+#: includes/class-demo-importer.php:577 includes/class-demo-importer.php:605
 msgid ""
 "This demo requires %1$s version of %2$s theme and %3$s version of %4$s as "
 "well as %5$s version of %6$s plugins to get imported"
 msgstr ""
 
-#: includes/class-demo-importer.php:484 includes/class-demo-importer.php:494
-#: includes/class-demo-importer.php:500 includes/class-demo-importer.php:512
+#: includes/class-demo-importer.php:581 includes/class-demo-importer.php:591
+#: includes/class-demo-importer.php:597 includes/class-demo-importer.php:609
 msgid "Zakra Pro"
 msgstr ""
 
-#: includes/class-demo-importer.php:486 includes/class-demo-importer.php:514
-#: includes/class-demo-importer.php:522 includes/class-demo-importer.php:528
+#: includes/class-demo-importer.php:583 includes/class-demo-importer.php:611
+#: includes/class-demo-importer.php:619 includes/class-demo-importer.php:625
 msgid "Companion Elementor"
 msgstr ""
 
-#: includes/class-demo-importer.php:490 includes/class-demo-importer.php:518
+#: includes/class-demo-importer.php:587 includes/class-demo-importer.php:615
 msgid ""
 "This demo requires %1$s version of %2$s theme and %3$s version of %4$s "
 "plugin to get imported"
 msgstr ""
 
-#: includes/class-demo-importer.php:498 includes/class-demo-importer.php:526
+#: includes/class-demo-importer.php:595 includes/class-demo-importer.php:623
 msgid "This demo requires %1$s version of %2$s plugin to get imported"
 msgstr ""
 
-#: includes/class-demo-importer.php:546
+#: includes/class-demo-importer.php:643
 msgid "%s Pro"
 msgstr ""
 
@@ -473,28 +628,28 @@ msgstr ""
 msgid "ThemeGrill"
 msgstr ""
 
-#: includes/class-demo-importer.php:610
+#: includes/class-demo-importer.php:707
 msgid "No demo specified."
 msgstr ""
 
-#: includes/class-demo-importer.php:626
+#: includes/class-demo-importer.php:723
 msgid "Sorry, you are not allowed to import content."
 msgstr ""
 
-#: includes/class-demo-importer.php:658
+#: includes/class-demo-importer.php:755
 #: includes/functions-demo-importer.php:110
 msgid "Unable to connect to the filesystem. Please confirm your credentials."
 msgstr ""
 
-#: includes/class-demo-importer.php:741
+#: includes/class-demo-importer.php:838
 msgid "The XML file dummy content is missing."
 msgstr ""
 
-#: includes/class-demo-importer.php:832
+#: includes/class-demo-importer.php:929
 msgid "The DAT file customizer data is missing."
 msgstr ""
 
-#: includes/class-demo-importer.php:857
+#: includes/class-demo-importer.php:954
 msgid "The WIE file widget content is missing."
 msgstr ""
 
@@ -849,22 +1004,22 @@ msgctxt "demo"
 msgid "Imported"
 msgstr ""
 
-#: includes/class-demo-importer.php:179
+#: includes/class-demo-importer.php:176
 msgctxt "demo"
 msgid "Importing %s..."
 msgstr ""
 
-#: includes/class-demo-importer.php:184
+#: includes/class-demo-importer.php:181
 msgctxt "demo"
 msgid "%s imported!"
 msgstr ""
 
-#: includes/class-demo-importer.php:185
+#: includes/class-demo-importer.php:182
 msgctxt "demo"
 msgid "%s import failed"
 msgstr ""
 
-#: includes/class-demo-importer.php:187
+#: includes/class-demo-importer.php:184
 msgctxt "demo"
 msgid "Live Preview %s"
 msgstr ""
@@ -882,4 +1037,122 @@ msgstr ""
 #: includes/class-demo-importer.php:134
 msgctxt "Admin menu name"
 msgid "Demo Importer"
+msgstr ""
+
+#: includes/class-demo-importer.php:204
+msgctxt "plugin"
+msgid "Updated!"
+msgstr ""
+
+#: includes/class-demo-importer.php:209
+#. translators: %s: Plugin name and version.
+msgctxt "plugin"
+msgid "Update %s now"
+msgstr ""
+
+#: includes/class-demo-importer.php:214
+#. translators: %s: Plugin name and version.
+msgctxt "plugin"
+msgid "Updating %s..."
+msgstr ""
+
+#: includes/class-demo-importer.php:216
+#. translators: %s: Plugin name and version.
+msgctxt "plugin"
+msgid "%s updated!"
+msgstr ""
+
+#: includes/class-demo-importer.php:218
+#. translators: %s: Plugin name and version.
+msgctxt "plugin"
+msgid "%s update failed"
+msgstr ""
+
+#: includes/class-demo-importer.php:228
+#. translators: %s: Plugin name.
+msgctxt "plugin"
+msgid "Install %s now"
+msgstr ""
+
+#: includes/class-demo-importer.php:230
+msgctxt "plugin"
+msgid "Installed!"
+msgstr ""
+
+#: includes/class-demo-importer.php:236
+#. translators: %s: Plugin name and version.
+msgctxt "plugin"
+msgid "Installing %s..."
+msgstr ""
+
+#: includes/class-demo-importer.php:240
+#. translators: %s: Plugin name and version.
+msgctxt "plugin"
+msgid "%s installed!"
+msgstr ""
+
+#: includes/class-demo-importer.php:244
+#. translators: %s: Plugin name and version.
+msgctxt "plugin"
+msgid "%s installation failed"
+msgstr ""
+
+#: includes/class-demo-importer.php:260
+msgctxt "plugin"
+msgid "Deleted!"
+msgstr ""
+
+#: includes/class-demo-importer.php:266
+#. translators: %s: Plugin name.
+msgctxt "plugin"
+msgid "Network Activate %s"
+msgstr ""
+
+#: includes/class-demo-importer.php:266
+msgctxt "plugin"
+msgid "Activate %s"
+msgstr ""
+
+#: includes/class-demo-importer.php:205
+msgctxt "theme"
+msgid "Updated!"
+msgstr ""
+
+#: includes/class-demo-importer.php:231
+msgctxt "theme"
+msgid "Installed!"
+msgstr ""
+
+#: includes/class-demo-importer.php:238
+#. translators: %s: Theme name and version.
+msgctxt "theme"
+msgid "Installing %s..."
+msgstr ""
+
+#: includes/class-demo-importer.php:242
+#. translators: %s: Theme name and version.
+msgctxt "theme"
+msgid "%s installed!"
+msgstr ""
+
+#: includes/class-demo-importer.php:246
+#. translators: %s: Theme name and version.
+msgctxt "theme"
+msgid "%s installation failed"
+msgstr ""
+
+#: includes/class-demo-importer.php:261
+msgctxt "theme"
+msgid "Deleted!"
+msgstr ""
+
+#: includes/class-demo-importer.php:268
+#. translators: %s: Theme name.
+msgctxt "theme"
+msgid "Network Activate %s"
+msgstr ""
+
+#: includes/class-demo-importer.php:268
+msgctxt "theme"
+msgid "Activate %s"
 msgstr ""

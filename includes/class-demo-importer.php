@@ -168,27 +168,124 @@ class TG_Demo_Importer {
 
 		// Demo Importer appearance page.
 		if ( 'appearance_page_demo-importer' === $screen_id ) {
+			/**
+			 * Default ThemeGrill Demo Importer update strings.
+			 */
+			$demo_update_settings['l10n'] = array(
+				'importing'             => __( 'Importing...', 'themegrill-demo-importer' ),
+				'demoImportingLabel'    => _x( 'Importing %s...', 'demo', 'themegrill-demo-importer' ), // no ellipsis
+				'importingMsg'          => __( 'Importing... please wait.', 'themegrill-demo-importer' ),
+				'importedMsg'           => __( 'Import completed successfully.', 'themegrill-demo-importer' ),
+				'importFailedShort'     => __( 'Import Failed!', 'themegrill-demo-importer' ),
+				'importFailed'          => __( 'Import failed: %s', 'themegrill-demo-importer' ),
+				'demoImportedLabel'     => _x( '%s imported!', 'demo', 'themegrill-demo-importer' ),
+				'demoImportFailedLabel' => _x( '%s import failed', 'demo', 'themegrill-demo-importer' ),
+				'livePreview'           => __( 'Live Preview', 'themegrill-demo-importer' ),
+				'livePreviewLabel'      => _x( 'Live Preview %s', 'demo', 'themegrill-demo-importer' ),
+				'imported'              => __( 'Imported!', 'themegrill-demo-importer' ),
+				'statusTextLink'        => '<a href="https://docs.themegrill.com/knowledgebase/demo-import-process-failed/" target="_blank">' . __( 'Try this solution!', 'themegrill-demo-importer' ) . '</a>',
+			);
+
+			/**
+			 * Update strings from WordPress.
+			 *
+			 * Added since WordPress 5.5 has removed them causing demo import issues.
+			 *
+			 * @since 1.6.6
+			 */
+			if ( version_compare( $GLOBALS['wp_version'], '5.5', '>=' ) ) {
+				$demo_update_settings_wordpress_translations = array(
+					/* translators: %s: Search query. */
+					'searchResults'            => __( 'Search results for &#8220;%s&#8221;', 'themegrill-demo-importer' ),
+					'searchResultsLabel'       => __( 'Search Results', 'themegrill-demo-importer' ),
+					'noPlugins'                => __( 'You do not appear to have any plugins available at this time.', 'themegrill-demo-importer' ),
+					'noItemsSelected'          => __( 'Please select at least one item to perform this action on.', 'themegrill-demo-importer' ),
+					'updating'                 => __( 'Updating...', 'themegrill-demo-importer' ), // No ellipsis.
+					'pluginUpdated'            => _x( 'Updated!', 'plugin', 'themegrill-demo-importer' ),
+					'themeUpdated'             => _x( 'Updated!', 'theme', 'themegrill-demo-importer' ),
+					'update'                   => __( 'Update', 'themegrill-demo-importer' ),
+					'updateNow'                => __( 'Update Now', 'themegrill-demo-importer' ),
+					/* translators: %s: Plugin name and version. */
+					'pluginUpdateNowLabel'     => _x( 'Update %s now', 'plugin', 'themegrill-demo-importer' ),
+					'updateFailedShort'        => __( 'Update Failed!', 'themegrill-demo-importer' ),
+					/* translators: %s: Error string for a failed update. */
+					'updateFailed'             => __( 'Update Failed: %s', 'themegrill-demo-importer' ),
+					/* translators: %s: Plugin name and version. */
+					'pluginUpdatingLabel'      => _x( 'Updating %s...', 'plugin', 'themegrill-demo-importer' ), // No ellipsis.
+					/* translators: %s: Plugin name and version. */
+					'pluginUpdatedLabel'       => _x( '%s updated!', 'plugin', 'themegrill-demo-importer' ),
+					/* translators: %s: Plugin name and version. */
+					'pluginUpdateFailedLabel'  => _x( '%s update failed', 'plugin', 'themegrill-demo-importer' ),
+					/* translators: Accessibility text. */
+					'updatingMsg'              => __( 'Updating... please wait.', 'themegrill-demo-importer' ), // No ellipsis.
+					/* translators: Accessibility text. */
+					'updatedMsg'               => __( 'Update completed successfully.', 'themegrill-demo-importer' ),
+					/* translators: Accessibility text. */
+					'updateCancel'             => __( 'Update canceled.', 'themegrill-demo-importer' ),
+					'beforeunload'             => __( 'Updates may not complete if you navigate away from this page.', 'themegrill-demo-importer' ),
+					'installNow'               => __( 'Install Now', 'themegrill-demo-importer' ),
+					/* translators: %s: Plugin name. */
+					'pluginInstallNowLabel'    => _x( 'Install %s now', 'plugin', 'themegrill-demo-importer' ),
+					'installing'               => __( 'Installing...', 'themegrill-demo-importer' ),
+					'pluginInstalled'          => _x( 'Installed!', 'plugin', 'themegrill-demo-importer' ),
+					'themeInstalled'           => _x( 'Installed!', 'theme', 'themegrill-demo-importer' ),
+					'installFailedShort'       => __( 'Installation Failed!', 'themegrill-demo-importer' ),
+					/* translators: %s: Error string for a failed installation. */
+					'installFailed'            => __( 'Installation failed: %s', 'themegrill-demo-importer' ),
+					/* translators: %s: Plugin name and version. */
+					'pluginInstallingLabel'    => _x( 'Installing %s...', 'plugin', 'themegrill-demo-importer' ), // No ellipsis.
+					/* translators: %s: Theme name and version. */
+					'themeInstallingLabel'     => _x( 'Installing %s...', 'theme', 'themegrill-demo-importer' ), // No ellipsis.
+					/* translators: %s: Plugin name and version. */
+					'pluginInstalledLabel'     => _x( '%s installed!', 'plugin', 'themegrill-demo-importer' ),
+					/* translators: %s: Theme name and version. */
+					'themeInstalledLabel'      => _x( '%s installed!', 'theme', 'themegrill-demo-importer' ),
+					/* translators: %s: Plugin name and version. */
+					'pluginInstallFailedLabel' => _x( '%s installation failed', 'plugin', 'themegrill-demo-importer' ),
+					/* translators: %s: Theme name and version. */
+					'themeInstallFailedLabel'  => _x( '%s installation failed', 'theme', 'themegrill-demo-importer' ),
+					'installingMsg'            => __( 'Installing... please wait.', 'themegrill-demo-importer' ),
+					'installedMsg'             => __( 'Installation completed successfully.', 'themegrill-demo-importer' ),
+					/* translators: %s: Activation URL. */
+					'importerInstalledMsg'     => __( 'Importer installed successfully. <a href="%s">Run importer</a>', 'themegrill-demo-importer' ),
+					/* translators: %s: Theme name. */
+					'aysDelete'                => __( 'Are you sure you want to delete %s?', 'themegrill-demo-importer' ),
+					/* translators: %s: Plugin name. */
+					'aysDeleteUninstall'       => __( 'Are you sure you want to delete %s and its data?', 'themegrill-demo-importer' ),
+					'aysBulkDelete'            => __( 'Are you sure you want to delete the selected plugins and their data?', 'themegrill-demo-importer' ),
+					'aysBulkDeleteThemes'      => __( 'Caution: These themes may be active on other sites in the network. Are you sure you want to proceed?', 'themegrill-demo-importer' ),
+					'deleting'                 => __( 'Deleting...', 'themegrill-demo-importer' ),
+					/* translators: %s: Error string for a failed deletion. */
+					'deleteFailed'             => __( 'Deletion failed: %s', 'themegrill-demo-importer' ),
+					'pluginDeleted'            => _x( 'Deleted!', 'plugin', 'themegrill-demo-importer' ),
+					'themeDeleted'             => _x( 'Deleted!', 'theme', 'themegrill-demo-importer' ),
+					'livePreview'              => __( 'Live Preview', 'themegrill-demo-importer' ),
+					'activatePlugin'           => is_network_admin() ? __( 'Network Activate', 'themegrill-demo-importer' ) : __( 'Activate', 'themegrill-demo-importer' ),
+					'activateTheme'            => is_network_admin() ? __( 'Network Enable', 'themegrill-demo-importer' ) : __( 'Activate', 'themegrill-demo-importer' ),
+					/* translators: %s: Plugin name. */
+					'activatePluginLabel'      => is_network_admin() ? _x( 'Network Activate %s', 'plugin', 'themegrill-demo-importer' ) : _x( 'Activate %s', 'plugin', 'themegrill-demo-importer' ),
+					/* translators: %s: Theme name. */
+					'activateThemeLabel'       => is_network_admin() ? _x( 'Network Activate %s', 'theme', 'themegrill-demo-importer' ) : _x( 'Activate %s', 'theme', 'themegrill-demo-importer' ),
+					'activateImporter'         => __( 'Run Importer', 'themegrill-demo-importer' ),
+					/* translators: %s: Importer name. */
+					'activateImporterLabel'    => __( 'Run %s', 'themegrill-demo-importer' ),
+					'unknownError'             => __( 'Something went wrong.', 'themegrill-demo-importer' ),
+					'connectionError'          => __( 'Connection lost or the server is busy. Please try again later.', 'themegrill-demo-importer' ),
+					'nonceError'               => __( 'An error has occurred. Please reload the page and try again.', 'themegrill-demo-importer' ),
+					/* translators: %s: Number of plugins. */
+					'pluginsFound'             => __( 'Number of plugins found: %d', 'themegrill-demo-importer' ),
+					'noPluginsFound'           => __( 'No plugins found. Try a different search.', 'themegrill-demo-importer' ),
+				);
+
+				$demo_update_settings['l10n'] = array_merge( $demo_update_settings['l10n'], $demo_update_settings_wordpress_translations );
+			}
+
 			wp_enqueue_style( 'tg-demo-importer' );
 			wp_enqueue_script( 'tg-demo-importer' );
 			wp_localize_script(
 				'tg-demo-updates',
 				'_demoUpdatesSettings',
-				array(
-					'l10n' => array(
-						'importing'             => __( 'Importing...', 'themegrill-demo-importer' ),
-						'demoImportingLabel'    => _x( 'Importing %s...', 'demo', 'themegrill-demo-importer' ), // no ellipsis
-						'importingMsg'          => __( 'Importing... please wait.', 'themegrill-demo-importer' ),
-						'importedMsg'           => __( 'Import completed successfully.', 'themegrill-demo-importer' ),
-						'importFailedShort'     => __( 'Import Failed!', 'themegrill-demo-importer' ),
-						'importFailed'          => __( 'Import failed: %s', 'themegrill-demo-importer' ),
-						'demoImportedLabel'     => _x( '%s imported!', 'demo', 'themegrill-demo-importer' ),
-						'demoImportFailedLabel' => _x( '%s import failed', 'demo', 'themegrill-demo-importer' ),
-						'livePreview'           => __( 'Live Preview', 'themegrill-demo-importer' ),
-						'livePreviewLabel'      => _x( 'Live Preview %s', 'demo', 'themegrill-demo-importer' ),
-						'imported'              => __( 'Imported!', 'themegrill-demo-importer' ),
-						'statusTextLink'        => '<a href="https://docs.themegrill.com/knowledgebase/demo-import-process-failed/" target="_blank">' . __( 'Try this solution!', 'themegrill-demo-importer' ) . '</a>',
-					),
-				)
+				$demo_update_settings
 			);
 			wp_localize_script(
 				'tg-demo-importer',
