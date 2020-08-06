@@ -45,11 +45,12 @@ defined( 'ABSPATH' ) || exit;
 	foreach ( $faq_rss->get_items( 0, 5 ) as $faq ) {
 		$link        = $faq->get_permalink();
 		$title       = $faq->get_title();
-		$description = $faq->get_description();
+		$description = $faq->get_content();
+		$description = substr( wpautop( $description ), 0, strpos( wpautop( $description ), '</p>' ) + 4 );
 
 		echo '<div class="faq">';
 		echo '<h3><a href="' . esc_url( strip_tags( $link ) ) . '" target="_blank">' . esc_html( strip_tags( $title ) ) . '</a></h3>';
-		echo '<p>' . esc_html( $description ) . '</p>';
+		echo '<p>' . strip_tags( $description ) . '</p>';
 		echo '</div>';
 	}
 	echo '</div>';
@@ -58,5 +59,5 @@ defined( 'ABSPATH' ) || exit;
 	unset( $faq_rss );
 	?>
 
-	<a class="btn button-primary" href="https://docs.themegrill.com/themegrill-demo-importer/docs-category/faqs/" target="_blank"><?php esc_html_e( 'View More Faq\'s' ); ?></a>
+	<a class="btn button-primary" href="https://docs.themegrill.com/themegrill-demo-importer/docs-category/faqs/" target="_blank"><?php esc_html_e( 'View More FAQ\'s' ); ?></a>
 </div>
