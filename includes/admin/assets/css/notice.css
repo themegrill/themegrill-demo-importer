@@ -37,3 +37,7 @@
 	margin: 1em 0 0;
 	padding: 0;
 }
+
+.demo-importer-faq-wrapper .faq p {
+	margin-bottom: 0;
+}
