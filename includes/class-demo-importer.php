@@ -582,9 +582,19 @@ class TG_Demo_Importer {
 								}
 							}
 						} else {
-							if ( $current_template === $theme && version_compare( $minimum_version, $current_theme_version, '>' ) ) {
-								$required_version           = $minimum_version;
+							if (
+								$current_template === $theme && version_compare( $minimum_version, $current_theme_version, '>' ) ||
+								( 'companion-elementor' === $theme && version_compare( $minimum_version, $companion_elementor_plugin_name, '>' ) )
+							) {
 								$required_version_installed = true;
+
+								if ( $current_template === $theme ) {
+									$required_version = $minimum_version;
+								}
+
+								if ( 'companion-elementor' === $theme ) {
+									$companion_elementor_required_version = $minimum_version;
+								}
 							}
 						}
 					}
@@ -659,6 +669,24 @@ class TG_Demo_Importer {
 							$required_version,
 							$current_theme_name
 						);
+					}
+
+					if ( $companion_elementor_required_version ) {
+						if ( $required_version ) {
+							$required_message = sprintf(
+								esc_html__( 'This demo requires %1$s version of %2$s theme and %3$s version of %4$s plugin to get imported', 'themegrill-demo-importer' ),
+								$required_version,
+								$current_theme_name,
+								$companion_elementor_required_version,
+								esc_html__( 'Companion Elementor', 'themegrill-demo-importer' )
+							);
+						} else {
+							$required_message = sprintf(
+								esc_html__( 'This demo requires %1$s version of %2$s plugin to get imported', 'themegrill-demo-importer' ),
+								$companion_elementor_required_version,
+								esc_html__( 'Companion Elementor', 'themegrill-demo-importer' )
+							);
+						}
 					}
 				}
 

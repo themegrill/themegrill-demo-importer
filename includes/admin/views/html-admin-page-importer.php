@@ -250,7 +250,7 @@ defined( 'ABSPATH' ) || exit;
 				<# } else if ( data.isPro ) { #>
 					<a class="button button-hero button-primary purchase-now" href="{{ data.homepage }}" target="_blank"><?php esc_html_e( 'Buy Now', 'themegrill-demo-importer' ); ?></a>
 				<# } else if ( data.isAllThemePlan ) { #>
-					<a class="button button-primary purchase-now" href="{{ data.homepage }}" target="_blank"><?php esc_html_e( 'Upgrade to All Themes Plan', 'themegrill-demo-importer' ); ?></a>
+					<a class="button button-hero button-primary purchase-now" href="{{ data.homepage }}" target="_blank"><?php esc_html_e( 'Upgrade to All Themes Plan', 'themegrill-demo-importer' ); ?></a>
 				<# } else if ( data.requiredTheme ) { #>
 					<button class="button button-hero button-primary hide-if-no-js disabled"><?php esc_html_e( 'Import Demo', 'themegrill-demo-importer' ); ?></button>
 				<# } else if ( data.requiredVersion ) { #>
