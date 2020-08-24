@@ -72,6 +72,9 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 3. Finally, Import the Demo with just one click.
 
 == Changelog ==
+= TBD =
+* Tweak - Require `Companion Addons for Elementor` plugin to import certain demos according to the demo config set
+
 = 1.6.6 - 06-08-2020 =
 * Introduce - Demo Importer Status page
 * Tweak     - Added compatibility with WordPress v5.5
