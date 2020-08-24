@@ -464,6 +464,21 @@ class TG_Demo_Importer {
 	}
 
 	/**
+	 * Check for ThemeGrill All Themes Plan
+	 *
+	 * @return bool
+	 */
+	public function themegrill_is_all_themes_plan() {
+
+		if ( is_plugin_active( 'companion-elementor/companion-elementor.php') ) {
+			return true;
+		}
+
+		return false;
+
+	}
+
+	/**
 	 * Ajax handler for getting demos from github.
 	 */
 	public function ajax_query_demos( $return = true ) {
