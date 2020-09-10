@@ -1,5 +1,8 @@
 ( function( $, wp, settings ) {
-	var $document = $( document );
+	var $document = $( document ),
+		__ = wp.i18n.__,
+		_x = wp.i18n._x,
+		sprintf = wp.i18n.sprintf;
 
 	wp = wp || {};
 
