@@ -174,6 +174,7 @@ class TG_Demo_Importer {
 		if ( 'appearance_page_demo-importer' === $screen_id ) {
 			wp_enqueue_style( 'tg-demo-importer' );
 			wp_enqueue_script( 'tg-demo-importer' );
+
 			wp_localize_script(
 				'tg-demo-importer',
 				'_demoImporterSettings',
@@ -219,6 +220,9 @@ class TG_Demo_Importer {
 					),
 				)
 			);
+
+			// For translation of strings within scripts.
+			wp_set_script_translations( 'tg-demo-updates', 'themegrill-demo-importer' );
 		}
 	}
 
