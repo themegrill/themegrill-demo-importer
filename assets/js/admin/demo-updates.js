@@ -198,27 +198,39 @@
 		if ( $document.find( 'body' ).hasClass( 'full-overlay-active' ) ) {
 			$pluginRow = $( 'tr[data-slug="' + args.slug + '"]' );
 			$message   = $( '.theme-install-overlay .demo-import[data-slug="' + args.demo + '"]' );
-			message    = wp.updates.l10n.pluginInstallingLabel.replace( '%s', $pluginRow.data( 'name' ) );
+			message    = sprintf(
+				_x( 'Installing %s...', 'plugin', 'themegrill-demo-importer' ),
+				$pluginRow.data( 'name' )
+			);
 			$pluginRow.find( '.plugin-status span' )
 				.addClass( 'updating-message' )
-				.attr( 'aria-label', wp.updates.l10n.pluginInstallingLabel.replace( '%s', $pluginRow.data( 'name' ) ) )
-				.text( wp.updates.l10n.installing );
+				.attr(
+					'aria-label',
+					sprintf(
+						_x( 'Installing %s...', 'plugin', 'themegrill-demo-importer' ),
+						$pluginRow.data( 'name' )
+					)
+				)
+				.text( __( 'Installing...', 'themegrill-demo-importer' ) );
 		} else {
 			$message = $( '.demo-import[data-slug="' + args.demo + '"]' );
-			message  = wp.updates.l10n.pluginInstallingLabel.replace( '%s', args.name );
+			message  = sprintf(
+				_x( 'Installing %s...', 'plugin', 'themegrill-demo-importer' ),
+				args.name
+			);
 			$message.parents( '.theme' ).addClass( 'focus' );
 		}
 
-		if ( $message.html() !== wp.updates.l10n.installing ) {
+		if ( $message.html() !== __( 'Installing...', 'themegrill-demo-importer' ) ) {
 			$message.data( 'originaltext', $message.html() );
 		}
 
 		$message
 			.attr( 'aria-label', message )
 			.addClass( 'updating-message' )
-			.text( wp.updates.l10n.installing );
+			.text( __( 'Installing...', 'themegrill-demo-importer' ) );
 
-		wp.a11y.speak( wp.updates.l10n.installingMsg, 'polite' );
+		wp.a11y.speak( __( 'Installing... please wait.', 'themegrill-demo-importer' ), 'polite' );
 
 		$document.trigger( 'wp-plugin-bulk-installing', args );
 
