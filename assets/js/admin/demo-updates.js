@@ -253,10 +253,16 @@
 		$updateMessage
 			.removeClass( 'updating-message install-now' )
 			.addClass( 'updated-message active' )
-			.attr( 'aria-label', wp.updates.l10n.pluginInstalledLabel.replace( '%s', response.pluginName ) )
-			.text( wp.updates.l10n.pluginInstalled );
+			.attr(
+				'aria-label',
+				sprintf(
+					_x( '%s installed!', 'plugin', 'themegrill-demo-importer' ),
+					response.pluginName
+				)
+			)
+			.text( _x( 'Installed!', 'plugin', 'themegrill-demo-importer' ) );
 
-		wp.a11y.speak( wp.updates.l10n.installedMsg, 'polite' );
+		wp.a11y.speak( __( 'Installation completed successfully.', 'themegrill-demo-importer' ), 'polite' );
 
 		$document.trigger( 'wp-plugin-bulk-install-success', response );
 	};
@@ -284,13 +290,22 @@
 			return;
 		}
 
-		errorMessage = wp.updates.l10n.installFailed.replace( '%s', response.errorMessage );
+		errorMessage = sprintf(
+			__( 'Installation failed: %s', 'themegrill-demo-importer' ),
+			response.errorMessage
+		);
 
 		$updateMessage
 			.removeClass( 'updating-message' )
 			.addClass( 'updated-message' )
-			.attr( 'aria-label', wp.updates.l10n.pluginInstallFailedLabel.replace( '%s', $pluginRow.data( 'name' ) ) )
-			.text( wp.updates.l10n.installFailedShort );
+			.attr(
+				'aria-label',
+				sprintf(
+					_x( '%s installation failed', 'plugin', 'themegrill-demo-importer' ),
+					$pluginRow.data( 'name' )
+				)
+			)
+			.text( __( 'Installation Failed!', 'themegrill-demo-importer' ) );
 
 		wp.a11y.speak( errorMessage, 'assertive' );
 
