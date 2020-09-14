@@ -14,18 +14,6 @@
 	wp.updates = wp.updates || {};
 
 	/**
-	 * Localized strings.
-	 *
-	 * @type {object}
-	 */
-	wp.updates.l10n = _.extend( wp.updates.l10n, settings.l10n || {} );
-
-	// Check for WordPress 5.5 version.
-	if ( 'undefined' === typeof wp.updates.l10n ) {
-		wp.updates.l10n = settings.l10n || {};
-	}
-
-	/**
 	 * Sends an Ajax request to the server to import a demo.
 	 *
 	 * @param {object}             args
