@@ -46,6 +46,7 @@
 			.attr(
 				'aria-label',
 				sprintf(
+					/* translators: %s: Demo name. */
 					_x( 'Importing %s...', 'demo', 'themegrill-demo-importer' ),
 					$message.data( 'name' )
 				)
@@ -80,6 +81,7 @@
 			.attr(
 				'aria-label',
 				sprintf(
+					/* translators: %s: Demo name. */
 					_x( '%s imported!', 'demo', 'themegrill-demo-importer' ),
 					response.demoName
 				)
@@ -104,6 +106,7 @@
 					.attr(
 						'aria-label',
 						sprintf(
+							/* translators: %s: Demo name. */
 							_x( 'Live Preview %s', 'demo', 'themegrill-demo-importer' ),
 							response.demoName
 						)
@@ -125,6 +128,7 @@
 	wp.updates.importDemoError = function( response ) {
 		var $card, $button,
 			errorMessage = sprintf(
+				/* translators: %s: Demo import error message. */
 				__( 'Import failed: %s', 'themegrill-demo-importer' ),
 				response.errorMessage
 			),
@@ -154,6 +158,7 @@
 			.attr(
 				'aria-label',
 				sprintf(
+					/* translators: %s: Demo name. */
 					_x( '%s import failed', 'demo', 'themegrill-demo-importer' ),
 					$button.data( 'name' )
 				)
@@ -187,6 +192,7 @@
 			$pluginRow = $( 'tr[data-slug="' + args.slug + '"]' );
 			$message   = $( '.theme-install-overlay .demo-import[data-slug="' + args.demo + '"]' );
 			message    = sprintf(
+				/* translators: %s: Plugin name. */
 				_x( 'Installing %s...', 'plugin', 'themegrill-demo-importer' ),
 				$pluginRow.data( 'name' )
 			);
@@ -195,6 +201,7 @@
 				.attr(
 					'aria-label',
 					sprintf(
+						/* translators: %s: Plugin name. */
 						_x( 'Installing %s...', 'plugin', 'themegrill-demo-importer' ),
 						$pluginRow.data( 'name' )
 					)
@@ -203,6 +210,7 @@
 		} else {
 			$message = $( '.demo-import[data-slug="' + args.demo + '"]' );
 			message  = sprintf(
+				/* translators: %s: Plugin name. */
 				_x( 'Installing %s...', 'plugin', 'themegrill-demo-importer' ),
 				args.name
 			);
@@ -244,6 +252,7 @@
 			.attr(
 				'aria-label',
 				sprintf(
+					/* translators: %s: Plugin name. */
 					_x( '%s installed!', 'plugin', 'themegrill-demo-importer' ),
 					response.pluginName
 				)
@@ -279,6 +288,7 @@
 		}
 
 		errorMessage = sprintf(
+			/* translators: %s: Bulk plugin installation error message. */
 			__( 'Installation failed: %s', 'themegrill-demo-importer' ),
 			response.errorMessage
 		);
@@ -289,6 +299,7 @@
 			.attr(
 				'aria-label',
 				sprintf(
+					/* translators: %s: Plugin name. */
 					_x( '%s installation failed', 'plugin', 'themegrill-demo-importer' ),
 					$pluginRow.data( 'name' )
 				)

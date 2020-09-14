@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2020-09-14T04:30:15+00:00\n"
+"POT-Creation-Date: 2020-09-14T04:36:49+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.4.0\n"
 "X-Domain: themegrill-demo-importer\n"
@@ -212,7 +212,7 @@ msgstr ""
 #: includes/admin/views/html-admin-page-importer.php:109
 #: includes/admin/views/html-admin-page-importer.php:150
 #: includes/admin/views/html-admin-page-importer.php:254
-#: assets/js/admin/demo-updates.js:111
+#: assets/js/admin/demo-updates.js:114
 msgid "Live Preview"
 msgstr ""
 
@@ -1038,105 +1038,114 @@ msgstr ""
 msgid "Importing..."
 msgstr ""
 
-#: assets/js/admin/demo-updates.js:49
+#. translators: %s: Demo name.
+#: assets/js/admin/demo-updates.js:50
 msgctxt "demo"
 msgid "Importing %s..."
 msgstr ""
 
-#: assets/js/admin/demo-updates.js:53
+#: assets/js/admin/demo-updates.js:54
 msgid "Importing... please wait."
 msgstr ""
 
-#: assets/js/admin/demo-updates.js:83
+#. translators: %s: Demo name.
+#: assets/js/admin/demo-updates.js:85
 msgctxt "demo"
 msgid "%s imported!"
 msgstr ""
 
-#: assets/js/admin/demo-updates.js:87
+#: assets/js/admin/demo-updates.js:89
 msgid "Imported!"
 msgstr ""
 
-#: assets/js/admin/demo-updates.js:89
+#: assets/js/admin/demo-updates.js:91
 msgid "Import completed successfully."
 msgstr ""
 
-#: assets/js/admin/demo-updates.js:107
+#. translators: %s: Demo name.
+#: assets/js/admin/demo-updates.js:110
 msgctxt "demo"
 msgid "Live Preview %s"
 msgstr ""
 
-#: assets/js/admin/demo-updates.js:128
-#: assets/js/admin/demo-updates.js:336
+#. translators: %s: Demo import error message.
+#: assets/js/admin/demo-updates.js:132
+#: assets/js/admin/demo-updates.js:347
 msgid "Import failed: %s"
 msgstr ""
 
-#: assets/js/admin/demo-updates.js:157
+#. translators: %s: Demo name.
+#: assets/js/admin/demo-updates.js:162
 msgctxt "demo"
 msgid "%s import failed"
 msgstr ""
 
-#: assets/js/admin/demo-updates.js:161
-#: assets/js/admin/demo-updates.js:361
+#: assets/js/admin/demo-updates.js:166
+#: assets/js/admin/demo-updates.js:372
 msgid "Import Failed!"
 msgstr ""
 
-#: assets/js/admin/demo-updates.js:190
-#: assets/js/admin/demo-updates.js:198
-#: assets/js/admin/demo-updates.js:206
+#. translators: %s: Plugin name.
+#: assets/js/admin/demo-updates.js:196
+#: assets/js/admin/demo-updates.js:205
+#: assets/js/admin/demo-updates.js:214
 msgctxt "plugin"
 msgid "Installing %s..."
 msgstr ""
 
-#: assets/js/admin/demo-updates.js:202
-#: assets/js/admin/demo-updates.js:212
-#: assets/js/admin/demo-updates.js:219
+#: assets/js/admin/demo-updates.js:209
+#: assets/js/admin/demo-updates.js:220
+#: assets/js/admin/demo-updates.js:227
 msgid "Installing..."
 msgstr ""
 
-#: assets/js/admin/demo-updates.js:221
+#: assets/js/admin/demo-updates.js:229
 msgid "Installing... please wait."
 msgstr ""
 
-#: assets/js/admin/demo-updates.js:247
+#. translators: %s: Plugin name.
+#: assets/js/admin/demo-updates.js:256
 msgctxt "plugin"
 msgid "%s installed!"
 msgstr ""
 
-#: assets/js/admin/demo-updates.js:251
+#: assets/js/admin/demo-updates.js:260
 msgctxt "plugin"
 msgid "Installed!"
 msgstr ""
 
-#: assets/js/admin/demo-updates.js:253
+#: assets/js/admin/demo-updates.js:262
 msgid "Installation completed successfully."
 msgstr ""
 
-#: assets/js/admin/demo-updates.js:282
-#: assets/js/admin/demo-updates.js:340
+#. translators: %s: Bulk plugin installation error message.
+#: assets/js/admin/demo-updates.js:292
+#: assets/js/admin/demo-updates.js:351
 msgid "Installation failed: %s"
 msgstr ""
 
-#: assets/js/admin/demo-updates.js:292
+#. translators: %s: Plugin name.
+#: assets/js/admin/demo-updates.js:303
 msgctxt "plugin"
 msgid "%s installation failed"
 msgstr ""
 
-#: assets/js/admin/demo-updates.js:296
+#: assets/js/admin/demo-updates.js:307
 msgid "Installation Failed!"
 msgstr ""
 
-#: assets/js/admin/demo-updates.js:316
+#: assets/js/admin/demo-updates.js:327
 msgid "Something went wrong."
 msgstr ""
 
-#: assets/js/admin/demo-updates.js:325
+#: assets/js/admin/demo-updates.js:336
 msgid "An error has occurred. Please reload the page and try again."
 msgstr ""
 
-#: assets/js/admin/demo-updates.js:329
+#: assets/js/admin/demo-updates.js:340
 msgid "Connection lost or the server is busy. Please try again later."
 msgstr ""
 
-#: assets/js/admin/demo-updates.js:331
+#: assets/js/admin/demo-updates.js:342
 msgid "Try this solution!"
 msgstr ""
