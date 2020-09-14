@@ -1,4 +1,4 @@
-( function( $, wp, settings ) {
+( function( $, wp ) {
 	var $document = $( document ),
 		__ = wp.i18n.__,
 		_x = wp.i18n._x,
@@ -397,4 +397,4 @@
 		$document.trigger( 'wp-updates-queue-job', job );
 	};
 
-})( jQuery, window.wp, window._demoUpdatesSettings );
+})( jQuery, window.wp );
