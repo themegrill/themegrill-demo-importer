@@ -49,14 +49,20 @@
 
 		$message.addClass( 'updating-message' );
 		$message.parents( '.theme' ).addClass( 'focus' );
-		if ( $message.html() !== wp.updates.l10n.importing ) {
+		if ( $message.html() !== __( 'Importing...', 'themegrill-demo-importer' ) ) {
 			$message.data( 'originaltext', $message.html() );
 		}
 
 		$message
-			.text( wp.updates.l10n.importing )
-			.attr( 'aria-label', wp.updates.l10n.demoImportingLabel.replace( '%s', $message.data( 'name' ) ) );
-		wp.a11y.speak( wp.updates.l10n.importingMsg, 'polite' );
+			.text( __( 'Importing...', 'themegrill-demo-importer' ) )
+			.attr(
+				'aria-label',
+				sprintf(
+					_x( 'Importing %s...', 'demo', 'themegrill-demo-importer' ),
+					$message.data( 'name' )
+				)
+			);
+		wp.a11y.speak( __( 'Importing... please wait.', 'themegrill-demo-importer' ), 'polite' );
 
 		// Remove previous error messages, if any.
 		$( '.install-theme-info, [data-slug="' + args.slug + '"]' ).removeClass( 'demo-import-failed' ).find( '.notice.notice-error' ).remove();
@@ -83,10 +89,16 @@
 		$message = $card.find( '.button-primary' )
 			.removeClass( 'updating-message' )
 			.addClass( 'updated-message disabled' )
-			.attr( 'aria-label', wp.updates.l10n.demoImportedLabel.replace( '%s', response.demoName ) )
-			.text( wp.updates.l10n.imported );
+			.attr(
+				'aria-label',
+				sprintf(
+					_x( '%s imported!', 'demo', 'themegrill-demo-importer' ),
+					response.demoName
+				)
+			)
+			.text( __( 'Imported!', 'themegrill-demo-importer' ) );
 
-		wp.a11y.speak( wp.updates.l10n.importedMsg, 'polite' );
+		wp.a11y.speak( __( 'Import completed successfully.', 'themegrill-demo-importer' ), 'polite' );
 
 		setTimeout( function() {
 
@@ -101,8 +113,14 @@
 					.attr( 'href', response.previewUrl )
 					.removeClass( 'demo-import updated-message disabled' )
 					.addClass( 'live-preview' )
-					.attr( 'aria-label', wp.updates.l10n.livePreviewLabel.replace( '%s', response.demoName ) )
-					.text( wp.updates.l10n.livePreview );
+					.attr(
+						'aria-label',
+						sprintf(
+							_x( 'Live Preview %s', 'demo', 'themegrill-demo-importer' ),
+							response.demoName
+						)
+					)
+					.text( __( 'Live Preview', 'themegrill-demo-importer' ) );
 			}
 		}, 1000 );
 	};
