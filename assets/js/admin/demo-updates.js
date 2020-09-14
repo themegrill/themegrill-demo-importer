@@ -136,7 +136,10 @@
 	 */
 	wp.updates.importDemoError = function( response ) {
 		var $card, $button,
-			errorMessage = wp.updates.l10n.importFailed.replace( '%s', response.errorMessage ),
+			errorMessage = sprintf(
+				__( 'Import failed: %s', 'themegrill-demo-importer' ),
+				response.errorMessage
+			),
 			$message     = wp.updates.adminNotice( {
 				className: 'update-message notice-error notice-alt',
 				message:   errorMessage
@@ -160,8 +163,14 @@
 
 		$button
 			.removeClass( 'updating-message' )
-			.attr( 'aria-label', wp.updates.l10n.demoImportFailedLabel.replace( '%s', $button.data( 'name' ) ) )
-			.text( wp.updates.l10n.importFailedShort );
+			.attr(
+				'aria-label',
+				sprintf(
+					_x( '%s import failed', 'demo', 'themegrill-demo-importer' ),
+					$button.data( 'name' )
+				)
+			)
+			.text( __( 'Import Failed!', 'themegrill-demo-importer' ) );
 
 		wp.a11y.speak( errorMessage, 'assertive' );
 
