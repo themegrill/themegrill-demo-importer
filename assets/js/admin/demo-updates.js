@@ -325,7 +325,7 @@
 	 *                                                'update' or 'install'.
 	 */
 	wp.updates.isValidResponse = function( response, action ) {
-		var error = wp.updates.l10n.unknownError,
+		var error = __( 'Something went wrong.', 'themegrill-demo-importer' ),
 			errorMessage;
 
 		// Make sure the response is a valid data object and not a Promise object.
@@ -334,22 +334,22 @@
 		}
 
 		if ( _.isString( response ) && '-1' === response ) {
-			error = wp.updates.l10n.nonceError;
+			error = __( 'An error has occurred. Please reload the page and try again.', 'themegrill-demo-importer' );
 		} else if ( _.isString( response ) ) {
 			error = response;
 		} else if ( 'undefined' !== typeof response.readyState && 0 === response.readyState ) {
-			error = wp.updates.l10n.connectionError;
+			error = __( 'Connection lost or the server is busy. Please try again later.', 'themegrill-demo-importer' );
 		} else if ( _.isString( response.statusText ) ) {
-			error = response.statusText + ' ' + wp.updates.l10n.statusTextLink;
+			error = response.statusText + ' ' + '<a href="https://docs.themegrill.com/knowledgebase/demo-import-process-failed/" target="_blank">' + __( 'Try this solution!', 'themegrill-demo-importer' ) + '</a>';
 		}
 
 		switch ( action ) {
 			case 'import':
-				errorMessage = wp.updates.l10n.importFailed;
+				errorMessage = __( 'Import failed: %s', 'themegrill-demo-importer' );
 				break;
 
 			case 'install':
-				errorMessage = wp.updates.l10n.installFailed;
+				errorMessage = __( 'Installation failed: %s', 'themegrill-demo-importer' );
 				break;
 		}
 
@@ -370,7 +370,7 @@
 		$( '.button.updating-message' )
 			.removeClass( 'updating-message' )
 			.removeAttr( 'aria-label' )
-			.text( wp.updates.l10n.importFailedShort );
+			.text( __( 'Import Failed!', 'themegrill-demo-importer' ) );
 
 		wp.a11y.speak( errorMessage, 'assertive' );
 
