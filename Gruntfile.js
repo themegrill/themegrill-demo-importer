@@ -121,26 +121,6 @@ module.exports = function( grunt ){
 			}
 		},
 
-		// Generate POT files.
-		makepot: {
-			options: {
-				type: 'wp-plugin',
-				domainPath: 'languages',
-				potHeaders: {
-					'report-msgid-bugs-to': 'https://github.com/themegrill/themegrill-demo-importer/issues',
-					'language-team': 'LANGUAGE <EMAIL@ADDRESS>'
-				}
-			},
-			dist: {
-				options: {
-					potFilename: 'themegrill-demo-importer.pot',
-					exclude: [
-						'vendor/.*'
-					]
-				}
-			}
-		},
-
 		// Add Textdomain.
 		addtextdomain: {
 			options: {
@@ -296,6 +276,5 @@ module.exports = function( grunt ){
 
 	grunt.registerTask( 'i18n', [
 		'checktextdomain',
-		'makepot'
 	]);
 };
