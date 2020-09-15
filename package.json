@@ -1,7 +1,7 @@
 {
   "name": "themegrill-demo-importer",
   "title": "ThemeGrill Demo Importer",
-  "version": "1.6.6",
+  "version": "1.6.7",
   "homepage": "https://themegrill.com/demo-importer/",
   "repository": {
     "type": "git",
@@ -10,7 +10,7 @@
   "license": "GPL-3.0+",
   "main": "Gruntfile.js",
   "scripts": {
-    "build": "grunt",
+    "build": "grunt && composer make-pot",
     "build-watch": "grunt watch",
     "lint:js": "eslint assets/js --ext=js",
     "git:update-hooks": "rm -r .git/hooks && node ./node_modules/husky/husky.js install"

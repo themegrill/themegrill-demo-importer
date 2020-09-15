@@ -10,7 +10,8 @@
     "composer/installers": "~1.2"
   },
   "require-dev": {
-    "wpeverest/wpeverest-sniffs": "^0.0.2"
+    "wpeverest/wpeverest-sniffs": "^0.0.2",
+    "wp-cli/i18n-command": "^2.2.5"
   },
   "scripts": {
     "phpcs": [
@@ -21,6 +22,9 @@
     ],
     "phpcbf": [
       "phpcbf -p"
+    ],
+    "make-pot": [
+      "wp i18n make-pot . languages/themegrill-demo-importer.pot --exclude=\"vendor,node_modules,.github,.wordpress.org\" --slug=themegrill-demo-importer"
     ]
   },
   "extra": {
