@@ -1,5 +1,8 @@
-( function( $, wp, settings ) {
-	var $document = $( document );
+( function( $, wp ) {
+	var $document = $( document ),
+		__ = wp.i18n.__,
+		_x = wp.i18n._x,
+		sprintf = wp.i18n.sprintf;
 
 	wp = wp || {};
 
@@ -9,18 +12,6 @@
 	 * @type {object}
 	 */
 	wp.updates = wp.updates || {};
-
-	/**
-	 * Localized strings.
-	 *
-	 * @type {object}
-	 */
-	wp.updates.l10n = _.extend( wp.updates.l10n, settings.l10n || {} );
-
-	// Check for WordPress 5.5 version.
-	if ( 'undefined' === typeof wp.updates.l10n ) {
-		wp.updates.l10n = settings.l10n || {};
-	}
 
 	/**
 	 * Sends an Ajax request to the server to import a demo.
@@ -46,14 +37,21 @@
 
 		$message.addClass( 'updating-message' );
 		$message.parents( '.theme' ).addClass( 'focus' );
-		if ( $message.html() !== wp.updates.l10n.importing ) {
+		if ( $message.html() !== __( 'Importing...', 'themegrill-demo-importer' ) ) {
 			$message.data( 'originaltext', $message.html() );
 		}
 
 		$message
-			.text( wp.updates.l10n.importing )
-			.attr( 'aria-label', wp.updates.l10n.demoImportingLabel.replace( '%s', $message.data( 'name' ) ) );
-		wp.a11y.speak( wp.updates.l10n.importingMsg, 'polite' );
+			.text( __( 'Importing...', 'themegrill-demo-importer' ) )
+			.attr(
+				'aria-label',
+				sprintf(
+					/* translators: %s: Demo name. */
+					_x( 'Importing %s...', 'demo', 'themegrill-demo-importer' ),
+					$message.data( 'name' )
+				)
+			);
+		wp.a11y.speak( __( 'Importing... please wait.', 'themegrill-demo-importer' ), 'polite' );
 
 		// Remove previous error messages, if any.
 		$( '.install-theme-info, [data-slug="' + args.slug + '"]' ).removeClass( 'demo-import-failed' ).find( '.notice.notice-error' ).remove();
@@ -80,10 +78,17 @@
 		$message = $card.find( '.button-primary' )
 			.removeClass( 'updating-message' )
 			.addClass( 'updated-message disabled' )
-			.attr( 'aria-label', wp.updates.l10n.demoImportedLabel.replace( '%s', response.demoName ) )
-			.text( wp.updates.l10n.imported );
+			.attr(
+				'aria-label',
+				sprintf(
+					/* translators: %s: Demo name. */
+					_x( '%s imported!', 'demo', 'themegrill-demo-importer' ),
+					response.demoName
+				)
+			)
+			.text( __( 'Imported!', 'themegrill-demo-importer' ) );
 
-		wp.a11y.speak( wp.updates.l10n.importedMsg, 'polite' );
+		wp.a11y.speak( __( 'Import completed successfully.', 'themegrill-demo-importer' ), 'polite' );
 
 		setTimeout( function() {
 
@@ -98,8 +103,15 @@
 					.attr( 'href', response.previewUrl )
 					.removeClass( 'demo-import updated-message disabled' )
 					.addClass( 'live-preview' )
-					.attr( 'aria-label', wp.updates.l10n.livePreviewLabel.replace( '%s', response.demoName ) )
-					.text( wp.updates.l10n.livePreview );
+					.attr(
+						'aria-label',
+						sprintf(
+							/* translators: %s: Demo name. */
+							_x( 'Live Preview %s', 'demo', 'themegrill-demo-importer' ),
+							response.demoName
+						)
+					)
+					.text( __( 'Live Preview', 'themegrill-demo-importer' ) );
 			}
 		}, 1000 );
 	};
@@ -115,7 +127,11 @@
 	 */
 	wp.updates.importDemoError = function( response ) {
 		var $card, $button,
-			errorMessage = wp.updates.l10n.importFailed.replace( '%s', response.errorMessage ),
+			errorMessage = sprintf(
+				/* translators: %s: Demo import error message. */
+				__( 'Import failed: %s', 'themegrill-demo-importer' ),
+				response.errorMessage
+			),
 			$message     = wp.updates.adminNotice( {
 				className: 'update-message notice-error notice-alt',
 				message:   errorMessage
@@ -139,8 +155,15 @@
 
 		$button
 			.removeClass( 'updating-message' )
-			.attr( 'aria-label', wp.updates.l10n.demoImportFailedLabel.replace( '%s', $button.data( 'name' ) ) )
-			.text( wp.updates.l10n.importFailedShort );
+			.attr(
+				'aria-label',
+				sprintf(
+					/* translators: %s: Demo name. */
+					_x( '%s import failed', 'demo', 'themegrill-demo-importer' ),
+					$button.data( 'name' )
+				)
+			)
+			.text( __( 'Import Failed!', 'themegrill-demo-importer' ) );
 
 		wp.a11y.speak( errorMessage, 'assertive' );
 
@@ -168,27 +191,42 @@
 		if ( $document.find( 'body' ).hasClass( 'full-overlay-active' ) ) {
 			$pluginRow = $( 'tr[data-slug="' + args.slug + '"]' );
 			$message   = $( '.theme-install-overlay .demo-import[data-slug="' + args.demo + '"]' );
-			message    = wp.updates.l10n.pluginInstallingLabel.replace( '%s', $pluginRow.data( 'name' ) );
+			message    = sprintf(
+				/* translators: %s: Plugin name. */
+				_x( 'Installing %s...', 'plugin', 'themegrill-demo-importer' ),
+				$pluginRow.data( 'name' )
+			);
 			$pluginRow.find( '.plugin-status span' )
 				.addClass( 'updating-message' )
-				.attr( 'aria-label', wp.updates.l10n.pluginInstallingLabel.replace( '%s', $pluginRow.data( 'name' ) ) )
-				.text( wp.updates.l10n.installing );
+				.attr(
+					'aria-label',
+					sprintf(
+						/* translators: %s: Plugin name. */
+						_x( 'Installing %s...', 'plugin', 'themegrill-demo-importer' ),
+						$pluginRow.data( 'name' )
+					)
+				)
+				.text( __( 'Installing...', 'themegrill-demo-importer' ) );
 		} else {
 			$message = $( '.demo-import[data-slug="' + args.demo + '"]' );
-			message  = wp.updates.l10n.pluginInstallingLabel.replace( '%s', args.name );
+			message  = sprintf(
+				/* translators: %s: Plugin name. */
+				_x( 'Installing %s...', 'plugin', 'themegrill-demo-importer' ),
+				args.name
+			);
 			$message.parents( '.theme' ).addClass( 'focus' );
 		}
 
-		if ( $message.html() !== wp.updates.l10n.installing ) {
+		if ( $message.html() !== __( 'Installing...', 'themegrill-demo-importer' ) ) {
 			$message.data( 'originaltext', $message.html() );
 		}
 
 		$message
 			.attr( 'aria-label', message )
 			.addClass( 'updating-message' )
-			.text( wp.updates.l10n.installing );
+			.text( __( 'Installing...', 'themegrill-demo-importer' ) );
 
-		wp.a11y.speak( wp.updates.l10n.installingMsg, 'polite' );
+		wp.a11y.speak( __( 'Installing... please wait.', 'themegrill-demo-importer' ), 'polite' );
 
 		$document.trigger( 'wp-plugin-bulk-installing', args );
 
@@ -211,10 +249,17 @@
 		$updateMessage
 			.removeClass( 'updating-message install-now' )
 			.addClass( 'updated-message active' )
-			.attr( 'aria-label', wp.updates.l10n.pluginInstalledLabel.replace( '%s', response.pluginName ) )
-			.text( wp.updates.l10n.pluginInstalled );
+			.attr(
+				'aria-label',
+				sprintf(
+					/* translators: %s: Plugin name. */
+					_x( '%s installed!', 'plugin', 'themegrill-demo-importer' ),
+					response.pluginName
+				)
+			)
+			.text( _x( 'Installed!', 'plugin', 'themegrill-demo-importer' ) );
 
-		wp.a11y.speak( wp.updates.l10n.installedMsg, 'polite' );
+		wp.a11y.speak( __( 'Installation completed successfully.', 'themegrill-demo-importer' ), 'polite' );
 
 		$document.trigger( 'wp-plugin-bulk-install-success', response );
 	};
@@ -242,13 +287,24 @@
 			return;
 		}
 
-		errorMessage = wp.updates.l10n.installFailed.replace( '%s', response.errorMessage );
+		errorMessage = sprintf(
+			/* translators: %s: Bulk plugin installation error message. */
+			__( 'Installation failed: %s', 'themegrill-demo-importer' ),
+			response.errorMessage
+		);
 
 		$updateMessage
 			.removeClass( 'updating-message' )
 			.addClass( 'updated-message' )
-			.attr( 'aria-label', wp.updates.l10n.pluginInstallFailedLabel.replace( '%s', $pluginRow.data( 'name' ) ) )
-			.text( wp.updates.l10n.installFailedShort );
+			.attr(
+				'aria-label',
+				sprintf(
+					/* translators: %s: Plugin name. */
+					_x( '%s installation failed', 'plugin', 'themegrill-demo-importer' ),
+					$pluginRow.data( 'name' )
+				)
+			)
+			.text( __( 'Installation Failed!', 'themegrill-demo-importer' ) );
 
 		wp.a11y.speak( errorMessage, 'assertive' );
 
@@ -268,7 +324,7 @@
 	 *                                                'update' or 'install'.
 	 */
 	wp.updates.isValidResponse = function( response, action ) {
-		var error = wp.updates.l10n.unknownError,
+		var error = __( 'Something went wrong.', 'themegrill-demo-importer' ),
 			errorMessage;
 
 		// Make sure the response is a valid data object and not a Promise object.
@@ -277,22 +333,22 @@
 		}
 
 		if ( _.isString( response ) && '-1' === response ) {
-			error = wp.updates.l10n.nonceError;
+			error = __( 'An error has occurred. Please reload the page and try again.', 'themegrill-demo-importer' );
 		} else if ( _.isString( response ) ) {
 			error = response;
 		} else if ( 'undefined' !== typeof response.readyState && 0 === response.readyState ) {
-			error = wp.updates.l10n.connectionError;
+			error = __( 'Connection lost or the server is busy. Please try again later.', 'themegrill-demo-importer' );
 		} else if ( _.isString( response.statusText ) ) {
-			error = response.statusText + ' ' + wp.updates.l10n.statusTextLink;
+			error = response.statusText + ' ' + '<a href="https://docs.themegrill.com/knowledgebase/demo-import-process-failed/" target="_blank">' + __( 'Try this solution!', 'themegrill-demo-importer' ) + '</a>';
 		}
 
 		switch ( action ) {
 			case 'import':
-				errorMessage = wp.updates.l10n.importFailed;
+				errorMessage = __( 'Import failed: %s', 'themegrill-demo-importer' );
 				break;
 
 			case 'install':
-				errorMessage = wp.updates.l10n.installFailed;
+				errorMessage = __( 'Installation failed: %s', 'themegrill-demo-importer' );
 				break;
 		}
 
@@ -313,7 +369,7 @@
 		$( '.button.updating-message' )
 			.removeClass( 'updating-message' )
 			.removeAttr( 'aria-label' )
-			.text( wp.updates.l10n.importFailedShort );
+			.text( __( 'Import Failed!', 'themegrill-demo-importer' ) );
 
 		wp.a11y.speak( errorMessage, 'assertive' );
 
@@ -352,4 +408,4 @@
 		$document.trigger( 'wp-updates-queue-job', job );
 	};
 
-})( jQuery, window.wp, window._demoUpdatesSettings );
+})( jQuery, window.wp );
