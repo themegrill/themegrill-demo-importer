@@ -1,4 +1,7 @@
 == Changelog ==
+= 1.6.7 - 15-09-2020 =
+* Tweak - Utilize `wp.i18n` for translation of strings for `wp.updates.l10n` deprecated since WordPress 5.5
+
 = 1.6.6 - 06-08-2020 =
 * Introduce - Demo Importer Status page
 * Tweak     - Added compatibility with WordPress v5.5
