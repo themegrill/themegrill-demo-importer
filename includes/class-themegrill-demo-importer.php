@@ -1,6 +1,6 @@
 <?php
 /**
- * ThemeGrill Demo Importer setup
+ * ThemeGrill Demo Importer setup.
  *
  * @package ThemeGrill_Demo_Importer
  * @since   1.5.0
@@ -17,29 +17,34 @@ defined( 'ABSPATH' ) || exit;
 final class ThemeGrill_Demo_Importer {
 
 	/**
-	 * Plugin version.
+	 * ThemeGrill Demo Importer version.
 	 *
 	 * @var string
 	 */
 	public $version = '2.0.0';
 
 	/**
-	 * Theme single instance of this class.
+	 * The single instance of the class.
 	 *
 	 * @var object
 	 */
 	protected static $_instance = null;
 
 	/**
-	 * Return an instance of this class.
+	 * Main ThemeGrill Demo Importer Instance.
 	 *
-	 * @return ThemeGrill_Demo_Importer A single instance of this class.
+	 * Ensures only one instance of ThemeGrill Demo Importer is loaded or can be loaded.
+	 *
+	 * @return ThemeGrill_Demo_Importer Main instance.
 	 */
 	public static function instance() {
+
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
 		}
+
 		return self::$_instance;
+
 	}
 
 	/**
@@ -61,13 +66,15 @@ final class ThemeGrill_Demo_Importer {
 	}
 
 	/**
-	 * Initialize the plugin.
+	 * ThemeGrill Demo Importer Constructor.
 	 */
 	private function __construct() {
+
 		$this->define_constants();
 		$this->init_hooks();
 
 		do_action( 'themegrill_demo_importer_loaded' );
+
 	}
 
 	/**
