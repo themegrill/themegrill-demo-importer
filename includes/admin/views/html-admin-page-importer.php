@@ -5,8 +5,8 @@
  * @package ThemeGrill_Demo_Importer
  */
 
+// Exit if accessed directly.
 defined( 'ABSPATH' ) || exit;
-
 ?>
 <div class="wrap demo-importer">
 	<h1 class="wp-heading-inline"><?php esc_html_e( 'Demo Importer', 'themegrill-demo-importer' ); ?></h1>

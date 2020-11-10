@@ -8,6 +8,7 @@
  * @version 1.1.0
  */
 
+// Exit if accessed directly.
 defined( 'ABSPATH' ) || exit;
 
 /**

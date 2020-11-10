@@ -8,6 +8,7 @@
  * @version 1.3.4
  */
 
+// Exit if accessed directly.
 defined( 'WP_UNINSTALL_PLUGIN' ) || exit;
 
 global $wpdb;

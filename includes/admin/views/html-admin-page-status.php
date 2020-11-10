@@ -5,6 +5,7 @@
  * @package ThemeGrill_Demo_Importer
  */
 
+// Exit if accessed directly.
 defined( 'ABSPATH' ) || exit;
 
 // Tabs on status page.

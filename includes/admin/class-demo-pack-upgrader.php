@@ -11,6 +11,15 @@
  * @see WP_Upgrader
  * @package ThemeGrill_Demo_Importer\Class
  */
+
+// Exit if accessed directly.
+defined( 'ABSPATH' ) || exit;
+
+/**
+ * Core class used for upgrading/installing demo packs.
+ *
+ * Class TG_Demo_Pack_Upgrader
+ */
 class TG_Demo_Pack_Upgrader extends WP_Upgrader {
 
 	/**

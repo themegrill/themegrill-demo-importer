@@ -6,6 +6,7 @@
  * @since   1.5.0
  */
 
+// Exit if accessed directly.
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -20,7 +21,7 @@ final class ThemeGrill_Demo_Importer {
 	 *
 	 * @var string
 	 */
-	public $version = '1.6.7';
+	public $version = '2.0.0';
 
 	/**
 	 * Theme single instance of this class.

@@ -5,6 +5,7 @@
  * Class TG_Demo_Importer_Deactivator
  */
 
+// Exit if accessed directly.
 defined( 'ABSPATH' ) || exit;
 
 /**
