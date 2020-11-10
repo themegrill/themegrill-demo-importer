@@ -7,6 +7,7 @@ package.json export-ignore
 package-lock.json export-ignore
 phpcs.xml export-ignore
 README.md export-ignore
+phpcs.xml.dist export-ignore
 
 # Set the default behavior, in case people don't have core.autocrlf set.
 * text=auto
