@@ -33,7 +33,7 @@ final class ThemeGrill_Demo_Importer {
 	/**
 	 * Return an instance of this class.
 	 *
-	 * @return object A single instance of this class.
+	 * @return ThemeGrill_Demo_Importer A single instance of this class.
 	 */
 	public static function instance() {
 		if ( is_null( self::$_instance ) ) {
