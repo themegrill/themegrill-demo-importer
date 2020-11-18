@@ -192,7 +192,7 @@ final class ThemeGrill_Demo_Importer {
 	}
 
 	/**
-	 * Install TG Demo Importer.
+	 * Install/Create ThemeGrill Demo Importer main uploads folder.
 	 */
 	public function install() {
 
@@ -211,8 +211,10 @@ final class ThemeGrill_Demo_Importer {
 
 		// Install files and folders.
 		foreach ( $files as $file ) {
+
 			if ( wp_mkdir_p( $file['base'] ) && ! file_exists( trailingslashit( $file['base'] ) . $file['file'] ) ) {
 				$file_handle = @fopen( trailingslashit( $file['base'] ) . $file['file'], 'w' ); // phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.file_system_read_fopen
+
 				if ( $file_handle ) {
 					fwrite( $file_handle, $file['content'] ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_fwrite
 					fclose( $file_handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_fclose
@@ -242,8 +244,8 @@ final class ThemeGrill_Demo_Importer {
 	 * Note: the first-loaded translation file overrides any following ones if the same translation is present.
 	 *
 	 * Locales found in:
-	 *      - WP_LANG_DIR/themegrill-demo-importer/themegrill-demo-importer-LOCALE.mo
-	 *      - WP_LANG_DIR/plugins/themegrill-demo-importer-LOCALE.mo
+	 *  - WP_LANG_DIR/themegrill-demo-importer/themegrill-demo-importer-LOCALE.mo
+	 *  - WP_LANG_DIR/plugins/themegrill-demo-importer-LOCALE.mo
 	 */
 	public function load_plugin_textdomain() {
 
@@ -317,10 +319,20 @@ final class ThemeGrill_Demo_Importer {
 	 */
 	public function theme_support_missing_notice() {
 
+		$output     = '';
 		$themes_url = array_intersect( array_keys( wp_get_themes() ), $this->get_core_supported_themes() ) ? admin_url( 'themes.php?search=themegrill' ) : admin_url( 'theme-install.php?search=themegrill' );
 
-		/* translators: %s: official ThemeGrill themes URL */
-		echo '<div class="error notice is-dismissible"><p><strong>' . esc_html__( 'ThemeGrill Demo Importer', 'themegrill-demo-importer' ) . '</strong> &#8211; ' . sprintf( esc_html__( 'This plugin requires %s to be activated to work.', 'themegrill-demo-importer' ), '<a href="' . esc_url( $themes_url ) . '">' . esc_html__( 'Official ThemeGrill Theme', 'themegrill-demo-importer' ) . '</a>' ) . '</p></div>';
+		$output .= '<div class="error notice is-dismissible"><p><strong>';
+		$output .= esc_html__( 'ThemeGrill Demo Importer', 'themegrill-demo-importer' );
+		$output .= '</strong> &#8211; ';
+		$output .= sprintf(
+			/* translators: %s: official ThemeGrill themes URL */
+			esc_html__( 'This plugin requires %s to be activated to work.', 'themegrill-demo-importer' ),
+			'<a href="' . esc_url( $themes_url ) . '">' . esc_html__( 'Official ThemeGrill Theme', 'themegrill-demo-importer' ) . '</a>'
+		);
+		$output .= '</p></div>';
+
+		echo $output;
 
 	}
 }

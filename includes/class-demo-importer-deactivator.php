@@ -3,6 +3,8 @@
  * Class to include the plugin deactivation functionality.
  *
  * Class TG_Demo_Importer_Deactivator
+ *
+ * @package ThemeGrill_Demo_Importer\Classes
  */
 
 // Exit if accessed directly.
