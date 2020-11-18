@@ -189,11 +189,6 @@ final class ThemeGrill_Demo_Importer {
 		include_once TGDM_ABSPATH . 'includes/admin/class-plugin-review-notice.php';
 		include_once TGDM_ABSPATH . 'includes/admin/class-plugin-deactivate-notice.php';
 
-		// Backward compatibility for demo packages config.
-		if ( file_exists( TGDM_DEMO_DIR . 'tg-demo-config.php' ) ) {
-			include_once TGDM_DEMO_DIR . 'tg-demo-config.php';
-		}
-
 	}
 
 	/**
