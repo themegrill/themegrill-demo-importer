@@ -213,6 +213,7 @@ final class ThemeGrill_Demo_Importer {
 		foreach ( $files as $file ) {
 
 			if ( wp_mkdir_p( $file['base'] ) && ! file_exists( trailingslashit( $file['base'] ) . $file['file'] ) ) {
+
 				$file_handle = @fopen( trailingslashit( $file['base'] ) . $file['file'], 'w' ); // phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.file_system_read_fopen
 
 				if ( $file_handle ) {
@@ -302,6 +303,7 @@ final class ThemeGrill_Demo_Importer {
 	public function plugin_row_meta( $plugin_meta, $plugin_file ) {
 
 		if ( TGDM_PLUGIN_BASENAME === $plugin_file ) {
+
 			$new_plugin_meta = array(
 				'docs'    => '<a href="' . esc_url( apply_filters( 'themegrill_demo_importer_docs_url', 'https://themegrill.com/docs/themegrill-demo-importer/' ) ) . '" title="' . esc_attr( __( 'View Demo Importer Documentation', 'themegrill-demo-importer' ) ) . '">' . __( 'Docs', 'themegrill-demo-importer' ) . '</a>',
 				'support' => '<a href="' . esc_url( apply_filters( 'themegrill_demo_importer_support_url', 'https://themegrill.com/support-forum/' ) ) . '" title="' . esc_attr( __( 'Visit Free Customer Support Forum', 'themegrill-demo-importer' ) ) . '">' . __( 'Free Support', 'themegrill-demo-importer' ) . '</a>',
@@ -332,7 +334,7 @@ final class ThemeGrill_Demo_Importer {
 		);
 		$output .= '</p></div>';
 
-		echo $output;
+		echo $output; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
 	}
 }
