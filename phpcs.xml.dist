@@ -16,7 +16,6 @@
 
 	<!-- Rules -->
 	<rule ref="WordPress" />
-
 	<rule ref="WordPress.WP.I18n">
 		<properties>
 			<property name="text_domain" type="array" value="themegrill-demo-importer"/>
