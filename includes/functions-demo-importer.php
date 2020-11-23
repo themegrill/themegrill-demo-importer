@@ -229,6 +229,55 @@ function tg_remove_theme_mods() {
 /**
  * After demo imported AJAX action.
  *
+ * @see tg_set_elementor_active_kit()
+ */
+add_action( 'themegrill_ajax_demo_imported', 'tg_set_elementor_active_kit' );
+
+/**
+ * Set Elementor kit properly.
+ */
+function tg_set_elementor_active_kit() {
+	if ( version_compare( ELEMENTOR_VERSION, '3.0.0', '>=' ) ) {
+
+		global $wpdb;
+		$page_ids = $wpdb->get_results( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE (post_name = %s OR post_title = %s) AND post_type = 'elementor_library' AND post_status = 'publish'", 'default-kit', 'Default Kit' ) );
+
+		if ( ! is_null( $page_ids ) ) {
+			$page_id    = 0;
+			$delete_ids = array();
+
+			// Retrieve page with greater id and delete others.
+			if ( sizeof( $page_ids ) > 1 ) {
+				foreach ( $page_ids as $page ) {
+					if ( $page->ID > $page_id ) {
+						if ( $page_id ) {
+							$delete_ids[] = $page_id;
+						}
+
+						$page_id = $page->ID;
+					} else {
+						$delete_ids[] = $page->ID;
+					}
+				}
+			} else {
+				$page_id = $page_ids[0]->ID;
+			}
+
+			// Delete posts.
+			foreach ( $delete_ids as $delete_id ) {
+				wp_delete_post( $delete_id, true );
+			}
+
+			if ( $page_id > 0 ) {
+				update_option( 'elementor_active_kit', $page_id );
+			}
+		}
+	}
+}
+
+/**
+ * After demo imported AJAX action.
+ *
  * @see tg_set_wc_pages()
  */
 if ( class_exists( 'WooCommerce' ) ) {

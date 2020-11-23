@@ -670,7 +670,6 @@ class TG_Demo_Importer {
 			$this->import_dummy_xml( $slug, $demo_data, $status );
 			$this->import_core_options( $slug, $demo_data );
 			$this->import_elementor_schemes( $slug, $demo_data );
-			$this->import_elementor_active_kit( $slug, $demo_data );
 			$this->import_customizer_data( $slug, $demo_data, $status );
 			$this->import_widget_settings( $slug, $demo_data, $status );
 
@@ -804,24 +803,6 @@ class TG_Demo_Importer {
 						update_option( 'elementor_scheme_' . $scheme_key, $scheme_value );
 					}
 				}
-			}
-		}
-
-		return true;
-	}
-
-	/**
-	 * Import Elementor active kit data.
-	 *
-	 * @param string $demo_id Demo ID.
-	 * @param array  $demo_data Demo Data.
-	 * @return bool
-	 */
-	public function import_elementor_active_kit( $demo_id, $demo_data ) {
-		if ( version_compare( ELEMENTOR_VERSION, '3.0.0', '>=' ) ) {
-
-			if ( ! empty( $demo_data['elementor_active_kit'] ) ) {
-				update_option( 'elementor_active_kit', $demo_data['elementor_active_kit'] );
 			}
 		}
 
