@@ -73,7 +73,8 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 
 == Changelog ==
 = TBD =
-* Fix - Elementor default kit not applied in theme demo import
+* Fix - WooCommerce default pages not set properly after the theme demo import
+* Fix - Elementor default kit introduced from version 3.0.0 not applied after the theme demo import
 
 = 1.6.7 - 15-09-2020 =
 * Tweak - Utilize `wp.i18n` for translation of strings for `wp.updates.l10n` deprecated since WordPress 5.5
