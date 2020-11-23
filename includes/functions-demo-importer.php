@@ -272,6 +272,12 @@ function tg_set_elementor_active_kit() {
 
 			// Update `elementor_active_kit` page.
 			if ( $page_id > 0 ) {
+				wp_update_post(
+					array(
+						'ID'        => $page_id,
+						'post_name' => sanitize_title( 'Default Kit' ),
+					)
+				);
 				update_option( 'elementor_active_kit', $page_id );
 			}
 		}
