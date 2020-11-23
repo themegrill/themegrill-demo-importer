@@ -72,6 +72,9 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 3. Finally, Import the Demo with just one click.
 
 == Changelog ==
+= TBD =
+* Fix - Elementor default kit not applied in theme demo import
+
 = 1.6.7 - 15-09-2020 =
 * Tweak - Utilize `wp.i18n` for translation of strings for `wp.updates.l10n` deprecated since WordPress 5.5
 

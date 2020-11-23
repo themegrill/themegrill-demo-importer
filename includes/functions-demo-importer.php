@@ -263,7 +263,6 @@ function tg_set_elementor_active_kit() {
 				$page_id = $page_ids[0]->ID;
 			}
 
-			// Delete posts.
 			foreach ( $delete_ids as $delete_id ) {
 				wp_delete_post( $delete_id, true );
 			}
