@@ -789,17 +789,20 @@ class TG_Demo_Importer {
 	 * @return bool
 	 */
 	public function import_elementor_schemes( $demo_id, $demo_data ) {
-		if ( ! empty( $demo_data['elementor_schemes'] ) ) {
-			foreach ( $demo_data['elementor_schemes'] as $scheme_key => $scheme_value ) {
-				if ( ! in_array( $scheme_key, array( 'color', 'typography', 'color-picker' ) ) ) {
-					continue;
-				}
+		if ( version_compare( ELEMENTOR_VERSION, '3.0.0', '<=' ) ) {
 
-				// Change scheme index to start from 1 instead.
-				$scheme_value = array_combine( range( 1, count( $scheme_value ) ), $scheme_value );
+			if ( ! empty( $demo_data['elementor_schemes'] ) ) {
+				foreach ( $demo_data['elementor_schemes'] as $scheme_key => $scheme_value ) {
+					if ( ! in_array( $scheme_key, array( 'color', 'typography', 'color-picker' ) ) ) {
+						continue;
+					}
 
-				if ( ! empty( $scheme_value ) ) {
-					update_option( 'elementor_scheme_' . $scheme_key, $scheme_value );
+					// Change scheme index to start from 1 instead.
+					$scheme_value = array_combine( range( 1, count( $scheme_value ) ), $scheme_value );
+
+					if ( ! empty( $scheme_value ) ) {
+						update_option( 'elementor_scheme_' . $scheme_key, $scheme_value );
+					}
 				}
 			}
 		}
@@ -815,8 +818,11 @@ class TG_Demo_Importer {
 	 * @return bool
 	 */
 	public function import_elementor_active_kit( $demo_id, $demo_data ) {
-		if ( ! empty( $demo_data['elementor_active_kit'] ) ) {
-			update_option( 'elementor_active_kit', $demo_data['elementor_active_kit'] );
+		if ( version_compare( ELEMENTOR_VERSION, '3.0.0', '>=' ) ) {
+
+			if ( ! empty( $demo_data['elementor_active_kit'] ) ) {
+				update_option( 'elementor_active_kit', $demo_data['elementor_active_kit'] );
+			}
 		}
 
 		return true;
