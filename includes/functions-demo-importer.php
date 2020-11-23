@@ -230,59 +230,27 @@ function tg_remove_theme_mods() {
 /**
  * After demo imported AJAX action.
  *
- * @see tg_set_wc_pages()
+ * @see tg_set_elementor_active_kit()
  */
-if ( class_exists( 'WooCommerce' ) ) {
-	add_action( 'themegrill_ajax_demo_imported', 'tg_set_wc_pages' );
-}
+add_action( 'themegrill_ajax_demo_imported', 'tg_set_elementor_active_kit' );
 
 /**
- * Set WC pages properly and disable setup wizard redirect.
- *
- * After importing demo data filter out duplicate WC pages and set them properly.
- * Happens when the user run default woocommerce setup wizard during installation.
- *
- * Note: WC pages ID are stored in an option and slug are modified to remove any numbers.
- *
- * @param string $demo_id
+ * Set Elementor kit properly.
  */
-function tg_set_wc_pages( $demo_id ) {
-	global $wpdb;
+function tg_set_elementor_active_kit() {
+	if ( version_compare( ELEMENTOR_VERSION, '3.0.0', '>=' ) ) {
 
-	$wc_pages = apply_filters(
-		'themegrill_wc_' . $demo_id . '_pages',
-		array(
-			'shop'      => array(
-				'name'  => 'shop',
-				'title' => 'Shop',
-			),
-			'cart'      => array(
-				'name'  => 'cart',
-				'title' => 'Cart',
-			),
-			'checkout'  => array(
-				'name'  => 'checkout',
-				'title' => 'Checkout',
-			),
-			'myaccount' => array(
-				'name'  => 'my-account',
-				'title' => 'My Account',
-			),
-		)
-	);
-
-	// Set WC pages properly.
-	foreach ( $wc_pages as $key => $wc_page ) {
-
-		// Get the ID of every page with matching name or title.
-		$page_ids = $wpdb->get_results( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE (post_name = %s OR post_title = %s) AND post_type = 'page' AND post_status = 'publish'", $wc_page['name'], $wc_page['title'] ) );
+		global $wpdb;
+		$page_ids = $wpdb->get_results( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE (post_name = %s OR post_title = %s) AND post_type = 'elementor_library' AND post_status = 'publish'", 'default-kit', 'Default Kit' ) );
 
 		if ( ! is_null( $page_ids ) ) {
+
 			$page_id    = 0;
 			$delete_ids = array();
 
 			// Retrieve page with greater id and delete others.
 			if ( sizeof( $page_ids ) > 1 ) {
+
 				foreach ( $page_ids as $page ) {
 					if ( $page->ID > $page_id ) {
 						if ( $page_id ) {
@@ -303,21 +271,113 @@ function tg_set_wc_pages( $demo_id ) {
 				wp_delete_post( $delete_id, true );
 			}
 
-			// Update WC page.
+			// Update `elementor_active_kit` page.
 			if ( $page_id > 0 ) {
-				update_option( 'woocommerce_' . $key . '_page_id', $page_id );
 				wp_update_post(
 					array(
 						'ID'        => $page_id,
-						'post_name' => sanitize_title( $wc_page['name'] ),
+						'post_name' => sanitize_title( 'Default Kit' ),
 					)
 				);
+				update_option( 'elementor_active_kit', $page_id );
 			}
 		}
 	}
+}
 
-	// We no longer need WC setup wizard redirect.
-	delete_transient( '_wc_activation_redirect' );
+/**
+ * After demo imported AJAX action.
+ *
+ * @see tg_set_wc_pages()
+ */
+add_action( 'themegrill_ajax_demo_imported', 'tg_set_wc_pages' );
+
+/**
+ * Set WC pages properly and disable setup wizard redirect.
+ *
+ * After importing demo data filter out duplicate WC pages and set them properly.
+ * Happens when the user run default woocommerce setup wizard during installation.
+ *
+ * Note: WC pages ID are stored in an option and slug are modified to remove any numbers.
+ *
+ * @param string $demo_id
+ */
+function tg_set_wc_pages( $demo_id ) {
+	if ( class_exists( 'WooCommerce' ) ) {
+
+		global $wpdb;
+		$wc_pages = apply_filters(
+			'themegrill_wc_' . $demo_id . '_pages',
+			array(
+				'shop'      => array(
+					'name'  => 'shop',
+					'title' => 'Shop',
+				),
+				'cart'      => array(
+					'name'  => 'cart',
+					'title' => 'Cart',
+				),
+				'checkout'  => array(
+					'name'  => 'checkout',
+					'title' => 'Checkout',
+				),
+				'myaccount' => array(
+					'name'  => 'my-account',
+					'title' => 'My Account',
+				),
+			)
+		);
+
+		// Set WC pages properly.
+		foreach ( $wc_pages as $key => $wc_page ) {
+
+			// Get the ID of every page with matching name or title.
+			$page_ids = $wpdb->get_results( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE (post_name = %s OR post_title = %s) AND post_type = 'page' AND post_status = 'publish'", $wc_page['name'], $wc_page['title'] ) );
+
+			if ( ! is_null( $page_ids ) ) {
+
+				$page_id    = 0;
+				$delete_ids = array();
+
+				// Retrieve page with greater id and delete others.
+				if ( sizeof( $page_ids ) > 1 ) {
+
+					foreach ( $page_ids as $page ) {
+						if ( $page->ID > $page_id ) {
+							if ( $page_id ) {
+								$delete_ids[] = $page_id;
+							}
+
+							$page_id = $page->ID;
+						} else {
+							$delete_ids[] = $page->ID;
+						}
+					}
+				} else {
+					$page_id = $page_ids[0]->ID;
+				}
+
+				// Delete posts.
+				foreach ( $delete_ids as $delete_id ) {
+					wp_delete_post( $delete_id, true );
+				}
+
+				// Update WC page.
+				if ( $page_id > 0 ) {
+					wp_update_post(
+						array(
+							'ID'        => $page_id,
+							'post_name' => sanitize_title( $wc_page['name'] ),
+						)
+					);
+					update_option( 'woocommerce_' . $key . '_page_id', $page_id );
+				}
+			}
+		}
+
+		// We no longer need WC setup wizard redirect.
+		delete_transient( '_wc_activation_redirect' );
+	}
 }
 
 /**
