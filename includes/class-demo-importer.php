@@ -549,6 +549,16 @@ class TG_Demo_Importer {
 							);
 						}
 					}
+
+					if ( ! $required_version && ( $zakra_pro_required_version && $companion_elementor_required_version ) ) {
+						$required_message = sprintf(
+							esc_html__( 'This demo requires %1$s version of %2$s as well as %3$s version of %4$s plugins to get imported', 'themegrill-demo-importer' ),
+							$zakra_pro_required_version,
+							esc_html__( 'Zakra Pro', 'themegrill-demo-importer' ),
+							$companion_elementor_required_version,
+							esc_html__( 'Companion Elementor', 'themegrill-demo-importer' )
+						);
+					}
 				} else {
 					if ( $required_version ) {
 						$required_message = sprintf(
