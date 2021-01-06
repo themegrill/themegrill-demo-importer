@@ -3,7 +3,7 @@ Contributors: ThemeGrill, shivapoudel
 Tags: themegrill, theme demos, demo, importer, one click import
 Requires at least: 4.7
 Tested up to: 5.5
-Stable tag: 1.6.7
+Stable tag: 1.6.8
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -74,6 +74,10 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 == Changelog ==
 = TBD =
 * Tweak - Require `Companion Addons for Elementor` plugin to import certain demos according to the demo config set
+
+= 1.6.8 - 23-11-2020 =
+* Fix - WooCommerce default pages not set properly after the theme demo import
+* Fix - Elementor default kit introduced from version 3.0.0 not applied after the theme demo import
 
 = 1.6.7 - 15-09-2020 =
 * Tweak - Utilize `wp.i18n` for translation of strings for `wp.updates.l10n` deprecated since WordPress 5.5
