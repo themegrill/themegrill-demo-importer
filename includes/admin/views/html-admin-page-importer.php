@@ -112,6 +112,8 @@ defined( 'ABSPATH' ) || exit;
 					<a class="button button-primary purchase-now" href="{{ data.homepage }}" target="_blank"><?php esc_html_e( 'Buy Now', 'themegrill-demo-importer' ); ?></a>
 				<# } else if ( data.isPro ) { #>
 					<a class="button button-primary purchase-now" href="{{ data.homepage }}" target="_blank"><?php esc_html_e( 'Buy Now', 'themegrill-demo-importer' ); ?></a>
+				<# } else if ( data.isAllThemePlan ) { #>
+					<a class="button button-primary purchase-now" href="{{ data.homepage }}" target="_blank"><?php esc_html_e( 'Upgrade Theme Plan', 'themegrill-demo-importer' ); ?></a>
 				<# } else if ( data.requiredVersion ) { #>
 					<a class="button button-primary" href="<?php echo current_user_can( 'update_themes' ) ? esc_url( admin_url( '/update-core.php' ) ) : '#'; ?>" title="{{ data.updateThemeNotice }}" target="_blank"><?php esc_html_e( 'Update', 'themegrill-demo-importer' ); ?></a>
 				<# } else { #>
@@ -141,6 +143,8 @@ defined( 'ABSPATH' ) || exit;
 				<a class="button button-primary purchase-now" href="{{ data.homepage }}" target="_blank"><?php esc_html_e( 'Buy Now', 'themegrill-demo-importer' ); ?></a>
 			<# } else if ( data.isPro ) { #>
 				<a class="button button-primary purchase-now" href="{{ data.homepage }}" target="_blank"><?php esc_html_e( 'Buy Now', 'themegrill-demo-importer' ); ?></a>
+			<# } else if ( data.isAllThemePlan ) { #>
+				<a class="button button-primary purchase-now" href="{{ data.homepage }}" target="_blank"><?php esc_html_e( 'Upgrade Theme Plan', 'themegrill-demo-importer' ); ?></a>
 			<# } else if ( data.requiredTheme ) { #>
 				<button class="button button-primary hide-if-no-js disabled"><?php esc_html_e( 'Import Demo', 'themegrill-demo-importer' ); ?></button>
 			<# } else if ( data.requiredVersion ) { #>
@@ -245,6 +249,8 @@ defined( 'ABSPATH' ) || exit;
 					<a class="button button-hero button-primary purchase-now" href="{{ data.homepage }}" target="_blank"><?php esc_html_e( 'Buy Now', 'themegrill-demo-importer' ); ?></a>
 				<# } else if ( data.isPro ) { #>
 					<a class="button button-hero button-primary purchase-now" href="{{ data.homepage }}" target="_blank"><?php esc_html_e( 'Buy Now', 'themegrill-demo-importer' ); ?></a>
+				<# } else if ( data.isAllThemePlan ) { #>
+					<a class="button button-hero button-primary purchase-now" href="{{ data.homepage }}" target="_blank"><?php esc_html_e( 'Upgrade Theme Plan', 'themegrill-demo-importer' ); ?></a>
 				<# } else if ( data.requiredTheme ) { #>
 					<button class="button button-hero button-primary hide-if-no-js disabled"><?php esc_html_e( 'Import Demo', 'themegrill-demo-importer' ); ?></button>
 				<# } else if ( data.requiredVersion ) { #>
