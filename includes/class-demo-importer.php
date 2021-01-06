@@ -352,6 +352,21 @@ class TG_Demo_Importer {
 	}
 
 	/**
+	 * Check for ThemeGrill All Themes Plan
+	 *
+	 * @return bool
+	 */
+	public function themegrill_is_all_themes_plan() {
+
+		if ( is_plugin_active( 'companion-elementor/companion-elementor.php') ) {
+			return true;
+		}
+
+		return false;
+
+	}
+
+	/**
 	 * Ajax handler for getting demos from github.
 	 */
 	public function ajax_query_demos( $return = true ) {
@@ -455,9 +470,19 @@ class TG_Demo_Importer {
 								}
 							}
 						} else {
-							if ( $current_template === $theme && version_compare( $minimum_version, $current_theme_version, '>' ) ) {
-								$required_version           = $minimum_version;
+							if (
+								$current_template === $theme && version_compare( $minimum_version, $current_theme_version, '>' ) ||
+								( 'companion-elementor' === $theme && version_compare( $minimum_version, $companion_elementor_plugin_name, '>' ) )
+							) {
 								$required_version_installed = true;
+
+								if ( $current_template === $theme ) {
+									$required_version = $minimum_version;
+								}
+
+								if ( 'companion-elementor' === $theme ) {
+									$companion_elementor_required_version = $minimum_version;
+								}
 							}
 						}
 					}
@@ -525,6 +550,16 @@ class TG_Demo_Importer {
 							);
 						}
 					}
+
+					if ( ! $required_version && ( $zakra_pro_required_version && $companion_elementor_required_version ) ) {
+						$required_message = sprintf(
+							esc_html__( 'This demo requires %1$s version of %2$s as well as %3$s version of %4$s plugins to get imported', 'themegrill-demo-importer' ),
+							$zakra_pro_required_version,
+							esc_html__( 'Zakra Pro', 'themegrill-demo-importer' ),
+							$companion_elementor_required_version,
+							esc_html__( 'Companion Elementor', 'themegrill-demo-importer' )
+						);
+					}
 				} else {
 					if ( $required_version ) {
 						$required_message = sprintf(
@@ -532,6 +567,24 @@ class TG_Demo_Importer {
 							$required_version,
 							$current_theme_name
 						);
+					}
+
+					if ( $companion_elementor_required_version ) {
+						if ( $required_version ) {
+							$required_message = sprintf(
+								esc_html__( 'This demo requires %1$s version of %2$s theme and %3$s version of %4$s plugin to get imported', 'themegrill-demo-importer' ),
+								$required_version,
+								$current_theme_name,
+								$companion_elementor_required_version,
+								esc_html__( 'Companion Elementor', 'themegrill-demo-importer' )
+							);
+						} else {
+							$required_message = sprintf(
+								esc_html__( 'This demo requires %1$s version of %2$s plugin to get imported', 'themegrill-demo-importer' ),
+								$companion_elementor_required_version,
+								esc_html__( 'Companion Elementor', 'themegrill-demo-importer' )
+							);
+						}
 					}
 				}
 
@@ -542,6 +595,7 @@ class TG_Demo_Importer {
 					'theme'             => $is_pro_theme_demo ? sprintf( esc_html__( '%s Pro', 'themegrill-demo-importer' ), $available_packages->name ) : $available_packages->name,
 					'isPro'             => $is_pro_theme_demo ? false : isset( $package_data->isPro ),
 					'isPremium'         => $this->zakra_is_premium_theme_plan() ? false : isset( $package_data->isPremium ),
+					'isAllThemePlan'    => $this->themegrill_is_all_themes_plan() ? false : isset( $package_data->isAllThemePlan ),
 					'active'            => $package_slug === $demo_activated_id,
 					'author'            => isset( $package_data->author ) ? $package_data->author : __( 'ThemeGrill', 'themegrill-demo-importer' ),
 					'version'           => isset( $package_data->version ) ? $package_data->version : $available_packages->version,
