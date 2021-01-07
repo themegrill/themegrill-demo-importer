@@ -1,4 +1,7 @@
 == Changelog ==
+= 1.6.9 - 7-01-2021 =
+* Tweak - Require `Companion Addons for Elementor` plugin to import certain demos according to the demo config set
+
 = 1.6.8 - 23-11-2020 =
 * Fix - WooCommerce default pages not set properly after the theme demo import
 * Fix - Elementor default kit introduced from version 3.0.0 not applied after the theme demo import

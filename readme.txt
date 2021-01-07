@@ -72,7 +72,7 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 3. Finally, Import the Demo with just one click.
 
 == Changelog ==
-= TBD =
+= 1.6.9 - 7-01-2021 =
 * Tweak - Require `Companion Addons for Elementor` plugin to import certain demos according to the demo config set
 
 = 1.6.8 - 23-11-2020 =
