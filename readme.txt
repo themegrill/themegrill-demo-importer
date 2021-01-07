@@ -3,7 +3,7 @@ Contributors: ThemeGrill, shivapoudel
 Tags: themegrill, theme demos, demo, importer, one click import
 Requires at least: 4.7
 Tested up to: 5.5
-Stable tag: 1.6.8
+Stable tag: 1.6.9
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -72,7 +72,7 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 3. Finally, Import the Demo with just one click.
 
 == Changelog ==
-= TBD =
+= 1.6.9 - 7-01-2021 =
 * Tweak - Require `Companion Addons for Elementor` plugin to import certain demos according to the demo config set
 
 = 1.6.8 - 23-11-2020 =
