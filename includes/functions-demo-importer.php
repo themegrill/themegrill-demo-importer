@@ -229,6 +229,24 @@ function tg_remove_theme_mods() {
 /**
  * After demo imported AJAX action.
  *
+ * @see tg_set_elementor_load_fa4_shim()
+ */
+add_action( 'themegrill_ajax_demo_imported', 'tg_set_elementor_load_fa4_shim' );
+
+/**
+ * Set Elementor Load FontAwesome 4 support.
+ */
+function tg_set_elementor_load_fa4_shim() {
+	$elementor_load_fa4_shim = get_option( 'elementor_load_fa4_shim' );
+
+	if ( ! $elementor_load_fa4_shim || '' === $elementor_load_fa4_shim ) {
+		update_option( 'elementor_load_fa4_shim', 'yes' );
+	}
+}
+
+/**
+ * After demo imported AJAX action.
+ *
  * @see tg_set_elementor_active_kit()
  */
 add_action( 'themegrill_ajax_demo_imported', 'tg_set_elementor_active_kit' );
