@@ -81,7 +81,11 @@ defined( 'ABSPATH' ) || exit;
 		<span class="premium-demo-banner"><?php esc_html_e( 'Premium', 'themegrill-demo-importer' ); ?></span>
 	<# } #>
 
-	<# if ( data.isPro ) { #>
+	<# if ( data.isPro && data.isAllThemePlan ) { #>
+		<span class="premium-demo-banner"><?php esc_html_e( 'Pro Plus', 'themegrill-demo-importer' ); ?></span>
+	<# } #>
+
+	<# if ( data.isPro && ! data.isAllThemePlan ) { #>
 		<span class="premium-demo-banner"><?php esc_html_e( 'Pro', 'themegrill-demo-importer' ); ?></span>
 	<# } #>
 
@@ -161,11 +165,11 @@ defined( 'ABSPATH' ) || exit;
 			<div class="install-theme-info">
 				<h3 class="theme-name">
 					{{ data.name }}
-					<# if ( data.isPremium ) { #>
-						<span class="premium-demo-tag"><?php esc_html_e( 'Premium', 'themegrill-demo-importer' ); ?></span>
+					<# if ( data.isPro && data.isAllThemePlan ) { #>
+						<span class="premium-demo-tag"><?php esc_html_e( 'Pro Plus', 'themegrill-demo-importer' ); ?></span>
 					<# } #>
 
-					<# if ( data.isPro ) { #>
+					<# if ( data.isPro && ! data.isAllThemePlan ) { #>
 						<span class="premium-demo-tag"><?php esc_html_e( 'Pro', 'themegrill-demo-importer' ); ?></span>
 					<# } #>
 				</h3>
