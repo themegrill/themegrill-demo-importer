@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv3 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: ThemeGrill Demo Importer 1.7.0\n"
+"Project-Id-Version: ThemeGrill Demo Importer 1.7.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/themegrill-demo-importer\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2021-01-11T07:41:56+00:00\n"
+"POT-Creation-Date: 2021-01-18T07:05:06+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.4.0\n"
 "X-Domain: themegrill-demo-importer\n"
@@ -17,7 +17,7 @@ msgstr ""
 #. Plugin Name of the plugin
 #. translators: %s: official ThemeGrill themes URL
 #: includes/class-demo-importer.php:249
-#: includes/class-themegrill-demo-importer.php:269
+#: includes/class-themegrill-demo-importer.php:268
 msgid "ThemeGrill Demo Importer"
 msgstr ""
 
@@ -108,27 +108,6 @@ msgstr ""
 msgid "Action failed. Please refresh the page and retry."
 msgstr ""
 
-#. Translators: %1$s current user display name.
-#: includes/admin/class-plugin-review-notice.php:57
-msgid "Howdy, %1$s! It seems that you have imported the theme demo in your site. We hope that you are happy with it and if you can spare a minute, please help us by leaving a 5-star review on WordPress.org."
-msgstr ""
-
-#: includes/admin/class-plugin-review-notice.php:70
-msgid "Sure"
-msgstr ""
-
-#: includes/admin/class-plugin-review-notice.php:75
-msgid "Maybe later"
-msgstr ""
-
-#: includes/admin/class-plugin-review-notice.php:80
-msgid "I already did"
-msgstr ""
-
-#: includes/admin/class-plugin-review-notice.php:86
-msgid "Got plugin support question?"
-msgstr ""
-
 #: includes/admin/views/html-admin-page-demo-import-faqs.php:11
 #: includes/admin/views/html-admin-page-status.php:14
 msgid "FAQ's"
@@ -148,7 +127,7 @@ msgstr ""
 
 #: includes/admin/views/html-admin-page-importer.php:12
 #: includes/class-demo-importer.php:120
-#: includes/class-themegrill-demo-importer.php:236
+#: includes/class-themegrill-demo-importer.php:235
 msgid "Demo Importer"
 msgstr ""
 
@@ -756,33 +735,33 @@ msgstr ""
 msgid "Cheatin&#8217; huh?"
 msgstr ""
 
-#: includes/class-themegrill-demo-importer.php:236
+#: includes/class-themegrill-demo-importer.php:235
 msgid "View Demo Importer"
 msgstr ""
 
-#: includes/class-themegrill-demo-importer.php:252
+#: includes/class-themegrill-demo-importer.php:251
 msgid "View Demo Importer Documentation"
 msgstr ""
 
-#: includes/class-themegrill-demo-importer.php:252
+#: includes/class-themegrill-demo-importer.php:251
 msgid "Docs"
 msgstr ""
 
-#: includes/class-themegrill-demo-importer.php:253
+#: includes/class-themegrill-demo-importer.php:252
 msgid "Visit Free Customer Support Forum"
 msgstr ""
 
-#: includes/class-themegrill-demo-importer.php:253
+#: includes/class-themegrill-demo-importer.php:252
 msgid "Free Support"
 msgstr ""
 
 #. translators: %s: official ThemeGrill themes URL
-#: includes/class-themegrill-demo-importer.php:269
+#: includes/class-themegrill-demo-importer.php:268
 msgid "This plugin requires %s to be activated to work."
 msgstr ""
 
 #. translators: %s: official ThemeGrill themes URL
-#: includes/class-themegrill-demo-importer.php:269
+#: includes/class-themegrill-demo-importer.php:268
 msgid "Official ThemeGrill Theme"
 msgstr ""
 
