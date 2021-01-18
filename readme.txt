@@ -72,6 +72,9 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 3. Finally, Import the Demo with just one click.
 
 == Changelog ==
+= TBD =
+* Remove - Admin notice for `Plugin Review`.
+
 = 1.7.0 - 11-01-2021 =
 * Tweak - Set FontAwesome 4 Shim feature to be enabled automatically on successful theme demo import.
 
