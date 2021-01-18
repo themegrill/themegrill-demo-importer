@@ -1,4 +1,7 @@
 == Changelog ==
+= 1.7.1 - 18-01-2021 =
+* Remove - Admin notice for `Plugin Review`.
+
 = 1.7.0 - 11-01-2021 =
 * Tweak - Set FontAwesome 4 Shim feature to be enabled automatically on successful theme demo import.
 
