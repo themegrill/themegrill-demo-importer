@@ -255,7 +255,9 @@ add_action( 'themegrill_ajax_demo_imported', 'tg_set_elementor_active_kit' );
  * Set Elementor kit properly.
  */
 function tg_set_elementor_active_kit() {
-	if ( version_compare( ELEMENTOR_VERSION, '3.0.0', '>=' ) ) {
+	$elementor_version = defined( 'ELEMENTOR_VERSION' ) ? ELEMENTOR_VERSION : false;
+
+	if ( version_compare( $elementor_version, '3.0.0', '>=' ) ) {
 
 		global $wpdb;
 		$page_ids = $wpdb->get_results( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE (post_name = %s OR post_title = %s) AND post_type = 'elementor_library' AND post_status = 'publish'", 'default-kit', 'Default Kit' ) );

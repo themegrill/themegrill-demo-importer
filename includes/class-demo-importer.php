@@ -842,7 +842,9 @@ class TG_Demo_Importer {
 	 * @return bool
 	 */
 	public function import_elementor_schemes( $demo_id, $demo_data ) {
-		if ( version_compare( ELEMENTOR_VERSION, '3.0.0', '<=' ) ) {
+		$elementor_version = defined( 'ELEMENTOR_VERSION' ) ? ELEMENTOR_VERSION : false;
+
+		if ( version_compare( $elementor_version, '3.0.0', '<=' ) ) {
 
 			if ( ! empty( $demo_data['elementor_schemes'] ) ) {
 				foreach ( $demo_data['elementor_schemes'] as $scheme_key => $scheme_value ) {
