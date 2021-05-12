@@ -324,7 +324,9 @@ body {
 
 //Modal Message after sucessful demo import
 
-.modal-message {
+//Modal Message after sucessful demo import
+
+.modal-message{
 	position: fixed;
 	top: 0;
 	bottom: 0;
@@ -337,5 +339,31 @@ body {
 	visibility: hidden;
 	transform: scale(1.2);
 	transition: all 0.3s ease-out;
-	
+
+	&__inner {
+		margin: auto;
+	}
+
+	&__title {
+
+	}
+
+	&__description {
+
+	}
+
+	&__close {
+		position: absolute;
+		top: 35px;
+		right: 35px;
+		font-size: 2rem;
+		color: #000;
+		cursor: pointer;
+	}
+
+	&--is-visible {
+		opacity: 1;
+		visibility: visible;
+		transform: scale(1);
+	}
 }
