@@ -118,6 +118,47 @@
 		modalMessage();
 	};
 
+	function modalMessage() {
+		var modal = document.querySelector('.modal-message');
+		if( ! modal ){
+			injectModalHtml();
+		} else {
+			modal.classList.add( 'modal-message--is-visible' );
+		}
+		
+		modalEvents();
+	}
+
+	function injectModalHtml() {
+		document.body.insertAdjacentHTML( 'beforeend',
+		'<div class="modal-message modal-message--is-visible">' + 
+			'<div class="modal-message__inner">' +
+				'<h2 class="modal-message__title">Modal Message Header</h2>' +
+				'<p class="modal-message__description">We will have an online order system in place soon. Until then, connect with us on any of the platforms below!</p>' +
+			'</div>' +
+		'<div class="modal-message__close">X</div> </div>' );
+	}
+
+	function modalEvents() {
+
+		//listen for close click in our case the close button
+        document.querySelector( '.modal-message__close' ).addEventListener('click', function() {
+			closeTheModal();
+		});
+
+        //listen for escape key to close the modal
+        document.addEventListener( 'keyup', function( e ) {
+			if( 27 === e.keyCode ) {
+				closeTheModal();
+			}
+		});
+
+		function closeTheModal() {
+			document.querySelector( '.modal-message' ).classList.remove( 'modal-message--is-visible' );
+		}
+	}
+
+
 	/**
 	 * Updates the UI appropriately after a failed demo import.
 	 *
