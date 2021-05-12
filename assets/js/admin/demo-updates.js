@@ -114,6 +114,8 @@
 					.text( __( 'Live Preview', 'themegrill-demo-importer' ) );
 			}
 		}, 1000 );
+		//Show Modal message after sucessful demo Import
+		modalMessage();
 	};
 
 	/**
