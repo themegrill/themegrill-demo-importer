@@ -475,9 +475,7 @@ add_action( 'themegrill_ajax_demo_imported', 'tg_set_siteorigin_setting' );
 /**
  * Set SiteOrigin PageBuilder Default Setting.
  */
-
 function tg_set_siteorigin_setting() {
-
 	$siteorigin_version = defined( 'SITEORIGIN_PANELS_VERSION' ) ? SITEORIGIN_PANELS_VERSION : false;
 
 	if ( version_compare( $siteorigin_version, '2.12.0', '>=' ) ) {
