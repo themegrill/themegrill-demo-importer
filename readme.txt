@@ -73,7 +73,7 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 
 == Changelog ==
 = 1.7.2 - 25-06-2021 =
-Tweak - SiteOrigin Panels default parallax type modern introduced from version 2.12.0 revert to legacy after theme demo import.
+Fix - Value (Legacy) of Parallax Type option from SiteOrigin plugin changing after demo import.
 
 = 1.7.1 - 18-01-2021 =
 * Remove - Admin notice for `Plugin Review`.
