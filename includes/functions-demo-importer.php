@@ -464,3 +464,28 @@ function tg_print_admin_notice_templates() {
 	</script>
 	<?php
 }
+
+/**
+ * After demo imported AJAX action.
+ *
+ * @see tg_set_siteorigin_setting()
+ */
+add_action( 'themegrill_ajax_demo_imported', 'tg_set_siteorigin_setting' );
+
+/**
+ * Set SiteOrigin PageBuilder Default Setting.
+ */
+
+function tg_set_siteorigin_setting() {
+
+	$siteorigin_version = defined( 'SITEORIGIN_PANELS_VERSION' ) ? SITEORIGIN_PANELS_VERSION : false;
+
+	if ( version_compare( $siteorigin_version, '2.12.0', '>=' ) ) {
+
+		$settings = get_option( 'siteorigin_panels_settings' );
+
+		$settings['parallax-type'] = 'legacy';
+
+		update_option( 'siteorigin_panels_settings', $settings );
+	}
+}
