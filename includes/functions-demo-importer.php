@@ -255,15 +255,14 @@ add_action( 'themegrill_ajax_demo_imported', 'tg_set_elementor_active_kit' );
  * Set Elementor kit properly.
  */
 function tg_set_elementor_active_kit() {
+	global $wpdb;
+
 	$elementor_version = defined( 'ELEMENTOR_VERSION' ) ? ELEMENTOR_VERSION : false;
 
 	if ( version_compare( $elementor_version, '3.0.0', '>=' ) ) {
-
-		global $wpdb;
 		$page_ids = $wpdb->get_results( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE (post_name = %s OR post_title = %s) AND post_type = 'elementor_library' AND post_status = 'publish'", 'default-kit', 'Default Kit' ) );
 
 		if ( ! is_null( $page_ids ) ) {
-
 			$page_id    = 0;
 			$delete_ids = array();
 
@@ -302,6 +301,78 @@ function tg_set_elementor_active_kit() {
 /**
  * After demo imported AJAX action.
  *
+ * @see tg_set_evf_default_form_page()
+ */
+add_action( 'themegrill_ajax_demo_imported', 'tg_set_evf_default_form_page' );
+
+/**
+ * Set EVF default form page correctly and remove activate redirection.
+ *
+ * Note: EVF default form page ID is stored in an option.
+ *
+ * @since 1.7.2
+ *
+ * @param string $demo_id Demo ID.
+ */
+function tg_set_evf_default_form_page( $demo_id ) {
+	global $wpdb;
+
+	if ( class_exists( 'EverestForms' ) ) {
+		$evf_page = apply_filters(
+			'themegrill_evf_' . $demo_id . '_page',
+			array(
+				'name'      => 'contact-us',
+				'title'     => 'Contact Us',
+				'form_name' => 'Contact Form',
+			)
+		);
+
+		// Get the ID of Contact form and page.
+		$form_id = $wpdb->get_results( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE (post_title = %s) AND post_type = 'everest_form' AND post_status = 'publish' LIMIT 1;", $evf_page['form_name'] ) );
+		$page_id = $wpdb->get_results( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE (post_name = %s OR post_title = %s) AND post_type = 'page' AND post_status = 'publish' LIMIT 1;", $evf_page['name'], $evf_page['title'] ) );
+
+		if ( ! empty( $form_id ) ) {
+			$form_id = (int) $form_id[0]->ID;
+
+			// Delete default form probably created by Everest Forms plugin.
+			$default_form_id = get_option( 'everest_forms_default_form_page_id' );
+			if ( $default_form_id ) {
+				wp_delete_post( $default_form_id, true );
+				delete_option( 'everest_forms_default_form_page_id' );
+			}
+
+			if ( ! empty( $page_id ) ) {
+				$page_id   = (int) $page_id[0]->ID;
+				$form_page = get_post( $page_id );
+
+				// Replace the shortcode content.
+				preg_match_all( '/' . get_shortcode_regex( array( 'everest_form' ) ) . '/', $form_page->post_content, $matches, PREG_SET_ORDER );
+				if ( ! empty( $matches[0] ) ) {
+					$found_shortcode         = $matches[0];
+					$form_page->post_content = str_replace( $found_shortcode[0], '[everest_form id="' . (int) $form_id . '"]', $form_page->post_content );
+				}
+
+				// Update form page.
+				if ( $form_id > 0 ) {
+					wp_update_post(
+						array(
+							'ID'           => $page_id,
+							'post_name'    => sanitize_title( $evf_page['name'] ),
+							'post_content' => $form_page->post_content,
+						)
+					);
+				}
+			}
+		}
+
+		// We no longer need EVF activation redirect.
+		delete_transient( '_evf_activation_redirect' );
+	}
+}
+
+/**
+ * After demo imported AJAX action.
+ *
  * @see tg_set_wc_pages()
  */
 add_action( 'themegrill_ajax_demo_imported', 'tg_set_wc_pages' );
@@ -317,9 +388,9 @@ add_action( 'themegrill_ajax_demo_imported', 'tg_set_wc_pages' );
  * @param string $demo_id
  */
 function tg_set_wc_pages( $demo_id ) {
-	if ( class_exists( 'WooCommerce' ) ) {
+	global $wpdb;
 
-		global $wpdb;
+	if ( class_exists( 'WooCommerce' ) ) {
 		$wc_pages = apply_filters(
 			'themegrill_wc_' . $demo_id . '_pages',
 			array(
@@ -354,8 +425,7 @@ function tg_set_wc_pages( $demo_id ) {
 				$delete_ids = array();
 
 				// Retrieve page with greater id and delete others.
-				if ( sizeof( $page_ids ) > 1 ) {
-
+				if ( count( $page_ids ) > 1 ) {
 					foreach ( $page_ids as $page ) {
 						if ( $page->ID > $page_id ) {
 							if ( $page_id ) {
