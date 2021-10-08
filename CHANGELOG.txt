@@ -1,6 +1,11 @@
 == Changelog ==
+= 1.7.3 - 08-10-2021 =
+* Tweak - Support eLearning theme.
+* Tweak - Disable Masteriyo setup wizard.
+* Tweak - Setup Masteriyo pages properly after demo import.
+
 = 1.7.2 - 25-06-2021 =
-Fix - Value (Legacy) of Parallax Type option from SiteOrigin plugin changing after demo import.
+* Fix - Value (Legacy) of Parallax Type option from SiteOrigin plugin changing after demo import.
 
 = 1.7.1 - 18-01-2021 =
 * Remove - Admin notice for `Plugin Review`.
