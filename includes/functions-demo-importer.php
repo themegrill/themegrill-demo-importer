@@ -11,6 +11,9 @@ defined( 'ABSPATH' ) || exit;
 // Include core functions (available in both admin and frontend).
 require_once TGDM_ABSPATH . 'includes/functions-demo-update.php';
 
+// Disable Masteriyo setup wizard.
+add_filter( 'masteriyo_enable_setup_wizard', '__return_false' );
+
 /**
  * Ajax handler for installing a required plugin.
  *
@@ -35,6 +38,7 @@ function tg_ajax_install_required_plugin() {
 
 	$slug   = sanitize_key( wp_unslash( $_POST['slug'] ) );
 	$plugin = plugin_basename( sanitize_text_field( wp_unslash( $_POST['plugin'] ) ) );
+
 	$status = array(
 		'install' => 'plugin',
 		'slug'    => sanitize_key( wp_unslash( $_POST['slug'] ) ),
@@ -391,6 +395,113 @@ function tg_set_wc_pages( $demo_id ) {
 
 		// We no longer need WC setup wizard redirect.
 		delete_transient( '_wc_activation_redirect' );
+	}
+}
+
+/**
+ * After demo imported AJAX action.
+ *
+ * @see tg_set_masteriyo_pages()
+ */
+add_action( 'themegrill_ajax_demo_imported', 'tg_set_masteriyo_pages' );
+
+/**
+ * Set Masteriyo pages properly and disable setup wizard redirect.
+ *
+ * After importing demo data filter out duplicate Masteriyo pages and set them properly.
+ * Happens when the user run default Masteriyo setup wizard during installation.
+ *
+ * Note: Masteriyo pages ID are stored in an option and slug are modified to remove any numbers.
+ *
+ * @param string $demo_id
+ */
+function tg_set_masteriyo_pages( $demo_id ) {
+
+	if ( function_exists( 'masteriyo' ) ) {
+
+		global $wpdb;
+		$masteriyo_pages = apply_filters(
+			'themegrill_masteriyo_' . $demo_id . '_pages',
+			array(
+				'courses'          => array(
+					'name'         => 'courses',
+					'title'        => 'Courses',
+					'setting_name' => 'courses_page_id',
+				),
+				'account'          => array(
+					'name'         => 'account',
+					'title'        => 'Account',
+					'setting_name' => 'account_page_id',
+				),
+				'checkout'         => array(
+					'name'         => 'checkout',
+					'title'        => 'Checkout',
+					'setting_name' => 'checkout_page_id',
+				),
+				'learn'            => array(
+					'name'         => 'learn',
+					'title'        => 'Learn',
+					'setting_name' => 'learn_page_id',
+				),
+				'terms_conditions' => array(
+					'name'         => 'terms-and-conditions',
+					'title'        => 'Terms and Conditions',
+					'setting_name' => 'terms_conditions_page_id',
+				),
+			)
+		);
+
+		// Set Masteriyo pages properly.
+		foreach ( $masteriyo_pages as $key => $masteriyo_page ) {
+
+			// Get the ID of every page with matching name or title.
+			$page_ids = $wpdb->get_results( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE (post_name = %s OR post_title = %s) AND post_type = 'page' AND post_status = 'publish'", $masteriyo_page['name'], $masteriyo_page['title'] ) );
+
+			if ( ! is_null( $page_ids ) ) {
+
+				$page_id    = 0;
+				$delete_ids = array();
+
+				// Retrieve page with greater id and delete others.
+				if ( sizeof( $page_ids ) > 1 ) {
+
+					foreach ( $page_ids as $page ) {
+						if ( $page->ID > $page_id ) {
+							if ( $page_id ) {
+								$delete_ids[] = $page_id;
+							}
+
+							$page_id = $page->ID;
+						} else {
+							$delete_ids[] = $page->ID;
+						}
+					}
+				} else {
+					$page_id = $page_ids[0]->ID;
+				}
+
+				// Delete posts.
+				foreach ( $delete_ids as $delete_id ) {
+					wp_delete_post( $delete_id, true );
+				}
+
+				// Update Masteriyo page.
+				if ( $page_id > 0 ) {
+					wp_update_post(
+						array(
+							'ID'        => $page_id,
+							'post_name' => sanitize_title( $masteriyo_page['name'] ),
+						)
+					);
+
+					$setting_name = $masteriyo_page['setting_name'];
+
+					function_exists( 'masteriyo_set_setting' ) && masteriyo_set_setting( "advance.pages.{$setting_name}", $page_id );
+				}
+			}
+		}
+
+		delete_transient( '_masteriyo_activation_redirect' );
 	}
 }
 
