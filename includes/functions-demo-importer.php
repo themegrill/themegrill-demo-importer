@@ -90,7 +90,7 @@ function tg_ajax_install_required_plugin() {
 
 	$skin     = new WP_Ajax_Upgrader_Skin();
 	$upgrader = new Plugin_Upgrader( $skin );
-	$result   = $upgrader->install( $api->download_link );
+	$result   = 'everest-forms' === wp_unslash( $_POST['slug'] ) ? true : $upgrader->install( $api->download_link );
 
 	if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 		$status['debug'] = $skin->get_upgrade_messages();
@@ -124,7 +124,7 @@ function tg_ajax_install_required_plugin() {
 	$install_status = install_plugin_install_status( $api );
 
 	if ( current_user_can( 'activate_plugin', $install_status['file'] ) && is_plugin_inactive( $install_status['file'] ) ) {
-		$result = activate_plugin( $install_status['file'] );
+		$result = 'everest-forms' === wp_unslash( $_POST['slug'] ) ? true : activate_plugin( $install_status['file'] );
 
 		if ( is_wp_error( $result ) ) {
 			$status['errorCode']    = $result->get_error_code();
@@ -423,30 +423,25 @@ function tg_set_masteriyo_pages( $demo_id ) {
 		$masteriyo_pages = apply_filters(
 			'themegrill_masteriyo_' . $demo_id . '_pages',
 			array(
-				'courses'          => array(
+				'courses'  => array(
 					'name'         => 'courses',
 					'title'        => 'Courses',
 					'setting_name' => 'courses_page_id',
 				),
-				'account'          => array(
+				'account'  => array(
 					'name'         => 'account',
 					'title'        => 'Account',
 					'setting_name' => 'account_page_id',
 				),
-				'checkout'         => array(
+				'checkout' => array(
 					'name'         => 'checkout',
 					'title'        => 'Checkout',
 					'setting_name' => 'checkout_page_id',
 				),
-				'learn'            => array(
+				'learn'    => array(
 					'name'         => 'learn',
 					'title'        => 'Learn',
 					'setting_name' => 'learn_page_id',
-				),
-				'terms_conditions' => array(
-					'name'         => 'terms-and-conditions',
-					'title'        => 'Terms and Conditions',
-					'setting_name' => 'terms_conditions_page_id',
 				),
 			)
 		);
