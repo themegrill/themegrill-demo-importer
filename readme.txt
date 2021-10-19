@@ -72,6 +72,9 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 3. Finally, Import the Demo with just one click.
 
 == Changelog ==
+= TBD - 19-10-2021 =
+* Enhancement - Compatibility with latest Masteriyo LMS plugin.
+
 = 1.7.3 - 08-10-2021 =
 * Tweak - Support eLearning theme.
 * Tweak - Disable Masteriyo setup wizard.
