@@ -1,4 +1,7 @@
 == Changelog ==
+= 1.7.4 - 19-10-2021 =
+* Enhancement - Compatibility with latest Masteriyo LMS plugin.
+
 = 1.7.3 - 08-10-2021 =
 * Tweak - Support eLearning theme.
 * Tweak - Disable Masteriyo setup wizard.
