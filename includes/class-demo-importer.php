@@ -183,25 +183,18 @@ class TG_Demo_Importer {
 					'settings' => array(
 						'isNew'         => false,
 						'ajaxUrl'       => admin_url( 'admin-ajax.php' ),
-						'adminUrl'      => parse_url( self_admin_url(), PHP_URL_PATH ),
+						'adminUrl'      => wp_parse_url( self_admin_url(), PHP_URL_PATH ),
 						'suggestURI'    => apply_filters( 'themegrill_demo_importer_suggest_new', 'https://themegrill.com/contact/' ),
 						'confirmImport' => sprintf(
-
+							/* translators: Before import warning texts */
 							__( 'Importing demo data will ensure that your site will look similar as theme demo. It makes you easy to modify the content instead of creating them from scratch. Also, consider before importing the demo: %1$s %2$s %3$s %4$s %5$s %6$s', 'themegrill-demo-importer' ),
-
 							'<ol><li class="warning">' . __( 'Importing the demo on the site if you have already added the content is highly discouraged.', 'themegrill-demo-importer' ) . '</li>',
-
 							'<li>' . __( 'You need to import demo on fresh WordPress install to exactly replicate the theme demo.', 'themegrill-demo-importer' ) . '</li>',
-
 							'<li>' . __( 'It will install the required plugins as well as activate them for installing the required theme demo within your site.', 'themegrill-demo-importer' ) . '</li>',
-
 							'<li>' . __( 'Copyright images will get replaced with other placeholder images.', 'themegrill-demo-importer' ) . '</li>',
-
 							'<li>' . __( 'None of the posts, pages, attachments or any other data already existing in your site will be deleted or modified.', 'themegrill-demo-importer' ) . '</li>',
-
 							'<li>' . __( 'It will take some time to import the theme demo.', 'themegrill-demo-importer' ) . '</li></ol>'
-
-							)
+						),
 					),
 					'l10n'     => array(
 						'search'              => __( 'Search Demos', 'themegrill-demo-importer' ),
@@ -210,6 +203,7 @@ class TG_Demo_Importer {
 						'error'               => sprintf( __( 'An unexpected error occurred. Something may be wrong with ThemeGrill demo server&#8217;s configuration. If you continue to have problems, please try the <a href="%s">support forums</a>.', 'themegrill-demo-importer' ), 'https://wordpress.org/support/plugin/themegrill-demo-importer' ),
 						'tryAgain'            => __( 'Try Again', 'themegrill-demo-importer' ),
 						'suggestNew'          => __( 'Please suggest us!', 'themegrill-demo-importer' ),
+						/* translators: %d: Number of demos. */
 						'demosFound'          => __( 'Number of Demos found: %d', 'themegrill-demo-importer' ),
 						'noDemosFound'        => __( 'No demos found. Try a different search.', 'themegrill-demo-importer' ),
 						'collapseSidebar'     => __( 'Collapse Sidebar', 'themegrill-demo-importer' ),
@@ -274,15 +268,17 @@ class TG_Demo_Importer {
 				'content' =>
 					'<h2>' . __( 'Help &amp; Support', 'themegrill-demo-importer' ) . '</h2>' .
 				'<p>' . sprintf(
+					/* translators: %s: Documentation URL */
 					__( 'Should you need help understanding, using, or extending ThemeGrill Demo Importer, <a href="%s">please read our documentation</a>. You will find all kinds of resources including snippets, tutorials and much more.', 'themegrill-demo-importer' ),
 					'https://themegrill.com/docs/themegrill-demo-importer/'
 				) . '</p>' .
 				'<p>' . sprintf(
+					/* translators: 1: WP support URL. 2: TG support URL  */
 					__( 'For further assistance with ThemeGrill Demo Importer core you can use the <a href="%1$s">community forum</a>. If you need help with premium themes sold by ThemeGrill, please <a href="%2$s">use our free support forum</a>.', 'themegrill-demo-importer' ),
 					'https://wordpress.org/support/plugin/themegrill-demo-importer',
 					'https://themegrill.com/support-forum/'
 				) . '</p>' .
-					'<p><a href="' . 'https://wordpress.org/support/plugin/themegrill-demo-importer' . '" class="button button-primary">' . __( 'Community forum', 'themegrill-demo-importer' ) . '</a> <a href="' . 'https://themegrill.com/support-forum/' . '" class="button">' . __( 'ThemeGrill Support', 'themegrill-demo-importer' ) . '</a></p>',
+					'<p><a href="https://wordpress.org/support/plugin/themegrill-demo-importer" class="button button-primary">' . __( 'Community forum', 'themegrill-demo-importer' ) . '</a> <a href="https://themegrill.com/support-forum/" class="button">' . __( 'ThemeGrill Support', 'themegrill-demo-importer' ) . '</a></p>',
 			)
 		);
 
@@ -292,19 +288,24 @@ class TG_Demo_Importer {
 				'title'   => __( 'Found a bug?', 'themegrill-demo-importer' ),
 				'content' =>
 					'<h2>' . __( 'Found a bug?', 'themegrill-demo-importer' ) . '</h2>' .
-					'<p>' . sprintf( __( 'If you find a bug within ThemeGrill Demo Importer you can create a ticket via <a href="%1$s">Github issues</a>. Ensure you read the <a href="%2$s">contribution guide</a> prior to submitting your report. To help us solve your issue, please be as descriptive as possible.', 'themegrill-demo-importer' ), 'https://github.com/themegrill/themegrill-demo-importer/issues?state=open', 'https://github.com/themegrill/themegrill-demo-importer/blob/master/.github/CONTRIBUTING.md' ) . '</p>' .
-					'<p><a href="' . 'https://github.com/themegrill/themegrill-demo-importer/issues?state=open' . '" class="button button-primary">' . __( 'Report a bug', 'themegrill-demo-importer' ) . '</a></p>',
+					'<p>' . sprintf(
+						/* translators: %s: GitHub links */
+						__( 'If you find a bug within ThemeGrill Demo Importer you can create a ticket via <a href="%1$s">Github issues</a>. Ensure you read the <a href="%2$s">contribution guide</a> prior to submitting your report. To help us solve your issue, please be as descriptive as possible.', 'themegrill-demo-importer' ),
+						'https://github.com/themegrill/themegrill-demo-importer/issues?state=open',
+						'https://github.com/themegrill/themegrill-demo-importer/blob/master/.github/CONTRIBUTING.md'
+					) . '</p>' .
+					'<p><a href="https://github.com/themegrill/themegrill-demo-importer/issues?state=open" class="button button-primary">' . __( 'Report a bug', 'themegrill-demo-importer' ) . '</a></p>',
 
 			)
 		);
 
 		$screen->set_help_sidebar(
 			'<p><strong>' . __( 'For more information:', 'themegrill-demo-importer' ) . '</strong></p>' .
-			'<p><a href="' . 'https://themegrill.com/demo-importer/' . '" target="_blank">' . __( 'About Demo Importer', 'themegrill-demo-importer' ) . '</a></p>' .
-			'<p><a href="' . 'https://wordpress.org/plugins/themegrill-demo-importer/' . '" target="_blank">' . __( 'WordPress.org project', 'themegrill-demo-importer' ) . '</a></p>' .
-			'<p><a href="' . 'https://github.com/themegrill/themegrill-demo-importer' . '" target="_blank">' . __( 'Github project', 'themegrill-demo-importer' ) . '</a></p>' .
-			'<p><a href="' . 'https://themegrill.com/wordpress-themes/' . '" target="_blank">' . __( 'Official themes', 'themegrill-demo-importer' ) . '</a></p>' .
-			'<p><a href="' . 'https://themegrill.com/plugins/' . '" target="_blank">' . __( 'Official plugins', 'themegrill-demo-importer' ) . '</a></p>'
+			'<p><a href="https://themegrill.com/demo-importer/" target="_blank">' . __( 'About Demo Importer', 'themegrill-demo-importer' ) . '</a></p>' .
+			'<p><a href="https://wordpress.org/plugins/themegrill-demo-importer/" target="_blank">' . __( 'WordPress.org project', 'themegrill-demo-importer' ) . '</a></p>' .
+			'<p><a href="https://github.com/themegrill/themegrill-demo-importer" target="_blank">' . __( 'Github project', 'themegrill-demo-importer' ) . '</a></p>' .
+			'<p><a href="https://themegrill.com/wordpress-themes/" target="_blank">' . __( 'Official themes', 'themegrill-demo-importer' ) . '</a></p>' .
+			'<p><a href="https://themegrill.com/plugins/" target="_blank">' . __( 'Official plugins', 'themegrill-demo-importer' ) . '</a></p>'
 		);
 	}
 
@@ -342,7 +343,7 @@ class TG_Demo_Importer {
 	 */
 	public function zakra_is_premium_theme_plan() {
 
-		if ( is_plugin_active( 'zakra-pro/zakra-pro.php' ) && is_plugin_active( 'companion-elementor/companion-elementor.php') ) {
+		if ( is_plugin_active( 'zakra-pro/zakra-pro.php' ) && is_plugin_active( 'companion-elementor/companion-elementor.php' ) ) {
 			return true;
 		}
 
@@ -357,7 +358,7 @@ class TG_Demo_Importer {
 	 */
 	public function themegrill_is_all_themes_plan() {
 
-		if ( is_plugin_active( 'companion-elementor/companion-elementor.php') ) {
+		if ( is_plugin_active( 'companion-elementor/companion-elementor.php' ) ) {
 			return true;
 		}
 

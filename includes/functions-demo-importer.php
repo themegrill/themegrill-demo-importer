@@ -458,7 +458,7 @@ function tg_set_masteriyo_pages( $demo_id ) {
 				$delete_ids = array();
 
 				// Retrieve page with greater id and delete others.
-				if ( sizeof( $page_ids ) > 1 ) {
+				if ( count( $page_ids ) > 1 ) {
 
 					foreach ( $page_ids as $page ) {
 						if ( $page->ID > $page_id ) {
@@ -554,7 +554,7 @@ function tg_print_admin_notice_templates() {
 							printf( __( '%s installs failed.', 'themegrill-demo-importer' ), '{{ data.errors }}' );
 							?>
 						<# } #>
-						<span class="screen-reader-text"><?php _e( 'Show more details', 'themegrill-demo-importer' ); ?></span>
+						<span class="screen-reader-text"><?php esc_html_e( 'Show more details', 'themegrill-demo-importer' ); ?></span>
 						<span class="toggle-indicator" aria-hidden="true"></span>
 					</button>
 				<# } #>
