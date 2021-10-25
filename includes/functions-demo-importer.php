@@ -90,7 +90,7 @@ function tg_ajax_install_required_plugin() {
 
 	$skin     = new WP_Ajax_Upgrader_Skin();
 	$upgrader = new Plugin_Upgrader( $skin );
-	$result   = 'everest-forms' === wp_unslash( $_POST['slug'] ) ? true : $upgrader->install( $api->download_link );
+	$result   = $upgrader->install( $api->download_link );
 
 	if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 		$status['debug'] = $skin->get_upgrade_messages();
@@ -124,7 +124,7 @@ function tg_ajax_install_required_plugin() {
 	$install_status = install_plugin_install_status( $api );
 
 	if ( current_user_can( 'activate_plugin', $install_status['file'] ) && is_plugin_inactive( $install_status['file'] ) ) {
-		$result = 'everest-forms' === wp_unslash( $_POST['slug'] ) ? true : activate_plugin( $install_status['file'] );
+		$result = activate_plugin( $install_status['file'] );
 
 		if ( is_wp_error( $result ) ) {
 			$status['errorCode']    = $result->get_error_code();
