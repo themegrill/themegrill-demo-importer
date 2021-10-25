@@ -3,7 +3,7 @@ Contributors: ThemeGrill, shivapoudel
 Tags: themegrill, theme demos, demo, importer, one click import
 Requires at least: 4.7
 Tested up to: 5.8
-Stable tag: 1.7.4
+Stable tag: 1.7.5
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -72,6 +72,9 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 3. Finally, Import the Demo with just one click.
 
 == Changelog ==
+= 1.7.5 - 25-10-2021 =
+* Tweak - Use of escaping and sanitization functions.
+
 = 1.7.4 - 19-10-2021 =
 * Enhancement - Compatibility with latest Masteriyo LMS plugin.
 

@@ -1,4 +1,7 @@
 == Changelog ==
+= 1.7.5 - 25-10-2021 =
+* Tweak - Use of escaping and sanitization functions.
+
 = 1.7.4 - 19-10-2021 =
 * Enhancement - Compatibility with latest Masteriyo LMS plugin.
 
