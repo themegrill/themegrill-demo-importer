@@ -1,5 +1,5 @@
 === ThemeGrill Demo Importer ===
-Contributors: ThemeGrill, shivapoudel
+Contributors: ThemeGrill
 Tags: themegrill, theme demos, demo, importer, one click import
 Requires at least: 4.7
 Tested up to: 5.8
