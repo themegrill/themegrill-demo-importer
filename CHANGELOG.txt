@@ -1,4 +1,7 @@
 == Changelog ==
+= TBD =
+* Tweak - Updates resources URL.
+
 = 1.7.5 - 25-10-2021 =
 * Tweak - Use of escaping and sanitization functions.
 
