@@ -72,6 +72,9 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 3. Finally, Import the Demo with just one click.
 
 == Changelog ==
+= TBD =
+* Tweak - Updates resources URL.
+
 = 1.7.5 - 25-10-2021 =
 * Tweak - Use of escaping and sanitization functions.
 
