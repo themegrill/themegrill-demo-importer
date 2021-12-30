@@ -15,6 +15,10 @@ Import <a href="https://themegrill.com/themes/" target="_blank" rel="nofollow">T
 
 Get [free support](https://themegrill.com/support-forum/)
 
+== Notes ==
+
+* The plugin makes a call to our S3 server remotely to import static demo content.
+
 = Demo Importer in action: =
 
 [youtube https://youtu.be/cXxmpNIui9Y]
