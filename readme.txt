@@ -3,7 +3,7 @@ Contributors: ThemeGrill
 Tags: themegrill, theme demos, demo, importer, one click import
 Requires at least: 4.7
 Tested up to: 5.8
-Stable tag: 1.7.5
+Stable tag: 1.7.6.1
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -76,8 +76,11 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 3. Finally, Import the Demo with just one click.
 
 == Changelog ==
+= 1.7.6.1 - 31-12-2021 =
+* Tweak - Update stable tag.
+
 = 1.7.6 - 30-12-2021 =
-* Tweak - Updates resources URL.
+* Tweak - Update resources URL.
 
 = 1.7.5 - 25-10-2021 =
 * Tweak - Use of escaping and sanitization functions.

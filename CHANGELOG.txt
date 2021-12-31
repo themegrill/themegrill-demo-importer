@@ -1,6 +1,9 @@
 == Changelog ==
+= 1.7.6.1 - 31-12-2021 =
+* Tweak - Update stable tag.
+
 = 1.7.6 - 30-12-2021 =
-* Tweak - Updates resources URL.
+* Tweak - Update resources URL.
 
 = 1.7.5 - 25-10-2021 =
 * Tweak - Use of escaping and sanitization functions.
