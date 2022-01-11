@@ -11,6 +11,9 @@ defined( 'ABSPATH' ) || exit;
 // Include core functions (available in both admin and frontend).
 require_once TGDM_ABSPATH . 'includes/functions-demo-update.php';
 
+// Disable Masteriyo setup wizard.
+add_filter( 'masteriyo_enable_setup_wizard', '__return_false' );
+
 /**
  * Ajax handler for installing a required plugin.
  *
