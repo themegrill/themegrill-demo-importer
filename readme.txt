@@ -3,7 +3,7 @@ Contributors: ThemeGrill
 Tags: themegrill, theme demos, demo, importer, one click import
 Requires at least: 4.7
 Tested up to: 5.8
-Stable tag: 1.7.6.1
+Stable tag: 1.7.7
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -76,30 +76,12 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 3. Finally, Import the Demo with just one click.
 
 == Changelog ==
+= 1.7.7 - 12-01-2022 =
+* Support - BlockArt Blocks plugin.
+* Support - Online Education theme.
+* Fix     - PHP warning while importing widget.
+
 = 1.7.6.1 - 31-12-2021 =
 * Tweak - Update stable tag.
-
-= 1.7.6 - 30-12-2021 =
-* Tweak - Update resources URL.
-
-= 1.7.5 - 25-10-2021 =
-* Tweak - Use of escaping and sanitization functions.
-
-= 1.7.4 - 19-10-2021 =
-* Enhancement - Compatibility with latest Masteriyo LMS plugin.
-
-= 1.7.3 - 08-10-2021 =
-* Tweak - Support eLearning theme.
-* Tweak - Disable Masteriyo setup wizard.
-* Tweak - Setup Masteriyo pages properly after demo import.
-
-= 1.7.2 - 25-06-2021 =
-* Fix - Value (Legacy) of Parallax Type option from SiteOrigin plugin changing after demo import.
-
-= 1.7.1 - 18-01-2021 =
-* Remove - Admin notice for `Plugin Review`.
-
-= 1.7.0 - 11-01-2021 =
-* Tweak - Set FontAwesome 4 Shim feature to be enabled automatically on successful theme demo import.
 
 [See changelog for all versions](https://raw.githubusercontent.com/themegrill/themegrill-demo-importer/master/CHANGELOG.txt).

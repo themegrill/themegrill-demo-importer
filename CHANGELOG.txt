@@ -1,4 +1,9 @@
 == Changelog ==
+= 1.7.7 - 12-01-2022 =
+* Support - BlockArt Blocks plugin.
+* Support - Online Education theme.
+* Fix     - PHP warning while importing widget.
+
 = 1.7.6.1 - 31-12-2021 =
 * Tweak - Update stable tag.
 
