@@ -955,15 +955,16 @@ class TG_Demo_Importer {
 	 * @return array
 	 */
 	public function update_widget_data( $widget, $widget_type, $instance_id, $demo_data ) {
-		if ( 'nav_menu' == $widget_type ) {
-			$nav_menu = wp_get_nav_menu_object( $widget['title'] );
+		if ( 'nav_menu' === $widget_type ) {
+			$menu     = isset( $widget['title'] ) ? $widget['title'] : $widget['nav_menu'];
+			$nav_menu = wp_get_nav_menu_object( $menu );
 
 			if ( is_object( $nav_menu ) && $nav_menu->term_id ) {
 				$widget['nav_menu'] = $nav_menu->term_id;
 			}
 		} elseif ( ! empty( $demo_data['widgets_data_update'] ) ) {
 			foreach ( $demo_data['widgets_data_update'] as $dropdown_type => $dropdown_data ) {
-				if ( ! in_array( $dropdown_type, array( 'dropdown_pages', 'dropdown_categories' ) ) ) {
+				if ( ! in_array( $dropdown_type, array( 'dropdown_pages', 'dropdown_categories' ), true ) ) {
 					continue;
 				}
 
@@ -971,7 +972,7 @@ class TG_Demo_Importer {
 				switch ( $dropdown_type ) {
 					case 'dropdown_pages':
 						foreach ( $dropdown_data as $widget_id => $widget_data ) {
-							if ( ! empty( $widget_data[ $instance_id ] ) && $widget_id == $widget_type ) {
+							if ( ! empty( $widget_data[ $instance_id ] ) && $widget_id === $widget_type ) {
 								foreach ( $widget_data[ $instance_id ] as $widget_key => $widget_value ) {
 									$page = get_page_by_title( $widget_value );
 
@@ -982,6 +983,7 @@ class TG_Demo_Importer {
 							}
 						}
 						break;
+					default:
 					case 'dropdown_categories':
 						foreach ( $dropdown_data as $taxonomy => $taxonomy_data ) {
 							if ( ! taxonomy_exists( $taxonomy ) ) {
@@ -989,7 +991,7 @@ class TG_Demo_Importer {
 							}
 
 							foreach ( $taxonomy_data as $widget_id => $widget_data ) {
-								if ( ! empty( $widget_data[ $instance_id ] ) && $widget_id == $widget_type ) {
+								if ( ! empty( $widget_data[ $instance_id ] ) && $widget_id === $widget_type ) {
 									foreach ( $widget_data[ $instance_id ] as $widget_key => $widget_value ) {
 										$term = get_term_by( 'name', $widget_value, $taxonomy );
 

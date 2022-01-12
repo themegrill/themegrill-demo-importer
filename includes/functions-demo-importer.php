@@ -14,6 +14,9 @@ require_once TGDM_ABSPATH . 'includes/functions-demo-update.php';
 // Disable Masteriyo setup wizard.
 add_filter( 'masteriyo_enable_setup_wizard', '__return_false' );
 
+// Disable BlockArt redirection.
+add_filter( 'blockart_activation_redirect', '__return_false' );
+
 /**
  * Ajax handler for installing a required plugin.
  *
@@ -243,7 +246,7 @@ add_action( 'themegrill_ajax_demo_imported', 'tg_set_elementor_load_fa4_shim' );
 function tg_set_elementor_load_fa4_shim() {
 	$elementor_load_fa4_shim = get_option( 'elementor_load_fa4_shim' );
 
-	if ( ! $elementor_load_fa4_shim || '' === $elementor_load_fa4_shim ) {
+	if ( ! $elementor_load_fa4_shim ) {
 		update_option( 'elementor_load_fa4_shim', 'yes' );
 	}
 }
@@ -423,25 +426,30 @@ function tg_set_masteriyo_pages( $demo_id ) {
 		$masteriyo_pages = apply_filters(
 			'themegrill_masteriyo_' . $demo_id . '_pages',
 			array(
-				'courses'  => array(
+				'courses'                 => array(
 					'name'         => 'courses',
 					'title'        => 'Courses',
 					'setting_name' => 'courses_page_id',
 				),
-				'account'  => array(
+				'account'                 => array(
 					'name'         => 'account',
 					'title'        => 'Account',
 					'setting_name' => 'account_page_id',
 				),
-				'checkout' => array(
+				'checkout'                => array(
 					'name'         => 'checkout',
 					'title'        => 'Checkout',
 					'setting_name' => 'checkout_page_id',
 				),
-				'learn'    => array(
+				'learn'                   => array(
 					'name'         => 'learn',
 					'title'        => 'Learn',
 					'setting_name' => 'learn_page_id',
+				),
+				'instructor-registration' => array(
+					'name'         => 'instructor-registration',
+					'title'        => 'Instructor Registration',
+					'setting_name' => 'instructor_registration_page_id',
 				),
 			)
 		);
@@ -576,12 +584,12 @@ function tg_print_admin_notice_templates() {
  *
  * @see tg_set_siteorigin_setting()
  */
-add_action( 'themegrill_ajax_demo_imported', 'tg_set_siteorigin_setting' );
+add_action( 'themegrill_ajax_demo_imported', 'tg_set_siteorigin_settings' );
 
 /**
  * Set SiteOrigin PageBuilder Default Setting.
  */
-function tg_set_siteorigin_setting() {
+function tg_set_siteorigin_settings() {
 	$siteorigin_version = defined( 'SITEORIGIN_PANELS_VERSION' ) ? SITEORIGIN_PANELS_VERSION : false;
 
 	if ( version_compare( $siteorigin_version, '2.12.0', '>=' ) ) {
@@ -591,5 +599,30 @@ function tg_set_siteorigin_setting() {
 		$settings['parallax-type'] = 'legacy';
 
 		update_option( 'siteorigin_panels_settings', $settings );
+	}
+}
+
+/**
+ * After demo imported AJAX action.
+ *
+ * @see tg_update_masteriyo_settings()
+ */
+add_action( 'themegrill_ajax_demo_imported', 'tg_update_masteriyo_settings', 10, 2 );
+
+/**
+ * Update Masteriyo settings.
+ *
+ * @param string $id Demo Id.
+ * @param array  $data Demo data.
+ * @return void
+ */
+function tg_update_masteriyo_settings( $id, $data ) {
+
+	if ( ! function_exists( 'masteriyo_set_setting' ) || empty( $data['masteriyo_settings'] ) ) {
+		return;
+	}
+
+	foreach ( $data['masteriyo_settings'] as $key => $value ) {
+		masteriyo_set_setting( $key, $value );
 	}
 }
