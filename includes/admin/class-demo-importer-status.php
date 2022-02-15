@@ -53,7 +53,7 @@ class TG_Demo_Importer_Status {
 	 */
 	public static function get_demo_server_connection_status() {
 		$output              = '';
-		$package_file_server = wp_remote_get( 'https://themegrill-demo-pack.s3.us-east-2.amazonaws.com/README.md' );
+		$package_file_server = wp_remote_get( 'https://d1sb0nhp4t2db4.cloudfront.net/README.md' );
 		$http_response_code  = wp_remote_retrieve_response_code( $package_file_server );
 
 		if ( is_wp_error( $package_file_server ) || 200 !== (int) $http_response_code ) {
