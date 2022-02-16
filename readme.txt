@@ -17,7 +17,7 @@ Get [free support](https://themegrill.com/support-forum/)
 
 == Notes ==
 
-* The plugin makes a call to our S3 server remotely to import static demo content.
+* The plugin makes a call to our CloudFront server remotely to import static demo content.
 
 = Demo Importer in action: =
 
@@ -76,6 +76,9 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 3. Finally, Import the Demo with just one click.
 
 == Changelog ==
+= TBD =
+* Tweak - Update remote url.
+
 = 1.7.8 - 10-02-2022 =
 * Support - Luza theme.
 
