@@ -17,7 +17,7 @@ Get [free support](https://themegrill.com/support-forum/)
 
 == Notes ==
 
-* The plugin makes a call to our S3 server remotely to import static demo content.
+* The plugin makes a call to our CloudFront server remotely to import static demo content.
 
 = Demo Importer in action: =
 
