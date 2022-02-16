@@ -3,7 +3,7 @@ Contributors: ThemeGrill
 Tags: themegrill, theme demos, demo, importer, one click import
 Requires at least: 4.7
 Tested up to: 5.9
-Stable tag: 1.7.8
+Stable tag: 1.7.9
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -76,8 +76,8 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 3. Finally, Import the Demo with just one click.
 
 == Changelog ==
-= TBD =
-* Tweak - Update remote url.
+= 1.7.9 - 16-02-2022 =
+* Tweak - Update static demo content url.
 
 = 1.7.8 - 10-02-2022 =
 * Support - Luza theme.

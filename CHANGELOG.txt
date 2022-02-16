@@ -1,4 +1,7 @@
 == Changelog ==
+= 1.7.9 - 16-02-2022 =
+* Tweak - Update static demo content url.
+
 = 1.7.8 - 10-02-2022 =
 * Support - Luza theme.
 
