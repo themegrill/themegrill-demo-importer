@@ -1,4 +1,8 @@
 == Changelog ==
+= 1.8.0 - 08-03-2022 =
+* Support - Skincare theme.
+* Remove  - Support for Luza theme. 
+
 = 1.7.9 - 16-02-2022 =
 * Tweak - Update static demo content url.
 
