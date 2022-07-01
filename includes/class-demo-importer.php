@@ -883,9 +883,6 @@ class TG_Demo_Importer {
 			if ( is_wp_error( $results ) ) {
 				return false;
 			}
-		} else {
-			$status['errorMessage'] = __( 'The DAT file customizer data is missing.', 'themegrill-demo-importer' );
-			wp_send_json_error( $status );
 		}
 
 		return true;
@@ -908,9 +905,6 @@ class TG_Demo_Importer {
 			if ( is_wp_error( $results ) ) {
 				return false;
 			}
-		} else {
-			$status['errorMessage'] = __( 'The WIE file widget content is missing.', 'themegrill-demo-importer' );
-			wp_send_json_error( $status );
 		}
 
 		return true;
