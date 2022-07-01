@@ -498,8 +498,9 @@ function tg_set_masteriyo_pages( $demo_id ) {
 					);
 
 					$setting_name = $masteriyo_page['setting_name'];
-
-					function_exists( 'masteriyo_set_setting' ) && masteriyo_set_setting( "advance.pages.{$setting_name}", $page_id );
+					$version      = masteriyo_get_version();
+					$tab          = version_compare( '1.5.4', $version, '<=' ) ? 'general' : 'advance';
+					function_exists( 'masteriyo_set_setting' ) && masteriyo_set_setting( "$tab.pages.{$setting_name}", $page_id );
 				}
 			}
 		}
