@@ -148,6 +148,7 @@ final class ThemeGrill_Demo_Importer {
 			'online-education',
 			'skincare',
 			'estory',
+			'libreria',
 		);
 		// Check for official core themes pro version.
 		$pro_themes = array_diff( $core_themes, array( 'explore', 'masonic' ) );
