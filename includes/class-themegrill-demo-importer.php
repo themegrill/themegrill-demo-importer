@@ -20,7 +20,7 @@ final class ThemeGrill_Demo_Importer {
 	 *
 	 * @var string
 	 */
-	public $version = '1.8.3';
+	public $version = '1.8.4';
 
 	/**
 	 * Theme single instance of this class.
@@ -149,6 +149,7 @@ final class ThemeGrill_Demo_Importer {
 			'skincare',
 			'estory',
 			'libreria',
+			'magazinex',
 		);
 		// Check for official core themes pro version.
 		$pro_themes = array_diff( $core_themes, array( 'explore', 'masonic' ) );

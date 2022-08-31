@@ -1,4 +1,17 @@
 == Changelog ==
+= 1.8.4 - 31-08-2022 =
+* Support - MagazineX theme.
+
+= 1.8.3 - 14-07-2022 =
+* Support - Libreria theme.
+
+= 1.8.2 - 01-07-2022 =
+* Support - eStory theme.
+
+= 1.8.1 - 01-07-2022 =
+- Fix    - Masteriyo page duplication.
+- Update – Header field Tested up to.
+
 = 1.8.0 - 08-03-2022 =
 * Support - Skincare theme.
 * Remove  - Support for Luza theme. 
