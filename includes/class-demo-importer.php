@@ -429,7 +429,7 @@ class TG_Demo_Importer {
 
 				// Plugins status.
 				foreach ( $plugins_list as $plugin => $plugin_data ) {
-					$plugin_data->is_active = is_plugin_active( $plugin_data->slug );
+					$plugin_data->is_active = 'learning-management-system/lms.php' === $plugin_data->slug ? ( is_plugin_active( 'learning-management-system/lms.php' ) || is_plugin_active( 'learning-management-system-pro/lms.php' ) ) : is_plugin_active( $plugin_data->slug );
 
 					// Looks like a plugin is installed, but not active.
 					if ( file_exists( WP_PLUGIN_DIR . '/' . $plugin ) ) {
