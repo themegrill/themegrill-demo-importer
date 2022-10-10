@@ -76,6 +76,9 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 3. Finally, Import the Demo with just one click.
 
 == Changelog ==
+= FDB =
+* Remove  - Support for eStory Pro. 
+
 = 1.8.5 - 19-09-2022 =
 * Fix - Compatibility with Masteriyo Pro.
 
