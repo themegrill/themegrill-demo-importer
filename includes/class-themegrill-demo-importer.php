@@ -113,7 +113,9 @@ final class ThemeGrill_Demo_Importer {
 			add_filter( 'plugin_action_links_' . TGDM_PLUGIN_BASENAME, array( $this, 'plugin_action_links' ) );
 			add_filter( 'plugin_row_meta', array( $this, 'plugin_row_meta' ), 10, 2 );
 		} else {
-			add_action( 'admin_notices', array( $this, 'theme_support_missing_notice' ) );
+			if ( get_option( 'template' ) !== 'estory-pro' ) {
+				add_action( 'admin_notices', array( $this, 'theme_support_missing_notice' ) );
+			}
 		}
 	}
 
@@ -148,15 +150,15 @@ final class ThemeGrill_Demo_Importer {
 			'online-education',
 			'skincare',
 			'estory',
+			'eStory',
 			'libreria',
 			'magazinex',
 		);
 		// Check for official core themes pro version.
-		$pro_themes = array_diff( $core_themes, array( 'explore', 'masonic' ) );
+		$pro_themes = array_diff( $core_themes, array( 'explore', 'masonic', 'estory' ) );
 		if ( ! empty( $pro_themes ) ) {
 			$pro_themes = preg_replace( '/$/', '-pro', $pro_themes );
 		}
-
 		return array_merge( $core_themes, $pro_themes );
 	}
 
