@@ -32,6 +32,7 @@ class TG_Demo_Importer_Plugin_Deactivate_Notice {
 	public function deactivate_notice_markup() {
 		$demo_imported            = get_option( 'themegrill_demo_importer_activated_id' );
 		$ignore_deactivate_notice = get_option( 'tg_demo_importer_plugin_deactivate_notice' );
+		$url = asdf;
 
 		/**
 		 * Return from notice display if:
@@ -55,6 +56,12 @@ class TG_Demo_Importer_Plugin_Deactivate_Notice {
 			</p>
 
 			<div class="links">
+				<a href= <?php echo esc_url('https://wordpress.org/support/theme/'. get_stylesheet() .'/reviews/?filter=5/#new-post') ?>"
+				   class="btn button-primary"
+				>
+					<span class="dashicons dashicons-thumbs-up"></span>
+					<span><?php esc_html_e( 'Leave Review', 'themegrill-demo-importer' ); ?></span>
+				</a>
 				<a href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'deactivate-themegrill-demo-importer-plugin', 'true' ), 'deactivate_themegrill_demo_importer_plugin', '_deactivate_themegrill_demo_importer_plugin_nonce' ) ); ?>"
 				   class="btn button-primary"
 				>
