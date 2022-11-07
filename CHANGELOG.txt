@@ -1,4 +1,7 @@
 == Changelog ==
+= 1.8.8.1 - 07-11-2022 =
+* Update – Stable tag.
+
 = 1.8.8 - 07-11-2022 =
 * Support – Support for Gizmo. 
 
