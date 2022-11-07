@@ -150,6 +150,7 @@ final class ThemeGrill_Demo_Importer {
 			'online-education',
 			'skincare',
 			'estory',
+			'gizmo',
 			'libreria',
 			'magazinex',
 		);
