@@ -1,4 +1,7 @@
 == Changelog ==
+= 1.8.9 - 14-12-2022 =
+* Support – Support for Vastra.
+
 = 1.8.8.2 - 07-11-2022 =
 * Fix – Support for Gizmo.
 
