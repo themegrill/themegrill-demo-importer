@@ -77,7 +77,7 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 
 == Changelog ==
 = TBD =
-* Tweak – Updated admin page text and review link to active ThemeGrill theme.
+* Tweak – Update review notice message.
 
 = 1.8.8.2 - 07-11-2022 =
 * Fix – Support for Gizmo.
