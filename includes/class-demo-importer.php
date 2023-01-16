@@ -239,9 +239,9 @@ class TG_Demo_Importer {
 			if ( ! get_option( 'themegrill_demo_importer_admin_footer_text_rated' ) ) {
 				$footer_text = sprintf(
 					/* translators: 1: ThemeGrill Demo Importer 2: five stars */
-					__( 'If you like %1$s please leave us a %2$s rating. A huge thanks in advance!', 'themegrill-demo-importer' ),
-					sprintf( '<strong>%s</strong>', esc_html__( 'ThemeGrill Demo Importer', 'themegrill-demo-importer' ) ),
-					'<a href="https://wordpress.org/support/plugin/themegrill-demo-importer/reviews?rate=5#new-post" target="_blank" class="themegrill-demo-importer-rating-link" data-rated="' . esc_attr__( 'Thanks :)', 'themegrill-demo-importer' ) . '">&#9733;&#9733;&#9733;&#9733;&#9733;</a>'
+					__( 'If you like %1$s, please leave us a %2$s rating. A huge thanks in advance!', 'themegrill-demo-importer' ),
+					sprintf( '<strong>%s</strong>', esc_html__( wp_get_theme(), 'themegrill-demo-importer' ) ),
+					'<a href="https://wordpress.org/support/theme/' . wp_get_theme() . '/reviews/#new-post"  target="_blank" class="themegrill-demo-importer-rating-link" data-rated="' . esc_attr__( 'Thanks :)', 'themegrill-demo-importer' ) . '">&#9733;&#9733;&#9733;&#9733;&#9733;</a>'
 				);
 			} else {
 				$footer_text = __( 'Thank you for importing with ThemeGrill Demo Importer.', 'themegrill-demo-importer' );
