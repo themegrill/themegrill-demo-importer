@@ -76,8 +76,6 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 3. Finally, Import the Demo with just one click.
 
 == Changelog ==
-
-== Changelog ==
 = TBD =
 * Tweak – Updated admin page text and review link to active ThemeGrill theme.
 
