@@ -78,6 +78,7 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 == Changelog ==
 = TBD =
 * Tweak – Update review notice message.
+* Tweak – Update popup information message.
 
 = 1.8.8.2 - 07-11-2022 =
 * Fix – Support for Gizmo.
