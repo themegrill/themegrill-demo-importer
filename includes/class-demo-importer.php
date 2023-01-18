@@ -89,7 +89,7 @@ class TG_Demo_Importer {
 		$template = strtolower( str_replace( '-pro', '', get_option( 'template' ) ) );
 
 		if ( false === $packages || ( isset( $packages->slug ) && $template !== $packages->slug ) ) {
-			$raw_packages = wp_safe_remote_get( "https://d1sb0nhp4t2db4.cloudfront.net/configs/{$template}.json" );
+			$raw_packages = wp_safe_remote_get( "https://raw.githubusercontent.com/themegrill/themegrill-demo-pack/magazinex/configs/magazinex.json" );
 
 			if ( ! is_wp_error( $raw_packages ) ) {
 				$packages = json_decode( wp_remote_retrieve_body( $raw_packages ) );
@@ -351,6 +351,16 @@ class TG_Demo_Importer {
 
 	}
 
+	public function magazinex_is_premium_theme_plan() {
+
+		if ( is_plugin_active( 'magazinex-pro/magazinex-pro.php' ) && is_plugin_active( 'magazine-blocks-pro/magazine-blocks-pro.php' ) ) {
+			return true;
+		}
+
+		return false;
+
+	}
+
 	/**
 	 * Check for ThemeGrill All Themes Plan
 	 *
@@ -381,6 +391,10 @@ class TG_Demo_Importer {
 		// Condition for Zakra Pro.
 		$zakra_pro_plugin_version        = is_plugin_active( 'zakra-pro/zakra-pro.php' ) ? ZAKRA_PRO_VERSION : false;
 		$companion_elementor_plugin_name = is_plugin_active( 'companion-elementor/companion-elementor.php' ) ? COMPANION_ELEMENTOR_VERSION : false;
+
+		// Condition for MagazineX Pro.
+		$magazinex_pro_plugin_version = is_plugin_active( 'magazinex-pro/magazinex-pro.php' ) ? MAGAZINEX_PRO_VERSION : false;
+		$magazine_blocks_plugin_name  = is_plugin_active( 'magazine-blocks-pro/magazine-blocks-pro.php' ) ? MAGAZINE_BLOCKS_VERSION : false;
 
 		// Condition if child theme is being used.
 		if ( is_child_theme() ) {
@@ -447,6 +461,9 @@ class TG_Demo_Importer {
 				$required_version                     = false;
 				$zakra_pro_required_version           = false;
 				$companion_elementor_required_version = false;
+				$magazinex_pro_required_version       = false;
+				$magazine_blocks_pro_required_version = false;
+
 				if ( isset( $package_data->minimum_version ) && is_object( $package_data->minimum_version ) ) {
 					foreach ( $package_data->minimum_version as $theme => $minimum_version ) {
 						if ( 'zakra' === $current_template ) {
@@ -467,6 +484,26 @@ class TG_Demo_Importer {
 
 								if ( 'companion-elementor' === $theme ) {
 									$companion_elementor_required_version = $minimum_version;
+								}
+							}
+						} elseif ( 'magazinex' === $current_template ) {
+							if (
+								version_compare( $minimum_version, $current_theme_version, '>' ) ||
+								( 'magazinex-pro' === $theme && version_compare( $minimum_version, $magazinex_pro_plugin_version, '>' ) ) ||
+								( 'magazine-blocks-pro' === $theme && version_compare( $minimum_version, $magazine_blocks_plugin_name, '>' ) )
+							) {
+								$required_version_installed = true;
+
+								if ( 'magazinex' === $theme ) {
+									$required_version = $minimum_version;
+								}
+
+								if ( 'magazinex-pro' === $theme ) {
+									$magazinex_pro_required_version = $minimum_version;
+								}
+
+								if ( 'magazine-blocks-pro' === $theme ) {
+									$magazine_blocks_pro_required_version = $minimum_version;
 								}
 							}
 						} else {
@@ -560,6 +597,76 @@ class TG_Demo_Importer {
 							esc_html__( 'Companion Elementor', 'themegrill-demo-importer' )
 						);
 					}
+				} else if ( 'magazinex' === $current_template ) {
+					if ( $required_version ) {
+						$required_message = sprintf( esc_html__( 'This demo requires %1$s version of %2$s theme to get imported', 'themegrill-demo-importer' ), $required_version, $current_theme_name );
+					}
+
+					if ( $magazinex_pro_required_version ) {
+						if ( $required_version && $magazine_blocks_pro_required_version ) {
+							$required_message = sprintf(
+								esc_html__( 'This demo requires %1$s version of %2$s theme and %3$s version of %4$s as well as %5$s version of %6$s plugins to get imported', 'themegrill-demo-importer' ),
+								$required_version,
+								$current_theme_name,
+								$magazinex_pro_required_version,
+								esc_html__( 'MagazineX Pro', 'themegrill-demo-importer' ),
+								$magazine_blocks_pro_required_version,
+								esc_html__( 'Magazine Blocks Pro', 'themegrill-demo-importer' )
+							);
+						} elseif ( $required_version ) {
+							$required_message = sprintf(
+								esc_html__( 'This demo requires %1$s version of %2$s theme and %3$s version of %4$s plugin to get imported', 'themegrill-demo-importer' ),
+								$required_version,
+								$current_theme_name,
+								$magazinex_pro_required_version,
+								esc_html__( 'MagazineX Pro', 'themegrill-demo-importer' )
+							);
+						} else {
+							$required_message = sprintf(
+								esc_html__( 'This demo requires %1$s version of %2$s plugin to get imported', 'themegrill-demo-importer' ),
+								$magazinex_pro_required_version,
+								esc_html__( 'MagazineX', 'themegrill-demo-importer' )
+							);
+						}
+					}
+
+					if ( $magazine_blocks_pro_required_version ) {
+						if ( $required_version && $magazinex_pro_required_version ) {
+							$required_message = sprintf(
+								esc_html__( 'This demo requires %1$s version of %2$s theme and %3$s version of %4$s as well as %5$s version of %6$s plugins to get imported', 'themegrill-demo-importer' ),
+								$required_version,
+								$current_theme_name,
+								$magazinex_pro_required_version,
+								esc_html__( 'MagazineX Pro', 'themegrill-demo-importer' ),
+								$magazine_blocks_pro_required_version,
+								esc_html__( 'Magazine Blocks', 'themegrill-demo-importer' )
+							);
+						} elseif ( $required_version ) {
+							$required_message = sprintf(
+								esc_html__( 'This demo requires %1$s version of %2$s theme and %3$s version of %4$s plugin to get imported', 'themegrill-demo-importer' ),
+								$required_version,
+								$current_theme_name,
+								$magazine_blocks_pro_required_version,
+								esc_html__( 'Magazine Blocks Pro', 'themegrill-demo-importer' )
+							);
+						} else {
+							$required_message = sprintf(
+								esc_html__( 'This demo requires %1$s version of %2$s plugin to get imported', 'themegrill-demo-importer' ),
+								$magazine_blocks_pro_required_version,
+								esc_html__( 'Magazine Blocks Pro', 'themegrill-demo-importer' )
+							);
+						}
+					}
+
+					if ( ! $required_version && ( $magazinex_pro_required_version && $magazine_blocks_pro_required_version ) ) {
+						$required_message = sprintf(
+							esc_html__( 'This demo requires %1$s version of %2$s as well as %3$s version of %4$s plugins to get imported', 'themegrill-demo-importer' ),
+							$magazinex_pro_required_version,
+							esc_html__( 'MagazineX Pro', 'themegrill-demo-importer' ),
+							$magazine_blocks_pro_required_version,
+							esc_html__( 'Magazine Blocks Pro', 'themegrill-demo-importer' )
+						);
+					}
 				} else {
 					if ( $required_version ) {
 						$required_message = sprintf(
@@ -589,12 +696,13 @@ class TG_Demo_Importer {
 				}
 
 				// Prepare all demos.
+				error_log( print_r($package_data->template, true)  );
 				$prepared_demos[ $package_slug ] = array(
 					'slug'              => $package_slug,
 					'name'              => $package_data->title,
 					'theme'             => $is_pro_theme_demo ? sprintf( esc_html__( '%s Pro', 'themegrill-demo-importer' ), $available_packages->name ) : $available_packages->name,
 					'isPro'             => $is_pro_theme_demo ? false : isset( $package_data->isPro ),
-					'isPremium'         => $this->zakra_is_premium_theme_plan() ? false : isset( $package_data->isPremium ),
+					'isPremium'         => $this->magazinex_is_premium_theme_plan() || $this->zakra_is_premium_theme_plan() ? false : isset( $package_data->isPremium ),
 					'isAllThemePlan'    => $this->themegrill_is_all_themes_plan() ? false : isset( $package_data->isAllThemePlan ),
 					'active'            => $package_slug === $demo_activated_id,
 					'author'            => isset( $package_data->author ) ? $package_data->author : __( 'ThemeGrill', 'themegrill-demo-importer' ),
