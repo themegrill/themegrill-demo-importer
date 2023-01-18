@@ -78,6 +78,7 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 == Changelog ==
 = TBD =
 * Tweak – Update review notice message.
+* Tweak - Updated Wordpress tested upto version to 6.1.
 
 = 1.8.8.2 - 07-11-2022 =
 * Fix – Support for Gizmo.
