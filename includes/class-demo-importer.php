@@ -696,7 +696,6 @@ class TG_Demo_Importer {
 				}
 
 				// Prepare all demos.
-				error_log( print_r($package_data->template, true)  );
 				$prepared_demos[ $package_slug ] = array(
 					'slug'              => $package_slug,
 					'name'              => $package_data->title,
