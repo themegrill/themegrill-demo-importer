@@ -431,7 +431,7 @@ class TG_Demo_Importer {
 		if ( isset( $available_packages->demos ) ) {
 			foreach ( $available_packages->demos as $package_slug => $package_data ) {
 				$plugins_list   = isset( $package_data->plugins_list ) ? $package_data->plugins_list : array();
-				$screenshot_url = "https://d1sb0nhp4t2db4.cloudfront.net/resources/{$available_packages->slug}/{$package_slug}/screenshot.jpg";
+				$screenshot_url = "https://raw.githubusercontent.com/themegrill/themegrill-demo-pack/magazinex/resources/{$available_packages->slug}/{$package_slug}/screenshot.jpg";
 
 				if ( isset( $request['browse'], $package_data->category ) && ! in_array( $request['browse'], $package_data->category, true ) ) {
 					continue;
@@ -791,7 +791,7 @@ class TG_Demo_Importer {
 		$upgrader = new TG_Demo_Pack_Upgrader( $skin );
 		$template = strtolower( str_replace( '-pro', '', get_option( 'template' ) ) );
 		$packages = isset( $this->demo_packages->demos ) ? json_decode( wp_json_encode( $this->demo_packages->demos ), true ) : array();
-		$result   = $upgrader->install( "https://d1sb0nhp4t2db4.cloudfront.net/packages/{$template}/{$slug}.zip" );
+		$result   = $upgrader->install( "https://raw.githubusercontent.com/themegrill/themegrill-demo-pack/magazinex/packages/{$template}/{$slug}.zip" );
 
 		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 			$status['debug'] = $skin->get_upgrade_messages();
