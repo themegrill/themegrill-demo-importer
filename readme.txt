@@ -79,6 +79,7 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 = TBD =
 * Tweak – Update review notice message.
 * Tweak - Updated WordPress tested upto version to 6.1.
+* Tweak – Update popup information message.
 
 = 1.8.8.2 - 07-11-2022 =
 * Fix – Support for Gizmo.

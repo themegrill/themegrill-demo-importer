@@ -191,7 +191,7 @@ class TG_Demo_Importer {
 							'<ol><li class="warning">' . __( 'Importing the demo on the site if you have already added the content is highly discouraged.', 'themegrill-demo-importer' ) . '</li>',
 							'<li>' . __( 'You need to import demo on fresh WordPress install to exactly replicate the theme demo.', 'themegrill-demo-importer' ) . '</li>',
 							'<li>' . __( 'It will install the required plugins as well as activate them for installing the required theme demo within your site.', 'themegrill-demo-importer' ) . '</li>',
-							'<li>' . __( 'Copyright images will get replaced with other placeholder images.', 'themegrill-demo-importer' ) . '</li>',
+							'<li>' . __( 'To avoid copyright infringement, ensure to replace all demo images with your own after importing the demo.', 'themegrill-demo-importer' ) . '</li>',
 							'<li>' . __( 'None of the posts, pages, attachments or any other data already existing in your site will be deleted or modified.', 'themegrill-demo-importer' ) . '</li>',
 							'<li>' . __( 'It will take some time to import the theme demo.', 'themegrill-demo-importer' ) . '</li></ol>'
 						),
