@@ -1,4 +1,7 @@
 == Changelog ==
+= 1.9.1 - 15-02-2023 =
+* Update - Stable tag.
+
 = 1.9.0 - 15-02-2023 =
 * Tweak – Update review notice message.
 * Tweak - Updated WordPress tested upto version to 6.1.
