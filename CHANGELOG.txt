@@ -1,4 +1,9 @@
 == Changelog ==
+= 1.9.0 - 15-02-2023 =
+* Tweak – Update review notice message.
+* Tweak - Updated WordPress tested upto version to 6.1.
+* Tweak – Update popup information message.
+
 = 1.8.9 - 14-12-2022 =
 * Support – Support for Vastra.
 

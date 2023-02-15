@@ -76,10 +76,13 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 3. Finally, Import the Demo with just one click.
 
 == Changelog ==
-= TBD =
+= 1.9.0 - 15-02-2023 =
 * Tweak – Update review notice message.
 * Tweak - Updated WordPress tested upto version to 6.1.
 * Tweak – Update popup information message.
+
+= 1.8.9 - 14-12-2022 =
+* Support – Support for Vastra.
 
 = 1.8.8.2 - 07-11-2022 =
 * Fix – Support for Gizmo.
