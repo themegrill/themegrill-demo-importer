@@ -1,5 +1,8 @@
 == Changelog ==
-= 1.9.2 - 03-04-2022 =
+= 1.9.2.1 - 03-04-2023 =
+* Fix – Support for Blissful.
+
+= 1.9.2 - 03-04-2023 =
 * Support – Support for Blissful.
 
 = 1.9.1 - 15-02-2023 =

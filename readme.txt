@@ -3,7 +3,7 @@ Contributors: ThemeGrill
 Tags: themegrill, theme demos, demo, importer, one click import
 Requires at least: 4.7
 Tested up to: 6.1
-Stable tag: 1.9.2
+Stable tag: 1.9.2.1
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -76,7 +76,10 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 3. Finally, Import the Demo with just one click.
 
 == Changelog ==
-= 1.9.2 - 03-04-2022 =
+= 1.9.2.1 - 03-04-2023 =
+* Fix – Support for Blissful.
+
+= 1.9.2 - 03-04-2023 =
 * Support – Support for Blissful.
 
 = 1.9.1 - 15-02-2023 =
