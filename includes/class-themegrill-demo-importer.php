@@ -20,7 +20,7 @@ final class ThemeGrill_Demo_Importer {
 	 *
 	 * @var string
 	 */
-	public $version = '1.9.1';
+	public $version = '1.9.2';
 
 	/**
 	 * Theme single instance of this class.
@@ -154,6 +154,7 @@ final class ThemeGrill_Demo_Importer {
 			'libreria',
 			'magazinex',
 			'vastra',
+			'blissful',
 		);
 		// Check for official core themes pro version.
 		$pro_themes = array_diff( $core_themes, array( 'explore', 'masonic', 'estory' ) );

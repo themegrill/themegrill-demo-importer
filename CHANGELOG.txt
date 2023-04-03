@@ -1,4 +1,7 @@
 == Changelog ==
+= 1.9.2 - 03-04-2022 =
+* Support – Support for Blissful.
+
 = 1.9.1 - 15-02-2023 =
 * Update - Stable tag.
 
