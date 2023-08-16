@@ -2,8 +2,8 @@
 Contributors: ThemeGrill
 Tags: themegrill, theme demos, demo, importer, one click import
 Requires at least: 4.7
-Tested up to: 6.1
-Stable tag: 1.9.2.1
+Tested up to: 6.3
+Stable tag: 1.9.2.2
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -78,6 +78,7 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 == Changelog ==
 = 1.9.2.2 - 16-08-2023 =
 * Support – Support for Kirana.
+* Tweak - Update WordPress tested upto version to 6.3.
 
 = 1.9.2.1 - 03-04-2023 =
 * Fix – Support for Blissful.
