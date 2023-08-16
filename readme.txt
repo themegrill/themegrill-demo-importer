@@ -76,6 +76,9 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 3. Finally, Import the Demo with just one click.
 
 == Changelog ==
+= 1.9.2.2 - 16-08-2023 =
+* Support – Support for Kirana.
+
 = 1.9.2.1 - 03-04-2023 =
 * Fix – Support for Blissful.
 
