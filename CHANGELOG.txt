@@ -1,4 +1,7 @@
 == Changelog ==
+= 1.9.2.2 - 16-08-2023 =
+* Support – Support for Kirana.
+
 = 1.9.2.1 - 03-04-2023 =
 * Fix – Support for Blissful.
 
