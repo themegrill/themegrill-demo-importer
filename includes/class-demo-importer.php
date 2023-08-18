@@ -818,7 +818,7 @@ class TG_Demo_Importer {
 						break;
 					case 'page_on_front':
 					case 'page_for_posts':
-						$page = get_page_by_title( $option_value );
+						$page = $this->get_page_by_title( $option_value );
 
 						if ( is_object( $page ) && $page->ID ) {
 							update_option( $option_key, $page->ID );
@@ -968,7 +968,7 @@ class TG_Demo_Importer {
 						foreach ( $dropdown_data as $widget_id => $widget_data ) {
 							if ( ! empty( $widget_data[ $instance_id ] ) && $widget_id === $widget_type ) {
 								foreach ( $widget_data[ $instance_id ] as $widget_key => $widget_value ) {
-									$page = get_page_by_title( $widget_value );
+									$page = $this->get_page_by_title( $widget_value );
 
 									if ( is_object( $page ) && $page->ID ) {
 										$widget[ $widget_key ] = $page->ID;
@@ -1023,7 +1023,7 @@ class TG_Demo_Importer {
 					case 'pages':
 						foreach ( $data_value as $option_key => $option_value ) {
 							if ( ! empty( $data['mods'][ $option_key ] ) ) {
-								$page = get_page_by_title( $option_value );
+								$page = $this->get_page_by_title( $option_value );
 
 								if ( is_object( $page ) && $page->ID ) {
 									$data['mods'][ $option_key ] = $page->ID;
@@ -1147,7 +1147,7 @@ class TG_Demo_Importer {
 		if ( ! empty( $demo_data['elementor_data_update'] ) ) {
 			foreach ( $demo_data['elementor_data_update'] as $data_type => $data_value ) {
 				if ( ! empty( $data_value['post_title'] ) ) {
-					$page = get_page_by_title( $data_value['post_title'] );
+					$page = $this->get_page_by_title( $data_value['post_title'] );
 
 					if ( is_object( $page ) && $page->ID ) {
 						$elementor_data = get_post_meta( $page->ID, '_elementor_data', true );
@@ -1247,7 +1247,7 @@ class TG_Demo_Importer {
 
 												if ( $level == $instance ) {
 													foreach ( $widget_data[ $instance_id ] as $widget_key => $widget_value ) {
-														$page = get_page_by_title( $widget_value );
+														$page = $this->get_page_by_title( $widget_value );
 
 														if ( is_object( $page ) && $page->ID ) {
 															$widget_instance[ $widget_key ] = $page->ID;
@@ -1303,7 +1303,7 @@ class TG_Demo_Importer {
 		if ( ! empty( $demo_data['siteorigin_panels_data_update'] ) ) {
 			foreach ( $demo_data['siteorigin_panels_data_update'] as $data_type => $data_value ) {
 				if ( ! empty( $data_value['post_title'] ) ) {
-					$page = get_page_by_title( $data_value['post_title'] );
+					$page = $this->get_page_by_title( $data_value['post_title'] );
 
 					if ( is_object( $page ) && $page->ID ) {
 						$panels_data = get_post_meta( $page->ID, 'panels_data', true );
@@ -1339,6 +1339,32 @@ class TG_Demo_Importer {
 			// Redirect to demo import page once the transient is clear, since on first click, none of the demo is shown up in lists.
 			wp_safe_redirect( admin_url( 'themes.php?page=demo-importer&browse=all' ) );
 		}
+	}
+
+    // Get page by title.
+	public function get_page_by_title( $title ) {
+		if ( ! $title ) {
+			return null;
+		}
+
+		$query = new WP_Query(
+			array(
+				'post_type'              => 'page',
+				'title'                  => $title,
+				'post_status'            => 'all',
+				'posts_per_page'         => 1,
+				'no_found_rows'          => true,
+				'ignore_sticky_posts'    => true,
+				'update_post_term_cache' => false,
+				'update_post_meta_cache' => false,
+			)
+		);
+
+		if ( ! $query->have_posts() ) {
+			return null;
+		}
+
+		return current( $query->posts );
 	}
 }
 
