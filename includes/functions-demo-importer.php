@@ -627,3 +627,28 @@ function tg_update_masteriyo_settings( $id, $data ) {
 		masteriyo_set_setting( $key, $value );
 	}
 }
+
+/**
+ * After demo imported AJAX action.
+ *
+ * @see tg_setup_yith_woocommerce_wishlist()
+ */
+add_action( 'themegrill_ajax_demo_imported', 'tg_setup_yith_woocommerce_wishlist', 10, 2 );
+
+/**
+ * Update YITH Wishlist settings.
+ *
+ * @param string $id Demo Id.
+ * @param array  $data Demo data.
+ * @return void
+ */
+function tg_setup_yith_woocommerce_wishlist( $demo_id, $demo_data ) {
+
+	if ( function_exists( 'YITH_WCWL_Install' ) || ! YITH_WCWL_Install()->is_installed() ) {
+		YITH_WCWL_Install()->init();
+	}
+
+	foreach ( $demo_data['yith_woocommerce_wishlist_settings'] as $key => $value ) {
+		update_option( $key, $value );
+	}
+}
