@@ -1,4 +1,8 @@
 == Changelog ==
+= 1.9.3 - 18-08-2023 =
+* Support – Support for YITH Wishlist default settings when importing demo.
+* Tweak   - Replace deprecated function get_page_by_title with WP_Query.
+
 = 1.9.2.2 - 16-08-2023 =
 * Support – Support for Kirana.
 * Tweak   - Update WordPress tested upto version to 6.3.
