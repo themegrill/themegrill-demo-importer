@@ -1341,31 +1341,37 @@ class TG_Demo_Importer {
 		}
 	}
 
-    // Get page by title.
-	public function get_page_by_title( $title ) {
-		if ( ! $title ) {
-			return null;
-		}
+ 	/**
+	 * Retrieve a page by its title.
+	 *
+	 * @param string $title The title of the page to retrieve.
+	 * @return WP_Post|null The retrieved page object or null if not found.
+	 */
+    public function get_page_by_title( $title ) {
+        if ( ! $title ) {
+            return null;
+        }
 
-		$query = new WP_Query(
-			array(
-				'post_type'              => 'page',
-				'title'                  => $title,
-				'post_status'            => 'all',
-				'posts_per_page'         => 1,
-				'no_found_rows'          => true,
-				'ignore_sticky_posts'    => true,
-				'update_post_term_cache' => false,
-				'update_post_meta_cache' => false,
-			)
-		);
+        $query = new WP_Query(
+            array(
+                'post_type'              => 'page',
+                'title'                  => $title,
+                'post_status'            => 'all',
+                'posts_per_page'         => 1,
+                'no_found_rows'          => true,
+                'ignore_sticky_posts'    => true,
+                'update_post_term_cache' => false,
+                'update_post_meta_cache' => false,
+            )
+        );
 
-		if ( ! $query->have_posts() ) {
-			return null;
-		}
+        if ( ! $query->have_posts() ) {
+            return null;
+        }
 
-		return current( $query->posts );
-	}
+	    return current( $query->posts );
+    }
+
 }
 
 new TG_Demo_Importer();
