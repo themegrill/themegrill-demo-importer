@@ -644,9 +644,11 @@ add_action( 'themegrill_ajax_demo_imported', 'tg_setup_yith_woocommerce_wishlist
  */
 function tg_setup_yith_woocommerce_wishlist( $demo_id, $demo_data ) {
 
-	if ( function_exists( 'YITH_WCWL_Install' ) || ! YITH_WCWL_Install()->is_installed() ) {
-		YITH_WCWL_Install()->init();
+	if ( ! function_exists( 'YITH_WCWL_Install' ) || YITH_WCWL_Install()->is_installed() ) {
+		return;
 	}
+
+	YITH_WCWL_Install()->init();
 
 	foreach ( $demo_data['yith_woocommerce_wishlist_settings'] as $key => $value ) {
 		update_option( $key, $value );
