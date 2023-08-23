@@ -1,4 +1,7 @@
 == Changelog ==
+= 1.9.4 - 23-08-2023 =
+* Fix – Import fail message issue.
+
 = 1.9.3 - 18-08-2023 =
 * Support – Support for YITH Wishlist default settings when importing demo.
 * Tweak   - Replace deprecated function get_page_by_title with WP_Query.

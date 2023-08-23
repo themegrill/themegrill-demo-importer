@@ -3,7 +3,7 @@ Contributors: ThemeGrill
 Tags: themegrill, theme demos, demo, importer, one click import
 Requires at least: 4.7
 Tested up to: 6.3
-Stable tag: 1.9.3
+Stable tag: 1.9.4
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -76,6 +76,9 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 3. Finally, Import the Demo with just one click.
 
 == Changelog ==
+= 1.9.4 - 23-08-2023 =
+* Fix – Import fail message issue.
+
 = 1.9.3 - 18-08-2023 =
 * Support – Support for YITH Wishlist default settings when importing demo.
 * Tweak   - Replace deprecated function get_page_by_title with WP_Query.
