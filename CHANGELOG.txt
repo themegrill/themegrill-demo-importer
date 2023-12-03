@@ -1,4 +1,7 @@
 == Changelog ==
+= 1.9.4.1 - 03-12-2023 =
+* Support – Support for Ornate Decor.
+
 = 1.9.4 - 23-08-2023 =
 * Fix – Import fail message issue.
 

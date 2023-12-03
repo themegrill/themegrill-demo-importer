@@ -156,6 +156,7 @@ final class ThemeGrill_Demo_Importer {
 			'vastra',
 			'blissful',
 			'kirana',
+			'ornate-decor',
 		);
 		// Check for official core themes pro version.
 		$pro_themes = array_diff( $core_themes, array( 'explore', 'masonic', 'estory' ) );
