@@ -1,4 +1,7 @@
 == Changelog ==
+= 1.9.4.3 - 04-12-2023 =
+* Fix - Ornate Decor slug.
+
 = 1.9.4.2 - 04-12-2023 =
 * Fix - Ornate Decor config name.
 
