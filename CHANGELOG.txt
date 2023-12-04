@@ -1,4 +1,7 @@
 == Changelog ==
+= 1.9.4.2 - 04-12-2023 =
+* Fix - Ornate Decor config name.
+
 = 1.9.4.1 - 03-12-2023 =
 * Support – Support for Ornate Decor.
 * Tweak   - Update WordPress tested upto version to 6.4.
