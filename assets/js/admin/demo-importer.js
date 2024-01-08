@@ -4,13 +4,14 @@ window.wp = window.wp || {};
 ( function( $ ) {
 
 // Set up our namespace...
-	var demos, l10n;
+	var demos, l10n, route;
 	demos = wp.demos = wp.demos || {};
 
 // Store the demo data and settings for organized and quick access
 // demos.data.settings, demos.data.demos, demos.data.l10n
 	demos.data = _demoImporterSettings;
 	l10n = demos.data.l10n;
+	route = _demoImporterSettings.routes;
 
 // Shortcut for isNew check
 	demos.isNew = !! demos.data.settings.isNew;
@@ -1154,15 +1155,10 @@ window.wp = window.wp || {};
 // Listens to [demo] and [search] params
 	demos.Router = Backbone.Router.extend({
 
-		routes: {
-			'themes.php?page=colormag&tab=starter-templates&demo=:slug': 'preview',
-			'themes.php?page=colormag&tab=starter-templates&browse=:sort': 'sort',
-			'themes.php?page=colormag&tab=starter-templates&search=:query': 'search',
-			'themes.php?page=colormag&tab=starter-templates': 'sort'
-		},
+		routes: route,
 
 		baseUrl: function( url ) {
-			return 'themes.php?page=colormag&tab=starter-templates' + url;
+			return _demoImporterSettings.baseURL + url;
 		},
 
 		demoPath: '&demo=',
