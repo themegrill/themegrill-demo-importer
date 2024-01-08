@@ -246,12 +246,12 @@ class TG_Demo_Importer {
 						'suggestURI'    => apply_filters( 'themegrill_demo_importer_suggest_new', 'https://themegrill.com/contact/' ),
 						'confirmImport' => sprintf(
 						/* translators: Before import warning texts */
-							__( 'Importing demo data will ensure that your site will look similar as theme demo. It makes you easy to modify the content instead of creating them from scratch. Also, consider before importing the demo: %1$s %2$s %3$s %4$s %5$s %6$s', 'themegrill-demo-importer' ),
-							'<ol><li class="warning">' . __( 'Importing the demo on the site if you have already added the content is highly discouraged.', 'themegrill-demo-importer' ) . '</li>',
-							'<li>' . __( 'You need to import demo on fresh WordPress install to exactly replicate the theme demo.', 'themegrill-demo-importer' ) . '</li>',
-							'<li>' . __( 'It will install the required plugins as well as activate them for installing the required theme demo within your site.', 'themegrill-demo-importer' ) . '</li>',
-							'<li>' . __( 'To avoid copyright infringement, ensure to replace all demo images with your own after importing the demo.', 'themegrill-demo-importer' ) . '</li>',
-							'<li>' . __( 'None of the posts, pages, attachments or any other data already existing in your site will be deleted or modified.', 'themegrill-demo-importer' ) . '</li>',
+							__( 'Importing demo data ensures that your website looks similar to the theme demo. So, you can work on modifying the demo content rather than creating it from scratch. However, please consider the following points before importing the demo', 'themegrill-demo-importer' ),
+							'<ol><li>' . __( 'It’s highly discouraged to import the demo if you’ve already added content to your website.', 'themegrill-demo-importer' ) . '</li>',
+							'<li>' . __( 'To replicate the theme demo accurately, you must import the demo on a fresh WordPress installation.', 'themegrill-demo-importer' ) . '</li>',
+							'<li>' . __( 'The import process will install and activate the plugins required for the theme demo to function properly on your site. ', 'themegrill-demo-importer' ) . '</li>',
+							'<li>' . __( 'To avoid copyright infringement, replace all demo images with your own after importing the demo. ', 'themegrill-demo-importer' ) . '</li>',
+							'<li>' . __( 'None of the existing posts, pages, attachments, and other data on your site will be modified or deleted during the import. ', 'themegrill-demo-importer' ) . '</li>',
 							'<li>' . __( 'It will take some time to import the theme demo.', 'themegrill-demo-importer' ) . '</li></ol>'
 						),
 					),
