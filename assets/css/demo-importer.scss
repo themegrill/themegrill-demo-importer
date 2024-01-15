@@ -99,7 +99,7 @@
 						font-size: 13px;
 						font-weight: 400;
 						margin-left: 5px;
-						padding: 0px 10px;
+						padding: 0 10px;
 						line-height: 22px;
 						border-radius: 3px;
 						background: #67c016;
@@ -144,7 +144,7 @@
 
 								&.updating-message {
 									border-left-color: #5cb85c;
-									animation: spin .75s linear infinite;
+									animation: spin 0.75s linear infinite;
 								}
 							}
 						}
@@ -295,7 +295,7 @@ img.tips {
 		margin-left: 20px;
 
 		.warning {
-			color: #f00000;
+			color: #2563eb;
 		}
 	}
 }
@@ -304,12 +304,12 @@ img.tips {
 
 	.demo-import-confirm-button {
 		background: #f00000;
-		color: #ffffff;
+		color: #fff;
 	}
 
 	.demo-import-cancel-button {
-		background: #eeeeee;
-		border-color: #999999;
+		background: #eee;
+		border-color: #999;
 		color: #23282d;
 	}
 }

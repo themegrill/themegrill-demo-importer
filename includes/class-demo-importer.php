@@ -186,12 +186,13 @@ class TG_Demo_Importer {
 					'suggestURI'    => apply_filters( 'themegrill_demo_importer_suggest_new', 'https://themegrill.com/contact/' ),
 					'confirmImport' => sprintf(
 					/* translators: Before import warning texts */
+						'<h2>' . __( 'Things to Know </h2> %1$s %2$s %3$s %4$s %5$s %6$s', 'themegrill-demo-importer' ),
 						__( 'Importing demo data ensures that your website looks similar to the theme demo. So, you can work on modifying the demo content rather than creating it from scratch. However, please consider the following points before importing the demo', 'themegrill-demo-importer' ),
-						'<ol><li>' . __( 'It’s highly discouraged to import the demo if you’ve already added content to your website.', 'themegrill-demo-importer' ) . '</li>',
+						'<ol><li class="warning">' . __( 'It’s highly discouraged to import the demo if you’ve already added content to your website.', 'themegrill-demo-importer' ) . '</li>',
 						'<li>' . __( 'To replicate the theme demo accurately, you must import the demo on a fresh WordPress installation.', 'themegrill-demo-importer' ) . '</li>',
-						'<li>' . __( 'The import process will install and activate the plugins required for the theme demo to function properly on your site. ', 'themegrill-demo-importer' ) . '</li>',
-						'<li>' . __( 'To avoid copyright infringement, replace all demo images with your own after importing the demo. ', 'themegrill-demo-importer' ) . '</li>',
-						'<li>' . __( 'None of the existing posts, pages, attachments, and other data on your site will be modified or deleted during the import. ', 'themegrill-demo-importer' ) . '</li>',
+						'<li>' . __( 'The import process will install and activate the plugins required for the theme demo to function properly on your site.', 'themegrill-demo-importer' ) . '</li>',
+						'<li>' . __( 'To avoid copyright infringement, replace all demo images with your own after importing the demo.', 'themegrill-demo-importer' ) . '</li>',
+						'<li>' . __( 'None of the existing posts, pages, attachments, and other data on your site will be modified or deleted during the import.', 'themegrill-demo-importer' ) . '</li>',
 						'<li>' . __( 'It will take some time to import the theme demo.', 'themegrill-demo-importer' ) . '</li></ol>'
 					),
 				),
@@ -209,7 +210,7 @@ class TG_Demo_Importer {
 					'expandSidebar'       => __( 'Expand Sidebar', 'themegrill-demo-importer' ),
 					/* translators: accessibility text */
 					'selectFeatureFilter' => __( 'Select one or more Demo features to filter by', 'themegrill-demo-importer' ),
-					'confirmMsg'          => __( 'Confirm!', 'themegrill-demo-importer' ),
+					'confirmMsg'          => __( 'Continue', 'themegrill-demo-importer' ),
 				),
 				'routes' => apply_filters( 'themegrill_demo_importer_routes', array(
 					'themes.php?page=demo-importer&demo=:slug'=> 'preview',

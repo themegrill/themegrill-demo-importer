@@ -65,5 +65,8 @@
       "*.min.js",
       "*.css"
     ]
+  },
+  "dependencies": {
+    "gulp": "^4.0.2"
   }
 }
