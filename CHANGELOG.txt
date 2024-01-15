@@ -1,4 +1,7 @@
 == Changelog ==
+= 1.9.4.4 - 15-01-2023 =
+* Support - Support for theme dashboard enhancement.
+
 = 1.9.4.3 - 04-12-2023 =
 * Fix - Ornate Decor slug.
 
