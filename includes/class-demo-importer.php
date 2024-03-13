@@ -472,8 +472,6 @@ class TG_Demo_Importer {
 					}
 				}
 
-
-
 				// Get the required theme versions.
 				$required_version_installed           = false;
 				$required_version                     = false;
