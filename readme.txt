@@ -76,8 +76,8 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 3. Finally, Import the Demo with just one click.
 
 == Changelog ==
-= 1.9.5 - 13-03-2024 =
-* Tweak – Update review notice message.
+= 1.9.5 - 19-03-2024 =
+* Tweak - Minor fixes.
 
 = 1.9.4.4 - 15-01-2023 =
 * Support - Support for theme dashboard enhancement.
