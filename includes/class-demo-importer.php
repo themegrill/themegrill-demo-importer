@@ -439,6 +439,24 @@ class TG_Demo_Importer {
 					continue;
 				}
 
+				$plugins_list = is_object( $plugins_list ) ? $plugins_list : new stdClass();
+
+				// Zakra: check if BlockArt is in plugin list if not add it.
+				if ( 'Zakra' === $current_theme_name  && ! isset( $plugins_list->{'blockart-blocks'} ) ) {
+					$plugins_list->{'blockart-blocks'} = (object) array(
+						'name'       => 'BlockArt',
+						'slug'       => 'blockart-blocks/blockart.php'
+					);
+				}
+
+				// CM: check if Magazine blocks is in plugin list if not add it.
+				if ( 'ColorMag' === $current_theme_name && ! isset( $plugins_list->{'magazine-blocks'} ) ) {
+					$plugins_list->{'magazine-blocks'} = (object) array(
+						'name'       => 'Magazine Blocks',
+						'slug'       => 'magazine-blocks/magazine-blocks.php'
+					);
+				}
+
 				// Plugins status.
 				foreach ( $plugins_list as $plugin => $plugin_data ) {
 					$plugin_data->is_active = 'learning-management-system/lms.php' === $plugin_data->slug ? ( is_plugin_active( 'learning-management-system/lms.php' ) || is_plugin_active( 'learning-management-system-pro/lms.php' ) ) : is_plugin_active( $plugin_data->slug );
