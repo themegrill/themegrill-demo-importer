@@ -175,7 +175,7 @@ function tg_get_attachment_id( $filename ) {
 			$original_file       = basename( $meta['file'] );
 			$cropped_image_files = wp_list_pluck( $meta['sizes'], 'file' );
 
-			if ( $original_file === $file || in_array( $file, $cropped_image_files ) ) {
+			if ( $original_file === $file || in_array( $file, $cropped_image_files, true ) ) {
 				$attachment_id = $post_id;
 				break;
 			}
@@ -265,43 +265,30 @@ function tg_set_elementor_active_kit() {
 	$elementor_version = defined( 'ELEMENTOR_VERSION' ) ? ELEMENTOR_VERSION : false;
 
 	if ( version_compare( $elementor_version, '3.0.0', '>=' ) ) {
+		$query = new WP_Query(
+			array(
+				'post_type' => 'elementor_library',
+			)
+		);
 
-		global $wpdb;
-		$page_ids = $wpdb->get_results( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE (post_name = %s OR post_title = %s) AND post_type = 'elementor_library' AND post_status = 'publish'", 'default-kit', 'Default Kit' ) );
+		$ids = array_map(
+			function ( $post ) {
+				return $post->ID;
+			},
+			$query->posts
+		);
 
-		if ( ! is_null( $page_ids ) ) {
+		$found = null;
 
-			$page_id    = 0;
-			$delete_ids = array();
-
-			// Retrieve page with greater id and delete others.
-			if ( sizeof( $page_ids ) > 1 ) {
-
-				foreach ( $page_ids as $page ) {
-					if ( $page->ID > $page_id ) {
-						if ( $page_id ) {
-							$delete_ids[] = $page_id;
-						}
-
-						$page_id = $page->ID;
-					} else {
-						$delete_ids[] = $page->ID;
-					}
-				}
-			} else {
-				$page_id = $page_ids[0]->ID;
+		foreach ( $ids as $id ) {
+			if ( is_array( get_post_meta( $id, '_elementor_page_settings', true ) ) ) {
+				$found = $id;
+				break;
 			}
+		}
 
-			// Update `elementor_active_kit` page.
-			if ( $page_id > 0 ) {
-				wp_update_post(
-					array(
-						'ID'        => $page_id,
-						'post_name' => sanitize_title( 'Default Kit' ),
-					)
-				);
-				update_option( 'elementor_active_kit', $page_id );
-			}
+		if ( $found ) {
+			update_option( 'elementor_active_kit', $found );
 		}
 	}
 }
