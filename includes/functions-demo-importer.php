@@ -670,7 +670,7 @@ add_action(
 			foreach ( $ids as $id ) {
 				if ( is_array( get_post_meta( $id, '_elementor_page_settings', true ) ) ) {
 					$found = $id;
-					break;
+					continue;
 				}
 			}
 
