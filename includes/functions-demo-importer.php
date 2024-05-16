@@ -641,3 +641,44 @@ function tg_setup_yith_woocommerce_wishlist( $demo_id, $demo_data ) {
 		update_option( $key, $value );
 	}
 }
+
+add_action(
+	'init',
+	function () {
+		if (
+			! in_array( 'elementor/elementor.php', get_option( 'active_plugins', array() ), true ) ||
+			! get_option( 'themegrill_demo_importer_activated_id' )
+		) {
+			return;
+		}
+		if ( version_compare( ELEMENTOR_VERSION, '3.0.0', '>=' ) ) {
+			$query = new WP_Query(
+				array(
+					'post_type' => 'elementor_library',
+				)
+			);
+
+			$ids = array_map(
+				function ( $post ) {
+					return $post->ID;
+				},
+				$query->posts
+			);
+
+			$found = null;
+
+			foreach ( $ids as $id ) {
+				if ( is_array( get_post_meta( $id, '_elementor_page_settings', true ) ) ) {
+					$found = $id;
+					continue;
+				}
+				wp_delete_post( $id, true );
+			}
+
+			if ( $found ) {
+				update_option( 'elementor_active_kit', $found );
+			}
+		}
+	},
+	PHP_INT_MAX
+);
