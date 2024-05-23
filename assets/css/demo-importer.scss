@@ -305,6 +305,11 @@ img.tips {
 	.demo-import-confirm-button {
 		background: #f00000;
 		color: #fff;
+
+		&.disabled {
+			pointer-events: none;
+			opacity: 0.3;
+		}
 	}
 
 	.demo-import-cancel-button {

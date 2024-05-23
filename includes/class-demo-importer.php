@@ -194,6 +194,11 @@ class TG_Demo_Importer {
 						'<li>' . __( 'None of the existing posts, pages, attachments, and other data on your site will be modified or deleted during the import.', 'themegrill-demo-importer' ) . '</li>',
 						'<li>' . __( 'It will take some time to import the theme demo.', 'themegrill-demo-importer' ) . '</li></ol>'
 					),
+					'ceAddonNotice' => "<div class='tg-notice tg-notice-warning'><p>" . sprintf(
+						/* translators: %s: Companion Elementor plugin name */
+						__( 'This demo requires %s plugin to be installed and activated.', 'themegrill-demo-importer' ),
+						'<strong>' . __( 'Companion Elementor', 'themegrill-demo-importer' ) . '</strong>'
+					) . '</p></div>',
 				),
 				'l10n'     => array(
 					'search'              => __( 'Search Demos', 'themegrill-demo-importer' ),
@@ -458,6 +463,11 @@ class TG_Demo_Importer {
 
 				// Plugins status.
 				foreach ( $plugins_list as $plugin => $plugin_data ) {
+
+					if ( 'companion-elementor' === $plugin && ! is_plugin_active($plugin_data->slug ) ) {
+						$package_data->require_ce = true;
+					}
+
 					$plugin_data->is_active = 'learning-management-system/lms.php' === $plugin_data->slug ? ( is_plugin_active( 'learning-management-system/lms.php' ) || is_plugin_active( 'learning-management-system-pro/lms.php' ) ) : is_plugin_active( $plugin_data->slug );
 
 					// Looks like a plugin is installed, but not active.
@@ -636,6 +646,7 @@ class TG_Demo_Importer {
 					'requiredPlugins'   => wp_list_filter( json_decode( wp_json_encode( $plugins_list ), true ), array( 'is_active' => false ) ) ? true : false,
 					'requiredVersion'   => $required_version_installed,
 					'updateThemeNotice' => $required_message,
+					'ceAddonNotice' => isset( $package_data->require_ce ) && $package_data->require_ce ? __('CE required') : '',
 				);
 
 				unset( $required_version );
