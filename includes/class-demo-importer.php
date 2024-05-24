@@ -194,10 +194,15 @@ class TG_Demo_Importer {
 						'<li>' . __( 'None of the existing posts, pages, attachments, and other data on your site will be modified or deleted during the import.', 'themegrill-demo-importer' ) . '</li>',
 						'<li>' . __( 'It will take some time to import the theme demo.', 'themegrill-demo-importer' ) . '</li></ol>'
 					),
-					'ceAddonNotice' => "<div class='tg-notice tg-notice-warning'><p>" . sprintf(
+					'ceAddonNotice' => "<div class='demo-import-notice demo-import-notice-warning'><p>" . sprintf(
 						/* translators: %s: Companion Elementor plugin name */
-						__( 'This demo requires %s plugin to be installed and activated.', 'themegrill-demo-importer' ),
-						'<strong>' . __( 'Companion Elementor', 'themegrill-demo-importer' ) . '</strong>'
+						__( 'This demo requires %1$s plugin to be installed and activated. %2$s', 'themegrill-demo-importer' ),
+						'<strong>' . __( 'Companion Elementor', 'themegrill-demo-importer' ) . '</strong>',
+						'<span>' . sprintf(
+							__( 'You can refer to this %1$s documentation %2$s for its installation.', 'themegrill-demo-importer' ),
+							'<a href="https://docs.zakratheme.com/en/article/how-to-import-zakra-premium-templates-9wj04y/" target="_blank">',
+							'</a>'
+						) . '</span>'
 					) . '</p></div>',
 				),
 				'l10n'     => array(
@@ -464,7 +469,7 @@ class TG_Demo_Importer {
 				// Plugins status.
 				foreach ( $plugins_list as $plugin => $plugin_data ) {
 
-					if ( 'companion-elementor' === $plugin && ! is_plugin_active($plugin_data->slug ) ) {
+					if ( 'companion-elementor' === $plugin && ! is_plugin_active( $plugin_data->slug ) ) {
 						$package_data->require_ce = true;
 					}
 
@@ -646,7 +651,7 @@ class TG_Demo_Importer {
 					'requiredPlugins'   => wp_list_filter( json_decode( wp_json_encode( $plugins_list ), true ), array( 'is_active' => false ) ) ? true : false,
 					'requiredVersion'   => $required_version_installed,
 					'updateThemeNotice' => $required_message,
-					'ceAddonNotice' => isset( $package_data->require_ce ) && $package_data->require_ce ? __('CE required') : '',
+					'ceAddonNotice'     => isset( $package_data->require_ce ) && $package_data->require_ce ? __( 'CE required' ) : '',
 				);
 
 				unset( $required_version );
