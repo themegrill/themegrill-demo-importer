@@ -20,7 +20,7 @@ final class ThemeGrill_Demo_Importer {
 	 *
 	 * @var string
 	 */
-	public $version = '1.9.6';
+	public $version = '1.9.7';
 
 	/**
 	 * Theme single instance of this class.
@@ -112,10 +112,8 @@ final class ThemeGrill_Demo_Importer {
 
 			add_filter( 'plugin_action_links_' . TGDM_PLUGIN_BASENAME, array( $this, 'plugin_action_links' ) );
 			add_filter( 'plugin_row_meta', array( $this, 'plugin_row_meta' ), 10, 2 );
-		} else {
-			if ( get_option( 'template' ) !== 'estory-pro' ) {
+		} elseif ( get_option( 'template' ) !== 'estory-pro' ) {
 				add_action( 'admin_notices', array( $this, 'theme_support_missing_notice' ) );
-			}
 		}
 	}
 
@@ -215,7 +213,7 @@ final class ThemeGrill_Demo_Importer {
 	 * Deactivation hook.
 	 */
 	public function deactivate() {
-		include_once dirname( __FILE__ ) . '/class-demo-importer-deactivator.php';
+		include_once __DIR__ . '/class-demo-importer-deactivator.php';
 
 		TG_Demo_Importer_Deactivator::deactivate();
 	}
