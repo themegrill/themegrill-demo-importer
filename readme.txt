@@ -77,7 +77,7 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 
 == Changelog ==
 = 1.9.7 - 29-05-2024 =
-* Tweak - Remove compulsory require of companion elementor in Zakra premium demo.
+* Tweak - Remove compulsory companion elementor in Zakra premium demo.
 
 = 1.9.6 - 16-05-2024 =
 * Fix - Elementor kit import issue.
