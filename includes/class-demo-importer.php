@@ -74,9 +74,9 @@ class TG_Demo_Importer {
 	 * Include required core files.
 	 */
 	public function includes() {
-		include_once dirname( __FILE__ ) . '/importers/class-widget-importer.php';
-		include_once dirname( __FILE__ ) . '/importers/class-customizer-importer.php';
-		include_once dirname( __FILE__ ) . '/admin/class-demo-importer-status.php';
+		include_once __DIR__ . '/importers/class-widget-importer.php';
+		include_once __DIR__ . '/importers/class-customizer-importer.php';
+		include_once __DIR__ . '/admin/class-demo-importer-status.php';
 	}
 
 	/**
@@ -118,11 +118,10 @@ class TG_Demo_Importer {
 	 */
 	public function admin_menu() {
 
-		if ( apply_filters("themegrill_demo_importer_show_main_menu", true ) ) {
+		if ( apply_filters( 'themegrill_demo_importer_show_main_menu', true ) ) {
 			add_theme_page( __( 'Demo Importer', 'themegrill-demo-importer' ), __( 'Demo Importer', 'themegrill-demo-importer' ), 'switch_themes', 'demo-importer', array( $this, 'demo_importer' ) );
 		}
 		add_theme_page( __( 'Demo Importer Status', 'themegrill-demo-importer' ), __( 'Demo Importer Status', 'themegrill-demo-importer' ), 'switch_themes', 'demo-importer-status', array( $this, 'status_menu' ) );
-
 	}
 
 	/**
@@ -195,6 +194,16 @@ class TG_Demo_Importer {
 						'<li>' . __( 'None of the existing posts, pages, attachments, and other data on your site will be modified or deleted during the import.', 'themegrill-demo-importer' ) . '</li>',
 						'<li>' . __( 'It will take some time to import the theme demo.', 'themegrill-demo-importer' ) . '</li></ol>'
 					),
+					'ceAddonNotice' => "<div class='demo-import-notice demo-import-notice-warning'><p>" . sprintf(
+						/* translators: %s: Companion Elementor plugin name */
+						__( 'This demo requires %1$s plugin to be installed and activated. %2$s', 'themegrill-demo-importer' ),
+						'<strong>' . __( 'Companion Elementor', 'themegrill-demo-importer' ) . '</strong>',
+						'<span>' . sprintf(
+							__( 'You can refer to this %1$s documentation %2$s for its installation.', 'themegrill-demo-importer' ),
+							'<a href="https://docs.zakratheme.com/en/article/how-to-import-zakra-premium-templates-9wj04y/" target="_blank">',
+							'</a>'
+						) . '</span>'
+					) . '</p></div>',
 				),
 				'l10n'     => array(
 					'search'              => __( 'Search Demos', 'themegrill-demo-importer' ),
@@ -212,13 +221,16 @@ class TG_Demo_Importer {
 					'selectFeatureFilter' => __( 'Select one or more Demo features to filter by', 'themegrill-demo-importer' ),
 					'confirmMsg'          => __( 'Continue', 'themegrill-demo-importer' ),
 				),
-				'routes' => apply_filters( 'themegrill_demo_importer_routes', array(
-					'themes.php?page=demo-importer&demo=:slug'=> 'preview',
-					'themes.php?page=demo-importer&browse=:sort'=> 'sort',
-					'themes.php?page=demo-importer&search=:query'=> 'search',
-					'themes.php?page=demo-importer'=> 'sort'
-				) ),
-				'baseURL' => apply_filters( 'themegrill_demo_importer_baseURL', 'themes.php?page=demo-importer' ),
+				'routes'   => apply_filters(
+					'themegrill_demo_importer_routes',
+					array(
+						'themes.php?page=demo-importer&demo=:slug' => 'preview',
+						'themes.php?page=demo-importer&browse=:sort' => 'sort',
+						'themes.php?page=demo-importer&search=:query' => 'search',
+						'themes.php?page=demo-importer' => 'sort',
+					)
+				),
+				'baseURL'  => apply_filters( 'themegrill_demo_importer_baseURL', 'themes.php?page=demo-importer' ),
 			)
 		);
 
@@ -331,21 +343,20 @@ class TG_Demo_Importer {
 		if ( 'appearance_page_demo-importer' === $screen->id ) {
 			add_filter( 'woocommerce_enable_setup_wizard', '__return_false', 1 );
 		}
-
 	}
 
 	/**
 	 * Demo Importer page output.
 	 */
 	public function demo_importer() {
-		include_once dirname( __FILE__ ) . '/admin/views/html-admin-page-importer.php';
+		include_once __DIR__ . '/admin/views/html-admin-page-importer.php';
 	}
 
 	/**
 	 * Demo Importer status page output.
 	 */
 	public function status_menu() {
-		include_once dirname( __FILE__ ) . '/admin/views/html-admin-page-status.php';
+		include_once __DIR__ . '/admin/views/html-admin-page-status.php';
 	}
 
 	/**
@@ -355,12 +366,11 @@ class TG_Demo_Importer {
 	 */
 	public function zakra_is_premium_theme_plan() {
 
-		if ( is_plugin_active( 'zakra-pro/zakra-pro.php' ) && is_plugin_active( 'companion-elementor/companion-elementor.php' ) ) {
+		if ( is_plugin_active( 'zakra-pro/zakra-pro.php' ) ) {
 			return true;
 		}
 
 		return false;
-
 	}
 
 	/**
@@ -375,7 +385,6 @@ class TG_Demo_Importer {
 		}
 
 		return false;
-
 	}
 
 	/**
@@ -442,23 +451,28 @@ class TG_Demo_Importer {
 				$plugins_list = is_object( $plugins_list ) ? $plugins_list : new stdClass();
 
 				// Zakra: check if BlockArt is in plugin list if not add it.
-				if ( 'Zakra' === $current_theme_name  && ! isset( $plugins_list->{'blockart-blocks'} ) ) {
+				if ( 'Zakra' === $current_theme_name && ! isset( $plugins_list->{'blockart-blocks'} ) ) {
 					$plugins_list->{'blockart-blocks'} = (object) array(
-						'name'       => 'BlockArt',
-						'slug'       => 'blockart-blocks/blockart.php'
+						'name' => 'BlockArt',
+						'slug' => 'blockart-blocks/blockart.php',
 					);
 				}
 
 				// CM: check if Magazine blocks is in plugin list if not add it.
 				if ( 'ColorMag' === $current_theme_name && ! isset( $plugins_list->{'magazine-blocks'} ) ) {
 					$plugins_list->{'magazine-blocks'} = (object) array(
-						'name'       => 'Magazine Blocks',
-						'slug'       => 'magazine-blocks/magazine-blocks.php'
+						'name' => 'Magazine Blocks',
+						'slug' => 'magazine-blocks/magazine-blocks.php',
 					);
 				}
 
 				// Plugins status.
 				foreach ( $plugins_list as $plugin => $plugin_data ) {
+
+					if ( 'companion-elementor' === $plugin && ! is_plugin_active( $plugin_data->slug ) ) {
+						$package_data->require_ce = true;
+					}
+
 					$plugin_data->is_active = 'learning-management-system/lms.php' === $plugin_data->slug ? ( is_plugin_active( 'learning-management-system/lms.php' ) || is_plugin_active( 'learning-management-system-pro/lms.php' ) ) : is_plugin_active( $plugin_data->slug );
 
 					// Looks like a plugin is installed, but not active.
@@ -499,20 +513,19 @@ class TG_Demo_Importer {
 									$companion_elementor_required_version = $minimum_version;
 								}
 							}
-						} else {
-							if (
+						} elseif (
 								$current_template === $theme && version_compare( $minimum_version, $current_theme_version, '>' ) ||
 								( 'companion-elementor' === $theme && version_compare( $minimum_version, $companion_elementor_plugin_name, '>' ) )
 							) {
+
 								$required_version_installed = true;
 
-								if ( $current_template === $theme ) {
-									$required_version = $minimum_version;
-								}
+							if ( $current_template === $theme ) {
+								$required_version = $minimum_version;
+							}
 
-								if ( 'companion-elementor' === $theme ) {
-									$companion_elementor_required_version = $minimum_version;
-								}
+							if ( 'companion-elementor' === $theme ) {
+								$companion_elementor_required_version = $minimum_version;
 							}
 						}
 					}
@@ -638,6 +651,7 @@ class TG_Demo_Importer {
 					'requiredPlugins'   => wp_list_filter( json_decode( wp_json_encode( $plugins_list ), true ), array( 'is_active' => false ) ) ? true : false,
 					'requiredVersion'   => $required_version_installed,
 					'updateThemeNotice' => $required_message,
+					'ceAddonNotice'     => isset( $package_data->require_ce ) && $package_data->require_ce ? __( 'CE required' ) : '',
 				);
 
 				unset( $required_version );
@@ -708,7 +722,7 @@ class TG_Demo_Importer {
 		}
 
 		include_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
-		include_once dirname( __FILE__ ) . '/admin/class-demo-pack-upgrader.php';
+		include_once __DIR__ . '/admin/class-demo-pack-upgrader.php';
 
 		$skin     = new WP_Ajax_Upgrader_Skin();
 		$upgrader = new TG_Demo_Pack_Upgrader( $skin );
@@ -801,7 +815,7 @@ class TG_Demo_Importer {
 		}
 
 		// Include WXR Importer.
-		require dirname( __FILE__ ) . '/importers/wordpress-importer/class-wxr-importer.php';
+		require __DIR__ . '/importers/wordpress-importer/class-wxr-importer.php';
 
 		do_action( 'themegrill_ajax_before_dummy_xml_import', $demo_data, $demo_id );
 
@@ -1401,7 +1415,6 @@ class TG_Demo_Importer {
 
 		return current( $query->posts );
 	}
-
 }
 
 new TG_Demo_Importer();

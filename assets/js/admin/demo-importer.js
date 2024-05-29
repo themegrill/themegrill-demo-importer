@@ -568,14 +568,14 @@ window.wp = window.wp || {};
 
 			$.confirm( {
 				title : '',
-				content: '<div class="demo-import-confirm-message">' + wp.demos.data.settings.confirmImport + '</div>',
+				content: '<div class="demo-import-confirm-message">' + ( _this.model.get( 'ceAddonNotice' ) ? wp.demos.data.settings.ceAddonNotice : '' )  + wp.demos.data.settings.confirmImport + '</div>',
 				boxWidth: '50%',
 				useBootstrap: false,
 				buttons: {
 					confirm: {
 						text: wp.demos.data.l10n.confirmMsg,
 						keys: ['enter'],
-						btnClass: 'demo-import-confirm-button',
+						btnClass: _this.model.get( 'ceAddonNotice' ) ? 'disabled demo-import-confirm-button' : 'demo-import-confirm-button',
 						action: function(){
 							_this.processImport( $target, pluginsList, _this );
 						}

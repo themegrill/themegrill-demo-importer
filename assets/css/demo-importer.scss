@@ -305,6 +305,11 @@ img.tips {
 	.demo-import-confirm-button {
 		background: #f00000;
 		color: #fff;
+
+		&.disabled {
+			pointer-events: none;
+			opacity: 0.3;
+		}
 	}
 
 	.demo-import-cancel-button {
@@ -319,5 +324,37 @@ body {
 	&.demo-import-message-popup {
 		overflow: visible;
 		visibility: visible;
+	}
+}
+
+
+.demo-import-notice-warning {
+	color: #f00000c7;
+	padding: 16px 30px;
+	border: 1px solid #f0000029;
+	border-radius: 6px;
+	background: #f0000008;
+	position: relative;
+
+	p {
+		margin: 0;
+	}
+
+	span {
+		color: #000000;
+	}
+
+	a {
+		text-decoration: underline;
+	}
+
+	&::before {
+		content: '\f534';
+		font-family: 'dashicons';
+		position: absolute;
+		top: 50%;
+		left: 10px;
+		transform: translateY(-50%);
+		color: #f00000;
 	}
 }
