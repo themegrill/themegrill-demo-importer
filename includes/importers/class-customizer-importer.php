@@ -29,7 +29,9 @@ class TG_Customizer_Importer {
 	public static function import( $import_file, $demo_id, $demo_data ) {
 		global $wp_customize;
 
-		$data = maybe_unserialize( file_get_contents( $import_file ) );
+		$content = file_get_contents( $import_file );
+
+		$data = maybe_unserialize( $content );
 
 		// Data checks.
 		if ( ! is_array( $data ) && ( ! isset( $data['template'] ) || ! isset( $data['mods'] ) ) ) {
@@ -57,7 +59,7 @@ class TG_Customizer_Importer {
 			}
 
 			// Include Customizer Demo Importer Setting class.
-			include_once dirname( __FILE__ ) . '/customize/class-oc-customize-demo-importer-setting.php';
+			include_once __DIR__ . '/customize/class-oc-customize-demo-importer-setting.php';
 
 			foreach ( $data['options'] as $option_key => $option_value ) {
 				$option = new OC_Customize_Demo_Importer_Setting(

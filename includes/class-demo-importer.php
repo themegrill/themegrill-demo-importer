@@ -8,6 +8,9 @@
 
 defined( 'ABSPATH' ) || exit;
 
+require __DIR__ . '/importers/wordpress-importer/class-wxr-import-ui.php';
+
+
 /**
  * TG_Demo_Importer Class.
  */
@@ -18,7 +21,15 @@ class TG_Demo_Importer {
 	 *
 	 * @var array
 	 */
+	protected $fetch_attachments = true;
 	public $demo_packages;
+
+	/**
+	 * The importer class object
+	 *
+	 * @var object
+	 */
+	private $importer;
 
 	/**
 	 * Constructor.
@@ -61,6 +72,7 @@ class TG_Demo_Importer {
 
 		// Refresh demos.
 		add_action( 'admin_init', array( $this, 'refresh_demo_lists' ) );
+		add_action( 'admin_init', array( $this, 'wpimportv2_init' ) );
 	}
 
 	/**
@@ -771,12 +783,10 @@ class TG_Demo_Importer {
 			$this->import_elementor_schemes( $slug, $demo_data );
 			$this->import_customizer_data( $slug, $demo_data, $status );
 			$this->import_widget_settings( $slug, $demo_data, $status );
-
 			// Update imported demo ID.
 			update_option( 'themegrill_demo_importer_activated_id', $slug );
 			do_action( 'themegrill_ajax_demo_imported', $slug, $demo_data );
 		}
-
 		wp_send_json_success( $status );
 	}
 
@@ -801,6 +811,7 @@ class TG_Demo_Importer {
 	 * @return bool
 	 */
 	public function import_dummy_xml( $demo_id, $demo_data, $status ) {
+
 		$import_file = $this->get_import_file_path( 'dummy-data.xml' );
 
 		// Load Importer API.
@@ -821,12 +832,18 @@ class TG_Demo_Importer {
 
 		// Import XML file demo content.
 		if ( is_file( $import_file ) ) {
-			$wp_import                    = new TG_WXR_Importer();
-			$wp_import->fetch_attachments = true;
-
+			$importer = $this->get_importer();
 			ob_start();
-			$wp_import->import( $import_file );
+			$data = $importer->import( $import_file );
 			ob_end_clean();
+			if ( is_wp_error( $data ) ) {
+				return $data;
+			}
+			// $wp_import = new TG_WXR_Importer();
+
+			// ob_start();
+			// $wp_import->import( $import_file );
+			// ob_end_clean();
 
 			do_action( 'themegrill_ajax_dummy_xml_imported', $demo_data, $demo_id );
 
@@ -837,6 +854,37 @@ class TG_Demo_Importer {
 		}
 
 		return true;
+	}
+	/**
+	 * Get the importer instance.
+	 *
+	 * @return TG_WXR_Importer
+	 */
+	protected function get_importer() {
+		$this->importer = new TG_WXR_Importer( $this->get_import_options() );
+		$logger         = new WP_Importer_Logger_ServerSentEvents();
+		$this->importer->set_logger( $logger );
+
+		return $this->importer;
+	}
+
+	/**
+	 * Get options for the importer.
+	 *
+	 * @return array Options to pass to WXR_Importer::__construct
+	 */
+	protected function get_import_options() {
+		$options = array(
+			'fetch_attachments' => $this->fetch_attachments,
+			'default_author'    => get_current_user_id(),
+		);
+
+		/**
+		 * Filter the importer options used in the admin UI.
+		 *
+		 * @param array $options Options to pass to WXR_Importer::__construct
+		 */
+		return apply_filters( 'wxr_importer.admin.import_options', $options );
 	}
 
 	/**
@@ -942,7 +990,6 @@ class TG_Demo_Importer {
 	 */
 	public function import_widget_settings( $demo_id, $demo_data, $status ) {
 		$import_file = $this->get_import_file_path( 'dummy-widgets.wie' );
-
 		if ( is_file( $import_file ) ) {
 			$results = TG_Widget_Importer::import( $import_file, $demo_id, $demo_data );
 
@@ -961,7 +1008,6 @@ class TG_Demo_Importer {
 		$menu_locations = get_nav_menu_locations();
 
 		foreach ( $menu_locations as $location => $menu_id ) {
-
 			if ( is_nav_menu( $menu_id ) ) {
 				$menu_items = wp_get_nav_menu_items( $menu_id, array( 'post_status' => 'any' ) );
 
@@ -994,7 +1040,7 @@ class TG_Demo_Importer {
 	 */
 	public function update_widget_data( $widget, $widget_type, $instance_id, $demo_data ) {
 		if ( 'nav_menu' === $widget_type ) {
-			$menu     = isset( $widget['title'] ) ? $widget['title'] : $widget['nav_menu'];
+			$menu     = isset( $widget['title'] ) ? $widget['title'] : $this->importer->get_term_new_id( $widget['nav_menu'] );
 			$nav_menu = wp_get_nav_menu_object( $menu );
 
 			if ( is_object( $nav_menu ) && $nav_menu->term_id ) {
@@ -1414,6 +1460,16 @@ class TG_Demo_Importer {
 		}
 
 		return current( $query->posts );
+	}
+
+
+	public function wpimportv2_init() {
+		/**
+		 * WordPress Importer object for registering the import callback
+		 * @global WP_Import $wp_import
+		 */
+		$GLOBALS['wxr_importer'] = new WXR_Import_UI();
+		add_action( 'wp_ajax_wxr-import', array( $GLOBALS['wxr_importer'], 'stream_import' ) );
 	}
 }
 
