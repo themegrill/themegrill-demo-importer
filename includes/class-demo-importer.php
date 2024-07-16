@@ -8,8 +8,6 @@
 
 defined( 'ABSPATH' ) || exit;
 
-require __DIR__ . '/importers/wordpress-importer/class-wxr-import-ui.php';
-
 
 /**
  * TG_Demo_Importer Class.
@@ -72,7 +70,6 @@ class TG_Demo_Importer {
 
 		// Refresh demos.
 		add_action( 'admin_init', array( $this, 'refresh_demo_lists' ) );
-		add_action( 'admin_init', array( $this, 'wpimportv2_init' ) );
 	}
 
 	/**
@@ -245,7 +242,6 @@ class TG_Demo_Importer {
 				'baseURL'  => apply_filters( 'themegrill_demo_importer_baseURL', 'themes.php?page=demo-importer' ),
 			)
 		);
-
 		// Demo Importer appearance page.
 		if ( 'appearance_page_demo-importer' === $screen_id ) {
 			wp_enqueue_style( 'tg-demo-importer' );
@@ -839,14 +835,13 @@ class TG_Demo_Importer {
 			if ( is_wp_error( $data ) ) {
 				return $data;
 			}
-			// $wp_import = new TG_WXR_Importer();
 
+			// $wp_import = new TG_WXR_Importer();
 			// ob_start();
 			// $wp_import->import( $import_file );
 			// ob_end_clean();
 
 			do_action( 'themegrill_ajax_dummy_xml_imported', $demo_data, $demo_id );
-
 			flush_rewrite_rules();
 		} else {
 			$status['errorMessage'] = __( 'The XML file dummy content is missing.', 'themegrill-demo-importer' );
@@ -1460,16 +1455,6 @@ class TG_Demo_Importer {
 		}
 
 		return current( $query->posts );
-	}
-
-
-	public function wpimportv2_init() {
-		/**
-		 * WordPress Importer object for registering the import callback
-		 * @global WP_Import $wp_import
-		 */
-		$GLOBALS['wxr_importer'] = new WXR_Import_UI();
-		add_action( 'wp_ajax_wxr-import', array( $GLOBALS['wxr_importer'], 'stream_import' ) );
 	}
 }
 
