@@ -6,6 +6,8 @@
  * @version 1.0.0
  */
 
+use Elementor\Plugin;
+
 defined( 'ABSPATH' ) || exit;
 
 // Include core functions (available in both admin and frontend).
@@ -289,6 +291,7 @@ function tg_set_elementor_active_kit() {
 
 		if ( $found ) {
 			update_option( 'elementor_active_kit', $found );
+			Plugin::$instance->files_manager->clear_cache();
 		}
 	}
 }
