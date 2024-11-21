@@ -21,6 +21,13 @@ class TG_Demo_Importer {
 	public $demo_packages;
 
 	/**
+	 * The importer class object
+	 *
+	 * @var object
+	 */
+	private $importer;
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
@@ -821,7 +828,7 @@ class TG_Demo_Importer {
 
 		// Import XML file demo content.
 		if ( is_file( $import_file ) ) {
-			$wp_import                    = new TG_WXR_Importer();
+			$wp_import                    = $this->get_importer();
 			$wp_import->fetch_attachments = true;
 
 			ob_start();
@@ -838,6 +845,17 @@ class TG_Demo_Importer {
 
 		return true;
 	}
+
+	/**
+	 * Get the importer instance.
+	 *
+	 * @return TG_WXR_Importer
+	 */
+	protected function get_importer() {
+		$this->importer = new TG_WXR_Importer();
+		return $this->importer;
+	}
+
 
 	/**
 	 * Import site core options from its ID.
@@ -994,7 +1012,7 @@ class TG_Demo_Importer {
 	 */
 	public function update_widget_data( $widget, $widget_type, $instance_id, $demo_data ) {
 		if ( 'nav_menu' === $widget_type ) {
-			$menu     = isset( $widget['title'] ) ? $widget['title'] : $widget['nav_menu'];
+			$menu     = isset( $widget['title'] ) ? $widget['title'] : $this->importer->get_term_new_id( $widget['nav_menu'] );
 			$nav_menu = wp_get_nav_menu_object( $menu );
 
 			if ( is_object( $nav_menu ) && $nav_menu->term_id ) {
