@@ -3,7 +3,8 @@ Contributors: ThemeGrill
 Tags: themegrill, theme demos, demo, importer, one click import
 Requires at least: 4.7
 Tested up to: 6.5
-Stable tag: 1.9.7
+Requires PHP: 7.4
+Stable tag: 1.9.9
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -21,7 +22,7 @@ Get [free support](https://themegrill.com/support-forum/)
 
 = Demo Importer in action: =
 
-[youtube https://youtu.be/cXxmpNIui9Y]
+[youtube https://youtu.be/JgZbhBU1o4g]
 
 = Requirements =
 
@@ -76,6 +77,12 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 3. Finally, Import the Demo with just one click.
 
 == Changelog ==
+= 1.9.9 - 21-11-2024 =
+* Fix - Footer widget menu import issue.
+
+= 1.9.8 - 16-10-2024 =
+* Tweak - Update readme file.
+
 = 1.9.7 - 29-05-2024 =
 * Tweak - Remove compulsory companion elementor in Zakra premium demo.
 
@@ -133,13 +140,13 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 * Update – Stable tag.
 
 = 1.8.8 - 07-11-2022 =
-* Support – Support for Gizmo. 
+* Support – Support for Gizmo.
 
 = 1.8.7 - 10-10-2022 =
-* Update – Stable tag. 
+* Update – Stable tag.
 
 = 1.8.6 - 10-10-2022 =
-* Remove  - Support for eStory Pro. 
+* Remove  - Support for eStory Pro.
 
 = 1.8.5 - 19-09-2022 =
 * Fix - Compatibility with Masteriyo Pro.
@@ -159,7 +166,7 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 
 = 1.8.0 - 08-03-2022 =
 * Support - Skincare theme.
-* Remove  - Support for Luza theme. 
+* Remove  - Support for Luza theme.
 
 = 1.7.9 - 16-02-2022 =
 * Tweak - Update static demo content url.
