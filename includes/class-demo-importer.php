@@ -36,51 +36,6 @@ class TG_Demo_Importer {
 		add_action( 'init', array( $this, 'setup' ), 5 );
 		add_action( 'init', array( $this, 'includes' ) );
 
-		add_action(
-			'admin_menu',
-			function () {
-				$page = add_theme_page(
-					__( 'Demo Importer V2', 'themegrill-demo-importer' ),
-					__( 'Demo Importer V2', 'themegrill-demo-importer' ),
-					'switch_themes',
-					'demo-importer-v2',
-					function () {
-						echo '<div id="tg-demo-importer"></div>';
-					}
-				);
-				add_action(
-					"admin_print_scripts-$page",
-					function () {
-						$asset_url = function ( $filename ) {
-							if ( defined( 'TDI_DEVELOPMENT' ) && TDI_DEVELOPMENT ) {
-								return 'http://localhost:8887/' . $filename;
-							}
-							return plugin_dir_url( TGDM_PLUGIN_FILE ) . 'build/' . $filename;
-						};
-						$asset     = function ( $prefix ) {
-							$asset_file = plugin_dir_path( TGDM_PLUGIN_FILE ) . DIRECTORY_SEPARATOR . 'build' . DIRECTORY_SEPARATOR . $prefix . '.asset.php';
-							if ( file_exists( $asset_file ) ) {
-								return require $asset_file;
-							}
-							return array(
-								'dependencies' => array(),
-								'version'      => TGDM_VERSION,
-							);
-						};
-						wp_enqueue_script( 'tdi-dashboard', $asset_url( 'dashboard.js' ), $asset( 'dashboard' )['dependencies'], $asset( 'dashboard' )['version'], true );
-						wp_localize_script(
-							'tdi-dashboard',
-							'__TDI_DASHBOARD__',
-							array(
-								'data' => $this->demo_packages,
-							)
-						);
-						wp_enqueue_style( 'tdi-dashboard', $asset_url( 'dashboard.css' ), array(), $asset( 'dashboard' )['version'] );
-					}
-				);
-			}
-		);
-
 		// Add Demo Importer menu.
 		if ( apply_filters( 'themegrill_show_demo_importer_page', true ) ) {
 			add_action( 'admin_menu', array( $this, 'admin_menu' ), 9 );
@@ -100,21 +55,33 @@ class TG_Demo_Importer {
 		add_action( 'current_screen', array( $this, 'woocommerce_disable_setup_wizard' ) );
 
 		// AJAX Events to query demo, import demo and update rating footer.
-		add_action( 'wp_ajax_query-demos', array( $this, 'ajax_query_demos' ) );
-		add_action( 'wp_ajax_import-demo', array( $this, 'ajax_import_demo' ) );
-		add_action( 'wp_ajax_footer-text-rated', array( $this, 'ajax_footer_text_rated' ) );
+		// add_action( 'wp_ajax_query-demos', array( $this, 'ajax_query_demos' ) );
+		// add_action( 'wp_ajax_import-demo', array( $this, 'ajax_import_demo' ) );
+		// add_action( 'wp_ajax_footer-text-rated', array( $this, 'ajax_footer_text_rated' ) );
 
 		// Update custom nav menu items, elementor and siteorigin panel data.
-		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_nav_menu_items' ) );
-		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_elementor_data' ), 10, 2 );
-		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_siteorigin_data' ), 10, 2 );
+		// add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_nav_menu_items' ) );
+		// add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_elementor_data' ), 10, 2 );
+		// add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_siteorigin_data' ), 10, 2 );
 
 		// Update widget and customizer demo import settings data.
-		add_filter( 'themegrill_widget_demo_import_settings', array( $this, 'update_widget_data' ), 10, 4 );
-		add_filter( 'themegrill_customizer_demo_import_settings', array( $this, 'update_customizer_data' ), 10, 2 );
+		// add_filter( 'themegrill_widget_demo_import_settings', array( $this, 'update_widget_data' ), 10, 4 );
+		// add_filter( 'themegrill_customizer_demo_import_settings', array( $this, 'update_customizer_data' ), 10, 2 );
 
 		// Refresh demos.
 		add_action( 'admin_init', array( $this, 'refresh_demo_lists' ) );
+
+		// Register API Endpoints
+		add_action( 'rest_api_init', array( $this, 'register_api_endpoints' ) );
+	}
+
+	/**
+	 * Register endpoints for the REST API.
+	 */
+	public function register_api_endpoints() {
+		require_once TGDM_ABSPATH . 'includes/class-demo-importer-rest-api.php';
+		$importer_rest = new TG_Importer_REST_Controller();
+		$importer_rest->register_routes();
 	}
 
 	/**
@@ -122,6 +89,24 @@ class TG_Demo_Importer {
 	 */
 	public function setup() {
 		$this->demo_packages = $this->get_demo_packages();
+
+		// Include WXR Importer.
+		require __DIR__ . '/importers/wordpress-importer/class-wxr-importer.php';
+		$this->importer = new TG_WXR_Importer( $this->get_import_options() );
+	}
+
+
+	/**
+	 * check whether the current active theme is in core supported themes list
+	 */
+	public function get_theme() {
+		$instance         = ThemeGrill_Demo_Importer::instance();
+		$supported_themes = $instance->get_core_supported_themes();
+		$theme            = get_option( 'template' );
+		if ( in_array( $theme, $supported_themes, true ) ) {
+			return $theme;
+		}
+		return 'all';
 	}
 
 	/**
@@ -139,22 +124,24 @@ class TG_Demo_Importer {
 	 * @return array of objects
 	 */
 	private function get_demo_packages() {
-		$packages = get_transient( 'themegrill_demo_importer_packages' );
-		$template = strtolower( str_replace( '-pro', '', get_option( 'template' ) ) );
-
-		if ( false === $packages || ( isset( $packages->slug ) && $template !== $packages->slug ) ) {
-			$raw_packages = wp_safe_remote_get( "https://d1sb0nhp4t2db4.cloudfront.net/configs/{$template}.json" );
-
-			if ( ! is_wp_error( $raw_packages ) ) {
-				$packages = json_decode( wp_remote_retrieve_body( $raw_packages ) );
-
-				if ( $packages ) {
-					set_transient( 'themegrill_demo_importer_packages', $packages, WEEK_IN_SECONDS );
-				}
-			}
+		$data = wp_remote_get( 'http://themegrill-demos-api.test/wp-json/tgda/v1/sites' );
+		if ( is_wp_error( $data ) ) {
+			return;
 		}
 
-		return apply_filters( 'themegrill_demo_importer_packages_' . $template, $packages );
+		$instance         = ThemeGrill_Demo_Importer::instance();
+		$supported_themes = $instance->get_core_supported_themes();
+		$all_demos        = json_decode( wp_remote_retrieve_body( $data ) );
+		// $theme            = get_option( 'template' );
+		// if ( in_array( $theme, $supported_themes, true ) ) {
+		//  $properties = get_object_vars( $all_demos );
+		//  $keys       = array_keys( $properties );
+		//  if ( in_array( $theme, $keys, true ) ) {
+		//      $demos = $all_demos->$theme;
+		//      return apply_filters( 'themegrill_demo_importer_packages_template', $demos );
+		//  }
+		// }
+		return apply_filters( 'themegrill_demo_importer_packages_template', $all_demos );
 	}
 
 	/**
@@ -172,9 +159,50 @@ class TG_Demo_Importer {
 	 */
 	public function admin_menu() {
 
-		if ( apply_filters( 'themegrill_demo_importer_show_main_menu', true ) ) {
-			add_theme_page( __( 'Demo Importer', 'themegrill-demo-importer' ), __( 'Demo Importer', 'themegrill-demo-importer' ), 'switch_themes', 'demo-importer', array( $this, 'demo_importer' ) );
-		}
+		// if ( apply_filters( 'themegrill_demo_importer_show_main_menu', true ) ) {
+		//  add_theme_page( __( 'Demo Importer', 'themegrill-demo-importer' ), __( 'Demo Importer', 'themegrill-demo-importer' ), 'switch_themes', 'demo-importer', array( $this, 'demo_importer' ) );
+		// }
+
+		$page = add_theme_page(
+			__( 'Demo Importer V2', 'themegrill-demo-importer' ),
+			__( 'Demo Importer V2', 'themegrill-demo-importer' ),
+			'switch_themes',
+			'demo-importer-v2',
+			function () {
+				echo '<div id="tg-demo-importer"></div>';
+			}
+		);
+		add_action(
+			"admin_print_scripts-$page",
+			function () {
+				$asset_url = function ( $filename ) {
+					if ( defined( 'TDI_DEVELOPMENT' ) && TDI_DEVELOPMENT ) {
+						return 'http://localhost:8887/' . $filename;
+					}
+					return plugin_dir_url( TGDM_PLUGIN_FILE ) . 'build/' . $filename;
+				};
+				$asset     = function ( $prefix ) {
+					$asset_file = plugin_dir_path( TGDM_PLUGIN_FILE ) . DIRECTORY_SEPARATOR . 'build' . DIRECTORY_SEPARATOR . $prefix . '.asset.php';
+					if ( file_exists( $asset_file ) ) {
+						return require $asset_file;
+					}
+					return array(
+						'dependencies' => array(),
+						'version'      => TGDM_VERSION,
+					);
+				};
+				wp_enqueue_script( 'tdi-dashboard', $asset_url( 'dashboard.js' ), $asset( 'dashboard' )['dependencies'], $asset( 'dashboard' )['version'], true );
+				wp_localize_script(
+					'tdi-dashboard',
+					'__TDI_DASHBOARD__',
+					array(
+						'theme' => $this->get_theme(),
+						'data'  => $this->demo_packages,
+					)
+				);
+				wp_enqueue_style( 'tdi-dashboard', $asset_url( 'dashboard.css' ), array(), $asset( 'dashboard' )['version'] );
+			}
+		);
 		add_theme_page( __( 'Demo Importer Status', 'themegrill-demo-importer' ), __( 'Demo Importer Status', 'themegrill-demo-importer' ), 'switch_themes', 'demo-importer-status', array( $this, 'status_menu' ) );
 	}
 

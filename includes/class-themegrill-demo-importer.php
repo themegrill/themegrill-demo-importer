@@ -75,23 +75,23 @@ final class ThemeGrill_Demo_Importer {
 	private function define_constants() {
 		$upload_dir = wp_upload_dir( null, false );
 
-		$this->define( 'TGDM_ABSPATH', dirname( TGDM_PLUGIN_FILE ) . '/' );
-		$this->define( 'TGDM_PLUGIN_BASENAME', plugin_basename( TGDM_PLUGIN_FILE ) );
-		$this->define( 'TGDM_VERSION', $this->version );
-		$this->define( 'TGDM_DEMO_DIR', $upload_dir['basedir'] . '/tg-demo-pack/' );
+		define( 'TGDM_ABSPATH', dirname( TGDM_PLUGIN_FILE ) . '/' );
+		define( 'TGDM_PLUGIN_BASENAME', plugin_basename( TGDM_PLUGIN_FILE ) );
+		define( 'TGDM_VERSION', $this->version );
+		define( 'TGDM_DEMO_DIR', $upload_dir['basedir'] . '/tg-demo-pack/' );
 	}
 
-	/**
-	 * Define constant if not already set.
-	 *
-	 * @param string      $name  Constant name.
-	 * @param string|bool $value Constant value.
-	 */
-	private function define( $name, $value ) {
-		if ( ! defined( $name ) ) {
-			define( $name, $value );
-		}
-	}
+	// /**
+	//  * Define constant if not already set.
+	//  *
+	//  * @param string      $name  Constant name.
+	//  * @param string|bool $value Constant value.
+	//  */
+	// private function define( $name, $value ) {
+	//  if ( ! defined( $name ) ) {
+	//      define( $name, $value );
+	//  }
+	// }
 
 	/**
 	 * Hook into actions and filters.
@@ -106,15 +106,19 @@ final class ThemeGrill_Demo_Importer {
 		// Register deactivation hook.
 		register_deactivation_hook( TGDM_PLUGIN_FILE, array( $this, 'deactivate' ) );
 
-		// Check with Official ThemeGrill theme is installed.
-		if ( in_array( get_option( 'template' ), $this->get_core_supported_themes(), true ) ) {
-			$this->includes();
+		$this->includes();
 
-			add_filter( 'plugin_action_links_' . TGDM_PLUGIN_BASENAME, array( $this, 'plugin_action_links' ) );
-			add_filter( 'plugin_row_meta', array( $this, 'plugin_row_meta' ), 10, 2 );
-		} elseif ( get_option( 'template' ) !== 'estory-pro' ) {
-				add_action( 'admin_notices', array( $this, 'theme_support_missing_notice' ) );
-		}
+		add_filter( 'plugin_action_links_' . TGDM_PLUGIN_BASENAME, array( $this, 'plugin_action_links' ) );
+		add_filter( 'plugin_row_meta', array( $this, 'plugin_row_meta' ), 10, 2 );
+		// Check with Official ThemeGrill theme is installed.
+		// if ( in_array( get_option( 'template' ), $this->get_core_supported_themes(), true ) ) {
+		//  $this->includes();
+
+		//  add_filter( 'plugin_action_links_' . TGDM_PLUGIN_BASENAME, array( $this, 'plugin_action_links' ) );
+		//  add_filter( 'plugin_row_meta', array( $this, 'plugin_row_meta' ), 10, 2 );
+		// } elseif ( get_option( 'template' ) !== 'estory-pro' ) {
+		//      add_action( 'admin_notices', array( $this, 'theme_support_missing_notice' ) );
+		// }
 	}
 
 	/**
@@ -122,7 +126,7 @@ final class ThemeGrill_Demo_Importer {
 	 *
 	 * @return array
 	 */
-	private function get_core_supported_themes() {
+	public function get_core_supported_themes() {
 		$core_themes = array(
 			'spacious',
 			'colormag',

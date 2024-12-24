@@ -18,6 +18,7 @@
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@types/wordpress__media-utils": "^4.14.4",
+    "@wordpress/api-fetch": "^7.10.0",
     "@wordpress/media-utils": "^5.4.0",
     "@wordpress/scripts": "^28.3.0",
     "autoprefixer": "^10.4.19",
