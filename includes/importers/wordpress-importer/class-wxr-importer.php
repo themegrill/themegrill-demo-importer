@@ -515,7 +515,7 @@ class TG_WXR_Importer extends WP_Importer {
 		if ( $this->options['aggressive_url_search'] ) {
 			$this->replace_attachment_urls_in_content();
 		}
-		// $this->remap_featured_images();
+		$this->remap_featured_images();
 		$this->import_end();
 	}
 
@@ -541,9 +541,9 @@ class TG_WXR_Importer extends WP_Importer {
 	 */
 	protected function import_start( $file ) {
 
-		if ( ! is_file( $file ) ) {
-			return new WP_Error( 'wxr_importer.file_missing', __( 'The file does not exist, please try again.', 'themegrill-demo-importer' ) );
-		}
+		// if ( ! is_file( $file ) ) {
+		//  return new WP_Error( 'wxr_importer.file_missing', __( 'The file does not exist, please try again.', 'themegrill-demo-importer' ) );
+		// }
 
 		// Suspend bunches of stuff in WP core
 		wp_defer_term_counting( true );
@@ -773,6 +773,7 @@ class TG_WXR_Importer extends WP_Importer {
 		 * @param array $comments Comments on the post.
 		 * @param array $terms Terms on the post.
 		 */
+
 		$data = apply_filters( 'wxr_importer.pre_process.post', $data, $meta, $comments, $terms );
 		if ( empty( $data ) ) {
 			return false;
@@ -803,6 +804,7 @@ class TG_WXR_Importer extends WP_Importer {
 		}
 
 		$post_exists = $this->post_exists( $data );
+
 		if ( $post_exists ) {
 
 			$this->logger->info(
@@ -1133,6 +1135,10 @@ class TG_WXR_Importer extends WP_Importer {
 		$post_id = wp_insert_attachment( $post, $upload['file'] );
 		if ( is_wp_error( $post_id ) ) {
 			return $post_id;
+		}
+
+		if ( ! function_exists( 'wp_generate_attachment_metadata' ) ) {
+			include ABSPATH . 'wp-admin/includes/image.php';
 		}
 
 		$attachment_metadata = wp_generate_attachment_metadata( $post_id, $upload['file'] );
@@ -1709,6 +1715,11 @@ class TG_WXR_Importer extends WP_Importer {
 			$key = array_search( $child->tagName, $tag_name );
 			if ( $key ) {
 				$data[ $key ] = $child->textContent;
+			} elseif ( $child->tagName === 'wp:termmeta' ) {
+				$meta_item = $this->parse_meta_node( $child );
+				if ( ! empty( $meta_item ) ) {
+					$meta[] = $meta_item;
+				}
 			}
 		}
 
@@ -1741,6 +1752,7 @@ class TG_WXR_Importer extends WP_Importer {
 
 		$mapping_key = sha1( $data['taxonomy'] . ':' . $data['slug'] );
 		$existing    = $this->term_exists( $data );
+
 		if ( $existing ) {
 
 			/**
@@ -1754,7 +1766,6 @@ class TG_WXR_Importer extends WP_Importer {
 			$this->mapping['term_id'][ $original_id ] = $existing;
 			return false;
 		}
-
 		// WP really likes to repeat itself in export files
 		if ( isset( $this->mapping['term'][ $mapping_key ] ) ) {
 			return false;
@@ -1833,6 +1844,7 @@ class TG_WXR_Importer extends WP_Importer {
 			)
 		);
 
+		$this->process_term_meta( $meta, $term_id, $data );
 		do_action( 'wp_import_insert_term', $term_id, $data );
 
 		/**
@@ -1842,6 +1854,49 @@ class TG_WXR_Importer extends WP_Importer {
 		 * @param array $data Raw data imported for the term.
 		 */
 		do_action( 'wxr_importer.processed.term', $term_id, $data );
+	}
+
+		/**
+	 * Process and import term meta items.
+	 *
+	 * @param array $meta List of meta data arrays
+	 * @param int $term_id Term to associate with
+	 * @param array $term Term data
+	 * @return int|WP_Error Number of meta items imported on success, error otherwise.
+	 */
+	protected function process_term_meta( $meta, $term_id, $term ) {
+		if ( empty( $meta ) ) {
+			return true;
+		}
+
+		foreach ( $meta as $meta_item ) {
+			/**
+			 * Pre-process term meta data.
+			 *
+			 * @param array $meta_item Meta data. (Return empty to skip.)
+			 * @param int $term_id Term the meta is attached to.
+			 */
+			$meta_item = apply_filters( 'wxr_importer.pre_process.term_meta', $meta_item, $term_id );
+			if ( empty( $meta_item ) ) {
+				return false;
+			}
+
+			$key   = apply_filters( 'import_term_meta_key', $meta_item['key'], $term_id, $term );
+			$value = false;
+
+			if ( $key ) {
+				// export gets meta straight from the DB so could have a serialized string
+				if ( ! $value ) {
+					$value = maybe_unserialize( $meta_item['value'] );
+				}
+
+				add_term_meta( $term_id, wp_slash( $key ), wp_slash_strings_only( $value ) );
+
+				do_action( 'import_term_meta', $term_id, $key, $value );
+			}
+		}
+
+		return true;
 	}
 
 	/**
@@ -2082,7 +2137,6 @@ class TG_WXR_Importer extends WP_Importer {
 		delete_post_meta( $post_id, '_wxr_import_menu_item' );
 	}
 
-
 	protected function post_process_comments( $todo ) {
 		foreach ( $todo as $comment_id => $_ ) {
 			$data = array();
@@ -2177,12 +2231,11 @@ class TG_WXR_Importer extends WP_Importer {
 	/**
 	 * Update _thumbnail_id meta to new, imported attachment IDs
 	 */
-	function remap_featured_images() {
+	protected function remap_featured_images() {
 		// cycle through posts that have a featured image
 		foreach ( $this->featured_images as $post_id => $value ) {
-			if ( isset( $this->processed_posts[ $value ] ) ) {
-				$new_id = $this->processed_posts[ $value ];
-
+			if ( isset( $this->mapping['post'][ $value ] ) ) {
+				$new_id = $this->mapping['post'][ $value ];
 				// only update if there's a difference
 				if ( $new_id !== $value ) {
 					update_post_meta( $post_id, '_thumbnail_id', $new_id );
