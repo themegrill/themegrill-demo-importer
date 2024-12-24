@@ -49,10 +49,11 @@ const ImportSidebar = () => {
 					<p className="text-[#6B6B6B] uppercase text-[12px]">Default Color</p>
 
 					<div className="border border-solid border-[#2563EB] p-2 rounded flex justify-between">
-						{colors.map((color) => (
+						{colors.map((color, index) => (
 							<div
 								className="border border-solid border-[#f4f4f4] rounded-full h-[28px] w-[28px]"
 								style={{ backgroundColor: color }}
+								key={index}
 							></div>
 						))}
 					</div>
@@ -62,10 +63,11 @@ const ImportSidebar = () => {
 					className="border border-solid border-[#F4F4F4] bg-white p-2 rounded w-full m-0 mt-[8px] flex justify-between cursor-pointer"
 					type="button"
 				>
-					{colors.map((color) => (
+					{colors.map((color, index) => (
 						<div
 							className="border border-solid border-[#f4f4f4] rounded-full h-[28px] w-[28px]"
 							style={{ backgroundColor: color }}
+							key={index}
 						></div>
 					))}
 				</button>
@@ -73,10 +75,11 @@ const ImportSidebar = () => {
 					className="border border-solid border-[#F4F4F4] bg-white p-2 rounded w-full m-0 mt-[8px] flex justify-between cursor-pointer"
 					type="button"
 				>
-					{colors.map((color) => (
+					{colors.map((color, index) => (
 						<div
 							className="border border-solid border-[#f4f4f4] rounded-full h-[28px] w-[28px]"
 							style={{ backgroundColor: color }}
+							key={index}
 						></div>
 					))}
 				</button>

@@ -1,15 +1,20 @@
+import apiFetch from '@wordpress/api-fetch';
 import Lottie from 'lottie-react';
 import React, { useState } from 'react';
 import confetti from '../../assets/animation/confetti.json';
 import { Progress } from '../../components/Progress';
+import { PageWithSelection, SearchResultType } from '../../lib/types';
 import ImportDialogSkeleton from '../dialog/ImportDialogSkeleton';
 
 type Props = {
 	flexDivCss?: String;
 	buttonTitle: string;
+	pages?: PageWithSelection[];
+	initialTheme: string;
+	demo: SearchResultType;
 };
 
-const ImportButton = ({ flexDivCss, buttonTitle }: Props) => {
+const ImportButton = ({ flexDivCss, buttonTitle, initialTheme, demo }: Props) => {
 	const notes = [
 		'It’s highly discouraged to import the demo on the site if you’ve already added the content.',
 		'Import the demo on a fresh WordPress installation for an exact replication of the theme demo.',
@@ -21,6 +26,7 @@ const ImportButton = ({ flexDivCss, buttonTitle }: Props) => {
 
 	const importNotes = [
 		{
+			slug: 'customizer',
 			content: 'Import Customizer Settings',
 			activeContent: 'Import Customizer Settings',
 			hasDescription: true,
@@ -29,6 +35,7 @@ const ImportButton = ({ flexDivCss, buttonTitle }: Props) => {
 			disabledToggle: false,
 		},
 		{
+			slug: 'widget',
 			content: 'Import Widgets',
 			activeContent: 'Imports all the Widgets that is needed fot the demo.',
 			hasDescription: true,
@@ -37,6 +44,7 @@ const ImportButton = ({ flexDivCss, buttonTitle }: Props) => {
 			disabledToggle: false,
 		},
 		{
+			slug: 'content',
 			content: 'Import Content',
 			activeContent: 'Import Content',
 			hasDescription: true,
@@ -45,6 +53,7 @@ const ImportButton = ({ flexDivCss, buttonTitle }: Props) => {
 			disabledToggle: false,
 		},
 		{
+			slug: 'plugins',
 			content: 'Install and Activate Necessary Plugins',
 			activeContent: 'Install and Activate Necessary Plugins',
 			hasDescription: true,
@@ -53,17 +62,10 @@ const ImportButton = ({ flexDivCss, buttonTitle }: Props) => {
 			disabledToggle: true,
 		},
 		{
+			slug: 'evf',
 			content: 'Everest Form',
 			activeContent: 'Everest Form',
 			hasDescription: true,
-			isDescriptionActive: false,
-			toggle: false,
-			disabledToggle: false,
-		},
-		{
-			content: 'Install WooCommerce',
-			activeContent: 'Install WooCommerce',
-			hasDescription: false,
 			isDescriptionActive: false,
 			toggle: false,
 			disabledToggle: false,
@@ -106,7 +108,9 @@ const ImportButton = ({ flexDivCss, buttonTitle }: Props) => {
 						type="button"
 						className="cursor-pointer bg-[#2563EB] text-white border-0 rounded px-[24px] py-[10px] text-[14px]"
 						onClick={() => {
-							setStep((prev) => prev + 1);
+							demo.theme === initialTheme
+								? setStep((prev) => prev + 3)
+								: setStep((prev) => prev + 1);
 						}}
 					>
 						Continue
@@ -139,9 +143,9 @@ const ImportButton = ({ flexDivCss, buttonTitle }: Props) => {
 					</div>
 
 					<p className="bg-[#E9EFFD] border border-solid border-[#81A5F3] p-[16px] m-0 rounded text-[14px]">
-						By clicking “Install”, you’ll install the Zakra theme to ensure the layout matches the
-						preview. Skipping the installation is strictly discouraged as it may result in a
-						different layout.
+						By clicking “Install”, you’ll install the {demo.theme} theme to ensure the layout
+						matches the preview. Skipping the installation is strictly discouraged as it may result
+						in a different layout.
 					</p>
 				</>
 			),
@@ -169,9 +173,7 @@ const ImportButton = ({ flexDivCss, buttonTitle }: Props) => {
 						<button
 							type="button"
 							className="cursor-pointer bg-[#2563EB] text-white border-0 rounded px-[24px] py-[10px] text-[14px]"
-							onClick={() => {
-								setStep((prev) => prev + 1);
-							}}
+							onClick={handleThemeInstall}
 						>
 							Install
 						</button>
@@ -286,7 +288,9 @@ const ImportButton = ({ flexDivCss, buttonTitle }: Props) => {
 									</label>
 								</div>
 								{item.isDescriptionActive && <p className="m-0 italic">{item.activeContent}</p>}
-								{notes.length !== index + 1 && <hr className="my-[5px] sm:my-[16px] border-b-0" />}
+								{importNotes.length !== index + 1 && (
+									<hr className="my-[5px] sm:my-[16px] border-b-0" />
+								)}
 							</li>
 						))}
 					</ul>
@@ -306,9 +310,7 @@ const ImportButton = ({ flexDivCss, buttonTitle }: Props) => {
 					<button
 						type="button"
 						className="cursor-pointer bg-[#2563EB] text-white border-0 rounded px-[24px] py-[10px] text-[14px]"
-						onClick={() => {
-							setStep((prev) => prev + 1);
-						}}
+						onClick={() => handleImport()}
 					>
 						Import
 					</button>
@@ -355,7 +357,7 @@ const ImportButton = ({ flexDivCss, buttonTitle }: Props) => {
 			footer: null,
 		},
 		{
-			header: 'Optigo is successfully imported! Thank you for your patience',
+			header: `${demo.name} is successfully imported! Thank you for your patience`,
 			content: () => (
 				<>
 					<div className="flex m-0 mb-4">
@@ -494,6 +496,58 @@ const ImportButton = ({ flexDivCss, buttonTitle }: Props) => {
 				itemIndex === index ? { ...item, toggle: !item.toggle } : item,
 			),
 		);
+	};
+
+	const handleThemeInstall = async () => {
+		try {
+			const response = await apiFetch<{
+				success: boolean;
+			}>({
+				path: 'tg-demo-importer/v1/install-theme',
+				method: 'POST',
+				data: { theme: demo.theme },
+			});
+			if (response.success) {
+				console.log(response);
+				setStep(step + 1);
+			} else {
+				console.log(response);
+				throw new Error(JSON.stringify(response));
+			}
+		} catch (e) {
+			console.error(e);
+		}
+	};
+
+	const handleImport = async () => {
+		try {
+			const pluginResponse = await apiFetch<{
+				success: boolean;
+			}>({
+				path: `tg-demo-importer/v1/import-plugins`,
+				method: 'POST',
+				data: { demo: demo },
+			});
+			if (pluginResponse.success) {
+				let slugs: string[] = [];
+				items.map((item) => {
+					if (item.toggle == true && item.slug != 'plugins') {
+						slugs.push(item.slug);
+					}
+				});
+				const response = await apiFetch({
+					path: 'tg-demo-importer/v1/import',
+					method: 'POST',
+					data: { demo: demo, slugs: slugs },
+				});
+				console.log(response);
+			} else {
+				console.log(pluginResponse);
+				throw new Error(JSON.stringify(pluginResponse));
+			}
+		} catch (error) {
+			console.error('Error importing plugin:', error);
+		}
 	};
 
 	return (

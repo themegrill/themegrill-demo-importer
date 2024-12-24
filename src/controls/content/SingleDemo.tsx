@@ -1,28 +1,30 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import elementor from '../../assets/images/elementor.png';
+import { SearchResultType } from '../../lib/types';
+
+declare const require: any;
 
 type DemoProps = {
-	isPro?: Boolean;
-	isPremium?: Boolean;
-	isNew?: Boolean;
+	demo: SearchResultType;
 };
 
-const SingleDemo = (props: DemoProps) => {
-	const { isPro, isPremium, isNew } = props;
+const SingleDemo = ({ demo }: DemoProps) => {
+	const checkImageExists = (key: string): string => {
+		try {
+			return require(`../../assets/images/${key}.jpg`);
+		} catch {
+			return '';
+		}
+	};
 	return (
 		<Link
-			to="/import-detail"
+			to={`/import-detail/${demo.slug}`}
 			className="text-[#383838] no-underline hover:text-[#383838] tg-demo flex flex-col gap-0"
 		>
 			<div className="shadow flex flex-col  ">
 				<div className="relative">
-					<img
-						src="https://d1sb0nhp4t2db4.cloudfront.net/resources/zakra/zakra-optigo/screenshot.jpg"
-						alt=""
-						className="w-full h-full"
-					/>
-					{isPro && (
+					<img src={demo.image} alt="" className="w-full h-full" />
+					{demo.pro && (
 						<div className="tg-demo-pro">
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
@@ -41,21 +43,30 @@ const SingleDemo = (props: DemoProps) => {
 							</svg>
 						</div>
 					)}
-					{isPremium && (
+					{demo.premium && (
 						<div className="tg-demo-pro text-white">
 							<p className="m-0 font-semibold">Premium</p>
 						</div>
 					)}
-					<div className="absolute bottom-[16px] left-[16px] p-[4px] bg-white rounded tg-pagebuilder hidden cursor-auto">
-						<img src={elementor} alt="" className="block" />
-						<span className="text-[#383838] ml-[8px] font-[600] hidden">Elementor</span>
-					</div>
+					{Object.entries(demo?.pagebuilders || {})
+						.filter(([key, _]) => key !== 'all')
+						.map(([key, value]) => (
+							<div
+								className="absolute bottom-[16px] left-[16px] p-[4px] bg-white rounded tg-pagebuilder hidden cursor-auto"
+								key={key}
+							>
+								{checkImageExists(key) !== '' && (
+									<img src={require(`../../assets/images/${key}.jpg`)} alt="" className="block" />
+								)}
+								<span className="text-[#383838] ml-[8px] font-[600] hidden">{value}</span>
+							</div>
+						))}
 				</div>
 
 				<div className="bg-white px-[16px] py-[15px] border-[#f4f4f4]">
 					<h4 className="m-0 ">
-						Optigo
-						{isNew && (
+						{demo.name}
+						{demo && (
 							<span className="bg-[#27AE60] px-[4px] py-[1px] text-[10px] text-white rounded-[4px] ml-[8px]">
 								New
 							</span>

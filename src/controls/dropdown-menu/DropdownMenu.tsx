@@ -1,5 +1,5 @@
 import React from 'react';
-import elementor from '../../assets/images/elementor.png';
+import { useSearchParams } from 'react-router-dom';
 import { Button } from '../../components/Button';
 import {
 	DropdownMenuContent,
@@ -8,8 +8,33 @@ import {
 	DropdownMenuTrigger,
 	DropdownMenu as TGDropdownMenu,
 } from '../../components/DropdownMenu';
+import { PagebuilderCategory } from '../../lib/types';
 
-const DropdownMenu = () => {
+declare const require: any;
+
+type Props = {
+	pagebuilders: PagebuilderCategory[];
+	setPagebuilder: (slug: string) => void;
+	currentPagebuilder: string;
+};
+
+const DropdownMenu = ({ pagebuilders, setPagebuilder, currentPagebuilder }: Props) => {
+	const [searchParams, setSearchParams] = useSearchParams();
+	const handlePagebuilderChange = (pagebuilder: PagebuilderCategory) => {
+		setPagebuilder(pagebuilder.slug);
+		const newSearchParams = new URLSearchParams(searchParams.toString());
+		newSearchParams.set('pagebuilder', pagebuilder.slug);
+		setSearchParams(newSearchParams);
+	};
+
+	const checkImageExists = (key: string): string => {
+		try {
+			return require(`../../assets/images/${key}.jpg`);
+		} catch {
+			return '';
+		}
+	};
+
 	return (
 		<TGDropdownMenu>
 			<DropdownMenuTrigger asChild>
@@ -17,7 +42,7 @@ const DropdownMenu = () => {
 					variant="outline"
 					className="text-[#383838] px-5 bg-white border-[1px] border-solid cursor-pointer border-[#f4f4f4] w-full sm:w-[172px] h-11 items-center justify-between focus-visible:ring-0"
 				>
-					<span>View All</span>
+					<span>{currentPagebuilder}</span>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
 						width="10"
@@ -40,20 +65,27 @@ const DropdownMenu = () => {
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent className="w-full sm:w-[172px] bg-white p-0">
-				<DropdownMenuItem className="p-[16px]">
-					<img src={elementor} alt="" className="mr-2" />
-					<span className="text-[14px]">Gutenberg (9)</span>
-				</DropdownMenuItem>
-				<DropdownMenuSeparator className="m-0" />
-				<DropdownMenuItem className="p-[16px]">
-					<img src={elementor} alt="" className="mr-2" />
-					<span>Brizy</span>
-				</DropdownMenuItem>
-				<DropdownMenuSeparator className="m-0" />
-				<DropdownMenuItem className="p-[16px]">
-					<img src={elementor} alt="" className="mr-2" />
-					<span>Elementor</span>
-				</DropdownMenuItem>
+				{pagebuilders &&
+					pagebuilders.map((pagebuilder) => (
+						<div key={pagebuilder.slug}>
+							<DropdownMenuItem
+								className="p-[16px]"
+								onClick={() => handlePagebuilderChange(pagebuilder)}
+							>
+								{pagebuilder.slug !== 'all' && checkImageExists(pagebuilder.slug) !== '' && (
+									<img
+										src={require(`../../assets/images/${pagebuilder.slug}.jpg`)}
+										alt=""
+										className="mr-2"
+									/>
+								)}
+								<span className="text-[14px]">
+									{pagebuilder.value} ({pagebuilder.count})
+								</span>
+							</DropdownMenuItem>
+							<DropdownMenuSeparator className="m-0" />
+						</div>
+					))}
 			</DropdownMenuContent>
 		</TGDropdownMenu>
 	);

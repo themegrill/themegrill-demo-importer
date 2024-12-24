@@ -1,81 +1,41 @@
-import React from 'react';
-import { useSearchParams } from 'react-router-dom';
+import React, { useMemo } from 'react';
 import { TabsContent } from '../../components/Tabs';
+import { PagebuilderCategory, SearchResultType } from '../../lib/types';
 import CategoryMenu from './CategoryMenu';
 import Demos from './Demos';
 
-const Content = () => {
-	const [searchParams] = useSearchParams();
-	const currentHeaderTab = searchParams.get('tab') || 'all';
-	const categories = [
-		{
-			label: 'All',
-			id: 'All',
-		},
-		{
-			label: 'Blog',
-			id: 'Blog',
-		},
-		{
-			label: 'eCommerce',
-			id: 'eCommerce',
-		},
-		{
-			label: 'LMS',
-			id: 'LMS',
-		},
-		{
-			label: 'Magazine',
-			id: 'Magazine',
-		},
-		{
-			label: 'Business',
-			id: 'Business',
-		},
-		{
-			label: 'Portfolio',
-			id: 'Portfolio',
-		},
-		{
-			label: 'Music',
-			id: 'Music',
-		},
-		{
-			label: 'Health',
-			id: 'Health',
-		},
-		{
-			label: 'Restaurant',
-			id: 'Restaurant',
-		},
-		{
-			label: 'Business',
-			id: 'Businesfs',
-		},
-		{
-			label: 'Portfolio',
-			id: 'Portfolifo',
-		},
-		{
-			label: 'Music',
-			id: 'Musicf',
-		},
-		{
-			label: 'Health',
-			id: 'Healthd',
-		},
-	];
+type Props = {
+	theme: string;
+	category: string;
+	pagebuilder: string;
+	categories: PagebuilderCategory[];
+	setCategory: (slug: string) => void;
+	data: SearchResultType[];
+};
+
+const Content = ({ theme, category, pagebuilder, categories, setCategory, data }: Props) => {
+	// const location = useLocation();
+	// const searchParams = new URLSearchParams(location.search);
+	// const currentHeaderTab = searchParams.get('tab') || '';
+	const demos = useMemo(() => {
+		return data
+			.filter((d) => ('all' !== theme ? d.theme == theme : true))
+			.filter((d) =>
+				'all' !== pagebuilder ? Object.keys(d.pagebuilders).some((p) => p === pagebuilder) : true,
+			)
+			.filter((d) =>
+				'all' !== category ? Object.keys(d.categories).some((p) => p === category) : true,
+			);
+	}, [theme, category, pagebuilder]);
 
 	return (
-		<TabsContent value={currentHeaderTab} className="mt-0">
-			{/* <Tabs defaultValue="all">
-				<TabsList className="border-[1px] border-solid border-[#f4f4f4] p-0 rounded-md overflow-hidden">
-					<CategoryTab categories={categories} />
-				</TabsList>
-			</Tabs> */}
-
-			<CategoryMenu categories={categories} />
-			<Demos currentHeaderTab={currentHeaderTab} />
+		<TabsContent value={theme} className="mt-0">
+			{categories && (
+				<>
+					<CategoryMenu categories={categories} setCategory={setCategory} />
+					<Demos demos={demos} />
+				</>
+			)}
 		</TabsContent>
 	);
 };

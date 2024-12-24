@@ -1,40 +1,51 @@
 import React, { useState } from 'react';
+import { Page, PageWithSelection, SearchResultType } from '../../lib/types';
 import ImportButton from '../import/ImportButton';
 import SingleTemplate from './SingleTemplate';
 
-const Template = () => {
-	const [selections, setSelections] = useState<boolean[]>([false, false, false, false]);
+type Props = {
+	pages: Page[];
+	demo: SearchResultType;
+	initialTheme: string;
+};
+
+const Template = ({ pages, demo, initialTheme }: Props) => {
+	const [allPages, setAllPages] = useState<PageWithSelection[]>(() => {
+		return pages.map((p, index) => {
+			return {
+				ID: index + 1,
+				post_name: p.post_name,
+				post_title: p.post_title,
+				content: p.content,
+				featured_image: p.featured_image,
+				isSelected: false,
+			};
+		});
+	});
 
 	return (
 		<div className="h-[370px] sm:h-[302px] w-full bg-white p-[25px] sm:p-[32px] shadow absolute bottom-0 ">
 			<div className="mb-[24px] flex flex-wrap justify-between items-center">
 				<div>
-					<h4 className="text-[22px] m-0 mb-[8px] text-[#383838]">Optigo</h4>
+					<h4 className="text-[22px] m-0 mb-[8px] text-[#383838]">{demo.name}</h4>
 					<p className="text-[#7a7a7a] text-[14px] mt-4 sm:m-0">
 						6 Templates (You can select pages manually by clicking on templates.)
 					</p>
 				</div>
 				<div className="mr-[70px] flex flex-wrap gap-[16px]">
-					<ImportButton buttonTitle="Import All" />
-					<ImportButton buttonTitle="Import Selected Pages" />
+					<ImportButton buttonTitle="Import All" initialTheme={initialTheme} demo={demo} />
+					<ImportButton
+						buttonTitle="Import Selected Pages"
+						pages={allPages}
+						initialTheme={initialTheme}
+						demo={demo}
+					/>
 				</div>
 			</div>
 			<div className="flex gap-[16px] w-full overflow-x-auto tg-overlay-template pb-[20px]">
-				<SingleTemplate />
-				<SingleTemplate />
-				<SingleTemplate />
-				<SingleTemplate />
-				<SingleTemplate />
-				<SingleTemplate />
-				<SingleTemplate />
-				<SingleTemplate />
-				<SingleTemplate />
-				<SingleTemplate />
-				<SingleTemplate />
-				<SingleTemplate />
-				<SingleTemplate />
-				<SingleTemplate />
-				<SingleTemplate />
+				{allPages.map((page, index) => (
+					<SingleTemplate key={index} page={page} setAllPages={setAllPages} />
+				))}
 			</div>
 		</div>
 	);

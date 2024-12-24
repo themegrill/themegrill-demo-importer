@@ -1,9 +1,26 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { SearchResultType } from '../../lib/types';
 import ImportContent from './ImportContent';
 import ImportSidebar from './ImportSidebar';
 
-const Import = () => {
+type Props = {
+	demos: SearchResultType[];
+	initialTheme: string;
+};
+
+const Import = ({ demos, initialTheme }: Props) => {
+	const { slug } = useParams();
+	const demo = useMemo(() => {
+		return demos.filter((demo) => demo.slug === slug)[0];
+	}, [slug]);
+
 	const [collapse, setCollapse] = useState(false);
+
+	const handleClick = (collapse: Boolean) => {
+		setCollapse(!collapse);
+	};
+
 	useEffect(() => {
 		// Add the class when the component mounts
 		document.body.classList.add('tg-full-overlay-active');
@@ -14,9 +31,7 @@ const Import = () => {
 			document.body.classList.remove('tg-full-overlay-active');
 		};
 	}, []);
-	const handleClick = (collapse: Boolean) => {
-		setCollapse(!collapse);
-	};
+
 	useEffect(() => {
 		const handleResize = () => {
 			if (window.innerWidth <= 768) {
@@ -51,17 +66,12 @@ const Import = () => {
 						viewBox="0 0 12 12"
 						fill="none"
 					>
-						<path
-							d="M2.5 6L9.5 6"
-							stroke="#383838"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-						/>
+						<path d="M2.5 6L9.5 6" stroke="#383838" strokeLinecap="round" strokeLinejoin="round" />
 						<path
 							d="M6 2.5L9.5 6L6 9.5"
 							stroke="#383838"
-							stroke-linecap="round"
-							stroke-linejoin="round"
+							strokeLinecap="round"
+							strokeLinejoin="round"
 						/>
 					</svg>
 				</button>
@@ -80,24 +90,19 @@ const Import = () => {
 							viewBox="0 0 12 12"
 							fill="none"
 						>
-							<path
-								d="M9.5 6H2.5"
-								stroke="#383838"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-							/>
+							<path d="M9.5 6H2.5" stroke="#383838" strokeLinecap="round" strokeLinejoin="round" />
 							<path
 								d="M6 9.5L2.5 6L6 2.5"
 								stroke="#383838"
-								stroke-linecap="round"
-								stroke-linejoin="round"
+								strokeLinecap="round"
+								strokeLinejoin="round"
 							/>
 						</svg>
 					</button>
 					<ImportSidebar />
 				</>
 			)}
-			<ImportContent />
+			<ImportContent demo={demo} initialTheme={initialTheme} />
 		</div>
 	);
 };

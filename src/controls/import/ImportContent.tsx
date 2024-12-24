@@ -1,14 +1,20 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { SearchResultType } from '../../lib/types';
 import Template from '../template/Template';
 import ImportButton from './ImportButton';
 
-const ImportContent = () => {
+type Props = {
+	demo: SearchResultType;
+	initialTheme: string;
+};
+
+const ImportContent = ({ demo, initialTheme }: Props) => {
 	const [collapseTemplate, setCollapseTemplate] = useState(false);
 	const navigate = useNavigate();
 
 	const handleExitClick = () => {
-		navigate('/');
+		navigate(-1);
 	};
 
 	const handleClick = (collapseTemplate: Boolean) => {
@@ -30,7 +36,7 @@ const ImportContent = () => {
 					viewBox="0 0 12 12"
 					fill="none"
 				>
-					<g clip-path="url(#clip0_3876_7854)">
+					<g clipPath="url(#clip0_3876_7854)">
 						<path
 							d="M11.1423 5.46664L2.23373 5.46664L6.40516 1.57864C6.45844 1.52891 6.5007 1.46988 6.52953 1.40491C6.55837 1.33994 6.57321 1.2703 6.57321 1.19997C6.57321 1.12965 6.55837 1.06001 6.52953 0.995042C6.5007 0.93007 6.45844 0.871035 6.40516 0.821308C6.35188 0.771581 6.28863 0.732135 6.21901 0.705223C6.1494 0.678311 6.07479 0.664459 5.99944 0.664459C5.84727 0.664459 5.70133 0.720879 5.59373 0.821308L0.45087 5.62131C0.397955 5.67137 0.35705 5.73136 0.33087 5.79731C0.30159 5.86143 0.286059 5.93028 0.285156 5.99997C0.286584 6.07134 0.30208 6.14185 0.33087 6.20797C0.360042 6.2693 0.400676 6.32528 0.45087 6.37331L5.59373 11.1733C5.64685 11.2233 5.71005 11.263 5.77968 11.2901C5.84932 11.3171 5.92401 11.3311 5.99944 11.3311C6.07488 11.3311 6.14957 11.3171 6.2192 11.2901C6.28883 11.263 6.35203 11.2233 6.40516 11.1733C6.45871 11.1237 6.50123 11.0647 6.53024 10.9997C6.55925 10.9348 6.57418 10.865 6.57418 10.7946C6.57418 10.7242 6.55925 10.6545 6.53024 10.5895C6.50123 10.5245 6.45871 10.4656 6.40516 10.416L2.23373 6.53331L11.1423 6.53331C11.2939 6.53331 11.4392 6.47712 11.5464 6.3771C11.6535 6.27708 11.7137 6.14142 11.7137 5.99997C11.7137 5.85853 11.6535 5.72287 11.5464 5.62285C11.4392 5.52283 11.2939 5.46664 11.1423 5.46664Z"
 							fill="white"
@@ -45,11 +51,7 @@ const ImportContent = () => {
 				<span className="ml-[8px] text-white font-[600]">Exit</span>
 			</button>
 
-			<iframe
-				src="https://zakrademos.com/optigo/"
-				title="Preview"
-				className="w-full h-full"
-			></iframe>
+			<iframe src={demo.url} title={`${demo.name} Preview`} className="w-full h-full"></iframe>
 
 			{collapseTemplate ? (
 				<>
@@ -66,21 +68,16 @@ const ImportContent = () => {
 							viewBox="0 0 12 12"
 							fill="none"
 						>
-							<path
-								d="M6 2.5V9.5"
-								stroke="#383838"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-							/>
+							<path d="M6 2.5V9.5" stroke="#383838" strokeLinecap="round" strokeLinejoin="round" />
 							<path
 								d="M9.5 6L6 9.5L2.5 6"
 								stroke="#383838"
-								stroke-linecap="round"
-								stroke-linejoin="round"
+								strokeLinecap="round"
+								strokeLinejoin="round"
 							/>
 						</svg>
 					</button>
-					<Template />
+					<Template pages={demo.pages} demo={demo} initialTheme={initialTheme} />
 				</>
 			) : (
 				<>
@@ -99,20 +96,22 @@ const ImportContent = () => {
 							<path
 								d="M6 9.5L6 2.5"
 								stroke="#383838"
-								stroke-linecap="round"
-								stroke-linejoin="round"
+								strokeLinecap="round"
+								strokeLinejoin="round"
 							/>
 							<path
 								d="M2.5 6L6 2.5L9.5 6"
 								stroke="#383838"
-								stroke-linecap="round"
-								stroke-linejoin="round"
+								strokeLinecap="round"
+								strokeLinejoin="round"
 							/>
 						</svg>
 					</button>
 					<ImportButton
 						flexDivCss="absolute bottom-[10%] right-[5%] sm:bottom-[2%] sm:right-[32px]"
 						buttonTitle="Import All"
+						initialTheme={initialTheme}
+						demo={demo}
 					/>
 				</>
 			)}
