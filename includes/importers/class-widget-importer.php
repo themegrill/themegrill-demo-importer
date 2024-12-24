@@ -28,7 +28,6 @@ class TG_Widget_Importer {
 		global $wp_registered_sidebars;
 
 		$data = json_decode( file_get_contents( $import_file ) );
-
 		// Have valid data? If no data or could not decode.
 		if ( empty( $data ) || ! is_object( $data ) ) {
 			return new WP_Error( 'themegrill_widget_import_data_error', __( 'Widget import data could not be read. Please try a different file.', 'themegrill-demo-importer' ) );
@@ -102,13 +101,13 @@ class TG_Widget_Importer {
 				 * It is probably much more likely that arrays are used than objects, however.
 				 */
 				$widget = json_decode( json_encode( $widget ), true );
-
 				/**
 				 * Filter to modify settings array.
 				 *
 				 * Do before identical check because changes may make it identical to end result (such as URL replacements).
 				 */
-				$widget = apply_filters( 'themegrill_widget_demo_import_settings', $widget, $id_base, $instance_id_number, $demo_data, $demo_id );
+				$widget = apply_filters( 'themegrill_widget_import_settings', $widget, $id_base, $instance_id_number, $demo_data, $demo_id );
+				// $widget = apply_filters( 'themegrill_widget_demo_import_settings', $widget, $id_base, $instance_id_number, $demo_data, $demo_id );
 
 				// Does widget with identical settings already exist in same sidebar?
 				if ( ! $fail && isset( $widget_instances[ $id_base ] ) ) {

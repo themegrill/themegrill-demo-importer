@@ -48,7 +48,7 @@ class TG_Customizer_Importer {
 		}
 
 		// Modify settings array.
-		$data = apply_filters( 'themegrill_customizer_demo_import_settings', $data, $demo_data, $demo_id );
+		$data = apply_filters( 'themegrill_customizer_import_settings', $data, $demo_data, $demo_id );
 
 		// Import custom options.
 		if ( isset( $data['options'] ) ) {
