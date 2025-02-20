@@ -6,10 +6,8 @@ import { __TDI_DASHBOARD__, SearchResultType } from './lib/types';
 
 const App = () => {
 	const data = __TDI_DASHBOARD__.data;
-	const initialTheme = 'all';
-	const [theme, setTheme] = useState<string>('all');
-	// const initialTheme = __TDI_DASHBOARD__.theme;
-	// const [theme, setTheme] = useState<string>( __TDI_DASHBOARD__.theme || 'all');
+	const initialTheme = __TDI_DASHBOARD__.theme;
+	const [theme, setTheme] = useState<string>(__TDI_DASHBOARD__.theme || 'all');
 
 	const searchTerms = useMemo<SearchResultType[]>(() => {
 		if ('all' === initialTheme) {
@@ -35,14 +33,8 @@ const App = () => {
 		} else {
 			return Object.entries(data?.[theme]?.demos || {}).map(([key, d], idx) => {
 				return {
-					id: idx + 1,
-					name: d.name,
-					description: d?.description ?? '',
-					pagebuilders: d?.pagebuilders ?? [],
-					categories: d?.categories ?? [],
-					slug: key,
 					theme: theme,
-					...data,
+					...d,
 				};
 			});
 		}
