@@ -18,7 +18,7 @@ type Props = {
 	currentPagebuilder: string;
 };
 
-const DropdownMenu = ({ pagebuilders, setPagebuilder, currentPagebuilder }: Props) => {
+const PagebuilderDropdownMenu = ({ pagebuilders, setPagebuilder, currentPagebuilder }: Props) => {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const handlePagebuilderChange = (pagebuilder: PagebuilderCategory) => {
 		setPagebuilder(pagebuilder.slug);
@@ -91,4 +91,4 @@ const DropdownMenu = ({ pagebuilders, setPagebuilder, currentPagebuilder }: Prop
 	);
 };
 
-export default DropdownMenu;
+export default PagebuilderDropdownMenu;

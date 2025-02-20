@@ -13,12 +13,15 @@ export type DataObjectType = Record<
 		demos: Record<
 			string,
 			{
+				id: number;
+				slug: string;
 				name: string;
 				description: string;
 				url: string;
 				image: string;
 				pro: boolean;
 				premium: boolean;
+				new?: boolean;
 				plugins: Array<string>;
 				pagebuilders?: Record<string, string>;
 				categories: Record<string, string>;
@@ -30,11 +33,16 @@ export type DataObjectType = Record<
 
 export type SearchResultType = {
 	id: number;
+	slug: string;
 	name: string;
 	description: string;
+	url: string;
+	image: string;
+	pro: boolean;
+	premium: boolean;
+	new?: boolean;
 	pagebuilders: Record<string, string>;
 	categories: Record<string, string>;
-	slug: string;
 	theme: string;
 	[k: string]: any;
 };
