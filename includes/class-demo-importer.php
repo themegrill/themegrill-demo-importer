@@ -101,7 +101,7 @@ class TG_Demo_Importer {
 	 */
 	public function get_theme() {
 		$instance         = ThemeGrill_Demo_Importer::instance();
-		$supported_themes = $instance->get_core_supported_themes();
+		$supported_themes = $instance->get_core_supported_themes(); // need to change this by checking it with api data
 		$theme            = get_option( 'template' );
 		if ( in_array( $theme, $supported_themes, true ) ) {
 			return $theme;
@@ -124,14 +124,19 @@ class TG_Demo_Importer {
 	 * @return array of objects
 	 */
 	private function get_demo_packages() {
-		$data = wp_remote_get( 'http://themegrill-demos-api.test/wp-json/tgda/v1/sites' );
+		$theme            = get_option( 'template' );
+		$instance         = ThemeGrill_Demo_Importer::instance();
+		$supported_themes = $instance->get_core_supported_themes();
+		if ( in_array( $theme, $supported_themes, true ) ) {
+			$data = wp_remote_get( 'http://themegrill-demos-api.test/wp-json/tgda/v1/sites?theme=' . $theme );
+		} else {
+			$data = wp_remote_get( 'http://themegrill-demos-api.test/wp-json/tgda/v1/sites' );
+		}
 		if ( is_wp_error( $data ) ) {
 			return;
 		}
 
-		$instance         = ThemeGrill_Demo_Importer::instance();
-		$supported_themes = $instance->get_core_supported_themes();
-		$all_demos        = json_decode( wp_remote_retrieve_body( $data ) );
+		$all_demos = json_decode( wp_remote_retrieve_body( $data ) );
 		// $theme            = get_option( 'template' );
 		// if ( in_array( $theme, $supported_themes, true ) ) {
 		//  $properties = get_object_vars( $all_demos );
