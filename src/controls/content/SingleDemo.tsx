@@ -66,7 +66,7 @@ const SingleDemo = ({ demo }: DemoProps) => {
 				<div className="bg-white px-[16px] py-[15px] border-[#f4f4f4]">
 					<h4 className="m-0 ">
 						{demo.name}
-						{demo && (
+						{demo.new && (
 							<span className="bg-[#27AE60] px-[4px] py-[1px] text-[10px] text-white rounded-[4px] ml-[8px]">
 								New
 							</span>
