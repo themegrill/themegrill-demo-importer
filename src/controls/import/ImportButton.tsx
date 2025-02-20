@@ -31,7 +31,7 @@ const ImportButton = ({ flexDivCss, buttonTitle, initialTheme, demo }: Props) =>
 			activeContent: 'Import Customizer Settings',
 			hasDescription: true,
 			isDescriptionActive: false,
-			toggle: false,
+			toggle: true,
 			disabledToggle: false,
 		},
 		{
@@ -40,7 +40,7 @@ const ImportButton = ({ flexDivCss, buttonTitle, initialTheme, demo }: Props) =>
 			activeContent: 'Imports all the Widgets that is needed fot the demo.',
 			hasDescription: true,
 			isDescriptionActive: false,
-			toggle: false,
+			toggle: true,
 			disabledToggle: false,
 		},
 		{
@@ -49,7 +49,7 @@ const ImportButton = ({ flexDivCss, buttonTitle, initialTheme, demo }: Props) =>
 			activeContent: 'Import Content',
 			hasDescription: true,
 			isDescriptionActive: false,
-			toggle: false,
+			toggle: true,
 			disabledToggle: false,
 		},
 		{
