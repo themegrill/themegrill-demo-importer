@@ -320,6 +320,9 @@ class TG_Demo_Importer {
 				'baseURL'  => apply_filters( 'themegrill_demo_importer_baseURL', 'themes.php?page=demo-importer' ),
 			)
 		);
+
+		wp_enqueue_media();
+
 		// Demo Importer appearance page.
 		if ( 'appearance_page_demo-importer' === $screen_id ) {
 			wp_enqueue_style( 'tg-demo-importer' );
