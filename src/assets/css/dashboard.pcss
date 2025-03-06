@@ -65,7 +65,7 @@
 	}
 
 	.tg-tabs {
-		@apply text-[#383838] cursor-pointer text-[14px] font-[500] data-[state=active]:bg-[#2563EB] data-[state=active]:border-[#2563EB] data-[state=active]:text-white;
+		@apply text-[#383838] cursor-pointer text-[14px] font-[400] data-[state=active]:bg-[#2563EB] data-[state=active]:border-[#2563EB] data-[state=active]:text-white;
 	}
 
 	.tg-category-tabs {
@@ -73,7 +73,7 @@
 	}
 
 	.tg-demo-count {
-		@apply ml-[8px] bg-[#F4F4F4] px-[6px] py-[2px] rounded-[2px];
+		@apply bg-[#F4F4F4] px-[6px] py-[2px] rounded-[2px];
 	}
 
 	.tg-tabs[data-state='active'] .tg-demo-count {
@@ -91,6 +91,7 @@
 		}
 		.tg-demo:hover .tg-pagebuilder {
 			display: flex;
+			gap: 8px;
 		}
 
 		.tg-pagebuilder:hover {
@@ -99,6 +100,13 @@
 			span {
 				display: inline;
 			}
+		}
+
+		.tg-overflow-category-button {
+			order: 99;
+			position: sticky;
+			right: 0;
+			visibility: visible;
 		}
 	}
 
