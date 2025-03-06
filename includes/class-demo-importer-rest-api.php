@@ -118,8 +118,9 @@ class TG_Importer_REST_Controller extends WP_REST_Controller {
 	}
 
 	public function import( $request ) {
-		$demo  = $request->get_param( 'demo' );
-		$slugs = $request->get_param( 'slugs' );
+		$demo        = $request->get_param( 'demo' );
+		$slugs       = $request->get_param( 'slugs' );
+		$pagebuilder = $request->get_param( 'selectedPagebuilder' );
 		// if ( in_array( 'plugins', $slugs, true ) ) {
 		//  $status['plugins'] = $this->import_plugins( $demo );
 		// }
@@ -127,33 +128,36 @@ class TG_Importer_REST_Controller extends WP_REST_Controller {
 			$status['evf'] = $this->import_evf();
 		}
 		if ( in_array( 'content', $slugs, true ) ) {
-			$status['content'] = $this->import_content( $demo );
+			$status['content'] = $this->import_content( $demo, $pagebuilder );
 		}
 		if ( in_array( 'customizer', $slugs, true ) ) {
-			$status['customizer'] = $this->import_customizer( $demo );
+			$status['customizer'] = $this->import_customizer( $demo, $pagebuilder );
 		}
 		if ( in_array( 'widget', $slugs, true ) ) {
-			$status['widget'] = $this->import_widget( $demo );
+			$status['widget'] = $this->import_widget( $demo, $pagebuilder );
 		}
 		// Update imported demo ID.
 		update_option( 'themegrill_demo_importer_activated_id', $demo['slug'] );
 		do_action( 'themegrill_demo_imported', $demo['slug'], $demo );
+
+		flush_rewrite_rules();
+		wp_cache_flush();
 		return new WP_REST_Response( array( 'status' => $status ), 200 );
 	}
 
-	public function import_content( $demo ) {
-		if ( ! $demo['content'] ) {
+	public function import_content( $demo, $pagebuilder ) {
+		$content = $demo['pagebuilder_data'][ $pagebuilder ]['content'];
+		if ( ! $content ) {
 			return new WP_Error( 'rest_custom_error', 'No content file.', array( 'status' => 400 ) );
 		}
 		do_action( 'themegrill_ajax_before_demo_import' );
-		$status = array();
-		$this->import_xml( $demo, $status );
+		$this->import_xml( $content );
 		$this->import_core_options( $demo );
 
 		return new WP_REST_Response( array( 'success' => 'Content Imported.' ), 200 );
 	}
 
-	public function import_xml( $demo ) {
+	public function import_xml( $content ) {
 		// Load Importer API.
 		require_once ABSPATH . 'wp-admin/includes/import.php';
 
@@ -168,7 +172,7 @@ class TG_Importer_REST_Controller extends WP_REST_Controller {
 		$logger = new WP_Importer_Logger_ServerSentEvents();
 		$this->importer->set_logger( $logger );
 		ob_start();
-		$data = $this->importer->import( $demo['content'] );
+		$data = $this->importer->import( $content );
 		ob_end_clean();
 		if ( is_wp_error( $data ) ) {
 			return new WP_Error( 'rest_custom_error', 'Error importing content:' . $data, array( 'status' => 400 ) );
@@ -235,24 +239,26 @@ class TG_Importer_REST_Controller extends WP_REST_Controller {
 		return current( $query->posts );
 	}
 
-	public function import_customizer( $demo ) {
-		if ( ! $demo['customizer'] ) {
+	public function import_customizer( $demo, $pagebuilder ) {
+		$customizer = $demo['pagebuilder_data'][ $pagebuilder ]['customizer'];
+		if ( ! $customizer ) {
 			return new WP_Error( 'rest_custom_error', 'No customizer file.', array( 'status' => 400 ) );
 		}
 
-		$import = TG_Customizer_Importer::import( $demo['customizer'], $demo['slug'], $demo );
+		$import = TG_Customizer_Importer::import( $customizer, $demo['slug'], $demo, $pagebuilder );
 		if ( is_wp_error( $import ) ) {
 			return new WP_Error( 'rest_custom_error', 'Error importing customizer.', array( 'status' => 400 ) );
 		}
 		return new WP_REST_Response( array( 'success' => 'Customizer Imported.' ), 200 );
 	}
 
-	public function import_widget( $demo ) {
-		if ( ! $demo['widget'] ) {
+	public function import_widget( $demo, $pagebuilder ) {
+		$widget = $demo['pagebuilder_data'][ $pagebuilder ]['widget'];
+		if ( ! $widget ) {
 			return new WP_Error( 'rest_custom_error', 'No widget file.', array( 'status' => 400 ) );
 		}
 
-		$import = TG_Widget_Importer::import( $demo['widget'], $demo['slug'], $demo );
+		$import = TG_Widget_Importer::import( $widget, $demo['slug'], $demo );
 		if ( is_wp_error( $import ) ) {
 			return new WP_Error( 'rest_custom_error', 'Error importing widget.', array( 'status' => 400 ) );
 		}
@@ -260,11 +266,20 @@ class TG_Importer_REST_Controller extends WP_REST_Controller {
 	}
 
 	public function import_plugins( $request ) {
-		$demo = $request->get_param( 'demo' );
-		if ( ! $demo['plugins'] ) {
+		$demo        = $request->get_param( 'demo' );
+		$slugs       = $request->get_param( 'slugs' );
+		$pagebuilder = $request->get_param( 'selectedPagebuilder' );
+		$plugins     = $demo['pagebuilder_data'][ $pagebuilder ]['plugins'];
+		if ( ! $plugins ) {
 			return new WP_Error( 'rest_custom_error', 'No plugins specified.', array( 'status' => 400 ) );
 		}
-		foreach ( $demo['plugins'] as $plugin ) {
+		if ( ! in_array( 'evf', $slugs, true ) ) {
+			$index = array_search( 'everest-forms/everest-forms.php', $plugins, true );
+			if ( false !== $index ) {
+				array_splice( $plugins, $index, 1 );
+			}
+		}
+		foreach ( $plugins as $plugin ) {
 			$pg = explode( '/', $plugin );
 			if ( file_exists( WP_PLUGIN_DIR . '/' . $plugin ) ) {
 				$plugin_data = get_plugin_data( WP_PLUGIN_DIR . '/' . $plugin );
@@ -453,9 +468,9 @@ class TG_Importer_REST_Controller extends WP_REST_Controller {
 
 				if ( ! empty( $menu_items ) ) {
 					foreach ( $menu_items as $menu_item ) {
-						if ( isset( $menu_item->url ) && isset( $menu_item->db_id ) && 'custom' == $menu_item->type ) {
-							$site_parts = parse_url( home_url( '/' ) );
-							$menu_parts = parse_url( $menu_item->url );
+						if ( isset( $menu_item->url ) && isset( $menu_item->db_id ) && 'custom' === $menu_item->type ) {
+							$site_parts = wp_parse_url( home_url( '/' ) );
+							$menu_parts = wp_parse_url( $menu_item->url );
 
 							// Update existing custom nav menu item URL.
 							if ( isset( $menu_parts['path'] ) && isset( $menu_parts['host'] ) && apply_filters( 'themegrill_demo_importer_nav_menu_item_url_hosts', in_array( $menu_parts['host'], array( 'demo.themegrill.com', 'zakrademos.com' ) ) ) ) {
@@ -471,9 +486,9 @@ class TG_Importer_REST_Controller extends WP_REST_Controller {
 
 	public function update_widget_data( $widget, $widget_type, $instance_id, $demo_data ) {
 		if ( 'nav_menu' === $widget_type ) {
-			$menu     = isset( $widget['title'] ) ? $widget['title'] : $this->importer->get_term_new_id( $widget['nav_menu'] );
+			// $menu     = isset( $widget['title'] ) ? $widget['title'] : $this->importer->get_term_new_id( $widget['nav_menu'] );
+			$menu     = $this->importer->get_term_new_id( $widget['nav_menu'] );
 			$nav_menu = wp_get_nav_menu_object( $menu );
-
 			if ( is_object( $nav_menu ) && $nav_menu->term_id ) {
 				$widget['nav_menu'] = $nav_menu->term_id;
 			}
@@ -569,7 +584,7 @@ class TG_Importer_REST_Controller extends WP_REST_Controller {
 							foreach ( $nav_menus as $nav_menu ) {
 								if ( is_object( $nav_menu ) ) {
 									foreach ( $data_value as $location => $location_name ) {
-										if ( $nav_menu->slug == $location_name ) {
+										if ( $nav_menu->slug === $location_name ) {
 											$data['mods'][ $data_type ][ $location ] = $nav_menu->term_id;
 										}
 									}

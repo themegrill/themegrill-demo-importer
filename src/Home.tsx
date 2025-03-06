@@ -65,28 +65,52 @@ const Home = ({ data, initialTheme, theme, setTheme, searchTerms }: Props) => {
 						.map(([key2, value2]) => {
 							Object.entries(value2).map(([key3, value3]) => {
 								if (!acc.has(key3)) {
-									acc.set(key3, {
-										slug: key3,
-										value: value3,
-										count:
-											searchResults
-												.filter((d) => ('all' !== theme ? d.theme === key : true))
-												.filter((d) => Object.keys(d.pagebuilders).some((p) => p === key3))
-												.filter((d) =>
-													'all' !== plan
-														? plan === 'pro'
-															? d.pro || d.premium
-															: !d.pro && !d.premium
-														: true,
-												)
-												.filter((d) =>
-													searchParams.get('search')
-														? d.name
-																.toLowerCase()
-																.indexOf(searchParams.get('search')?.toLowerCase() || '') !== -1
-														: true,
-												)?.length ?? 0,
-									});
+									if ('all' === key3) {
+										acc.set(key3, {
+											slug: key3,
+											value: value3,
+											count:
+												searchResults
+													.filter((d) => ('all' !== theme ? d.theme === key : true))
+													.filter((d) =>
+														'all' !== plan
+															? plan === 'pro'
+																? d.pro || d.premium
+																: !d.pro && !d.premium
+															: true,
+													)
+													.filter((d) =>
+														searchParams.get('search')
+															? d.name
+																	.toLowerCase()
+																	.indexOf(searchParams.get('search')?.toLowerCase() || '') !== -1
+															: true,
+													)?.length ?? 0,
+										});
+									} else {
+										acc.set(key3, {
+											slug: key3,
+											value: value3,
+											count:
+												searchResults
+													.filter((d) => ('all' !== theme ? d.theme === key : true))
+													.filter((d) => Object.keys(d.pagebuilders).some((p) => p === key3))
+													.filter((d) =>
+														'all' !== plan
+															? plan === 'pro'
+																? d.pro || d.premium
+																: !d.pro && !d.premium
+															: true,
+													)
+													.filter((d) =>
+														searchParams.get('search')
+															? d.name
+																	.toLowerCase()
+																	.indexOf(searchParams.get('search')?.toLowerCase() || '') !== -1
+															: true,
+													)?.length ?? 0,
+										});
+									}
 								}
 							});
 						});
@@ -99,8 +123,10 @@ const Home = ({ data, initialTheme, theme, setTheme, searchTerms }: Props) => {
 				slug: key,
 				value: val,
 				count:
-					searchResults.filter((d) => Object.keys(d.pagebuilders).some((p) => p === key))?.length ??
-					0,
+					'all' === key
+						? (searchResults?.length ?? 0)
+						: (searchResults.filter((d) => Object.keys(d.pagebuilders).some((p) => p === key))
+								?.length ?? 0),
 			}));
 		}
 	}, [theme, pagebuilder, category, searchResults, searchParams, plan]);
@@ -183,8 +209,10 @@ const Home = ({ data, initialTheme, theme, setTheme, searchTerms }: Props) => {
 				slug: key,
 				value: val,
 				count:
-					searchResults.filter((d) => Object.keys(d.categories).some((p) => p === key))?.length ??
-					0,
+					'all' === key
+						? (searchResults?.length ?? 0)
+						: (searchResults.filter((d) => Object.keys(d.categories).some((p) => p === key))
+								?.length ?? 0),
 			}));
 		}
 	}, [theme, pagebuilder, category, searchResults, searchParams, plan]);

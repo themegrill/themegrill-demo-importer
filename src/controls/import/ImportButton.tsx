@@ -6,6 +6,8 @@ import { Progress } from '../../components/Progress';
 import { PageWithSelection, SearchResultType } from '../../lib/types';
 import ImportDialogSkeleton from '../dialog/ImportDialogSkeleton';
 
+declare const require: any;
+
 type Props = {
 	flexDivCss?: String;
 	buttonTitle: string;
@@ -73,9 +75,12 @@ const ImportButton = ({ flexDivCss, buttonTitle, initialTheme, demo }: Props) =>
 	];
 
 	const [items, setItems] = useState(importNotes);
+	const [selectedPagebuilder, setSelectedPagebuilder] = useState('');
 	const [step, setStep] = useState(0);
 	const [installProgress, setInstallProgress] = useState(0);
 	const [importProgress, setImportProgress] = useState(0);
+
+	const totalPagebuilders = Object.entries(demo?.pagebuilders)?.length ?? 0;
 
 	const STEP: Array<{
 		header: React.ReactNode;
@@ -86,15 +91,15 @@ const ImportButton = ({ flexDivCss, buttonTitle, initialTheme, demo }: Props) =>
 			header: 'Things to know',
 			content: () => (
 				<>
-					<p className="bg-[#E9EFFD] border border-solid border-[#81A5F3] p-[16px] m-0 rounded text-[13px] sm:text-[14px]">
+					<p className="bg-[#E9EFFD] border border-solid border-[#81A5F3] px-[16px] py-[24px] m-0 rounded text-[14px]/[1.5] sm:text-[14px]">
 						Importing demo data ensures your site looks like the theme demo. You can simply modify
 						the content instead of starting everything from scratch. Also, we recommend considering
 						the following before importing the demo.
 					</p>
-					<ol className="pt-[16px] sm:pt-[32px] my-0 ml-[16px]">
+					<ol className="pt-[16px] sm:pt-[32px] my-0 ml-[16px] text-[16px]">
 						{notes.map((note, index) => (
 							<li className={`${index === 0 && 'text-[#2563EB]'} mb-0`} key={index}>
-								{note}
+								<span className="text-[16px]/[1.5] ">{note}</span>
 								{notes.length !== index + 1 && <hr className="my-[5px] sm:my-[16px] border-b-0" />}
 							</li>
 						))}
@@ -106,11 +111,18 @@ const ImportButton = ({ flexDivCss, buttonTitle, initialTheme, demo }: Props) =>
 					<div></div>
 					<button
 						type="button"
-						className="cursor-pointer bg-[#2563EB] text-white border-0 rounded px-[24px] py-[10px] text-[14px]"
+						className="cursor-pointer bg-[#2563EB] text-white border-0 rounded px-[24px] py-[10px] text-[16px]"
 						onClick={() => {
-							demo.theme === initialTheme
-								? setStep((prev) => prev + 3)
-								: setStep((prev) => prev + 1);
+							if (demo.theme === initialTheme) {
+								if (totalPagebuilders > 1) {
+									setStep(3);
+								} else {
+									setStep(4);
+									setSelectedPagebuilder(Object.entries(demo.pagebuilders)[0][0]);
+								}
+							} else {
+								setStep(1);
+							}
 						}}
 					>
 						Continue
@@ -123,7 +135,7 @@ const ImportButton = ({ flexDivCss, buttonTitle, initialTheme, demo }: Props) =>
 			content: () => (
 				<>
 					<div className="text-center mt-16 mb-12">
-						<div className="border-[25px] border-solid border-[#FDFDFD] rounded-full inline-block ">
+						{/* <div className="border-[25px] border-solid border-[#FDFDFD] rounded-full inline-block ">
 							<div className="border-[22px] border-solid border-[#f4f4f4] rounded-full block">
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
@@ -139,13 +151,15 @@ const ImportButton = ({ flexDivCss, buttonTitle, initialTheme, demo }: Props) =>
 									/>
 								</svg>
 							</div>
-						</div>
+						</div> */}
+						<img src={checkImageExists(`import-${demo.theme}`)} alt="" />
 					</div>
 
 					<p className="bg-[#E9EFFD] border border-solid border-[#81A5F3] p-[16px] m-0 rounded text-[14px]">
-						By clicking “Install”, you’ll install the {demo.theme} theme to ensure the layout
-						matches the preview. Skipping the installation is strictly discouraged as it may result
-						in a different layout.
+						By clicking “Install”, you’ll install the{' '}
+						<span className="capitalize">{demo.theme}</span> theme to ensure the layout matches the
+						preview. Skipping the installation is strictly discouraged as it may result in a
+						different layout.
 					</p>
 				</>
 			),
@@ -153,9 +167,9 @@ const ImportButton = ({ flexDivCss, buttonTitle, initialTheme, demo }: Props) =>
 				<>
 					<button
 						type="button"
-						className="cursor-pointer px-0 bg-transparent text-[#2563EB] border-0 text-[14px]"
+						className="cursor-pointer px-0 bg-transparent text-[#2563EB] border-0 text-[16px]"
 						onClick={() => {
-							setStep((prev) => prev - 1);
+							setStep(0);
 						}}
 					>
 						Back
@@ -163,16 +177,21 @@ const ImportButton = ({ flexDivCss, buttonTitle, initialTheme, demo }: Props) =>
 					<div>
 						<button
 							type="button"
-							className="cursor-pointer mr-[24px] bg-transparent text-[#2563EB] border-0 text-[14px]"
+							className="cursor-pointer mr-[24px] bg-transparent text-[#2563EB] border-0 text-[16px]"
 							onClick={() => {
-								setStep((prev) => prev + 2);
+								if (totalPagebuilders > 1) {
+									setStep(3);
+								} else {
+									setStep(4);
+									setSelectedPagebuilder(Object.entries(demo.pagebuilders)[0][0]);
+								}
 							}}
 						>
 							Skip
 						</button>
 						<button
 							type="button"
-							className="cursor-pointer bg-[#2563EB] text-white border-0 rounded px-[24px] py-[10px] text-[14px]"
+							className="cursor-pointer bg-[#2563EB] text-white border-0 rounded px-[24px] py-[10px] text-[16px]"
 							onClick={handleThemeInstall}
 						>
 							Install
@@ -185,8 +204,8 @@ const ImportButton = ({ flexDivCss, buttonTitle, initialTheme, demo }: Props) =>
 			header: 'Installing',
 			content: () => (
 				<>
-					<div className="text-center mt-16 mb-12">
-						<div className="border-[25px] border-solid border-[#FDFDFD] rounded-full inline-block ">
+					<div className="text-center mt-20 mb-6">
+						{/* <div className="border-[25px] border-solid border-[#FDFDFD] rounded-full inline-block ">
 							<div className="border-[22px] border-solid border-[#f4f4f4] rounded-full block">
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
@@ -202,11 +221,12 @@ const ImportButton = ({ flexDivCss, buttonTitle, initialTheme, demo }: Props) =>
 									/>
 								</svg>
 							</div>
-						</div>
+						</div> */}
+						<img src={checkImageExists(demo.theme)} alt="" />
 					</div>
 					<Progress
 						value={installProgress}
-						className="mb-32 border border-solid border-[#81A5F3] overflow-visible "
+						className="mb-48 border border-solid border-[#81A5F3] overflow-visible "
 						indicatorStyle={{ width: `${installProgress}%` }}
 						progressContent={
 							<div
@@ -222,10 +242,58 @@ const ImportButton = ({ flexDivCss, buttonTitle, initialTheme, demo }: Props) =>
 			footer: null,
 		},
 		{
+			header: 'Choose Page Builder',
+			content: () => (
+				<>
+					<div className="text-center my-[150px] flex gap-[32px] justify-center">
+						{Object.entries(demo?.pagebuilders).map(([key, value]) => (
+							<div key={key}>
+								<div
+									className={`border border-solid rounded-[2px] px-[44px] py-[38px] ${selectedPagebuilder === key ? 'border-[#3858E9]' : 'border-[#E0E0E0]'}`}
+									onClick={() => setSelectedPagebuilder(key)}
+								>
+									<img src={checkImageExists(`max-${key}`)} alt="" />
+								</div>
+								<p className="text-[14px] font-[600] text-[#383838] m-0 mt-[12px]">{value}</p>
+							</div>
+						))}
+					</div>
+				</>
+			),
+			footer: () => (
+				<>
+					<button
+						type="button"
+						className="cursor-pointer px-0 bg-transparent text-[#2563EB] border-0 text-[16px]"
+						onClick={() => {
+							if (demo.theme === initialTheme) {
+								setStep(0);
+							} else {
+								setStep(1);
+							}
+						}}
+					>
+						Back
+					</button>
+
+					<button
+						type="button"
+						className={`cursor-pointer bg-[#2563EB] text-white border-0 rounded px-[24px] py-[10px] text-[16px] ${!selectedPagebuilder ? 'opacity-50 cursor-not-allowed' : ''}`}
+						disabled={!selectedPagebuilder}
+						onClick={() => {
+							setStep(4);
+						}}
+					>
+						Continue
+					</button>
+				</>
+			),
+		},
+		{
 			header: 'Things to know',
 			content: () => (
 				<>
-					<p className="bg-[#E9EFFD] border border-solid border-[#81A5F3] p-[16px] m-0 rounded text-[13px] sm:text-[14px]">
+					<p className="bg-[#E9EFFD] border border-solid border-[#81A5F3] p-[16px] m-0 rounded text-[14px]">
 						Importing demo data ensures your site looks like the theme demo. You can simply modify
 						the content instead of starting everything from scratch. Also, we recommend considering
 						the following before importing the demo.
@@ -300,16 +368,30 @@ const ImportButton = ({ flexDivCss, buttonTitle, initialTheme, demo }: Props) =>
 				<>
 					<button
 						type="button"
-						className="cursor-pointer px-0 bg-transparent text-[#2563EB] border-0 text-[14px]"
+						className="cursor-pointer px-0 bg-transparent text-[#2563EB] border-0 text-[16px]"
 						onClick={() => {
-							setStep((prev) => prev - 2);
+							if (demo.theme === initialTheme) {
+								if (totalPagebuilders > 1) {
+									setStep(3);
+								} else {
+									setStep(0);
+									setSelectedPagebuilder(Object.entries(demo.pagebuilders)[0][0]);
+								}
+							} else {
+								if (totalPagebuilders > 1) {
+									setStep(3);
+								} else {
+									setStep(1);
+									setSelectedPagebuilder(Object.entries(demo.pagebuilders)[0][0]);
+								}
+							}
 						}}
 					>
 						Back
 					</button>
 					<button
 						type="button"
-						className="cursor-pointer bg-[#2563EB] text-white border-0 rounded px-[24px] py-[10px] text-[14px]"
+						className="cursor-pointer bg-[#2563EB] text-white border-0 rounded px-[24px] py-[10px] text-[16px]"
 						onClick={() => handleImport()}
 					>
 						Import
@@ -431,7 +513,7 @@ const ImportButton = ({ flexDivCss, buttonTitle, initialTheme, demo }: Props) =>
 				<>
 					<button
 						type="button"
-						className="cursor-pointer px-0 bg-transparent text-[#2563EB] border-0 text-[14px] z-[50000]"
+						className="cursor-pointer px-0 bg-transparent text-[#2563EB] border-0 text-[16px] z-[50000]"
 						onClick={() => {
 							setStep((prev) => prev - 1);
 						}}
@@ -441,7 +523,7 @@ const ImportButton = ({ flexDivCss, buttonTitle, initialTheme, demo }: Props) =>
 					<div className="z-[50000] flex flex-nowrap sm:block">
 						<button
 							type="button"
-							className="cursor-pointer mr-[10px] sm:mr-[24px] bg-transparent text-[#2563EB] border-0 text-[14px]"
+							className="cursor-pointer mr-[10px] sm:mr-[24px] bg-transparent text-[#2563EB] border-0 text-[16px]"
 							onClick={() => {
 								setStep((prev) => prev - 1);
 							}}
@@ -450,7 +532,7 @@ const ImportButton = ({ flexDivCss, buttonTitle, initialTheme, demo }: Props) =>
 						</button>
 						<button
 							type="button"
-							className="cursor-pointer bg-[#2563EB] text-white border-0 rounded px-[10px] sm:px-[24px] py-[10px] text-[14px]"
+							className="cursor-pointer bg-[#2563EB] text-white border-0 rounded px-[10px] sm:px-[24px] py-[10px] text-[16px]"
 						>
 							View Website
 						</button>
@@ -468,17 +550,22 @@ const ImportButton = ({ flexDivCss, buttonTitle, initialTheme, demo }: Props) =>
 				setInstallProgress(installProgress + 20);
 			}, 1000);
 		} else {
-			setStep(step + 1);
+			if (totalPagebuilders > 1) {
+				setStep(3);
+			} else {
+				setStep(4);
+				setSelectedPagebuilder(Object.entries(demo.pagebuilders)[0][0]);
+			}
 		}
 	}
 
-	if (step === 4) {
+	if (step === 5) {
 		if (importProgress < 100) {
 			setTimeout(() => {
 				setImportProgress(importProgress + 20);
 			}, 1000);
 		} else {
-			setStep(step + 1);
+			setStep(6);
 		}
 	}
 
@@ -509,7 +596,7 @@ const ImportButton = ({ flexDivCss, buttonTitle, initialTheme, demo }: Props) =>
 			});
 			if (response.success) {
 				console.log(response);
-				setStep(step + 1);
+				setStep(2);
 			} else {
 				console.log(response);
 				throw new Error(JSON.stringify(response));
@@ -521,24 +608,25 @@ const ImportButton = ({ flexDivCss, buttonTitle, initialTheme, demo }: Props) =>
 
 	const handleImport = async () => {
 		try {
+			let slugs: string[] = [];
+			items.map((item) => {
+				if (item.toggle == true && item.slug != 'plugins') {
+					slugs.push(item.slug);
+				}
+			});
 			const pluginResponse = await apiFetch<{
 				success: boolean;
 			}>({
 				path: `tg-demo-importer/v1/import-plugins`,
 				method: 'POST',
-				data: { demo: demo },
+				data: { demo: demo, slugs: slugs, selectedPagebuilder: selectedPagebuilder },
 			});
+			console.log(pluginResponse);
 			if (pluginResponse.success) {
-				let slugs: string[] = [];
-				items.map((item) => {
-					if (item.toggle == true && item.slug != 'plugins') {
-						slugs.push(item.slug);
-					}
-				});
 				const response = await apiFetch({
 					path: 'tg-demo-importer/v1/import',
 					method: 'POST',
-					data: { demo: demo, slugs: slugs },
+					data: { demo: demo, slugs: slugs, selectedPagebuilder: selectedPagebuilder },
 				});
 				console.log(response);
 			} else {
@@ -547,6 +635,14 @@ const ImportButton = ({ flexDivCss, buttonTitle, initialTheme, demo }: Props) =>
 			}
 		} catch (error) {
 			console.error('Error importing plugin:', error);
+		}
+	};
+
+	const checkImageExists = (key: string): string => {
+		try {
+			return require(`../../assets/images/${key}.png`);
+		} catch {
+			return '';
 		}
 	};
 

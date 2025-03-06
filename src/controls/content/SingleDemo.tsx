@@ -16,12 +16,13 @@ const SingleDemo = ({ demo }: DemoProps) => {
 			return '';
 		}
 	};
+
 	return (
 		<Link
 			to={`/import-detail/${demo.slug}`}
 			className="text-[#383838] no-underline hover:text-[#383838] tg-demo flex flex-col gap-0"
 		>
-			<div className="shadow flex flex-col  ">
+			<div className="shadow flex flex-col">
 				<div className="relative">
 					<img src={demo.image} alt="" className="w-full h-full" />
 					{demo.pro && (
@@ -48,23 +49,25 @@ const SingleDemo = ({ demo }: DemoProps) => {
 							<p className="m-0 font-semibold">Premium</p>
 						</div>
 					)}
-					{Object.entries(demo?.pagebuilders || {})
-						.filter(([key, _]) => key !== 'all')
-						.map(([key, value]) => (
-							<div
-								className="absolute bottom-[16px] left-[16px] p-[4px] bg-white rounded tg-pagebuilder hidden cursor-auto"
-								key={key}
-							>
-								{checkImageExists(key) !== '' && (
-									<img src={require(`../../assets/images/${key}.jpg`)} alt="" className="block" />
-								)}
-								<span className="text-[#383838] ml-[8px] font-[600] hidden">{value}</span>
-							</div>
-						))}
+					<div className="absolute bottom-[16px] left-[16px] flex gap-[10px]">
+						{Object.entries(demo?.pagebuilders || {}).map(
+							([key, value]) =>
+								checkImageExists(key) !== '' && (
+									<div
+										className="p-[4px] bg-white rounded tg-pagebuilder hidden cursor-auto"
+										key={key}
+									>
+										<img src={require(`../../assets/images/${key}.jpg`)} alt="" className="block" />
+
+										<span className="text-[#383838] font-[600] hidden text-[13px]">{value}</span>
+									</div>
+								),
+						)}
+					</div>
 				</div>
 
 				<div className="bg-white px-[16px] py-[15px] border-[#f4f4f4]">
-					<h4 className="m-0 ">
+					<h4 className="m-0 text-sm">
 						{demo.name}
 						{demo.new && (
 							<span className="bg-[#27AE60] px-[4px] py-[1px] text-[10px] text-white rounded-[4px] ml-[8px]">

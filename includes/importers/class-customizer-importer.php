@@ -24,9 +24,10 @@ class TG_Customizer_Importer {
 	 * @param  string $import_file Path to the import file.
 	 * @param  string $demo_id     The ID of demo being imported.
 	 * @param  array  $demo_data   The data of demo being imported.
+	 * @param  string  $pagebuilder   Pagebuilder key.
 	 * @return void|WP_Error
 	 */
-	public static function import( $import_file, $demo_id, $demo_data ) {
+	public static function import( $import_file, $demo_id, $demo_data, $pagebuilder ) {
 		global $wp_customize;
 
 		$content = file_get_contents( $import_file );
@@ -48,7 +49,7 @@ class TG_Customizer_Importer {
 		}
 
 		// Modify settings array.
-		$data = apply_filters( 'themegrill_customizer_import_settings', $data, $demo_data, $demo_id );
+		$data = apply_filters( 'themegrill_customizer_import_settings', $data, $demo_data['pagebuilder_data'][ $pagebuilder ], $demo_id );
 
 		// Import custom options.
 		if ( isset( $data['options'] ) ) {
