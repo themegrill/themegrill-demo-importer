@@ -33,7 +33,7 @@ const CategoryMenu = ({ categories, setCategory }: Props) => {
 							type="button"
 							key={category.slug}
 							data-target={category.slug}
-							className="tg-tabs tg-category-tabs flex items-center justify-between"
+							className="tg-tabs tg-category-tabs flex items-center justify-between gap-2"
 							data-state={activeTab === category.slug ? 'active' : 'inactive'}
 							onClick={() => handleClick(category.slug)}
 						>

@@ -77,12 +77,12 @@ const Header = ({
 				{themes.map((item, index) => (
 					<TabsTrigger
 						value={item.slug}
-						className={`tg-tabs px-[20px] py-[11px] h-11 bg-white ${index === 0 ? 'border-none' : 'border-[0px] border-l-[1px] border-solid border-[#f4f4f4]'}`}
+						className={`tg-tabs px-[20px] py-[11px] h-11 bg-white gap-2 ${index === 0 ? 'border-none' : 'border-[0px] border-l-[1px] border-solid border-[#f4f4f4]'}`}
 						onClick={() => handleThemeClick(item.slug)}
 						key={index}
 					>
 						{item.slug != 'all' && checkImageExists(item.slug) !== '' && (
-							<img src={require(`../../assets/images/${item.slug}.png`)} alt="" className="mr-2" />
+							<img src={require(`../../assets/images/${item.slug}.png`)} alt="" />
 						)}
 						<span>{item.name}</span>
 					</TabsTrigger>
@@ -132,23 +132,6 @@ const Header = ({
 				searchParams={searchParams}
 				setSearchParams={setSearchParams}
 			/>
-
-			{/* <div className="border-[1px] border-solid border-[#f4f4f4] p-0 rounded-md overflow-hidden">
-				<button
-					value="free"
-					className={`px-[20px] py-[11px] h-11 border-[0px] border-l-[1px] border-solid border-[#f4f4f4] cursor-pointer text-[14px] font-[500] ${searchParams.get('option') === 'free' ? 'bg-[#2563eb] text-white shadow-sm' : 'bg-white text-[#383838]'}`}
-					onClick={() => handleClick('free')}
-				>
-					Free
-				</button>
-				<button
-					value="pro"
-					className={`px-[20px] py-[11px] h-11 border-[0px] border-l-[1px] border-solid border-[#f4f4f4] cursor-pointer text-[14px] font-[500] ${searchParams.get('option') === 'pro' ? 'bg-[#2563eb] text-white shadow-sm' : 'bg-white text-[#383838]'}`}
-					onClick={() => handleClick('pro')}
-				>
-					Pro
-				</button>
-			</div> */}
 		</div>
 	);
 };

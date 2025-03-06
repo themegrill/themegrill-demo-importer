@@ -40,7 +40,7 @@ const PagebuilderDropdownMenu = ({ pagebuilders, setPagebuilder, currentPagebuil
 			<DropdownMenuTrigger asChild>
 				<Button
 					variant="outline"
-					className="text-[#383838] px-5 bg-white border-[1px] border-solid cursor-pointer border-[#f4f4f4] w-full sm:w-[172px] h-11 items-center justify-between focus-visible:ring-0"
+					className="text-[#383838] font-[400] px-5 bg-white border-[1px] border-solid cursor-pointer border-[#f4f4f4] w-full sm:w-[172px] h-11 items-center justify-between focus-visible:ring-0"
 				>
 					<span>{currentPagebuilder}</span>
 					<svg

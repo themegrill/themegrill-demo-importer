@@ -55,7 +55,7 @@ const ImportDialogSkeleton = ({
 				<DialogHeader className="border-0 border-b border-solid border-[#f4f4f4] px-[40px] py-[16px]">
 					<DialogTitle className="my-0 text-[18px]">{header}</DialogTitle>
 				</DialogHeader>
-				<div className="p-[16px] sm:px-[40px] sm:py-[24px] overflow-x-hidden overflow-y-scroll sm:overflow-hidden">
+				<div className="p-[16px] sm:px-[40px] sm:pt-[24px] sm:pb-[32px] overflow-x-hidden overflow-y-scroll sm:overflow-hidden">
 					<Content />
 				</div>
 				{Footer && (
