@@ -803,29 +803,31 @@ class TG_WXR_Importer extends WP_Importer {
 			return false;
 		}
 
-		$post_exists = $this->post_exists( $data );
+		if ( 'nav_menu_item' !== $data['post_type'] ) {
+			$post_exists = $this->post_exists( $data );
 
-		if ( $post_exists ) {
+			if ( $post_exists ) {
 
-			$this->logger->info(
-				sprintf(
-					__( '%1$s "%2$s" already exists.', 'themegrill-demo-importer' ),
-					$post_type_object->labels->singular_name,
-					$data['post_title']
-				)
-			);
+				$this->logger->info(
+					sprintf(
+						__( '%1$s "%2$s" already exists.', 'themegrill-demo-importer' ),
+						$post_type_object->labels->singular_name,
+						$data['post_title']
+					)
+				);
 
-			/**
-			 * Post processing already imported.
-			 *
-			 * @param array $data Raw data imported for the post.
-			 */
-			do_action( 'wxr_importer.process_already_imported.post', $data );
+				/**
+				 * Post processing already imported.
+				 *
+				 * @param array $data Raw data imported for the post.
+				 */
+				do_action( 'wxr_importer.process_already_imported.post', $data );
 
-			// Even though this post already exists, new comments might need importing
-			$this->process_comments( $comments, $original_id, $data, $post_exists );
+				// Even though this post already exists, new comments might need importing
+				$this->process_comments( $comments, $original_id, $data, $post_exists );
 
-			return false;
+				return false;
+			}
 		}
 
 		// Map the parent post, or mark it as one we need to fix
@@ -962,7 +964,10 @@ class TG_WXR_Importer extends WP_Importer {
 		if ( $requires_remapping ) {
 			$this->requires_remapping['post'][ $post_id ] = true;
 		}
-		$this->mark_post_exists( $data, $post_id );
+
+		if ( 'nav_menu_item' !== $data['post_type'] ) {
+			$this->mark_post_exists( $data, $post_id );
+		}
 
 		$this->logger->info(
 			sprintf(
