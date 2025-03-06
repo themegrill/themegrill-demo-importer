@@ -24,12 +24,15 @@ class TG_Customizer_Importer {
 	 * @param  string $import_file Path to the import file.
 	 * @param  string $demo_id     The ID of demo being imported.
 	 * @param  array  $demo_data   The data of demo being imported.
+	 * @param  string  $pagebuilder   Pagebuilder key.
 	 * @return void|WP_Error
 	 */
-	public static function import( $import_file, $demo_id, $demo_data ) {
+	public static function import( $import_file, $demo_id, $demo_data, $pagebuilder ) {
 		global $wp_customize;
 
-		$data = maybe_unserialize( file_get_contents( $import_file ) );
+		$content = file_get_contents( $import_file );
+
+		$data = maybe_unserialize( $content );
 
 		// Data checks.
 		if ( ! is_array( $data ) && ( ! isset( $data['template'] ) || ! isset( $data['mods'] ) ) ) {
@@ -46,7 +49,7 @@ class TG_Customizer_Importer {
 		}
 
 		// Modify settings array.
-		$data = apply_filters( 'themegrill_customizer_demo_import_settings', $data, $demo_data, $demo_id );
+		$data = apply_filters( 'themegrill_customizer_import_settings', $data, $demo_data['pagebuilder_data'][ $pagebuilder ], $demo_id );
 
 		// Import custom options.
 		if ( isset( $data['options'] ) ) {
@@ -57,7 +60,7 @@ class TG_Customizer_Importer {
 			}
 
 			// Include Customizer Demo Importer Setting class.
-			include_once dirname( __FILE__ ) . '/customize/class-oc-customize-demo-importer-setting.php';
+			include_once __DIR__ . '/customize/class-oc-customize-demo-importer-setting.php';
 
 			foreach ( $data['options'] as $option_key => $option_value ) {
 				$option = new OC_Customize_Demo_Importer_Setting(
