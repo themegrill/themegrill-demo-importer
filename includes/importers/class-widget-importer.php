@@ -24,7 +24,7 @@ class TG_Widget_Importer {
 	 * @param  array  $demo_data   The data of demo being imported.
 	 * @return WP_Error|array WP_Error on failure, $results on success.
 	 */
-	public static function import( $import_file, $demo_id, $demo_data ) {
+	public static function import( $import_file, $demo_id, $demo_data, $term_id_map ) {
 		global $wp_registered_sidebars;
 
 		$data = json_decode( file_get_contents( $import_file ) );
@@ -200,7 +200,7 @@ class TG_Widget_Importer {
 		}
 
 		// Hook after import.
-		do_action( 'themegrill_widget_importer_after_widgets_import' );
+		do_action( 'themegrill_widget_importer_after_widgets_import', $term_id_map );
 
 		// Return results.
 		return apply_filters( 'themegrill_widget_import_results', $results );
