@@ -938,9 +938,10 @@ class TG_Demo_Importer {
 	 */
 	public function import_customizer_data( $demo_id, $demo_data, $status ) {
 		$import_file = $this->get_import_file_path( 'dummy-customizer.dat' );
+		$term_id_map = $this->importer->get_processed_terms();
 
 		if ( is_file( $import_file ) ) {
-			$results = TG_Customizer_Importer::import( $import_file, $demo_id, $demo_data );
+			$results = TG_Customizer_Importer::import( $import_file, $demo_id, $demo_data, $term_id_map );
 
 			if ( is_wp_error( $results ) ) {
 				return false;
