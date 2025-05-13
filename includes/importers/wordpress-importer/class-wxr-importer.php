@@ -745,7 +745,7 @@ class TG_WXR_Importer extends WP_Importer {
 				);
 
 				$original_post_ID = $post['post_id'];
-				$postdata         = apply_filters( 'wp_import_post_data_processed', $postdata, $post );
+				$postdata         = apply_filters( 'wp_import_post_data_processed', $postdata, $post, $this->processed_terms );
 
 				$postdata = wp_slash( $postdata );
 
@@ -1514,5 +1514,9 @@ class TG_WXR_Importer extends WP_Importer {
 
 	public function get_term_new_id( $nav_menu ) {
 		return $this->processed_terms[ $nav_menu ];
+	}
+
+	public function get_processed_terms() {
+		return $this->processed_terms;
 	}
 }

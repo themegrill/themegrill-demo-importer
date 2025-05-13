@@ -684,3 +684,69 @@ add_action(
 	},
 	PHP_INT_MAX
 );
+
+
+
+/**
+ * After demo imported AJAX action.
+ *
+ * @see tg_update_magazine_blocks_settings()
+ */
+add_action( 'themegrill_ajax_demo_imported', 'tg_update_magazine_blocks_settings', 10, 2 );
+
+/**
+ * Update Magazine Blocks settings.
+ *
+ * @param string $id Demo Id.
+ * @param array  $data Demo data.
+ * @return void
+ */
+function tg_update_magazine_blocks_settings( $id, $data ) {
+
+	if ( empty( $data['magazine_blocks_settings'] ) ) {
+		return;
+	}
+
+	$settings = $data['magazine_blocks_settings'];
+
+	if ( is_string( $settings ) ) {
+		$decoded = json_decode( $settings, true );
+		if ( json_last_error() === JSON_ERROR_NONE ) {
+			$settings = $decoded;
+		}
+	}
+
+	update_option( '_magazine_blocks_settings', $settings );
+}
+
+/**
+ * After demo imported AJAX action.
+ *
+ * @see tg_update_blockart_blocks_settings()
+ */
+add_action( 'themegrill_ajax_demo_imported', 'tg_update_blockart_blocks_settings', 10, 2 );
+
+/**
+ * Update Blockart Blocks settings.
+ *
+ * @param string $id Demo Id.
+ * @param array  $data Demo data.
+ * @return void
+ */
+function tg_update_blockart_blocks_settings( $id, $data ) {
+
+	if ( empty( $data['blockart_blocks_settings'] ) ) {
+		return;
+	}
+
+	$settings = $data['blockart_blocks_settings'];
+
+	if ( is_string( $settings ) ) {
+		$decoded = json_decode( $settings, true );
+		if ( json_last_error() === JSON_ERROR_NONE ) {
+			$settings = $decoded;
+		}
+	}
+
+	update_option( '_blockart_settings', $settings );
+}
