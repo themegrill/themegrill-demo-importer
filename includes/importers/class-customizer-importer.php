@@ -26,7 +26,7 @@ class TG_Customizer_Importer {
 	 * @param  array  $demo_data   The data of demo being imported.
 	 * @return void|WP_Error
 	 */
-	public static function import( $import_file, $demo_id, $demo_data ) {
+	public static function import( $import_file, $demo_id, $demo_data, $term_id_map ) {
 		global $wp_customize;
 
 		$data = maybe_unserialize( file_get_contents( $import_file ) );
@@ -57,7 +57,7 @@ class TG_Customizer_Importer {
 			}
 
 			// Include Customizer Demo Importer Setting class.
-			include_once dirname( __FILE__ ) . '/customize/class-oc-customize-demo-importer-setting.php';
+			include_once __DIR__ . '/customize/class-oc-customize-demo-importer-setting.php';
 
 			foreach ( $data['options'] as $option_key => $option_value ) {
 				$option = new OC_Customize_Demo_Importer_Setting(
@@ -72,6 +72,11 @@ class TG_Customizer_Importer {
 
 				$option->import( $option_value );
 			}
+		}
+
+		if ( isset( $data['mods']['colormag_footer_menu'] ) && ! empty( $data['mods']['colormag_footer_menu'] ) ) {
+			$footer_menu_id                       = isset( $term_id_map[ $data['mods']['colormag_footer_menu'] ] ) ? (string) $term_id_map[ $data['mods']['colormag_footer_menu'] ] : $data['mods']['colormag_footer_menu'];
+			$data['mods']['colormag_footer_menu'] = $footer_menu_id;
 		}
 
 		// If wp_css is set then import it.
