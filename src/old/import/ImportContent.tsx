@@ -81,38 +81,57 @@ const ImportContent = ({ demo, initialTheme }: Props) => {
 				</>
 			) : (
 				<>
+					<div
+						className="absolute bottom-0 w-full border-0 border-t border-t-[#E1E1E1] border-solid"
+						style={{ boxShadow: '0px -8px 25px 0px rgba(0, 0, 0, 0.04)' }}
+					>
+						<div className="flex flex-wrap justify-between items-center bg-white px-[32px] py-[24px]">
+							<div>
+								<h4 className="text-[22px] m-0 mb-[8px] text-[#383838]">{demo.name}</h4>
+								<p className="text-[#7a7a7a] text-[14px] mt-4 sm:m-0">
+									6 Templates (You can select pages manually by clicking on templates.)
+								</p>
+							</div>
+							<div className=" flex flex-wrap gap-[16px]">
+								<ImportButton buttonTitle="Import All" initialTheme={initialTheme} demo={demo} />
+								<button
+									className="bg-white rounded-[2px] px-[16px] py-[8px] border border-solid border-[#2563EB] text-[#2563EB] font-[600] cursor-pointer"
+									onClick={() => handleClick(true)}
+								>
+									Select Pages
+								</button>
+							</div>
+						</div>
+					</div>
+
 					<button
 						type="button"
-						className="bg-white rounded-full px-[16px] py-[4px] border border-solid border-[#f4f4f4] cursor-pointer absolute bottom-[10%] left-[5%] sm:bottom-[2%] sm:left-[50%] shadow"
+						className="bg-[#1E1E1E] rounded-full px-[18px] py-[8px] border border-solid border-[#E1E1E1] cursor-pointer absolute bottom-20 left-[5%] sm:left-[50%] sm:translate-x-[-50%]"
 						onClick={() => handleClick(collapseTemplate)}
 					>
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
-							width="12"
-							height="12"
-							viewBox="0 0 12 12"
+							width="14"
+							height="14"
+							viewBox="0 0 14 14"
 							fill="none"
 						>
 							<path
-								d="M6 9.5L6 2.5"
-								stroke="#383838"
-								strokeLinecap="round"
-								strokeLinejoin="round"
+								d="M7 10.8182V3.18187"
+								stroke="white"
+								stroke-width="1.09091"
+								stroke-linecap="round"
+								stroke-linejoin="round"
 							/>
 							<path
-								d="M2.5 6L6 2.5L9.5 6"
-								stroke="#383838"
-								strokeLinecap="round"
-								strokeLinejoin="round"
+								d="M3.18187 7.00006L7.00006 3.18188L10.8182 7.00006"
+								stroke="white"
+								stroke-width="1.09091"
+								stroke-linecap="round"
+								stroke-linejoin="round"
 							/>
 						</svg>
 					</button>
-					<ImportButton
-						flexDivCss="absolute bottom-[10%] right-[5%] sm:bottom-[2%] sm:right-[32px]"
-						buttonTitle="Import All"
-						initialTheme={initialTheme}
-						demo={demo}
-					/>
 				</>
 			)}
 		</div>

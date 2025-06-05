@@ -6,7 +6,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
-} from '../../components/Dialog';
+} from '../../controls/Dialog';
 
 type Props = {
 	header: React.ReactNode;
@@ -30,7 +30,7 @@ const ImportDialogSkeleton = ({
 			<DialogTrigger asChild>
 				<button
 					type="button"
-					className="bg-[#2563EB] rounded px-[16px] py-[8px] border border-solid border-[#2563EB] cursor-pointer flex items-center"
+					className="bg-[#2563EB] rounded-[2px] px-[16px] py-[8px] border border-solid border-[#2563EB] cursor-pointer flex items-center"
 				>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
@@ -52,10 +52,10 @@ const ImportDialogSkeleton = ({
 				className="border-solid border-[#F4F4F4] px-0 py-0 gap-0 max-w-[300px] sm:max-w-[600px]"
 			>
 				{notice}
-				<DialogHeader className="border-0 border-b border-solid border-[#f4f4f4] px-[40px] py-[16px]">
-					<DialogTitle className="my-0 text-[18px]">{header}</DialogTitle>
+				<DialogHeader className="border-0 border-b border-solid border-[#f4f4f4] px-[40px] py-[20px]">
+					<DialogTitle className="my-0 text-[18px] text-[#383838]">{header}</DialogTitle>
 				</DialogHeader>
-				<div className="p-[16px] sm:px-[40px] sm:pt-[24px] sm:pb-[32px] overflow-x-hidden overflow-y-scroll sm:overflow-hidden">
+				<div className="px-[40px] pt-[20px] pb-[48px] overflow-x-hidden overflow-y-scroll sm:overflow-hidden">
 					<Content />
 				</div>
 				{Footer && (

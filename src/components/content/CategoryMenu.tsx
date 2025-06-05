@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import IntersectObserver from '../../components/IntersectionObserver';
+import { useDemoContext } from '../../context';
+import IntersectObserver from '../../controls/IntersectionObserver';
 import { PagebuilderCategory } from '../../lib/types';
 
 type Props = {
 	categories: PagebuilderCategory[];
-	setCategory: (slug: string) => void;
 };
 
-const CategoryMenu = ({ categories, setCategory }: Props) => {
+const CategoryMenu = ({ categories }: Props) => {
+	const { setCategory } = useDemoContext();
 	const [activeTab, setActiveTab] = useState<string>(categories[0]?.slug || '');
 	const [searchParams, setSearchParams] = useSearchParams();
 

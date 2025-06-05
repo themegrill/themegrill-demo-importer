@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Button } from '../../components/Button';
-import { Input } from '../../components/Input';
-import { TabsList, TabsTrigger } from '../../components/Tabs';
+import { Button } from '../../controls/Button';
+import { Input } from '../../controls/Input';
+import { TabsList, TabsTrigger } from '../../controls/Tabs';
 import { PagebuilderCategory, Theme } from '../../lib/types';
 import PagebuilderDropdownMenu from '../dropdown-menu/PagebuilderDropdownMenu';
 import PlanDropdown from '../dropdown-menu/PlanDropdown';
@@ -13,6 +13,7 @@ type Props = {
 	setTheme: (slug: string) => void;
 	pagebuilders: PagebuilderCategory[];
 	setPagebuilder: (slug: string) => void;
+	pagebuilder: string;
 	currentPagebuilder: string;
 	searchParams: URLSearchParams;
 	setSearchParams: (value: URLSearchParams) => void;
@@ -26,6 +27,7 @@ const Header = ({
 	setTheme,
 	pagebuilders,
 	setPagebuilder,
+	pagebuilder,
 	currentPagebuilder,
 	searchParams,
 	setSearchParams,
@@ -92,6 +94,7 @@ const Header = ({
 			<PagebuilderDropdownMenu
 				pagebuilders={pagebuilders}
 				setPagebuilder={setPagebuilder}
+				pagebuilder={pagebuilder}
 				currentPagebuilder={currentPagebuilder}
 			/>
 

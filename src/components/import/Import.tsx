@@ -1,15 +1,20 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { SearchResultType } from '../../lib/types';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useParams, useSearchParams } from 'react-router-dom';
+import { DataObjectType, SearchResultType } from '../../lib/types';
 import ImportContent from './ImportContent';
 import ImportSidebar from './ImportSidebar';
 
 type Props = {
 	demos: SearchResultType[];
 	initialTheme: string;
+	data: DataObjectType;
 };
 
-const Import = ({ demos, initialTheme }: Props) => {
+const Import = ({ demos, initialTheme, data }: Props) => {
+	const iframeRef = useRef(null);
+
+	const [searchParams, setSearchParams] = useSearchParams();
+
 	const { slug } = useParams();
 	const demo = useMemo(() => {
 		return demos.filter((demo) => demo.slug === slug)[0];
@@ -55,7 +60,7 @@ const Import = ({ demos, initialTheme }: Props) => {
 			{collapse ? (
 				<button
 					type="button"
-					className="bg-white rounded-full px-[8px] py-[16px] border-2 border-solid border-[#F4F4F4] cursor-pointer absolute top-[45%] left-[1%]"
+					className="bg-white rounded-full px-[8px] py-[16px] border border-solid border-[#E1E1E1] cursor-pointer absolute top-[45%] left-[1%]"
 					style={{ zIndex: 100 }}
 					onClick={() => handleClick(collapse)}
 				>
@@ -79,7 +84,7 @@ const Import = ({ demos, initialTheme }: Props) => {
 				<>
 					<button
 						type="button"
-						className="bg-white rounded-full px-[8px] py-[16px] border-2 border-solid border-[#F4F4F4] cursor-pointer absolute top-[45%] left-[285px]"
+						className="bg-white rounded-full px-[8px] py-[16px] border border-solid border-[#E1E1E1] cursor-pointer absolute top-[45%] left-[285px]"
 						style={{ zIndex: 100 }}
 						onClick={() => handleClick(collapse)}
 					>
@@ -99,10 +104,10 @@ const Import = ({ demos, initialTheme }: Props) => {
 							/>
 						</svg>
 					</button>
-					<ImportSidebar />
+					<ImportSidebar demo={demo} iframeRef={iframeRef} />
 				</>
 			)}
-			<ImportContent demo={demo} initialTheme={initialTheme} />
+			<ImportContent demo={demo} initialTheme={initialTheme} iframeRef={iframeRef} />
 		</div>
 	);
 };

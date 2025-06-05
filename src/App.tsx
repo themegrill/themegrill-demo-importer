@@ -1,7 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import { HashRouter, Route, Routes } from 'react-router-dom';
 import Home from './Home';
-import Import from './controls/import/Import';
+import Import from './components/import/Import';
+import { DemoContextProvider } from './context';
 import { __TDI_DASHBOARD__, SearchResultType } from './lib/types';
 
 const App = () => {
@@ -50,13 +51,15 @@ const App = () => {
 
 	return (
 		<HashRouter>
-			<Routes>
-				<Route path="/" element={<Home {...contentProps} />} />
-				<Route
-					path="/import-detail/:slug"
-					element={<Import demos={searchTerms} initialTheme={initialTheme} />}
-				/>
-			</Routes>
+			<DemoContextProvider>
+				<Routes>
+					<Route path="/" element={<Home {...contentProps} />} />
+					<Route
+						path="/import-detail/:slug"
+						element={<Import demos={searchTerms} initialTheme={initialTheme} data={data} />}
+					/>
+				</Routes>
+			</DemoContextProvider>
 		</HashRouter>
 	);
 };
