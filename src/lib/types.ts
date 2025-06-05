@@ -1,7 +1,14 @@
-export const __TDI_DASHBOARD__: {
+// export const __TDI_DASHBOARD__: {
+// 	theme: string;
+// 	data: DataObjectType;
+// } = (window as any).__TDI_DASHBOARD__;
+
+export const __TDI_DASHBOARD__: TDIDashboardType = (window as any).__TDI_DASHBOARD__;
+
+export type TDIDashboardType = {
 	theme: string;
 	data: DataObjectType;
-} = (window as any).__TDI_DASHBOARD__;
+};
 
 export type DataObjectType = Record<
 	string,
@@ -55,7 +62,7 @@ export type Theme = {
 export type PagebuilderCategory = {
 	slug: string;
 	value: string;
-	count: number;
+	count?: number;
 };
 
 export type Page = {

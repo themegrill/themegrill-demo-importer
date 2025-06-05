@@ -1,0 +1,119 @@
+import React from 'react';
+import { useDemoContext } from '../../context';
+import { Button } from '../../controls/Button';
+import { Input } from '../../controls/Input';
+import { TabsList, TabsTrigger } from '../../controls/Tabs';
+import { PagebuilderCategory, Theme } from '../../lib/types';
+import PagebuilderDropdownMenu from '../dropdown-menu/PagebuilderDropdownMenu';
+import PlanDropdown from '../dropdown-menu/PlanDropdown';
+
+declare const require: any;
+
+type Props = {
+	themes: Theme[];
+	pagebuilders: PagebuilderCategory[];
+	currentPagebuilder: string;
+	searchParams: URLSearchParams;
+	setSearchParams: (value: URLSearchParams) => void;
+	plans: Record<string, string>;
+};
+
+const Header = ({
+	themes,
+	pagebuilders,
+	currentPagebuilder,
+	searchParams,
+	setSearchParams,
+	plans,
+}: Props) => {
+	const { search, setTheme, setSearch } = useDemoContext();
+	const handleThemeClick = (tab: string) => {
+		// setSearchParams({ tab: tab });
+		setTheme(tab);
+	};
+
+	const checkImageExists = (key: string): string => {
+		try {
+			return require(`../../assets/images/${key}.png`);
+		} catch {
+			return '';
+		}
+	};
+
+	const removeSearchInput = () => {
+		if (search) {
+			setSearch('');
+			searchParams.delete('search');
+			setSearchParams(searchParams);
+		}
+	};
+
+	const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+		let value = event.target.value;
+		setSearch(value);
+		searchParams.set('search', value);
+		setSearchParams(searchParams);
+	};
+
+	return (
+		<div
+			className="flex gap-y-4 sm:gap-x-8 items-center px-[20px] py-[20px] flex-wrap sm:px-[40px]"
+			style={{ backgroundColor: '#fff' }}
+		>
+			<TabsList className="border-[1px] border-solid border-[#f4f4f4] p-0 rounded-md overflow-hidden">
+				{themes.map((item, index) => (
+					<TabsTrigger
+						value={item.slug}
+						className={`tg-tabs px-[20px] py-[11px] h-11 bg-white gap-2 ${index === 0 ? 'border-none' : 'border-[0px] border-l-[1px] border-solid border-[#f4f4f4]'}`}
+						onClick={() => handleThemeClick(item.slug)}
+						key={index}
+					>
+						{item.slug != 'all' && checkImageExists(item.slug) !== '' && (
+							<img src={require(`../../assets/images/${item.slug}.png`)} alt="" />
+						)}
+						<span>{item.name}</span>
+					</TabsTrigger>
+				))}
+			</TabsList>
+
+			<PagebuilderDropdownMenu
+				pagebuilders={pagebuilders}
+				currentPagebuilder={currentPagebuilder}
+			/>
+
+			<div className="flex items-center flex-1 relative">
+				<Input
+					type="text"
+					placeholder="Search awesome demos..."
+					style={{ paddingRight: '30px', border: '1px solid #f4f4f4' }}
+					value={search}
+					onChange={handleSearch}
+					className="h-11 placeholder:text-[#a7a7a7]"
+				/>
+				<Button
+					className="p-0 border-none bg-white absolute right-2 h-0 cursor-pointer"
+					onClick={removeSearchInput}
+				>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="22"
+						height="20"
+						viewBox="0 0 22 20"
+						fill="none"
+					>
+						<g opacity="0.5">
+							<path
+								d="M11.7195 3C15.587 3 18.7195 6.1325 18.7195 10C18.7195 13.8675 15.587 17 11.7195 17C7.85198 17 4.71948 13.8675 4.71948 10C4.71948 6.1325 7.85198 3 11.7195 3ZM16.0945 12.625L13.4695 10L16.0945 7.375L14.3445 5.625L11.7195 8.25L9.09448 5.625L7.34448 7.375L9.96948 10L7.34448 12.625L9.09448 14.375L11.7195 11.75L14.3445 14.375L16.0945 12.625Z"
+								fill="#383838"
+							/>
+						</g>
+					</svg>
+				</Button>
+			</div>
+
+			<PlanDropdown plans={plans} searchParams={searchParams} setSearchParams={setSearchParams} />
+		</div>
+	);
+};
+
+export default Header;

@@ -1,12 +1,12 @@
 import React from 'react';
-import { Button } from '../../components/Button';
+import { Button } from '../../controls/Button';
 import {
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 	DropdownMenu as TGDropdownMenu,
-} from '../../components/DropdownMenu';
+} from '../../controls/DropdownMenu';
 
 type Props = {
 	plans: Record<string, string>;
@@ -53,14 +53,16 @@ const PlanDropdown = ({ plans, plan, setPlan, searchParams, setSearchParams }: P
 			</DropdownMenuTrigger>
 			<DropdownMenuContent className="w-full sm:w-[130px] bg-white p-0">
 				{plans &&
-					Object.entries(plans).map(([key, value]) => (
-						<div key={key}>
-							<DropdownMenuItem className="p-[16px]" onClick={() => handleClick(key)}>
-								<span className="text-[14px]">{value}</span>
-							</DropdownMenuItem>
-							<DropdownMenuSeparator className="m-0" />
-						</div>
-					))}
+					Object.entries(plans)
+						.filter(([k, v]) => k !== plan)
+						.map(([key, value]) => (
+							<div key={key}>
+								<DropdownMenuItem className="p-[16px]" onClick={() => handleClick(key)}>
+									<span className="text-[14px]">{value}</span>
+								</DropdownMenuItem>
+								<DropdownMenuSeparator className="m-0" />
+							</div>
+						))}
 			</DropdownMenuContent>
 		</TGDropdownMenu>
 	);

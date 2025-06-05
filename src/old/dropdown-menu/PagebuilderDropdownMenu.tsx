@@ -1,13 +1,13 @@
 import React from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Button } from '../../components/Button';
+import { Button } from '../../controls/Button';
 import {
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 	DropdownMenu as TGDropdownMenu,
-} from '../../components/DropdownMenu';
+} from '../../controls/DropdownMenu';
 import { PagebuilderCategory } from '../../lib/types';
 
 declare const require: any;
@@ -15,10 +15,16 @@ declare const require: any;
 type Props = {
 	pagebuilders: PagebuilderCategory[];
 	setPagebuilder: (slug: string) => void;
+	pagebuilder: string;
 	currentPagebuilder: string;
 };
 
-const PagebuilderDropdownMenu = ({ pagebuilders, setPagebuilder, currentPagebuilder }: Props) => {
+const PagebuilderDropdownMenu = ({
+	pagebuilders,
+	setPagebuilder,
+	pagebuilder,
+	currentPagebuilder,
+}: Props) => {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const handlePagebuilderChange = (pagebuilder: PagebuilderCategory) => {
 		setPagebuilder(pagebuilder.slug);
@@ -66,26 +72,28 @@ const PagebuilderDropdownMenu = ({ pagebuilders, setPagebuilder, currentPagebuil
 			</DropdownMenuTrigger>
 			<DropdownMenuContent className="w-full sm:w-[172px] bg-white p-0">
 				{pagebuilders &&
-					pagebuilders.map((pagebuilder) => (
-						<div key={pagebuilder.slug}>
-							<DropdownMenuItem
-								className="p-[16px]"
-								onClick={() => handlePagebuilderChange(pagebuilder)}
-							>
-								{pagebuilder.slug !== 'all' && checkImageExists(pagebuilder.slug) !== '' && (
-									<img
-										src={require(`../../assets/images/${pagebuilder.slug}.jpg`)}
-										alt=""
-										className="mr-2"
-									/>
-								)}
-								<span className="text-[14px]">
-									{pagebuilder.value} ({pagebuilder.count})
-								</span>
-							</DropdownMenuItem>
-							<DropdownMenuSeparator className="m-0" />
-						</div>
-					))}
+					pagebuilders
+						.filter((pg) => pg.slug !== pagebuilder)
+						.map((pagebuilder) => (
+							<div key={pagebuilder.slug}>
+								<DropdownMenuItem
+									className="p-[16px]"
+									onClick={() => handlePagebuilderChange(pagebuilder)}
+								>
+									{pagebuilder.slug !== 'all' && checkImageExists(pagebuilder.slug) !== '' && (
+										<img
+											src={require(`../../assets/images/${pagebuilder.slug}.jpg`)}
+											alt=""
+											className="mr-2"
+										/>
+									)}
+									<span className="text-[14px]">
+										{pagebuilder.value} ({pagebuilder.count})
+									</span>
+								</DropdownMenuItem>
+								<DropdownMenuSeparator className="m-0" />
+							</div>
+						))}
 			</DropdownMenuContent>
 		</TGDropdownMenu>
 	);

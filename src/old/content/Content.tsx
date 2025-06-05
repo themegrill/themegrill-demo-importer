@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { TabsContent } from '../../components/Tabs';
+import { TabsContent } from '../../controls/Tabs';
 import { PagebuilderCategory, SearchResultType } from '../../lib/types';
 import CategoryMenu from './CategoryMenu';
 import Demos from './Demos';

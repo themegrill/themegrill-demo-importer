@@ -1,33 +1,45 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { matchPath, useLocation, useSearchParams } from 'react-router-dom';
-import { Tabs } from './components/Tabs';
-import Content from './controls/content/Content';
-import Header from './controls/header/Header';
+import Content from './components/content/Content';
+import Header from './components/header/Header';
+import { useDemoContext } from './context';
+import { Tabs } from './controls/Tabs';
 import { DataObjectType, SearchResultType } from './lib/types';
 
 type Props = {
 	data: DataObjectType;
 	initialTheme: string;
-	theme: string;
-	setTheme: (newTheme: string) => void;
+	// theme: string;
+	// setTheme: (newTheme: string) => void;
 	searchTerms: SearchResultType[];
 };
 
-const Home = ({ data, initialTheme, theme, setTheme, searchTerms }: Props) => {
+const Home = ({ data, initialTheme, searchTerms }: Props) => {
+	const {
+		theme,
+		pagebuilder,
+		category,
+		plan,
+		searchResults,
+		setPagebuilder,
+		setCategory,
+		setSearchResults,
+	} = useDemoContext();
 	const { pathname } = useLocation();
 	const match = matchPath('/import-detail/:slug', pathname);
 	const showTabs = !match;
-	const [pagebuilder, setPagebuilder] = useState<string>('all');
-	const [category, setCategory] = useState<string>('all');
-	const [loading, setLoading] = useState(true);
-	const [searchResults, setSearchResults] = useState<SearchResultType[]>([]);
-	const [searchParams, setSearchParams] = useSearchParams();
 	const plans = {
 		all: 'All',
 		free: 'Free',
 		pro: 'Pro',
 	};
-	const [plan, setPlan] = useState('all');
+	// const [pagebuilder, setPagebuilder] = useState<string>('all');
+	// const [category, setCategory] = useState<string>('all');
+	// const [plan, setPlan] = useState('all');
+	// const [searchResults, setSearchResults] = useState<SearchResultType[]>([]);
+
+	const [loading, setLoading] = useState(true);
+	const [searchParams, setSearchParams] = useSearchParams();
 
 	const themes = useMemo(() => {
 		if ('all' === initialTheme) {
@@ -271,27 +283,17 @@ const Home = ({ data, initialTheme, theme, setTheme, searchTerms }: Props) => {
 					<Tabs defaultValue={themes[0].slug}>
 						<Header
 							themes={themes}
-							setTheme={setTheme}
 							pagebuilders={pagebuilders}
-							setPagebuilder={setPagebuilder}
 							currentPagebuilder={currentPagebuilder}
+							plans={plans}
 							searchParams={searchParams}
 							setSearchParams={setSearchParams}
-							plans={plans}
-							plan={plan}
-							setPlan={setPlan}
 						/>
 						<div className="bg-[#FAFAFC]">
 							<Content
-								theme={theme}
-								category={category}
-								pagebuilder={pagebuilder}
 								categories={categories}
-								setCategory={setCategory}
-								data={searchResults}
 								searchParams={searchParams}
 								initialTheme={initialTheme}
-								plan={plan}
 							/>
 						</div>
 					</Tabs>
