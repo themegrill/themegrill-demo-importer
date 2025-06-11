@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDemoContext } from '../../context';
 import { SearchResultType } from '../../lib/types';
 import Template from '../template/Template';
 import ImportButton from './ImportButton';
@@ -8,9 +9,21 @@ type Props = {
 	demo: SearchResultType;
 	initialTheme: string;
 	iframeRef: React.RefObject<HTMLIFrameElement>;
+	siteTitle: string;
+	siteTagline: string;
+	siteLogoId: number;
 };
 
-const ImportContent = ({ demo, initialTheme, iframeRef }: Props) => {
+const ImportContent = ({
+	demo,
+	initialTheme,
+	iframeRef,
+	siteTitle,
+	siteTagline,
+	siteLogoId,
+}: Props) => {
+	const { pagebuilder } = useDemoContext();
+
 	const [collapseTemplate, setCollapseTemplate] = useState(false);
 	const navigate = useNavigate();
 
@@ -18,8 +31,8 @@ const ImportContent = ({ demo, initialTheme, iframeRef }: Props) => {
 		navigate(-1);
 	};
 
-	const handleClick = (collapseTemplate: Boolean) => {
-		setCollapseTemplate(!collapseTemplate);
+	const handleClick = (collapse: Boolean) => {
+		setCollapseTemplate(!collapse);
 	};
 
 	return (
@@ -83,7 +96,14 @@ const ImportContent = ({ demo, initialTheme, iframeRef }: Props) => {
 							/>
 						</svg>
 					</button>
-					<Template pages={demo.pages} demo={demo} initialTheme={initialTheme} />
+					<Template
+						pages={demo.pagebuilder_data[pagebuilder]?.pages || []}
+						demo={demo}
+						initialTheme={initialTheme}
+						siteTitle={siteTitle}
+						siteTagline={siteTagline}
+						siteLogoId={siteLogoId}
+					/>
 				</>
 			) : (
 				<>
@@ -99,10 +119,17 @@ const ImportContent = ({ demo, initialTheme, iframeRef }: Props) => {
 								</p>
 							</div>
 							<div className=" flex flex-wrap gap-[16px]">
-								<ImportButton buttonTitle="Import All" initialTheme={initialTheme} demo={demo} />
+								<ImportButton
+									buttonTitle="Import All"
+									initialTheme={initialTheme}
+									demo={demo}
+									siteTitle={siteTitle}
+									siteTagline={siteTagline}
+									siteLogoId={siteLogoId}
+								/>
 								<button
 									className="bg-white rounded-[2px] px-[16px] py-[8px] border border-solid border-[#2563EB] text-[#2563EB] font-[600] cursor-pointer"
-									onClick={() => handleClick(true)}
+									onClick={() => handleClick(false)}
 								>
 									Select Pages
 								</button>

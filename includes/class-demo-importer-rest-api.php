@@ -17,6 +17,7 @@ class TG_Importer_REST_Controller extends WP_REST_Controller {
 		add_action( 'themegrill_demo_imported', array( $this, 'update_nav_menu_items' ) );
 		add_action( 'themegrill_demo_imported', array( $this, 'update_elementor_data' ), 10, 2 );
 		add_action( 'themegrill_demo_imported', array( $this, 'update_siteorigin_data' ), 10, 2 );
+		add_action( 'themegrill_demo_imported_additional_update', array( $this, 'update_additional_settings' ), 10, 4 );
 		add_filter( 'themegrill_widget_import_settings', array( $this, 'update_widget_data' ), 10, 4 );
 		add_filter( 'themegrill_customizer_import_settings', array( $this, 'update_customizer_data' ), 10, 2 );
 	}
@@ -92,6 +93,11 @@ class TG_Importer_REST_Controller extends WP_REST_Controller {
 	public function install( $request ) {
 		$demo          = $request->get_param( 'demo' );
 		$install_theme = $request->get_param( 'installTheme' );
+		$site_title    = $request->get_param( 'siteTitle' );
+		$site_tagline  = $request->get_param( 'siteTagline' );
+		$site_logo_id  = $request->get_param( 'siteLogoId' );
+		$pages         = $request->get_param( 'pages' );
+
 		if ( ! $demo ) {
 			return new WP_Error( 'rest_custom_error', 'No demo data.', array( 'status' => 400 ) );
 		}
@@ -117,6 +123,7 @@ class TG_Importer_REST_Controller extends WP_REST_Controller {
 
 		update_option( 'themegrill_demo_importer_activated_id', $demo['slug'] );
 		do_action( 'themegrill_demo_imported', $demo['slug'], $demo );
+		do_action( 'themegrill_demo_imported_additional_update', $demo['slug'], $site_title, $site_tagline, $site_logo_id );
 		flush_rewrite_rules();
 		wp_cache_flush();
 		$response = array(
@@ -178,6 +185,7 @@ class TG_Importer_REST_Controller extends WP_REST_Controller {
 		$demo               = $request->get_param( 'demo' );
 		$additional_plugins = $request->get_param( 'additional_plugins' ) ?? array();
 		$pagebuilder        = $request->get_param( 'selectedPagebuilder' );
+		$pages              = $request->get_param( 'pages' );
 
 		$status = array(
 			'plugins'    => array(),
@@ -217,7 +225,7 @@ class TG_Importer_REST_Controller extends WP_REST_Controller {
 			$status['plugins'][] = $plugin_result;
 		}
 		// Import content, customizer settings, and widgets
-		$status['content']    = $this->import_content( $demo, $pagebuilder );
+		$status['content']    = $this->import_content( $demo, $pagebuilder, $pages );
 		$status['customizer'] = $this->import_customizer( $demo, $pagebuilder );
 		$status['widgets']    = $this->import_widget( $demo, $pagebuilder );
 
@@ -284,13 +292,22 @@ class TG_Importer_REST_Controller extends WP_REST_Controller {
 		return $results;
 	}
 
-	public function import_content( $demo, $pagebuilder ) {
-		$content = $demo['pagebuilder_data'][ $pagebuilder ]['content'];
-		if ( ! $content ) {
-			return new WP_Error( 'rest_custom_error', 'No content file.', array( 'status' => 400 ) );
-		}
+	public function import_content( $demo, $pagebuilder, $pages ) {
 		do_action( 'themegrill_ajax_before_demo_import' );
-		$this->import_xml( $content );
+
+		if ( $pages ) {
+			foreach ( $pages as $page ) {
+				if ( $page['isSelected'] ) {
+					$this->import_xml( $page['content'] );
+				}
+			}
+		} else {
+			$content = $demo['pagebuilder_data'][ $pagebuilder ]['content'];
+			if ( ! $content ) {
+				return new WP_Error( 'rest_custom_error', 'No content file.', array( 'status' => 400 ) );
+			}
+			$this->import_xml( $content );
+		}
 		$this->import_core_options( $demo );
 
 		return new WP_REST_Response( array( 'success' => 'Content Imported.' ), 200 );
@@ -404,135 +421,6 @@ class TG_Importer_REST_Controller extends WP_REST_Controller {
 		return new WP_REST_Response( array( 'success' => 'Widget Imported.' ), 200 );
 	}
 
-	// public function import_plugins( $request ) {
-	//  $demo        = $request->get_param( 'demo' );
-	//  $slugs       = $request->get_param( 'slugs' );
-	//  $pagebuilder = $request->get_param( 'selectedPagebuilder' );
-	//  $plugins     = $demo['pagebuilder_data'][ $pagebuilder ]['plugins'];
-	//  if ( ! $plugins ) {
-	//      return new WP_Error( 'rest_custom_error', 'No plugins specified.', array( 'status' => 400 ) );
-	//  }
-	//  if ( ! in_array( 'evf', $slugs, true ) ) {
-	//      $index = array_search( 'everest-forms/everest-forms.php', $plugins, true );
-	//      if ( false !== $index ) {
-	//          array_splice( $plugins, $index, 1 );
-	//      }
-	//  }
-	//  foreach ( $plugins as $plugin ) {
-	//      $pg = explode( '/', $plugin );
-	//      if ( file_exists( WP_PLUGIN_DIR . '/' . $plugin ) ) {
-	//          $plugin_data = get_plugin_data( WP_PLUGIN_DIR . '/' . $plugin );
-	//          if ( is_plugin_inactive( $plugin ) ) {
-	//              $result = activate_plugin( $plugin );
-
-	//              if ( is_wp_error( $result ) ) {
-	//                  // $status['errorCode']    = $result->get_error_code();
-	//                  // $status['errorMessage'] = $result->get_error_message();
-	//                  // wp_send_json_error( $status );
-	//                  $error[ $pg[0] ] = 'Error activating plugin : ' . esc_html( $result->get_error_message() );
-	//              }
-
-	//              $status[ $pg[0] ] = $plugin_data['Name'] . ' activated.';
-	//          } else {
-	//              $status[ $pg[0] ] = $plugin_data['Name'] . ' already activated.';
-	//          }
-	//          continue;
-	//      }
-	//      $api = plugins_api(
-	//          'plugin_information',
-	//          array(
-	//              'slug' => sanitize_key( wp_unslash( $pg[0] ) ),
-	//          )
-	//      );
-	//      if ( is_wp_error( $api ) ) {
-	//          $error[ $pg[0] ] = 'Error fetching plugin information: ' . esc_html( $api->get_error_message() );
-	//          // return new WP_Error( 'rest_custom_error', 'Error fetching plugin information: ' . esc_html( $api->get_error_message() ), array( 'status' => 400 ) );
-	//      }
-
-	//      $skin      = new WP_Ajax_Upgrader_Skin();
-	//      $upgrader  = new Plugin_Upgrader( $skin );
-	//      $installed = $upgrader->install( $api->download_link );
-
-	//      if ( is_wp_error( $installed ) ) {
-	//          $error[ $pg[0] ] = 'Failed to install the plugin: ' . esc_html( $installed->get_error_message() );
-	//          // return new WP_Error( 'rest_custom_error', 'Failed to install the plugin: ' . esc_html( $installed->get_error_message() ), array( 'status' => 400 ) );
-	//      }
-
-	//      $install_status = install_plugin_install_status( $api );
-
-	//      if ( is_plugin_inactive( $install_status['file'] ) ) {
-	//          $result = activate_plugin( $install_status['file'] );
-
-	//          if ( is_wp_error( $result ) ) {
-	//              // $status['errorCode']    = $result->get_error_code();
-	//              // $status['errorMessage'] = $result->get_error_message();
-	//              // wp_send_json_error( $status );
-	//              // return new WP_Error( $result->get_error_code(), 'Error activating plugin : ' . esc_html( $result->get_error_message() ), array( 'status' => 400 ) );
-	//              $error[ $pg[0] ] = 'Error activating plugin : ' . esc_html( $result->get_error_message() );
-	//          }
-	//      }
-	//      $status[ $pg[0] ] = $api->name . ' installed and activated.';
-
-	//  }
-
-	//  return new WP_REST_Response(
-	//      array(
-	//          'success' => true,
-	//          'message' => $status,
-	//      ),
-	//      200
-	//  );
-	// }
-
-	// public function import_evf() {
-	//  $plugin = 'everest-forms/everest-forms.php';
-	//  if ( file_exists( WP_PLUGIN_DIR . '/' . $plugin ) ) {
-	//      $plugin_data = get_plugin_data( WP_PLUGIN_DIR . '/' . $plugin );
-	//      if ( is_plugin_inactive( $plugin ) ) {
-	//          $result = activate_plugin( $plugin );
-
-	//          if ( is_wp_error( $result ) ) {
-	//              // $status['errorCode']    = $result->get_error_code();
-	//              // $status['errorMessage'] = $result->get_error_message();
-	//              // wp_send_json_error( $status );
-	//              return new WP_Error( $result->get_error_code(), 'Error activating plugin : ' . esc_html( $result->get_error_message() ), array( 'status' => 400 ) );
-	//          }
-	//          return new WP_REST_Response( array( 'success' => $plugin_data['Name'] . ' Activated.' ), 200 );
-	//      }
-	//      return new WP_REST_Response( array( 'success' => $plugin_data['Name'] . ' already activated.' ), 200 );
-	//  }
-	//  $pg      = explode( '/', $plugin );
-	//      $api = plugins_api(
-	//          'plugin_information',
-	//          array(
-	//              'slug' => sanitize_key( wp_unslash( $pg[0] ) ),
-	//          )
-	//      );
-	//  if ( is_wp_error( $api ) ) {
-	//      return new WP_Error( 'rest_custom_error', 'Error fetching plugin information: ' . esc_html( $api->get_error_message() ), array( 'status' => 400 ) );
-	//  }
-
-	//  $skin      = new WP_Ajax_Upgrader_Skin();
-	//  $upgrader  = new Plugin_Upgrader( $skin );
-	//  $installed = $upgrader->install( $api->download_link );
-
-	//  if ( is_wp_error( $installed ) ) {
-	//      return new WP_Error( 'rest_custom_error', 'Failed to install the plugin: ' . esc_html( $installed->get_error_message() ), array( 'status' => 400 ) );
-	//  }
-
-	//  $install_status = install_plugin_install_status( $api );
-
-	//  if ( is_plugin_inactive( $install_status['file'] ) ) {
-	//      $result = activate_plugin( $install_status['file'] );
-
-	//      if ( is_wp_error( $result ) ) {
-	//          return new WP_Error( $result->get_error_code(), 'Error activating plugin : ' . esc_html( $result->get_error_message() ), array( 'status' => 400 ) );
-
-	//      }
-	//  }
-
-	//  return new WP_REST_Response( array( 'success' => 'Everest Form Installed.' ), 200 );
-	// }
 
 	public function update_nav_menu_items() {
 		$menu_locations = get_nav_menu_locations();
@@ -894,5 +782,22 @@ class TG_Importer_REST_Controller extends WP_REST_Controller {
 		}
 
 		return $panels_data;
+	}
+
+	public function update_additional_settings( $data, $site_title, $site_tagline, $site_logo_id ) {
+		if ( $site_title ) {
+			update_option( 'blogname', $site_title );
+		}
+
+		if ( $site_tagline ) {
+			update_option( 'blogdescription', $site_tagline );
+		}
+
+		$theme_mods = get_theme_mods();
+		$post_id    = $theme_mods['custom_logo'] ?? null;
+
+		if ( $post_id ) {
+			set_theme_mod( 'custom_logo', $site_logo_id );
+		}
 	}
 }

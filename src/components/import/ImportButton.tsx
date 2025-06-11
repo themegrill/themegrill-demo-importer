@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import confetti from '../../assets/animation/confetti.json';
 import { useDemoContext } from '../../context';
 import { Progress } from '../../controls/Progress';
-import { PageWithSelection, SearchResultType } from '../../lib/types';
+import { __TDI_DASHBOARD__, PageWithSelection, SearchResultType } from '../../lib/types';
 import ImportDialogSkeleton from '../import-dialog/ImportDialogSkeleton';
 
 declare const require: any;
@@ -15,9 +15,26 @@ type Props = {
 	pages?: PageWithSelection[];
 	initialTheme: string;
 	demo: SearchResultType;
+	siteTitle: string;
+	siteTagline: string;
+	siteLogoId: number;
+	additionalStyles?: string;
+	textColor?: string;
+	disabled?: boolean;
 };
 
-const ImportButton = ({ buttonTitle, initialTheme, demo }: Props) => {
+const ImportButton = ({
+	buttonTitle,
+	initialTheme,
+	demo,
+	siteTitle,
+	siteTagline,
+	siteLogoId,
+	additionalStyles,
+	textColor,
+	disabled,
+	pages,
+}: Props) => {
 	const {
 		theme,
 		pagebuilder,
@@ -417,7 +434,7 @@ const ImportButton = ({ buttonTitle, initialTheme, demo }: Props) => {
 								fill="#23AB70"
 							/>
 						</svg>
-						<p className="m-0 ml-[8px] text-[14px] text-[#6B6B6B]">Imported Customizer Settings</p>
+						<p className="m-0 ml-[8px] text-[14px] text-[#6B6B6B]">Imported Widgets</p>
 					</div>
 					<div className="flex m-0 mb-4">
 						<svg
@@ -432,7 +449,7 @@ const ImportButton = ({ buttonTitle, initialTheme, demo }: Props) => {
 								fill="#23AB70"
 							/>
 						</svg>
-						<p className="m-0 ml-[8px] text-[14px] text-[#6B6B6B]">Imported Customizer Settings</p>
+						<p className="m-0 ml-[8px] text-[14px] text-[#6B6B6B]">Imported Content</p>
 					</div>
 					<div className="flex m-0 mb-4">
 						<svg
@@ -447,39 +464,40 @@ const ImportButton = ({ buttonTitle, initialTheme, demo }: Props) => {
 								fill="#23AB70"
 							/>
 						</svg>
-						<p className="m-0 ml-[8px] text-[14px] text-[#6B6B6B]">Imported Customizer Settings</p>
+						<p className="m-0 ml-[8px] text-[14px] text-[#6B6B6B]">
+							Installed and Activated Necessary Plugins
+						</p>
 					</div>
 					<p className="m-0 text-[14px] text-[#6B6B6B]">
 						PS: We try our best to use images free from legal perspectives. However, we do not take
 						responsibility for any harm. We strongly advise website owners to replace the images and
-						any copyrighted media before publishing them online.{' '}
+						any copyrighted media before publishing them online.
 					</p>
 				</>
 			),
 			footer: () => (
 				<>
-					<button
+					<a
 						type="button"
-						className="cursor-pointer px-0 bg-transparent text-[#2563EB] border-0 text-[16px] z-[50000]"
-						onClick={() => {
-							setStep((prev) => prev - 1);
-						}}
+						className="cursor-pointer px-0 bg-transparent text-[#2563EB] border-0 text-[16px] z-[50000] no-underline"
+						href={`${__TDI_DASHBOARD__.siteUrl}/wp-admin/`}
 					>
 						Go to Dashboard
-					</button>
-					<div className="z-[50000] flex flex-nowrap sm:block">
-						<button
+					</a>
+					<div className="z-[50000] flex flex-nowrap sm:block items-center ">
+						<a
 							type="button"
-							className="cursor-pointer mr-[10px] sm:mr-[24px] bg-transparent text-[#2563EB] border-0 text-[16px]"
-							onClick={() => {
-								setStep((prev) => prev - 1);
-							}}
+							className="cursor-pointer mr-[10px] sm:mr-[24px] bg-transparent text-[#2563EB] border-0 text-[16px] no-underline"
+							href={`${__TDI_DASHBOARD__.siteUrl}/wp-admin/customize.php`}
 						>
 							Customizer
-						</button>
+						</a>
 						<button
 							type="button"
-							className="cursor-pointer bg-[#2563EB] text-white border-0 rounded px-[10px] sm:px-[24px] py-[10px] text-[16px]"
+							className="cursor-pointer bg-[#2563EB] text-white border-0 rounded px-[10px] sm:px-[24px] py-[10px] text-[16px] "
+							onClick={() => {
+								window.open(__TDI_DASHBOARD__.siteUrl, '_blank');
+							}}
 						>
 							View Website
 						</button>
@@ -529,6 +547,10 @@ const ImportButton = ({ buttonTitle, initialTheme, demo }: Props) => {
 					selectedPagebuilder: pagebuilder,
 					additional_plugins: plugins,
 					installTheme: installTheme,
+					siteTitle: siteTitle,
+					siteTagline: siteTagline,
+					siteLogoId: siteLogoId,
+					pages: pages,
 				},
 			});
 			if (response.success) {
@@ -607,6 +629,9 @@ const ImportButton = ({ buttonTitle, initialTheme, demo }: Props) => {
 		<div>
 			<ImportDialogSkeleton
 				buttonTitle={buttonTitle}
+				additionalStyles={additionalStyles}
+				textColor={textColor}
+				disabled={disabled}
 				{...currentStep}
 				{...(step === STEP.length - 1 && {
 					notice: (

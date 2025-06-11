@@ -201,8 +201,9 @@ class TG_Demo_Importer {
 					'tdi-dashboard',
 					'__TDI_DASHBOARD__',
 					array(
-						'theme' => $this->get_theme(),
-						'data'  => $this->demo_packages,
+						'theme'   => $this->get_theme(),
+						'data'    => $this->demo_packages,
+						'siteUrl' => site_url(),
 					)
 				);
 				wp_enqueue_style( 'tdi-dashboard', $asset_url( 'dashboard.css' ), array(), $asset( 'dashboard' )['version'] );

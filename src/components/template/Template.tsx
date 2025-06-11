@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Page, PageWithSelection, SearchResultType } from '../../lib/types';
 import ImportButton from '../import/ImportButton';
 import SingleTemplate from './SingleTemplate';
@@ -7,9 +7,13 @@ type Props = {
 	pages: Page[];
 	demo: SearchResultType;
 	initialTheme: string;
+	siteTitle: string;
+	siteTagline: string;
+	siteLogoId: number;
 };
 
-const Template = ({ pages, demo, initialTheme }: Props) => {
+const Template = ({ pages, demo, initialTheme, siteTitle, siteTagline, siteLogoId }: Props) => {
+	const [disabled, setDisabled] = useState(true);
 	const [allPages, setAllPages] = useState<PageWithSelection[]>(() => {
 		return pages.map((p, index) => {
 			return {
@@ -23,6 +27,11 @@ const Template = ({ pages, demo, initialTheme }: Props) => {
 		});
 	});
 
+	useEffect(() => {
+		const hasSelectedPages = allPages.some((page) => page.isSelected);
+		setDisabled(!hasSelectedPages);
+	}, [allPages]);
+
 	return (
 		<div className="h-[370px] sm:h-[302px] w-full bg-white p-[25px] sm:p-[32px] shadow absolute bottom-0 ">
 			<div className="mb-[24px] flex flex-wrap justify-between items-center">
@@ -33,12 +42,25 @@ const Template = ({ pages, demo, initialTheme }: Props) => {
 					</p>
 				</div>
 				<div className="mr-[70px] flex flex-wrap gap-[16px]">
-					<ImportButton buttonTitle="Import All" initialTheme={initialTheme} demo={demo} />
+					<ImportButton
+						buttonTitle="Import All"
+						initialTheme={initialTheme}
+						demo={demo}
+						siteTitle={siteTitle}
+						siteTagline={siteTagline}
+						siteLogoId={siteLogoId}
+						additionalStyles="bg-white rounded-[2px] px-[16px] py-[8px] border border-solid border-[#2563EB] text-[#2563EB] font-[600] cursor-pointer"
+						textColor="#2563EB"
+					/>
 					<ImportButton
 						buttonTitle="Import Selected Pages"
 						pages={allPages}
 						initialTheme={initialTheme}
 						demo={demo}
+						siteTitle={siteTitle}
+						siteTagline={siteTagline}
+						siteLogoId={siteLogoId}
+						disabled={disabled}
 					/>
 				</div>
 			</div>
