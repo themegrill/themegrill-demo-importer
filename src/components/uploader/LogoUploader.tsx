@@ -1,7 +1,10 @@
 import { MediaUpload } from '@wordpress/media-utils';
 import React, { useState } from 'react';
 
-type Props = { iframeRef: React.RefObject<HTMLIFrameElement> };
+type Props = {
+	iframeRef: React.RefObject<HTMLIFrameElement>;
+	setSiteLogoId: (value: number) => void;
+};
 
 type LogoData = {
 	id: number;
@@ -25,7 +28,7 @@ type MediaObject = {
 	filesizeInBytes?: number;
 };
 
-const LogoUploader = ({ iframeRef }: Props) => {
+const LogoUploader = ({ iframeRef, setSiteLogoId }: Props) => {
 	const [selectedLogo, setSelectedLogo] = useState<LogoData | null>(null);
 
 	const handleLogoSelect = (media: MediaObject): void => {
@@ -52,6 +55,50 @@ const LogoUploader = ({ iframeRef }: Props) => {
 		};
 
 		setSelectedLogo(logoData);
+		setSiteLogoId(logoData.id);
+		updateLogoInIframe(logoData);
+	};
+
+	const updateLogoInIframe = async (logoData: LogoData) => {
+		try {
+			if (!iframeRef?.current?.contentWindow) {
+				console.warn('Iframe not available');
+				return;
+			}
+
+			const response = await fetch(logoData.url);
+			const blob = await response.blob();
+			const reader = new FileReader();
+			reader.onloadend = () => {
+				const base64data = reader.result as string;
+				// Send message to iframe
+				iframeRef.current?.contentWindow?.postMessage(
+					{
+						type: 'UPDATE_LOGO',
+						logoData: base64data,
+					},
+					'*',
+				);
+			};
+			reader.readAsDataURL(blob);
+
+			// Listen for confirmation
+			const handleMessage = (event: MessageEvent) => {
+				if (event.data.type === 'LOGO_UPDATED') {
+					console.log('Logo updated successfully:', event.data.success);
+					window.removeEventListener('message', handleMessage);
+				}
+			};
+
+			window.addEventListener('message', handleMessage);
+
+			// Cleanup after timeout
+			setTimeout(() => {
+				window.removeEventListener('message', handleMessage);
+			}, 5000);
+		} catch (error) {
+			console.error('Error sending logo update message:', error);
+		}
 	};
 
 	const renderSelectedLogo = () => {
@@ -109,6 +156,37 @@ const LogoUploader = ({ iframeRef }: Props) => {
 
 	const handleRemoveLogo = () => {
 		setSelectedLogo(null);
+		try {
+			if (!iframeRef?.current?.contentWindow) {
+				console.warn('Iframe not available');
+				return;
+			}
+
+			// Send message to iframe
+			iframeRef.current.contentWindow.postMessage(
+				{
+					type: 'REMOVE_LOGO',
+				},
+				'*',
+			);
+
+			// Listen for confirmation
+			const handleMessage = (event: MessageEvent) => {
+				if (event.data.type === 'LOGO_UPDATED') {
+					console.log('Logo updated successfully:', event.data.success);
+					window.removeEventListener('message', handleMessage);
+				}
+			};
+
+			window.addEventListener('message', handleMessage);
+
+			// Cleanup after timeout
+			setTimeout(() => {
+				window.removeEventListener('message', handleMessage);
+			}, 5000);
+		} catch (error) {
+			console.error('Error sending logo update message:', error);
+		}
 	};
 
 	return (

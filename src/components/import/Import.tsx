@@ -11,9 +11,12 @@ type Props = {
 };
 
 const Import = ({ demos, initialTheme, data }: Props) => {
-	const iframeRef = useRef(null);
+	const iframeRef = useRef<HTMLIFrameElement>(null);
 
 	const [searchParams, setSearchParams] = useSearchParams();
+	const [siteTitle, setSiteTitle] = useState('');
+	const [siteTagline, setSiteTagline] = useState('');
+	const [siteLogoId, setSiteLogoId] = useState<number>(0);
 
 	const { slug } = useParams();
 	const demo = useMemo(() => {
@@ -24,6 +27,42 @@ const Import = ({ demos, initialTheme, data }: Props) => {
 
 	const handleClick = (collapse: Boolean) => {
 		setCollapse(!collapse);
+	};
+
+	const handleSiteTitleChange = (value: string) => {
+		try {
+			if (!iframeRef?.current?.contentWindow) {
+				console.warn('Iframe not available');
+				return;
+			}
+
+			// Send message to iframe
+			iframeRef.current.contentWindow.postMessage(
+				{
+					type: 'UPDATE_SITE_TITLE',
+					siteTitle: value,
+				},
+				'*',
+			);
+
+			// Listen for confirmation
+			const handleMessage = (event: MessageEvent) => {
+				if (event.data.type === 'SITE_TITLE_UPDATED') {
+					console.log('Site title updated successfully:', event.data.success);
+					window.removeEventListener('message', handleMessage);
+				}
+			};
+
+			setSiteTitle(value);
+			window.addEventListener('message', handleMessage);
+
+			// Cleanup after timeout
+			setTimeout(() => {
+				window.removeEventListener('message', handleMessage);
+			}, 5000);
+		} catch (error) {
+			console.error('Error sending site title update message:', error);
+		}
 	};
 
 	useEffect(() => {
@@ -104,10 +143,23 @@ const Import = ({ demos, initialTheme, data }: Props) => {
 							/>
 						</svg>
 					</button>
-					<ImportSidebar demo={demo} iframeRef={iframeRef} />
+					<ImportSidebar
+						demo={demo}
+						iframeRef={iframeRef}
+						handleSiteTitleChange={handleSiteTitleChange}
+						setSiteTagline={setSiteTagline}
+						setSiteLogoId={setSiteLogoId}
+					/>
 				</>
 			)}
-			<ImportContent demo={demo} initialTheme={initialTheme} iframeRef={iframeRef} />
+			<ImportContent
+				demo={demo}
+				initialTheme={initialTheme}
+				iframeRef={iframeRef}
+				siteTitle={siteTitle}
+				siteTagline={siteTagline}
+				siteLogoId={siteLogoId}
+			/>
 		</div>
 	);
 };

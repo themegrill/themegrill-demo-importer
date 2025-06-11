@@ -8,6 +8,7 @@ export const __TDI_DASHBOARD__: TDIDashboardType = (window as any).__TDI_DASHBOA
 export type TDIDashboardType = {
 	theme: string;
 	data: DataObjectType;
+	siteUrl: string;
 };
 
 export type DataObjectType = Record<

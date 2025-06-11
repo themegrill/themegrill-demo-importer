@@ -7,9 +7,18 @@ import LogoUploader from '../uploader/LogoUploader';
 type Props = {
 	demo: SearchResultType;
 	iframeRef: React.RefObject<HTMLIFrameElement>;
+	handleSiteTitleChange: (value: string) => void;
+	setSiteTagline: (value: string) => void;
+	setSiteLogoId: (value: number) => void;
 };
 
-const ImportSidebar = ({ demo, iframeRef }: Props) => {
+const ImportSidebar = ({
+	demo,
+	iframeRef,
+	handleSiteTitleChange,
+	setSiteTagline,
+	setSiteLogoId,
+}: Props) => {
 	const {
 		theme,
 		pagebuilder,
@@ -64,13 +73,14 @@ const ImportSidebar = ({ demo, iframeRef }: Props) => {
 					isSidebar={true}
 				/>
 			</div>
-			<LogoUploader iframeRef={iframeRef} />
+			<LogoUploader iframeRef={iframeRef} setSiteLogoId={setSiteLogoId} />
 			<div className="mb-[24px]">
 				<h4 className="text-[17px] m-0 mb-4">Site Title</h4>
 				<input
 					type="text"
 					className="border border-solid !border-[#E9E9E9] !px-4 !py-[10px] !rounded-[4px] w-full"
 					placeholder="Enter Site Title"
+					onChange={(e) => handleSiteTitleChange(e.target.value)}
 				/>
 			</div>
 			<div className="mb-[24px]">
@@ -79,6 +89,7 @@ const ImportSidebar = ({ demo, iframeRef }: Props) => {
 					type="text"
 					className="border border-solid !border-[#E9E9E9] !px-4 !py-[10px] !rounded-[4px] w-full"
 					placeholder="Enter Site Tagline"
+					onChange={(e) => setSiteTagline(e.target.value)}
 				/>
 			</div>
 		</div>
