@@ -20,7 +20,7 @@ final class ThemeGrill_Demo_Importer {
 	 *
 	 * @var string
 	 */
-	public $version = '1.9.12';
+	public $version = '1.9.13';
 
 	/**
 	 * Theme single instance of this class.
