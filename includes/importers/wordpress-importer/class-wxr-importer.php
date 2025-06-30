@@ -1519,4 +1519,8 @@ class TG_WXR_Importer extends WP_Importer {
 	public function get_processed_terms() {
 		return $this->processed_terms;
 	}
+
+	public function get_processed_posts() {
+		return $this->processed_posts;
+	}
 }
