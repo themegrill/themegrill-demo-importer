@@ -1,3 +1,4 @@
+import { __ } from '@wordpress/i18n';
 import React, { useEffect, useState } from 'react';
 import { Page, PageWithSelection, SearchResultType } from '../../lib/types';
 import ImportButton from '../import/ImportButton';
@@ -38,12 +39,15 @@ const Template = ({ pages, demo, initialTheme, siteTitle, siteTagline, siteLogoI
 				<div>
 					<h4 className="text-[22px] m-0 mb-[8px] text-[#383838]">{demo.name}</h4>
 					<p className="text-[#7a7a7a] text-[14px] mt-4 sm:m-0">
-						6 Templates (You can select pages manually by clicking on templates.)
+						{__(
+							'6 Templates (You can select pages manually by clicking on templates.)',
+							'themegrill-demo-importer',
+						)}
 					</p>
 				</div>
 				<div className="mr-[70px] flex flex-wrap gap-[16px]">
 					<ImportButton
-						buttonTitle="Import All"
+						buttonTitle={__('Import All', 'themegrill-demo-importer')}
 						initialTheme={initialTheme}
 						demo={demo}
 						siteTitle={siteTitle}
@@ -53,7 +57,7 @@ const Template = ({ pages, demo, initialTheme, siteTitle, siteTagline, siteLogoI
 						textColor="#2563EB"
 					/>
 					<ImportButton
-						buttonTitle="Import Selected Pages"
+						buttonTitle={__('Import Selected Pages', 'themegrill-demo-importer')}
 						pages={allPages}
 						initialTheme={initialTheme}
 						demo={demo}

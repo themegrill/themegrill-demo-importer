@@ -1,3 +1,4 @@
+import { __ } from '@wordpress/i18n';
 import React, { useEffect, useMemo, useState } from 'react';
 import { matchPath, useLocation, useSearchParams } from 'react-router-dom';
 import Content from './components/content/Content';
@@ -277,7 +278,7 @@ const Home = ({ data, initialTheme, searchTerms }: Props) => {
 	return (
 		<>
 			{loading ? (
-				<p className="px-4">Loading...</p>
+				<p className="px-4">{__('Loading...', 'themegrill-demo-importer')}</p>
 			) : (
 				showTabs && (
 					<Tabs defaultValue={themes[0].slug}>
