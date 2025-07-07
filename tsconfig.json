@@ -15,10 +15,12 @@
     "isolatedModules": false,
     "noEmit": true,
     "jsx": "react",
-    "suppressImplicitAnyIndexErrors": true,
     "ignoreDeprecations": "5.0",
     "baseUrl": "src/",
-    "typeRoots": ["./src/types"]
+    "typeRoots": ["./src/types"],
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
   "exclude": ["node_modules", "build"],
   "include": ["./src", "src/components/content/.tsx", "src/@types"]

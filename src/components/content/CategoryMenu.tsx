@@ -1,3 +1,4 @@
+import { __ } from '@wordpress/i18n';
 import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useDemoContext } from '../../context';
@@ -25,7 +26,7 @@ const CategoryMenu = ({ categories }: Props) => {
 		<>
 			<div className="flex items-center gap-[30px] md:gap-[35px] px-[20px] py-[20px] sm:px-[40px] sm:py-[20px] ">
 				<p className="text-[#383838] uppercase font-semibold text-[14px] m-0 bg-[#FAFAFC]">
-					Templates
+					{__('Templates', 'themegrill-demo-importer')}
 				</p>
 
 				<IntersectObserver categories={categories} activeTab={activeTab} handleClick={handleClick}>

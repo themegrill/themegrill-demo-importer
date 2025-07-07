@@ -12,6 +12,13 @@ module.exports = {
 		dashboard: resolve(process.cwd(), 'src', 'dashboard.tsx'),
 	},
 	plugins: [...defaults.plugins, new ForkTsCheckerPlugin()],
+	resolve: {
+		...defaults.resolve,
+		alias: {
+			...defaults.resolve.alias,
+			'@/*': resolve(process.cwd(), 'src/*'),
+		},
+	},
 	devServer:
 		process.env.NODE_ENV === 'production'
 			? undefined

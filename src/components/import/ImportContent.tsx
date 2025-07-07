@@ -1,3 +1,4 @@
+import { __ } from '@wordpress/i18n';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDemoContext } from '../../context';
@@ -22,12 +23,13 @@ const ImportContent = ({
 	siteTagline,
 	siteLogoId,
 }: Props) => {
-	const { pagebuilder } = useDemoContext();
+	const { pagebuilder, setPagebuilder } = useDemoContext();
 
 	const [collapseTemplate, setCollapseTemplate] = useState(false);
 	const navigate = useNavigate();
 
 	const handleExitClick = () => {
+		setPagebuilder('all');
 		navigate(-1);
 	};
 
@@ -62,7 +64,9 @@ const ImportContent = ({
 						</clipPath>
 					</defs>
 				</svg>
-				<span className="ml-[8px] text-white font-[600]">Exit</span>
+				<span className="ml-[8px] text-white font-[600]">
+					{__('Exit', 'themegrill-demo-importer')}
+				</span>
 			</button>
 
 			<iframe
@@ -115,7 +119,10 @@ const ImportContent = ({
 							<div>
 								<h4 className="text-[22px] m-0 mb-[8px] text-[#383838]">{demo.name}</h4>
 								<p className="text-[#7a7a7a] text-[14px] mt-4 sm:m-0">
-									6 Templates (You can select pages manually by clicking on templates.)
+									{__(
+										'6 Templates (You can select pages manually by clicking on templates.)',
+										'themegrill-demo-importer',
+									)}
 								</p>
 							</div>
 							<div className=" flex flex-wrap gap-[16px]">
@@ -131,7 +138,7 @@ const ImportContent = ({
 									className="bg-white rounded-[2px] px-[16px] py-[8px] border border-solid border-[#2563EB] text-[#2563EB] font-[600] cursor-pointer"
 									onClick={() => handleClick(false)}
 								>
-									Select Pages
+									{__('Select Pages', 'themegrill-demo-importer')}
 								</button>
 							</div>
 						</div>

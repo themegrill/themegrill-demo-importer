@@ -1,3 +1,4 @@
+import { __ } from '@wordpress/i18n';
 import { MediaUpload } from '@wordpress/media-utils';
 import React, { useState } from 'react';
 
@@ -132,9 +133,8 @@ const LogoUploader = ({ iframeRef, setSiteLogoId }: Props) => {
 						className="text-[#dc3545] hover:text-[#c82333] text-[12px] underline"
 						onClick={handleRemoveLogo}
 					>
-						Remove
+						{__('Remove', 'themegrill-demo-importer')}
 					</button>
-					{/* Change logo button */}
 					<MediaUpload
 						allowedTypes={['image']}
 						onSelect={handleLogoSelect}
@@ -145,7 +145,7 @@ const LogoUploader = ({ iframeRef, setSiteLogoId }: Props) => {
 								className="text-[#0073aa] hover:text-[#005a87] text-[12px] underline"
 								onClick={open}
 							>
-								Change Logo
+								{__('Change Logo', 'themegrill-demo-importer')}
 							</button>
 						)}
 					/>
@@ -191,7 +191,7 @@ const LogoUploader = ({ iframeRef, setSiteLogoId }: Props) => {
 
 	return (
 		<div className="mb-[24px]">
-			<h4 className="text-[17px] m-0 mb-[20px]">Change Logo</h4>
+			<h4 className="text-[17px] m-0 mb-[20px]">{__('Change Logo', 'themegrill-demo-importer')}</h4>
 			{selectedLogo ? (
 				renderSelectedLogo()
 			) : (
@@ -207,9 +207,11 @@ const LogoUploader = ({ iframeRef, setSiteLogoId }: Props) => {
 									onClick={open}
 								>
 									<div className="text-center">
-										<h4 className="m-0 mb-[8px] text-[14px] text-[#222]">Upload Logo Here</h4>
+										<h4 className="m-0 mb-[8px] text-[14px] text-[#222]">
+											{__('Upload Logo Here', 'themegrill-demo-importer')}
+										</h4>
 										<p className="m-0 text-[12px] text-[#6B6B6B]">
-											Suggested Dimension: 190x60 pixels
+											{__('Suggested Dimension: 190x60 pixels', 'themegrill-demo-importer')}
 										</p>
 									</div>
 								</button>
@@ -217,7 +219,12 @@ const LogoUploader = ({ iframeRef, setSiteLogoId }: Props) => {
 						}}
 					/>
 					<p className="text-[#6b6b6b] font-[400] text-[12px] m-0">
-						<i>Don’t have a logo yet? No problem! You can upload it later.</i>
+						<i>
+							{__(
+								'Don’t have a logo yet? No problem! You can upload it later.',
+								'themegrill-demo-importer',
+							)}
+						</i>
 					</p>
 				</>
 			)}
