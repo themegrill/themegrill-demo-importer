@@ -98,7 +98,6 @@ class TG_WXR_Importer extends WP_Importer {
 	 * }
 	 */
 	public function __construct( $options = array() ) {
-		// Initialize some important variables
 		$empty_types = array(
 			'post'    => array(),
 			'comment' => array(),
@@ -959,6 +958,11 @@ class TG_WXR_Importer extends WP_Importer {
 			stick_post( $post_id );
 		}
 
+		$imported_posts   = get_option( 'themegrill_demo_importer_imported_posts', array() );
+		$imported_posts[] = $post_id;
+		$imported_posts   = array_unique( $imported_posts );
+		update_option( 'themegrill_demo_importer_imported_posts', $imported_posts );
+
 		// map pre-import ID to local ID
 		$this->mapping['post'][ $original_id ] = (int) $post_id;
 		if ( $requires_remapping ) {
@@ -1144,6 +1148,10 @@ class TG_WXR_Importer extends WP_Importer {
 
 		if ( ! function_exists( 'wp_generate_attachment_metadata' ) ) {
 			include ABSPATH . 'wp-admin/includes/image.php';
+		}
+
+		if ( ! function_exists( 'wp_read_video_metadata' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/media.php';
 		}
 
 		$attachment_metadata = wp_generate_attachment_metadata( $post_id, $upload['file'] );
@@ -1439,7 +1447,8 @@ class TG_WXR_Importer extends WP_Importer {
 			$comment                    = wp_filter_comment( $comment );
 
 			// wp_insert_comment expects slashed data
-			$comment_id                               = wp_insert_comment( wp_slash( $comment ) );
+			$comment_id = wp_insert_comment( wp_slash( $comment ) );
+
 			$this->mapping['comment'][ $original_id ] = $comment_id;
 			if ( $requires_remapping ) {
 				$this->requires_remapping['comment'][ $comment_id ] = true;
@@ -1626,6 +1635,7 @@ class TG_WXR_Importer extends WP_Importer {
 		}
 
 		$user_id = wp_insert_user( wp_slash( $userdata ) );
+
 		if ( is_wp_error( $user_id ) ) {
 			$this->logger->error(
 				sprintf(
@@ -1644,6 +1654,11 @@ class TG_WXR_Importer extends WP_Importer {
 			do_action( 'wxr_importer.process_failed.user', $user_id, $userdata );
 			return false;
 		}
+
+		$imported_users   = get_option( 'themegrill_demo_importer_imported_users', array() );
+		$imported_users[] = $user_id;
+		$imported_users   = array_unique( $imported_users );
+		update_option( 'themegrill_demo_importer_imported_users', $imported_users );
 
 		if ( $original_id ) {
 			$this->mapping['user'][ $original_id ] = $user_id;
@@ -1807,6 +1822,7 @@ class TG_WXR_Importer extends WP_Importer {
 		}
 
 		$result = wp_insert_term( $data['name'], $data['taxonomy'], $termdata );
+
 		if ( is_wp_error( $result ) ) {
 			$this->logger->warning(
 				sprintf(
@@ -1830,6 +1846,11 @@ class TG_WXR_Importer extends WP_Importer {
 		}
 
 		$term_id = $result['term_id'];
+
+		$imported_terms   = get_option( 'themegrill_demo_importer_imported_terms', array() );
+		$imported_terms[] = $term_id;
+		$imported_terms   = array_unique( $imported_terms );
+		update_option( 'themegrill_demo_importer_imported_terms', $imported_terms );
 
 		$this->mapping['term'][ $mapping_key ]    = $term_id;
 		$this->mapping['term_id'][ $original_id ] = $term_id;
@@ -2460,6 +2481,6 @@ class TG_WXR_Importer extends WP_Importer {
 
 
 	public function get_term_new_id( $nav_menu ) {
-		return $this->mapping['term_id'][ $nav_menu ];
+		return $this->mapping['term_id'][ $nav_menu ] ?? null;
 	}
 }
