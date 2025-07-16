@@ -1,8 +1,11 @@
-import { __ } from '@wordpress/i18n';
+import apiFetch from '@wordpress/api-fetch';
+import { __, sprintf } from '@wordpress/i18n';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDemoContext } from '../../context';
-import { SearchResultType } from '../../lib/types';
+import { themes } from '../../lib/themes';
+import { __TDI_DASHBOARD__, SearchResultType, TDIDashboardType } from '../../lib/types';
+import { useLocalizedData } from '../../LocalizedDataContext';
 import Template from '../template/Template';
 import ImportButton from './ImportButton';
 
@@ -23,19 +26,182 @@ const ImportContent = ({
 	siteTagline,
 	siteLogoId,
 }: Props) => {
-	const { pagebuilder, setPagebuilder } = useDemoContext();
-
-	const [collapseTemplate, setCollapseTemplate] = useState(false);
 	const navigate = useNavigate();
+	const {
+		pagebuilder,
+		setPagebuilder,
+		theme,
+		setTheme,
+		setCategory,
+		currentTheme,
+		setCurrentTheme,
+		zakraProInstalled,
+		zakraProActivated,
+	} = useDemoContext();
+	const [collapseTemplate, setCollapseTemplate] = useState(false);
+	// const [currentTheme, setCurrentTheme] = useState(__TDI_DASHBOARD__.current_theme);
+	const count = demo.pagebuilder_data[pagebuilder]?.pages.length || 0;
+	const matchedTheme = themes.find((theme) => theme.slug === demo.theme);
+	const { setData } = useLocalizedData();
 
-	const handleExitClick = () => {
+	const handleExitClick = (currentTheme: string) => {
+		const baseTheme = currentTheme.endsWith('-pro')
+			? currentTheme.replace('-pro', '')
+			: currentTheme;
+		const activeTab = baseTheme === demo.theme ? baseTheme : 'all';
+
+		setTheme(activeTab);
 		setPagebuilder('all');
-		navigate(-1);
+		setCategory('all');
+
+		const newParams = new URLSearchParams({
+			tab: activeTab,
+			category: 'all',
+			pagebuilder: 'all',
+		});
+
+		window.location.hash = `/?${newParams.toString()}`;
 	};
 
 	const handleClick = (collapse: Boolean) => {
 		setCollapseTemplate(!collapse);
 	};
+
+	const checkThemeExists = (demo: SearchResultType) => {
+		const proTheme = demo.theme + '-pro';
+		if (demo.theme === 'zakra') {
+			if (zakraProInstalled) {
+				return true;
+			}
+			return false;
+		}
+		const themeExists = __TDI_DASHBOARD__.installed_themes.includes(proTheme);
+		return themeExists;
+	};
+
+	const activatePro = async (slug: string) => {
+		const proSlug = slug + '-pro';
+		const response = await apiFetch<{
+			success: boolean;
+			message: string;
+		}>({
+			path: 'tg-demo-importer/v1/activate-pro',
+			method: 'POST',
+			data: {
+				slug: proSlug,
+			},
+		});
+		if (response.success) {
+			setCurrentTheme(proSlug);
+			const updated = await apiFetch<TDIDashboardType>({
+				path: '/tg-demo-importer/v1/localized-data',
+			});
+			setData(updated);
+		}
+	};
+
+	const renderImportSection = () =>
+		collapseTemplate ? (
+			<>
+				<button
+					type="button"
+					className="bg-white rounded-full px-[16px] py-[4px] border border-solid border-[#f4f4f4] cursor-pointer absolute bottom-[400px] sm:bottom-[350px] left-[50%] shadow"
+					onClick={() => handleClick(collapseTemplate)}
+					style={{ zIndex: 100 }}
+				>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="12"
+						height="12"
+						viewBox="0 0 12 12"
+						fill="none"
+					>
+						<path d="M6 2.5V9.5" stroke="#383838" strokeLinecap="round" strokeLinejoin="round" />
+						<path
+							d="M9.5 6L6 9.5L2.5 6"
+							stroke="#383838"
+							strokeLinecap="round"
+							strokeLinejoin="round"
+						/>
+					</svg>
+				</button>
+				<Template
+					pages={demo.pagebuilder_data[pagebuilder]?.pages || []}
+					demo={demo}
+					initialTheme={initialTheme}
+					siteTitle={siteTitle}
+					siteTagline={siteTagline}
+					siteLogoId={siteLogoId}
+				/>
+			</>
+		) : (
+			<>
+				<div
+					className="absolute bottom-0 w-full border-0 border-t border-t-[#E1E1E1] border-solid"
+					style={{ boxShadow: '0px -8px 25px 0px rgba(0, 0, 0, 0.04)' }}
+				>
+					<div className="flex flex-wrap justify-between items-center bg-white px-[32px] py-[24px]">
+						<div>
+							<h4 className="text-[22px] m-0 mb-[8px] text-[#383838]">{demo.name}</h4>
+							<p className="text-[#7a7a7a] text-[14px] mt-4 sm:m-0">
+								{sprintf(
+									__(
+										'%s Templates (You can select pages manually by clicking on templates.)',
+										'themegrill-demo-importer',
+									),
+									count,
+								)}
+							</p>
+						</div>
+						<div className=" flex flex-wrap gap-[16px]">
+							<ImportButton
+								buttonTitle="Import All"
+								initialTheme={initialTheme}
+								demo={demo}
+								siteTitle={siteTitle}
+								siteTagline={siteTagline}
+								siteLogoId={siteLogoId}
+							/>
+							<button
+								className="bg-white rounded-[2px] px-[16px] py-[8px] border border-solid border-[#2563EB] text-[#2563EB] font-[600] cursor-pointer"
+								onClick={() => handleClick(false)}
+							>
+								{__('Select Pages', 'themegrill-demo-importer')}
+							</button>
+						</div>
+					</div>
+				</div>
+
+				<button
+					type="button"
+					className="bg-[#1E1E1E] rounded-full px-[18px] py-[8px] border border-solid border-[#E1E1E1] cursor-pointer absolute bottom-20 left-[5%] sm:left-[50%] sm:translate-x-[-50%]"
+					onClick={() => handleClick(collapseTemplate)}
+				>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="14"
+						height="14"
+						viewBox="0 0 14 14"
+						fill="none"
+					>
+						<path
+							d="M7 10.8182V3.18187"
+							stroke="white"
+							strokeWidth="1.09091"
+							strokeLinecap="round"
+							strokeLinejoin="round"
+						/>
+						<path
+							d="M3.18187 7.00006L7.00006 3.18188L10.8182 7.00006"
+							stroke="white"
+							strokeWidth="1.09091"
+							strokeLinecap="round"
+							strokeLinejoin="round"
+						/>
+					</svg>
+				</button>
+			</>
+		);
 
 	return (
 		<div className="tg-full-overlay-content bg-[#f4f4f4] w-full relative">
@@ -43,7 +209,7 @@ const ImportContent = ({
 				type="button"
 				className="bg-[#0E0E0E] rounded-full px-[16px] py-[8px] border border-solid border-[#0E0E0E] cursor-pointer absolute top-[32px] left-[32px]"
 				style={{ boxShadow: '0px 8px 10px 0px rgba(0, 0, 0, 0.04)' }}
-				onClick={handleExitClick}
+				onClick={() => handleExitClick(currentTheme)}
 			>
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
@@ -76,103 +242,54 @@ const ImportContent = ({
 				className="w-full h-full"
 			></iframe>
 
-			{collapseTemplate ? (
-				<>
-					<button
-						type="button"
-						className="bg-white rounded-full px-[16px] py-[4px] border border-solid border-[#f4f4f4] cursor-pointer absolute bottom-[400px] sm:bottom-[350px] left-[50%] shadow"
-						onClick={() => handleClick(collapseTemplate)}
-						style={{ zIndex: 100 }}
-					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							width="12"
-							height="12"
-							viewBox="0 0 12 12"
-							fill="none"
-						>
-							<path d="M6 2.5V9.5" stroke="#383838" strokeLinecap="round" strokeLinejoin="round" />
-							<path
-								d="M9.5 6L6 9.5L2.5 6"
-								stroke="#383838"
-								strokeLinecap="round"
-								strokeLinejoin="round"
-							/>
-						</svg>
-					</button>
-					<Template
-						pages={demo.pagebuilder_data[pagebuilder]?.pages || []}
-						demo={demo}
-						initialTheme={initialTheme}
-						siteTitle={siteTitle}
-						siteTagline={siteTagline}
-						siteLogoId={siteLogoId}
-					/>
-				</>
-			) : (
-				<>
-					<div
-						className="absolute bottom-0 w-full border-0 border-t border-t-[#E1E1E1] border-solid"
-						style={{ boxShadow: '0px -8px 25px 0px rgba(0, 0, 0, 0.04)' }}
-					>
-						<div className="flex flex-wrap justify-between items-center bg-white px-[32px] py-[24px]">
+			{demo.pro || demo.premium ? (
+				checkThemeExists(demo) ? (
+					(demo.theme === 'zakra' ? zakraProActivated : demo.theme + '-pro' === currentTheme) ? (
+						renderImportSection()
+					) : (
+						<div className="h-[120px] sm:h-[120px] w-full bg-white p-[25px] sm:p-[32px] shadow absolute bottom-0 box-border">
+							<div className="mb-[24px] flex flex-wrap justify-between items-center">
+								<div>
+									<h4 className="text-[22px] m-0 mb-[8px] text-[#383838]">{demo.name}</h4>
+									<p className="text-[#7a7a7a] text-[14px] mt-4 sm:m-0">
+										{__('This is pro demo.', 'themegrill-demo-importer')}
+									</p>
+								</div>
+								<div className="flex flex-wrap gap-[16px]">
+									<button
+										className="cursor-pointer bg-[#2563EB] text-white border-0 rounded p-[16px] text-[16px] font-[600] no-underline capitalize hover:text-white visited:text-white"
+										onClick={() => activatePro(demo.theme)}
+									>
+										{__('Activate Pro', 'themegrill-demo-importer')}
+									</button>
+								</div>
+							</div>
+						</div>
+					)
+				) : (
+					<div className="h-[50px] sm:h-[50px] w-full bg-white p-[25px] sm:p-[32px] shadow absolute bottom-0 ">
+						<div className="mb-[24px] flex flex-wrap justify-between items-center">
 							<div>
 								<h4 className="text-[22px] m-0 mb-[8px] text-[#383838]">{demo.name}</h4>
 								<p className="text-[#7a7a7a] text-[14px] mt-4 sm:m-0">
-									{__(
-										'6 Templates (You can select pages manually by clicking on templates.)',
-										'themegrill-demo-importer',
-									)}
+									{__('This is pro demo.', 'themegrill-demo-importer')}
 								</p>
 							</div>
-							<div className=" flex flex-wrap gap-[16px]">
-								<ImportButton
-									buttonTitle="Import All"
-									initialTheme={initialTheme}
-									demo={demo}
-									siteTitle={siteTitle}
-									siteTagline={siteTagline}
-									siteLogoId={siteLogoId}
-								/>
-								<button
-									className="bg-white rounded-[2px] px-[16px] py-[8px] border border-solid border-[#2563EB] text-[#2563EB] font-[600] cursor-pointer"
-									onClick={() => handleClick(false)}
+							<div className="mr-[70px] flex flex-wrap gap-[16px]">
+								<a
+									href={matchedTheme?.pricing_link ?? '#'}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="cursor-pointer bg-[#2563EB] text-white border-0 rounded p-[16px] text-[16px] w-[80%] font-[600] no-underline capitalize hover:text-white visited:text-white"
 								>
-									{__('Select Pages', 'themegrill-demo-importer')}
-								</button>
+									{__('Upgrade to Pro', 'themegrill-demo-importer')}
+								</a>
 							</div>
 						</div>
 					</div>
-
-					<button
-						type="button"
-						className="bg-[#1E1E1E] rounded-full px-[18px] py-[8px] border border-solid border-[#E1E1E1] cursor-pointer absolute bottom-20 left-[5%] sm:left-[50%] sm:translate-x-[-50%]"
-						onClick={() => handleClick(collapseTemplate)}
-					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							width="14"
-							height="14"
-							viewBox="0 0 14 14"
-							fill="none"
-						>
-							<path
-								d="M7 10.8182V3.18187"
-								stroke="white"
-								strokeWidth="1.09091"
-								strokeLinecap="round"
-								strokeLinejoin="round"
-							/>
-							<path
-								d="M3.18187 7.00006L7.00006 3.18188L10.8182 7.00006"
-								stroke="white"
-								strokeWidth="1.09091"
-								strokeLinecap="round"
-								strokeLinejoin="round"
-							/>
-						</svg>
-					</button>
-				</>
+				)
+			) : (
+				renderImportSection()
 			)}
 		</div>
 	);

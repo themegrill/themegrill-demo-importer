@@ -1,29 +1,44 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
-import { DataObjectType, SearchResultType } from '../../lib/types';
+import { useParams } from 'react-router-dom';
+import { useDemoContext } from '../../context';
 import ImportContent from './ImportContent';
 import ImportSidebar from './ImportSidebar';
 
-type Props = {
-	demos: SearchResultType[];
-	initialTheme: string;
-	data: DataObjectType;
-};
+// type Props = {
+// 	demos: SearchResultType[];
+// 	initialTheme: string;
+// 	data: DataObjectType;
+// };
 
-const Import = ({ demos, initialTheme, data }: Props) => {
+const Import = () => {
+	const {
+		data,
+		theme,
+		pagebuilder,
+		category,
+		plan,
+		search,
+		searchResults,
+		searchTerms,
+		setTheme,
+		setPagebuilder,
+		setCategory,
+		setPlan,
+		setSearch,
+		setSearchResults,
+	} = useDemoContext();
+
 	const iframeRef = useRef<HTMLIFrameElement>(null);
+	const { slug } = useParams();
 
-	const [searchParams, setSearchParams] = useSearchParams();
 	const [siteTitle, setSiteTitle] = useState('');
 	const [siteTagline, setSiteTagline] = useState('');
 	const [siteLogoId, setSiteLogoId] = useState<number>(0);
-
-	const { slug } = useParams();
-	const demo = useMemo(() => {
-		return demos.filter((demo) => demo.slug === slug)[0];
-	}, [slug]);
-
 	const [collapse, setCollapse] = useState(false);
+
+	const demo = useMemo(() => {
+		return searchTerms.filter((demo) => demo.slug === slug)[0];
+	}, [slug]);
 
 	const handleClick = (collapse: Boolean) => {
 		setCollapse(!collapse);
@@ -154,7 +169,7 @@ const Import = ({ demos, initialTheme, data }: Props) => {
 			)}
 			<ImportContent
 				demo={demo}
-				initialTheme={initialTheme}
+				initialTheme={theme}
 				iframeRef={iframeRef}
 				siteTitle={siteTitle}
 				siteTagline={siteTagline}

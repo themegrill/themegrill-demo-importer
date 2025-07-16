@@ -1,8 +1,12 @@
 import { __ } from '@wordpress/i18n';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { DialogFooter, DialogHeader, DialogTitle } from '../../controls/Dialog';
+import { useDemoContext } from '../../context';
+import { DialogClose, DialogFooter, DialogHeader, DialogTitle } from '../../controls/Dialog';
+import { themes } from '../../lib/themes';
 import { SearchResultType } from '../../lib/types';
+
+declare const require: any;
 
 type PluginItem = {
 	slug: string;
@@ -32,7 +36,9 @@ export const DialogConsent = ({
 	setPlugins: React.Dispatch<React.SetStateAction<PluginItem[]>>;
 }) => {
 	const navigate = useNavigate();
+	const { currentTheme } = useDemoContext();
 	const [isConsentChecked, setIsConsentChecked] = useState(false);
+	const matchedTheme = themes.find((theme) => theme.slug === demo.theme);
 
 	const handlePluginToggle = (index: number) => {
 		setPlugins((prevItems: PluginItem[]) =>
@@ -49,6 +55,15 @@ export const DialogConsent = ({
 			),
 		);
 	};
+
+	const checkImageExists = (key: string): string => {
+		try {
+			return require(`../../images/${key}.png`);
+		} catch {
+			return '';
+		}
+	};
+
 	return (
 		<>
 			<DialogHeader className="border-0 border-b border-solid border-[#f4f4f4] px-[40px] py-[20px]">
@@ -65,10 +80,12 @@ export const DialogConsent = ({
 					<div>
 						<h3 className="text-[16px] text-[#383838]">Install and Activate</h3>
 						<div className="my-[20px]">
-							{demo.theme !== initialTheme && (
+							{('zakra' !== demo.theme && (demo.pro || demo.premium)
+								? `${demo.theme}-pro`
+								: demo.theme) !== currentTheme && (
 								<div className="flex items-center justify-between bg-[#FAFBFF] border border-solid border-[#EBEBEB] rounded px-[16px] py-[18px] mb-[16px]">
 									<div className="flex items-center gap-[10px] capitalize">
-										<svg
+										{/* <svg
 											xmlns="http://www.w3.org/2000/svg"
 											width="38"
 											height="38"
@@ -91,11 +108,14 @@ export const DialogConsent = ({
 												d="M24.6432 22.951L20.6777 26.9164H24.5648C25.166 26.9247 25.747 26.6992 26.1852 26.2874C26.6234 25.8757 26.8845 25.3099 26.9136 24.7093C26.9227 24.3405 26.8412 23.9751 26.6763 23.6451C26.5114 23.3151 26.268 23.0305 25.9676 22.8164C25.7663 22.6794 25.5231 22.6178 25.2809 22.6424C25.0386 22.667 24.8128 22.7763 24.6432 22.951Z"
 												fill="white"
 											/>
-										</svg>
+										</svg> */}
+										{checkImageExists(demo.theme) && (
+											<img src={checkImageExists(demo.theme)} alt="" width="38px" />
+										)}
 										<div>
 											<h6 className="text-[15px] text-[#111] m-0 mb-[4px]">{demo.theme} Theme</h6>
 											<p className="text-[13px] text-[#383838] tracking-[0.13px] m-0">
-												Powerful Multipurpose WordPress Theme
+												{matchedTheme?.description}
 											</p>
 										</div>
 									</div>
@@ -174,46 +194,46 @@ export const DialogConsent = ({
 							))}
 						</div>
 					</div>
-					<div className="bg-[#FFF0F0] rounded px-[16px] py-[14px] text-[14px]/[23px]">
-						<em>
-							{__(
-								'Importing demo content without activating the theme may lead to layout issues and missing features, causing your site to appear broken or incomplete.',
-								'themegrill-demo-importer',
-							)}
-						</em>
-						<div className="flex items-center mt-2 gap-2">
-							{/* <Checkbox id="proceed" /> */}
-							<input
-								id="proceed"
-								type="checkbox"
-								className="m-0 !mt-[2px]"
-								checked={isConsentChecked}
-								onChange={(e) => setIsConsentChecked(e.target.checked)}
-							/>
-							<label htmlFor="proceed" className="font-[600] text-[#222]">
+					{!installTheme && (
+						<div className="bg-[#FFF0F0] rounded px-[16px] py-[14px] text-[14px]/[23px]">
+							<em>
 								{__(
-									'I understand and agree to proceed with the import.',
+									'Importing demo content without activating the theme may lead to layout issues and missing features, causing your site to appear broken or incomplete.',
 									'themegrill-demo-importer',
 								)}
-							</label>
+							</em>
+							<div className="flex items-center mt-2 gap-2">
+								<input
+									id="proceed"
+									type="checkbox"
+									className="m-0 !mt-[2px]"
+									checked={isConsentChecked}
+									onChange={(e) => setIsConsentChecked(e.target.checked)}
+								/>
+								<label htmlFor="proceed" className="font-[600] text-[#222]">
+									{__(
+										'I understand and agree to proceed with the import.',
+										'themegrill-demo-importer',
+									)}
+								</label>
+							</div>
 						</div>
-					</div>
+					)}
 				</>
 			</div>
 			<DialogFooter className="border-0 border-t border-solid border-[#f4f4f4] p-[16px] sm:py-[16px] sm:px-[40px] flex items-center justify-between flex-row sm:justify-between">
-				<button
-					type="button"
-					className="cursor-pointer px-0 bg-transparent text-[#2563EB] border-0 text-[16px]"
-					onClick={() => {
-						navigate(-1);
-					}}
-				>
-					{__('Cancel', 'themegrill-demo-importer')}
-				</button>
+				<DialogClose asChild>
+					<button
+						type="button"
+						className="cursor-pointer px-0 bg-transparent text-[#2563EB] border-0 text-[16px]"
+					>
+						{__('Cancel', 'themegrill-demo-importer')}
+					</button>
+				</DialogClose>
 				<button
 					type="button"
 					className="cursor-pointer bg-[#2563EB] text-white border-0 rounded px-[24px] py-[10px] text-[16px] disabled:opacity-50 disabled:cursor-not-allowed"
-					disabled={!isConsentChecked}
+					disabled={!installTheme && !isConsentChecked}
 					onClick={onConfirm}
 				>
 					{__('Continue', 'themegrill-demo-importer')}

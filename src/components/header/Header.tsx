@@ -26,9 +26,8 @@ const Header = ({
 	setSearchParams,
 	plans,
 }: Props) => {
-	const { search, setTheme, setSearch } = useDemoContext();
+	const { search, theme, setTheme, setSearch } = useDemoContext();
 	const handleThemeClick = (tab: string) => {
-		// setSearchParams({ tab: tab });
 		setTheme(tab);
 	};
 
@@ -43,16 +42,12 @@ const Header = ({
 	const removeSearchInput = () => {
 		if (search) {
 			setSearch('');
-			searchParams.delete('search');
-			setSearchParams(searchParams);
 		}
 	};
 
 	const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-		let value = event.target.value;
+		const value = event.target.value;
 		setSearch(value);
-		searchParams.set('search', value);
-		setSearchParams(searchParams);
 	};
 
 	return (

@@ -1,4 +1,4 @@
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import React, { useEffect, useState } from 'react';
 import { Page, PageWithSelection, SearchResultType } from '../../lib/types';
 import ImportButton from '../import/ImportButton';
@@ -28,6 +28,8 @@ const Template = ({ pages, demo, initialTheme, siteTitle, siteTagline, siteLogoI
 		});
 	});
 
+	const count = allPages.length;
+
 	useEffect(() => {
 		const hasSelectedPages = allPages.some((page) => page.isSelected);
 		setDisabled(!hasSelectedPages);
@@ -39,9 +41,12 @@ const Template = ({ pages, demo, initialTheme, siteTitle, siteTagline, siteLogoI
 				<div>
 					<h4 className="text-[22px] m-0 mb-[8px] text-[#383838]">{demo.name}</h4>
 					<p className="text-[#7a7a7a] text-[14px] mt-4 sm:m-0">
-						{__(
-							'6 Templates (You can select pages manually by clicking on templates.)',
-							'themegrill-demo-importer',
+						{sprintf(
+							__(
+								'%s Templates (You can select pages manually by clicking on templates.)',
+								'themegrill-demo-importer',
+							),
+							count,
 						)}
 					</p>
 				</div>

@@ -8,16 +8,11 @@ import Demos from './Demos';
 type Props = {
 	categories: PagebuilderCategory[];
 	searchParams: URLSearchParams;
-	initialTheme: string;
 };
 
-const Content = ({ categories, searchParams, initialTheme }: Props) => {
-	// const location = useLocation();
-	// const searchParams = new URLSearchParams(location.search);
-	// const currentHeaderTab = searchParams.get('tab') || '';
-	const { theme, pagebuilder, category, plan, searchResults, setCategory } = useDemoContext();
+const Content = ({ categories, searchParams }: Props) => {
+	const { theme, pagebuilder, category, plan, search, searchResults } = useDemoContext();
 	const demos = useMemo(() => {
-		let search = searchParams.get('search');
 		return searchResults
 			.filter((d) => ('all' !== theme ? d.theme == theme : true))
 			.filter((d) =>
@@ -30,7 +25,7 @@ const Content = ({ categories, searchParams, initialTheme }: Props) => {
 				'all' !== plan ? (plan === 'pro' ? d.pro || d.premium : !d.pro && !d.premium) : true,
 			)
 			.filter((d) => (search ? d.name.toLowerCase().indexOf(search.toLowerCase()) !== -1 : true));
-	}, [theme, category, pagebuilder, searchParams]);
+	}, [theme, category, pagebuilder, plan, search, searchParams]);
 
 	return (
 		<TabsContent value={theme} className="mt-0">
