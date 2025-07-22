@@ -64,6 +64,10 @@
 		@apply pb-0;
 	}
 
+	#wpfooter {
+		@apply hidden;
+	}
+
 	.tg-tabs {
 		@apply text-[#383838] cursor-pointer text-[14px] font-[400] data-[state=active]:bg-[#2563EB] data-[state=active]:border-[#2563EB] data-[state=active]:text-white;
 	}
@@ -73,7 +77,7 @@
 	}
 
 	.tg-demo-count {
-		@apply bg-[#F4F4F4] px-[6px] py-[2px] rounded-[2px];
+		@apply bg-[#F4F4F4] p-1 rounded-[2px] text-[14px] leading-none inline-flex items-center justify-center;
 	}
 
 	.tg-tabs[data-state='active'] .tg-demo-count {
@@ -108,6 +112,32 @@
 			right: 0;
 			visibility: visible;
 		}
+
+		.tgdi-category-filter {
+			.rc-menu-overflow-item-rest {
+				@apply mb-0 bg-transparent border-0 px-4 py-2 cursor-pointer rounded;
+				.rc-menu-submenu-title {
+					@apply p-0 py-[2px];
+				}
+
+				&.rc-menu-submenu-selected {
+					@apply bg-[#2563EB] border-[#2563EB];
+					span {
+						@apply text-white;
+					}
+					svg {
+						@apply fill-white;
+					}
+				}
+			}
+
+			.rc-menu-submenu-active {
+				@apply border-b-0;
+				.rc-menu-submenu-title {
+					@apply bg-transparent;
+				}
+			}
+		}
 	}
 
 	&.tg-full-overlay-active {
@@ -132,6 +162,12 @@
 			z-index: -9999;
 		}
 
+		#tg-demo-importer {
+			position: absolute;
+			top: 0;
+			width: 100%;
+		}
+
 		.tg-full-overlay {
 			display: flex;
 		}
@@ -139,9 +175,8 @@
 		/* -------sidebar---------- */
 		.tg-full-overlay-sidebar {
 			padding: 32px;
-			max-width: 300px;
-			height: 100vh;
-			background-color: #fff;
+			height: 92vh;
+			background-color: #fafafa;
 			overflow-y: auto;
 			overflow-x: hidden;
 			box-sizing: border-box;

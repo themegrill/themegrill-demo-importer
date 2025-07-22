@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
-import { PageWithSelection } from '../../lib/types';
+import { PageWithSelection, SearchResultType } from '../../lib/types';
+
+declare const require: any;
 
 type Props = {
 	page: PageWithSelection;
 	setAllPages: React.Dispatch<React.SetStateAction<PageWithSelection[]>>;
+	demo: SearchResultType;
 };
 
-const SingleTemplate = ({ page, setAllPages }: Props) => {
+const SingleTemplate = ({ page, setAllPages, demo }: Props) => {
 	const [selected, setSelected] = useState(false);
 	const handleSelected = (selected: Boolean, id: number) => {
 		setSelected(!selected);
@@ -21,12 +24,26 @@ const SingleTemplate = ({ page, setAllPages }: Props) => {
 			type="button"
 			onClick={() => handleSelected(selected, page.ID)}
 		>
-			<div className="w-[100px] h-[120px] sm:w-[160px] sm:h-[180px] mb-[8px]">
-				<img
-					src={page.featured_image}
-					alt={page.post_title}
-					className="w-full h-full border border-solid border-[#F4F4F4] rounded-[2px]"
-				/>
+			<div className="w-[100px] h-[120px] sm:w-[177px] sm:h-[180px] mb-[10px]">
+				{page.screenshot ? (
+					<img
+						src={page.screenshot}
+						alt={page.post_title}
+						className="w-full h-full border border-solid border-[#F4F4F4] rounded-[2px]"
+					/>
+				) : demo.theme === 'colormag' || demo.theme === 'colornews' ? (
+					<img
+						src={require(`../../assets/images/colormag-skeleton.jpg`)}
+						alt={page.post_title}
+						className="w-full h-full border border-solid border-[#F4F4F4] rounded-[2px]"
+					/>
+				) : (
+					<img
+						src={require(`../../assets/images/zakra-skeleton.jpg`)}
+						alt={page.post_title}
+						className="w-full h-full border border-solid border-[#F4F4F4] rounded-[2px]"
+					/>
+				)}
 			</div>
 
 			<div className="flex justify-between items-center">

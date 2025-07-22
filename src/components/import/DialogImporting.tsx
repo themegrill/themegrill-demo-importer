@@ -44,11 +44,11 @@ const DialogImporting = ({
 					</div>
 					<Progress
 						value={importProgress}
-						className="border border-solid border-[#f4f4f4] h-[83px] rounded-[7px] overflow-visible"
-						indicatorClassName={`bg-[#E9EFFD] border border-solid border-[#2563EB] rounded-none rounded-l-[7px] h-[81px] ${importProgress === 100 ? 'rounded-r-[7px]' : 'border-r-0 '}`}
+						className="border border-solid border-[#f4f4f4] h-[83px] rounded-[7px] overflow-visible  "
+						indicatorClassName={`bg-[#E9EFFD] h-[81px] rounded-none  ${importProgress > 1 ? 'border border-solid border-[#2563EB] rounded-l-[7px]' : ''} ${importProgress === 100 ? 'rounded-r-[7px]' : 'border-r-0 '}`}
 						indicatorStyle={{ width: `${importProgress}%` }}
 						progressContent={
-							<div className="text-[#383838] p-[19px] absolute top-0">
+							<div className="text-[#383838] p-[19px] absolute top-0 rounded-l-[7px]">
 								<p className="m-0 mb-[4px] text-[14px]">
 									{importProgressStepTitle} {importProgress}%
 								</p>

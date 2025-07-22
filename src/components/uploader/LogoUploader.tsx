@@ -86,7 +86,7 @@ const LogoUploader = ({ iframeRef, setSiteLogoId }: Props) => {
 			// Listen for confirmation
 			const handleMessage = (event: MessageEvent) => {
 				if (event.data.type === 'LOGO_UPDATED') {
-					console.log('Logo updated successfully:', event.data.success);
+					// console.log('Logo updated successfully:', event.data.success);
 					window.removeEventListener('message', handleMessage);
 				}
 			};

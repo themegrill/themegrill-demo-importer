@@ -240,7 +240,7 @@ function tg_remove_theme_mods() {
  *
  * @see tg_set_elementor_load_fa4_shim()
  */
-add_action( 'themegrill_demo_imported', 'tg_set_elementor_load_fa4_shim' );
+add_action( 'themegrill_ajax_demo_imported', 'tg_set_elementor_load_fa4_shim' );
 
 /**
  * Set Elementor Load FontAwesome 4 support.
@@ -258,7 +258,7 @@ function tg_set_elementor_load_fa4_shim() {
  *
  * @see tg_set_elementor_active_kit()
  */
-add_action( 'themegrill_demo_imported', 'tg_set_elementor_active_kit' );
+add_action( 'themegrill_ajax_demo_imported', 'tg_set_elementor_active_kit' );
 
 /**
  * Set Elementor kit properly.
@@ -301,7 +301,7 @@ function tg_set_elementor_active_kit() {
  *
  * @see tg_set_wc_pages()
  */
-add_action( 'themegrill_demo_imported', 'tg_set_wc_pages' );
+add_action( 'themegrill_ajax_demo_imported', 'tg_set_wc_pages' );
 
 /**
  * Set WC pages properly and disable setup wizard redirect.
@@ -395,7 +395,7 @@ function tg_set_wc_pages( $demo_id ) {
  *
  * @see tg_set_masteriyo_pages()
  */
-add_action( 'themegrill_demo_imported', 'tg_set_masteriyo_pages' );
+add_action( 'themegrill_ajax_demo_imported', 'tg_set_masteriyo_pages' );
 
 /**
  * Set Masteriyo pages properly and disable setup wizard redirect.
@@ -574,7 +574,7 @@ function tg_print_admin_notice_templates() {
  *
  * @see tg_set_siteorigin_setting()
  */
-add_action( 'themegrill_demo_imported', 'tg_set_siteorigin_settings' );
+add_action( 'themegrill_ajax_demo_imported', 'tg_set_siteorigin_settings' );
 
 /**
  * Set SiteOrigin PageBuilder Default Setting.
@@ -597,7 +597,7 @@ function tg_set_siteorigin_settings() {
  *
  * @see tg_update_masteriyo_settings()
  */
-add_action( 'themegrill_demo_imported', 'tg_update_masteriyo_settings', 10, 2 );
+add_action( 'themegrill_ajax_demo_imported', 'tg_update_masteriyo_settings', 10, 2 );
 
 /**
  * Update Masteriyo settings.
@@ -622,7 +622,7 @@ function tg_update_masteriyo_settings( $id, $data ) {
  *
  * @see tg_setup_yith_woocommerce_wishlist()
  */
-add_action( 'themegrill_demo_imported', 'tg_setup_yith_woocommerce_wishlist', 10, 2 );
+add_action( 'themegrill_ajax_demo_imported', 'tg_setup_yith_woocommerce_wishlist', 10, 2 );
 
 /**
  * Update YITH Wishlist settings.
@@ -689,7 +689,7 @@ add_action(
  *
  * @see tg_regenerate_elementor_styles()
  */
-add_action( 'themegrill_demo_imported', 'tg_regenerate_elementor_styles', 10 );
+add_action( 'themegrill_ajax_demo_imported', 'tg_regenerate_elementor_styles', 10 );
 
 /**
  * Regenerate elementor styles settings.
