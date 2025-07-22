@@ -62,6 +62,10 @@ module.exports = {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
 			},
+			boxShadow: {
+				'custom-light': '4px 2px 6px 0px rgba(0, 0, 0, 0.10)',
+				'custom-top': '0px -8px 25px 0px rgba(0, 0, 0, 0.04)',
+			},
 		},
 	},
 	plugins: [],
