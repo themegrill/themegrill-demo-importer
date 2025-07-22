@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useDemoContext } from '../../context';
+import { useAllDemos } from '../../hooks/useAllDemos';
+import { TDIDashboardType } from '../../lib/types';
 import ImportContent from './ImportContent';
 import ImportSidebar from './ImportSidebar';
 
@@ -10,35 +11,48 @@ import ImportSidebar from './ImportSidebar';
 // 	data: DataObjectType;
 // };
 
-const Import = () => {
-	const {
-		data,
-		theme,
-		pagebuilder,
-		category,
-		plan,
-		search,
-		searchResults,
-		searchTerms,
-		setTheme,
-		setPagebuilder,
-		setCategory,
-		setPlan,
-		setSearch,
-		setSearchResults,
-	} = useDemoContext();
+const Import = ({
+	data,
+	setData,
+}: {
+	data: TDIDashboardType;
+	setData: React.Dispatch<React.SetStateAction<TDIDashboardType>>;
+}) => {
+	// const {
+	// 	data,
+	// 	theme,
+	// 	pagebuilder,
+	// 	category,
+	// 	plan,
+	// 	search,
+	// 	searchResults,
+	// 	searchTerms,
+	// 	setTheme,
+	// 	setPagebuilder,
+	// 	setCategory,
+	// 	setPlan,
+	// 	setSearch,
+	// 	setSearchResults,
+	// } = useDemoContext();
 
 	const iframeRef = useRef<HTMLIFrameElement>(null);
 	const { slug } = useParams();
+	const allDemos = useAllDemos(data, 'all');
+	const demo = useMemo(() => {
+		return allDemos.filter((demo) => demo.slug === slug)[0];
+	}, [slug]);
+	// const demo = allDemos.find((d) => d.slug === slug)!;
+	const theme = demo.theme;
 
 	const [siteTitle, setSiteTitle] = useState('');
 	const [siteTagline, setSiteTagline] = useState('');
 	const [siteLogoId, setSiteLogoId] = useState<number>(0);
 	const [collapse, setCollapse] = useState(false);
+	const [device, setDevice] = useState('desktop');
 
-	const demo = useMemo(() => {
-		return searchTerms.filter((demo) => demo.slug === slug)[0];
-	}, [slug]);
+	// const demo = useMemo(() => {
+	// 	return searchTerms.filter((demo) => demo.slug === slug)[0];
+	// }, [slug]);
 
 	const handleClick = (collapse: Boolean) => {
 		setCollapse(!collapse);
@@ -63,7 +77,7 @@ const Import = () => {
 			// Listen for confirmation
 			const handleMessage = (event: MessageEvent) => {
 				if (event.data.type === 'SITE_TITLE_UPDATED') {
-					console.log('Site title updated successfully:', event.data.success);
+					// console.log('Site title updated successfully:', event.data.success);
 					window.removeEventListener('message', handleMessage);
 				}
 			};
@@ -88,6 +102,7 @@ const Import = () => {
 		// Remove the class when the component unmounts
 		return () => {
 			document.body.classList.remove('tg-full-overlay-active');
+			document.documentElement.classList.add('wp-toolbar');
 		};
 	}, []);
 
@@ -114,7 +129,7 @@ const Import = () => {
 			{collapse ? (
 				<button
 					type="button"
-					className="bg-white rounded-full px-[8px] py-[16px] border border-solid border-[#E1E1E1] cursor-pointer absolute top-[45%] left-[1%]"
+					className="bg-white rounded-full px-[8px] py-[16px] border border-solid border-[#E1E1E1] cursor-pointer absolute top-[45%] left-[1%] shadow-custom-light"
 					style={{ zIndex: 100 }}
 					onClick={() => handleClick(collapse)}
 				>
@@ -138,7 +153,7 @@ const Import = () => {
 				<>
 					<button
 						type="button"
-						className="bg-white rounded-full px-[8px] py-[16px] border border-solid border-[#E1E1E1] cursor-pointer absolute top-[45%] left-[285px]"
+						className="bg-white rounded-full px-[8px] py-[16px] border border-solid border-[#E1E1E1] cursor-pointer absolute top-[45%] left-[285px] shadow-custom-light"
 						style={{ zIndex: 100 }}
 						onClick={() => handleClick(collapse)}
 					>
@@ -164,16 +179,24 @@ const Import = () => {
 						handleSiteTitleChange={handleSiteTitleChange}
 						setSiteTagline={setSiteTagline}
 						setSiteLogoId={setSiteLogoId}
+						device={device}
+						setDevice={setDevice}
 					/>
 				</>
 			)}
 			<ImportContent
 				demo={demo}
-				initialTheme={theme}
+				theme={theme}
 				iframeRef={iframeRef}
 				siteTitle={siteTitle}
 				siteTagline={siteTagline}
 				siteLogoId={siteLogoId}
+				// currentTheme={data.current_theme}
+				// zakraProInstalled={data.zakra_pro_installed}
+				// zakraProActivated={data.zakra_pro_activated}
+				data={data}
+				setData={setData}
+				device={device}
 			/>
 		</div>
 	);

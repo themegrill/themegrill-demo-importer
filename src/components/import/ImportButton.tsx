@@ -1,8 +1,9 @@
 import apiFetch from '@wordpress/api-fetch';
 import React, { useState } from 'react';
-import { useDemoContext } from '../../context';
+import { useParams } from 'react-router-dom';
 import { Dialog, DialogContent, DialogTrigger } from '../../controls/Dialog';
-import { __TDI_DASHBOARD__, PageWithSelection, SearchResultType } from '../../lib/types';
+import { PageWithSelection, SearchResultType, TDIDashboardType } from '../../lib/types';
+import DialogCleanup from './DialogCleanup';
 import { DialogConsent } from './DialogConsent';
 import DialogImported from './DialogImported';
 import DialogImportFailed from './DialogImportFailed';
@@ -11,7 +12,7 @@ import DialogImporting from './DialogImporting';
 type Props = {
 	buttonTitle: string;
 	pages?: PageWithSelection[];
-	initialTheme: string;
+	theme: string;
 	demo: SearchResultType;
 	siteTitle: string;
 	siteTagline: string;
@@ -19,11 +20,14 @@ type Props = {
 	additionalStyles?: string;
 	textColor?: string;
 	disabled?: boolean;
+	// currentTheme: string;
+	data: TDIDashboardType;
+	setData: (value: TDIDashboardType) => void;
 };
 
 const ImportButton = ({
 	buttonTitle,
-	initialTheme,
+	theme,
 	demo,
 	siteTitle,
 	siteTagline,
@@ -32,30 +36,36 @@ const ImportButton = ({
 	textColor,
 	disabled,
 	pages,
+	data,
+	setData,
 }: Props) => {
-	const {
-		theme,
-		pagebuilder,
-		category,
-		plan,
-		search,
-		searchResults,
-		setTheme,
-		setPagebuilder,
-		setCategory,
-		setPlan,
-		setSearchResults,
-		currentTheme,
-	} = useDemoContext();
+	// const {
+	// 	pagebuilder,
+	// 	category,
+	// 	plan,
+	// 	search,
+	// 	searchResults,
+	// 	setTheme,
+	// 	setPagebuilder,
+	// 	setCategory,
+	// 	setPlan,
+	// 	setSearchResults,
+	// 	currentTheme,
+	// } = useDemoContext();
+	// const { data } = useLocalizedData();
+	// const { current_theme: currentTheme } = data || {};
+	const { pagebuilder = '' } = useParams();
 
 	const IMPORT_ACTIONS = {
-		...(currentTheme !== demo.theme && {
-			'install-theme': {
-				progressWeight: 10,
-				stepTitle: 'Install Theme',
-				stepSubTitle: 'Installing theme...',
-			},
-		}),
+		...(data.current_theme !== demo.theme
+			? {
+					'install-theme': {
+						progressWeight: 10,
+						stepTitle: 'Install Theme',
+						stepSubTitle: 'Installing theme...',
+					},
+				}
+			: {}),
 		'install-plugins': {
 			progressWeight: 15,
 			stepTitle: 'Install Plugins',
@@ -112,6 +122,8 @@ const ImportButton = ({
 		useState('Initializing import...');
 	const [importAction, setImportAction] = useState<null | keyof typeof IMPORT_ACTIONS>(null);
 	const [isImportFailed, setIsImportFailed] = useState(false);
+	const [isCleanInstall, setIsCleanInstall] = useState(false);
+	const [isCleanInstallCompleted, setIsCleanInstallCompleted] = useState(false);
 
 	const totalPagebuilders = Object.entries(demo?.pagebuilders)?.length ?? 0;
 
@@ -164,7 +176,12 @@ const ImportButton = ({
 				});
 				setImportProgressStepTitle(IMPORT_ACTIONS[action]?.stepTitle ?? '');
 				setImportProgressStepSubTitle(IMPORT_ACTIONS[action]?.stepSubTitle ?? '');
-				console.log(results);
+				if (action === 'complete') {
+					const updated = await apiFetch<TDIDashboardType>({
+						path: '/tg-demo-importer/v1/localized-data',
+					});
+					setData(updated);
+				}
 			} catch (e) {
 				setImportAction(null);
 				setImportProgress(0);
@@ -174,7 +191,15 @@ const ImportButton = ({
 		}
 	};
 
-	const handleReimport = async () => {
+	const handleTryAgain = () => {
+		setImportAction(null);
+		setImportProgress(0);
+		setIsImportFailed(false);
+		setIsCleanInstall(true);
+		handleCleanup();
+	};
+
+	const handleCleanup = async () => {
 		const response = await apiFetch<{
 			success: boolean;
 			message: string;
@@ -183,18 +208,35 @@ const ImportButton = ({
 			method: 'POST',
 		});
 		if (response.success) {
-			setImportAction('install-theme');
+			if (data.current_theme !== demo.theme) {
+				let key: 'install-theme' = 'install-theme';
+				const step = IMPORT_ACTIONS[key]!;
+				setImportAction(key);
+				setImportProgressStepTitle(step.stepTitle);
+				setImportProgressStepSubTitle(step.stepSubTitle);
+			} else {
+				let key: 'install-plugins' = 'install-plugins';
+				const step = IMPORT_ACTIONS[key]!;
+				setImportAction(key);
+				setImportProgressStepTitle(step.stepTitle);
+				setImportProgressStepSubTitle(step.stepSubTitle);
+			}
+
 			setImportProgress(0);
-			setIsImportFailed(false);
-			handleInstallation();
+			setIsCleanInstallCompleted(true);
 		}
 	};
 
-	const checkThemeExists = (demo: SearchResultType) => {
-		const proTheme = demo.theme + '-pro';
-		const themeExists = __TDI_DASHBOARD__.installed_themes.includes(proTheme);
-		return themeExists;
+	const handleReimport = async () => {
+		setIsCleanInstall(false);
+		handleInstallation();
 	};
+
+	// const checkThemeExists = (demo: SearchResultType) => {
+	// 	const proTheme = demo.theme + '-pro';
+	// 	const themeExists = __TDI_DASHBOARD__.installed_themes.includes(proTheme);
+	// 	return themeExists;
+	// };
 
 	const renderDialog = () => {
 		// if (demo.pro || demo.premium) {
@@ -207,20 +249,29 @@ const ImportButton = ({
 		// 	}
 		// }
 
+		if (isCleanInstall) {
+			return (
+				<DialogCleanup
+					isCleanInstallCompleted={isCleanInstallCompleted}
+					handleReimport={handleReimport}
+				/>
+			);
+		}
+
 		if (isImportFailed) {
-			return <DialogImportFailed handleReimport={handleReimport} />;
+			return <DialogImportFailed handleTryAgain={handleTryAgain} />;
 		}
 
 		if (!importAction) {
 			return (
 				<DialogConsent
 					demo={demo}
-					initialTheme={initialTheme}
 					installTheme={installTheme}
 					setInstallTheme={setInstallTheme}
 					plugins={plugins}
 					setPlugins={setPlugins}
 					onConfirm={handleInstallation}
+					data={data}
 				/>
 			);
 		}
@@ -235,7 +286,7 @@ const ImportButton = ({
 			);
 		}
 
-		return <DialogImported demo={demo} data={__TDI_DASHBOARD__} />;
+		return <DialogImported demo={demo} data={data} />;
 	};
 
 	return (

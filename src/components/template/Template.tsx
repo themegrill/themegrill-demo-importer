@@ -1,19 +1,33 @@
 import { __, sprintf } from '@wordpress/i18n';
 import React, { useEffect, useState } from 'react';
-import { Page, PageWithSelection, SearchResultType } from '../../lib/types';
+import { useParams } from 'react-router-dom';
+import { Page, PageWithSelection, SearchResultType, TDIDashboardType } from '../../lib/types';
 import ImportButton from '../import/ImportButton';
 import SingleTemplate from './SingleTemplate';
 
 type Props = {
 	pages: Page[];
 	demo: SearchResultType;
-	initialTheme: string;
+	theme: string;
 	siteTitle: string;
 	siteTagline: string;
 	siteLogoId: number;
+	// currentTheme: string;
+	data: TDIDashboardType;
+	setData: (value: TDIDashboardType) => void;
 };
 
-const Template = ({ pages, demo, initialTheme, siteTitle, siteTagline, siteLogoId }: Props) => {
+const Template = ({
+	pages,
+	demo,
+	theme,
+	siteTitle,
+	siteTagline,
+	siteLogoId,
+	data,
+	setData,
+}: Props) => {
+	const { pagebuilder = '' } = useParams();
 	const [disabled, setDisabled] = useState(true);
 	const [allPages, setAllPages] = useState<PageWithSelection[]>(() => {
 		return pages.map((p, index) => {
@@ -22,7 +36,7 @@ const Template = ({ pages, demo, initialTheme, siteTitle, siteTagline, siteLogoI
 				post_name: p.post_name,
 				post_title: p.post_title,
 				content: p.content,
-				featured_image: p.featured_image,
+				screenshot: p.screenshot,
 				isSelected: false,
 			};
 		});
@@ -35,47 +49,64 @@ const Template = ({ pages, demo, initialTheme, siteTitle, siteTagline, siteLogoI
 		setDisabled(!hasSelectedPages);
 	}, [allPages]);
 
+	useEffect(() => {
+		const updatedPages = pages.map((p, index) => ({
+			ID: p.ID ?? index + 1,
+			post_name: p.post_name,
+			post_title: p.post_title,
+			content: p.content,
+			screenshot: p.screenshot,
+			isSelected: false,
+		}));
+
+		setAllPages(updatedPages);
+	}, [pagebuilder, pages]);
+
 	return (
-		<div className="h-[370px] sm:h-[302px] w-full bg-white p-[25px] sm:p-[32px] shadow absolute bottom-0 ">
+		<div className="w-full bg-[#FAFAFA] p-[25px] sm:p-[32px] shadow absolute bottom-0 box-border border-0 border-t border-solid border-t-[#E9E9E9]">
 			<div className="mb-[24px] flex flex-wrap justify-between items-center">
 				<div>
 					<h4 className="text-[22px] m-0 mb-[8px] text-[#383838]">{demo.name}</h4>
 					<p className="text-[#7a7a7a] text-[14px] mt-4 sm:m-0">
 						{sprintf(
 							__(
-								'%s Templates (You can select pages manually by clicking on templates.)',
+								'%s Templates (You can select pages by clicking on templates.)',
 								'themegrill-demo-importer',
 							),
 							count,
 						)}
 					</p>
 				</div>
-				<div className="mr-[70px] flex flex-wrap gap-[16px]">
+				<div className="flex flex-wrap gap-[16px]">
 					<ImportButton
 						buttonTitle={__('Import All', 'themegrill-demo-importer')}
-						initialTheme={initialTheme}
+						theme={theme}
 						demo={demo}
 						siteTitle={siteTitle}
 						siteTagline={siteTagline}
 						siteLogoId={siteLogoId}
 						additionalStyles="bg-white rounded-[2px] px-[16px] py-[8px] border border-solid border-[#2563EB] text-[#2563EB] font-[600] cursor-pointer"
 						textColor="#2563EB"
+						data={data}
+						setData={setData}
 					/>
 					<ImportButton
 						buttonTitle={__('Import Selected Pages', 'themegrill-demo-importer')}
 						pages={allPages}
-						initialTheme={initialTheme}
+						theme={theme}
 						demo={demo}
 						siteTitle={siteTitle}
 						siteTagline={siteTagline}
 						siteLogoId={siteLogoId}
 						disabled={disabled}
+						data={data}
+						setData={setData}
 					/>
 				</div>
 			</div>
 			<div className="flex gap-[16px] w-full overflow-x-auto tg-overlay-template pb-[20px]">
 				{allPages.map((page, index) => (
-					<SingleTemplate key={index} page={page} setAllPages={setAllPages} />
+					<SingleTemplate key={index} page={page} setAllPages={setAllPages} demo={demo} />
 				))}
 			</div>
 		</div>

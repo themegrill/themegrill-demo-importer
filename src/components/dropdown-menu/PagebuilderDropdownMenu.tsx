@@ -1,6 +1,5 @@
-import React from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { useDemoContext } from '../../context';
+import React, { useEffect, useRef, useState } from 'react';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Button } from '../../controls/Button';
 import {
 	DropdownMenuContent,
@@ -19,14 +18,29 @@ type Props = {
 	isSidebar?: boolean;
 };
 
-const PagebuilderDropdownMenu = ({ pagebuilders, currentPagebuilder, isSidebar }: Props) => {
-	const { pagebuilder, setPagebuilder } = useDemoContext();
+const PagebuilderDropdownMenu = ({
+	pagebuilders,
+	currentPagebuilder,
+	isSidebar = false,
+}: Props) => {
 	const [searchParams, setSearchParams] = useSearchParams();
-	const handlePagebuilderChange = (pagebuilder: PagebuilderCategory) => {
-		setPagebuilder(pagebuilder.slug);
-		const newSearchParams = new URLSearchParams(searchParams.toString());
-		newSearchParams.set('pagebuilder', pagebuilder.slug);
-		setSearchParams(newSearchParams);
+	const { pagebuilder: paramPagebuilder } = useParams<{ pagebuilder?: string }>();
+	const queryPagebuilder = searchParams.get('pagebuilder');
+	const pagebuilder = isSidebar ? paramPagebuilder || 'all' : queryPagebuilder || 'all';
+	const { slug } = useParams();
+	const navigate = useNavigate();
+
+	const handlePagebuilderChange = (pagebuilder: string, isSidebar: boolean) => {
+		if (isSidebar) {
+			navigate(`/import-detail/${slug}/${pagebuilder}`, {
+				replace: true,
+			});
+		} else {
+			setSearchParams((prev) => {
+				prev.set('pagebuilder', pagebuilder);
+				return prev;
+			});
+		}
 	};
 
 	const checkImageExists = (key: string): string => {
@@ -37,14 +51,34 @@ const PagebuilderDropdownMenu = ({ pagebuilders, currentPagebuilder, isSidebar }
 		}
 	};
 
+	const triggerRef = useRef<HTMLButtonElement>(null);
+	const [width, setWidth] = useState<number | null>(null);
+
+	useEffect(() => {
+		if (triggerRef.current) {
+			setWidth(triggerRef.current.offsetWidth);
+		}
+	}, [triggerRef.current]);
+
 	return (
 		<TGDropdownMenu>
 			<DropdownMenuTrigger asChild>
 				<Button
+					ref={triggerRef}
 					variant="outline"
-					className={`text-[#383838] font-[400] px-5 bg-white border-[1px] border-solid cursor-pointer border-[#f4f4f4] w-full ${!isSidebar && 'sm:w-[172px]'} h-11 items-center justify-between focus-visible:ring-0`}
+					className={`text-[#383838] font-[400] px-5 bg-[#fff] border border-solid cursor-pointer w-full ${!isSidebar ? 'border-[#f4f4f4] sm:w-[172px]' : 'border-[#E9E9E9]'} h-11 items-center justify-between focus-visible:ring-0`}
 				>
-					<span>{currentPagebuilder}</span>
+					{isSidebar ? (
+						<span className="flex items-center gap-[8px]">
+							{checkImageExists(pagebuilder) && pagebuilder && (
+								<img src={require(`../../assets/images/${pagebuilder}.jpg`)} alt="" />
+							)}
+							{currentPagebuilder}
+						</span>
+					) : (
+						<span>{currentPagebuilder}</span>
+					)}
+
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
 						width="10"
@@ -66,22 +100,23 @@ const PagebuilderDropdownMenu = ({ pagebuilders, currentPagebuilder, isSidebar }
 					</svg>
 				</Button>
 			</DropdownMenuTrigger>
-			<DropdownMenuContent className={`w-full ${!isSidebar && 'sm:w-[172px]'} bg-white p-0`}>
+			<DropdownMenuContent
+				className={`bg-white p-0`}
+				style={{
+					minWidth: width ? `${width}px` : undefined,
+				}}
+			>
 				{pagebuilders &&
 					pagebuilders
 						.filter((pg) => pg.slug !== pagebuilder)
 						.map((pagebuilder) => (
 							<div key={pagebuilder.slug}>
 								<DropdownMenuItem
-									className="p-[16px]"
-									onClick={() => handlePagebuilderChange(pagebuilder)}
+									className="p-[16px] gap-[8px] w-full"
+									onClick={() => handlePagebuilderChange(pagebuilder.slug, isSidebar)}
 								>
 									{pagebuilder.slug !== 'all' && checkImageExists(pagebuilder.slug) !== '' && (
-										<img
-											src={require(`../../assets/images/${pagebuilder.slug}.jpg`)}
-											alt=""
-											className="mr-2"
-										/>
+										<img src={require(`../../assets/images/${pagebuilder.slug}.jpg`)} alt="" />
 									)}
 									<span className="text-[14px]">
 										{pagebuilder.value} {!isSidebar && '(' + pagebuilder.count + ')'}

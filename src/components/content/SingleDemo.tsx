@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { SearchResultType } from '../../lib/types';
 
 declare const require: any;
@@ -9,6 +9,24 @@ type DemoProps = {
 };
 
 const SingleDemo = ({ demo }: DemoProps) => {
+	const [searchParams] = useSearchParams();
+	const pagebuilder = searchParams.get('pagebuilder');
+	const pagebuilders = Object.entries(demo?.pagebuilders || {}).map(([key, value]) => {
+		return {
+			slug: key,
+			value: value,
+		};
+	});
+
+	let currentPagebuilder = '';
+
+	if (pagebuilder !== 'all') {
+		currentPagebuilder = pagebuilders?.find((p) => p.slug === pagebuilder)?.slug || '';
+	} else {
+		if (pagebuilders.length > 0) {
+			currentPagebuilder = pagebuilders[0].slug;
+		}
+	}
 	const checkImageExists = (key: string): string => {
 		try {
 			return require(`../../assets/images/${key}.jpg`);
@@ -19,7 +37,7 @@ const SingleDemo = ({ demo }: DemoProps) => {
 
 	return (
 		<Link
-			to={`/import-detail/${demo.slug}`}
+			to={`/import-detail/${demo.slug}/${currentPagebuilder}`}
 			className="text-[#383838] no-underline hover:text-[#383838] tg-demo flex flex-col gap-0"
 		>
 			<div className="shadow flex flex-col">

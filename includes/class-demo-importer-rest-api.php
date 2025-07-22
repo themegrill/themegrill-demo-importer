@@ -135,12 +135,13 @@ class TG_Importer_REST_Controller extends WP_REST_Controller {
 			$is_pro_theme = strpos( $theme, '-pro' ) !== false;
 			if ( $is_pro_theme ) {
 				$base_theme = $is_pro_theme ? str_replace( '-pro', '', $theme ) : $theme;
-				$data       = wp_remote_get( 'http://themegrill-demos-api.test/wp-json/tgda/v1/sites?theme=' . $base_theme );
+				$data       = wp_remote_get( TG_Demo_Importer::$themegrill_base_url . '/sites?theme=' . $base_theme );
 			} else {
-				$data = wp_remote_get( 'http://themegrill-demos-api.test/wp-json/tgda/v1/sites?theme=' . $theme );
+				$data = wp_remote_get( TG_Demo_Importer::$themegrill_base_url . '/sites?theme=' . $theme );
 			}
 		} else {
-			$data = wp_remote_get( 'http://themegrill-demos-api.test/wp-json/tgda/v1/sites' );
+			$data  = wp_remote_get( TG_Demo_Importer::$themegrill_base_url . '/sites' );
+			$theme = 'all';
 		}
 		if ( is_wp_error( $data ) ) {
 			return;
@@ -317,6 +318,7 @@ class TG_Importer_REST_Controller extends WP_REST_Controller {
 				$response = rest_ensure_response( $result );
 				break;
 			case 'import-content':
+				$this->tgdi_cleanup(); //delete all previous imported data if any
 				$pages    = $options['pages'] ?? array();
 				$response = $this->import_content( $demo_config, $pagebuilder, $pages );
 				if ( is_wp_error( $response ) ) {
@@ -429,9 +431,10 @@ class TG_Importer_REST_Controller extends WP_REST_Controller {
 		$pg          = explode( '/', $plugin );
 		$plugin_file = WP_PLUGIN_DIR . '/' . $plugin;
 		$results     = array();
-		if ( file_exists( $plugin_file ) ) {
+		if ( 'companion-elementor/companion-elementor.php' === $plugin ) {
 			$plugin_data = get_plugin_data( $plugin_file );
 
+			$url = 'https://d1sb0nhp4t2db4.cloudfront.net/packages/companion-elementor.zip';
 			if ( is_plugin_active( $plugin ) ) {
 				$results[ $pg[0] ] = array(
 					'status'  => 'success',
@@ -439,69 +442,130 @@ class TG_Importer_REST_Controller extends WP_REST_Controller {
 				);
 				return $results;
 			}
-			$result = activate_plugin( $plugin );
+			$temp_file = download_url( $url );
 
+			if ( is_wp_error( $temp_file ) ) {
+				$this->tgdi_log_error( 'Failed to download companion elementor zip.' );
+
+				$results[ $pg[0] ] = array(
+					'status'  => 'success',
+					'message' => 'Failed to download companion elementor zip.',
+					$temp_file->get_error_message(),
+				);
+				return $results;
+			}
+
+			$upgrader = new Plugin_Upgrader( new WP_Ajax_Upgrader_Skin() );
+			$result   = $upgrader->install( $temp_file );
+			wp_delete_file( $temp_file );
 			if ( is_wp_error( $result ) ) {
-				$this->tgdi_log_error( 'Failed to activate plugin ' . $plugin . ': ' . $result->get_error_message() );
+				$this->tgdi_log_error( 'Failed to install plugin ' . $pg[0] . ': ' . $result->get_error_message() );
 
 				$results[ $pg[0] ] = array(
 					'status'  => 'error',
 					'message' => $result->get_error_message(),
 				);
+			}
+			if ( ! $result || ! $upgrader->plugin_info() ) {
+				$this->tgdi_log_error( 'Plugin install failed or no plugin info. ' . $pg[0] . ': ' . $result->get_error_message() );
+
+				$results[ $pg[0] ] = array(
+					'status'  => 'error',
+					'message' => $result->get_error_message(),
+				);
+			}
+
+			$plugin_file = $upgrader->plugin_info();
+			$activate    = activate_plugin( $plugin_file );
+
+			if ( is_wp_error( $activate ) ) {
+				$results[ $pg[0] ] = array(
+					'status'  => 'error',
+					'message' => $result->get_error_message(),
+				);
+				$this->tgdi_log_error( 'Failed to activate plugin after install ' . $pg[0] . ': ' . $activate->get_error_message() );
+			}
+
+			$results[ $pg[0] ] = array(
+				'status'  => 'success',
+				/* translators: %s Plugin name */
+				'message' => sprintf( __( '%s installed and activated.', 'themegrill-demo-importer' ), $plugin_data['Name'] ),
+			);
+		} else {
+			if ( file_exists( $plugin_file ) ) {
+				$plugin_data = get_plugin_data( $plugin_file );
+
+				if ( is_plugin_active( $plugin ) ) {
+					$results[ $pg[0] ] = array(
+						'status'  => 'success',
+						'message' => $plugin_data['Name'] . ' already activated.',
+					);
+					return $results;
+				}
+				$result = activate_plugin( $plugin );
+
+				if ( is_wp_error( $result ) ) {
+					$this->tgdi_log_error( 'Failed to activate plugin ' . $plugin . ': ' . $result->get_error_message() );
+
+					$results[ $pg[0] ] = array(
+						'status'  => 'error',
+						'message' => $result->get_error_message(),
+					);
+				}
+				$results[ $pg[0] ] = array(
+					'status'  => 'success',
+					'message' => $plugin_data['Name'] . ' activated.',
+				);
+				return $results;
+			}
+			$api = plugins_api(
+				'plugin_information',
+				array(
+					'slug' => sanitize_key( wp_unslash( $pg[0] ) ),
+				)
+			);
+			if ( is_wp_error( $api ) ) {
+				$this->tgdi_log_error( 'Failed to fetch plugin info for ' . $pg[0] . ': ' . $api->get_error_message() );
+
+				$results[ $pg[0] ] = array(
+					'status'  => 'error',
+					'message' => $api->get_error_message(),
+				);
+			}
+
+			$skin      = new WP_Ajax_Upgrader_Skin();
+			$upgrader  = new Plugin_Upgrader( $skin );
+			$installed = $upgrader->install( $api->download_link );
+
+			if ( is_wp_error( $installed ) ) {
+				$this->tgdi_log_error( 'Failed to install plugin ' . $pg[0] . ': ' . $installed->get_error_message() );
+
+				$results[ $pg[0] ] = array(
+					'status'  => 'error',
+					'message' => $installed->get_error_message(),
+				);
+			}
+
+			$install_status = install_plugin_install_status( $api );
+
+			if ( is_plugin_inactive( $install_status['file'] ) ) {
+				$result = activate_plugin( $install_status['file'] );
+
+				if ( is_wp_error( $result ) ) {
+					$this->tgdi_log_error( 'Failed to activate plugin after install ' . $pg[0] . ': ' . $result->get_error_message() );
+
+					$results[ $pg[0] ] = array(
+						'status'  => 'error',
+						'message' => $result->get_error_message(),
+					);
+				}
 			}
 			$results[ $pg[0] ] = array(
 				'status'  => 'success',
-				'message' => $plugin_data['Name'] . ' activated.',
-			);
-			return $results;
-		}
-		$api = plugins_api(
-			'plugin_information',
-			array(
-				'slug' => sanitize_key( wp_unslash( $pg[0] ) ),
-			)
-		);
-		if ( is_wp_error( $api ) ) {
-			$this->tgdi_log_error( 'Failed to fetch plugin info for ' . $pg[0] . ': ' . $api->get_error_message() );
-
-			$results[ $pg[0] ] = array(
-				'status'  => 'error',
-				'message' => $api->get_error_message(),
+				/* translators: %s Plugin name */
+				'message' => sprintf( __( '%s installed and activated.', 'themegrill-demo-importer' ), $api->name ),
 			);
 		}
-
-		$skin      = new WP_Ajax_Upgrader_Skin();
-		$upgrader  = new Plugin_Upgrader( $skin );
-		$installed = $upgrader->install( $api->download_link );
-
-		if ( is_wp_error( $installed ) ) {
-			$this->tgdi_log_error( 'Failed to install plugin ' . $pg[0] . ': ' . $installed->get_error_message() );
-
-			$results[ $pg[0] ] = array(
-				'status'  => 'error',
-				'message' => $installed->get_error_message(),
-			);
-		}
-
-		$install_status = install_plugin_install_status( $api );
-
-		if ( is_plugin_inactive( $install_status['file'] ) ) {
-			$result = activate_plugin( $install_status['file'] );
-
-			if ( is_wp_error( $result ) ) {
-				$this->tgdi_log_error( 'Failed to activate plugin after install ' . $pg[0] . ': ' . $result->get_error_message() );
-
-				$results[ $pg[0] ] = array(
-					'status'  => 'error',
-					'message' => $result->get_error_message(),
-				);
-			}
-		}
-		$results[ $pg[0] ] = array(
-			'status'  => 'success',
-			/* translators: %s Plugin name */
-			'message' => sprintf( __( '%s installed and activated.', 'themegrill-demo-importer' ), $api->name ),
-		);
 		return $results;
 	}
 

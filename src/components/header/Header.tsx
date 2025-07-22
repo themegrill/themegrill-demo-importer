@@ -1,11 +1,11 @@
 import React from 'react';
-import { useDemoContext } from '../../context';
+import { useSearchParams } from 'react-router-dom';
 import { Button } from '../../controls/Button';
 import { Input } from '../../controls/Input';
-import { TabsList, TabsTrigger } from '../../controls/Tabs';
 import { PagebuilderCategory, Theme } from '../../lib/types';
 import PagebuilderDropdownMenu from '../dropdown-menu/PagebuilderDropdownMenu';
 import PlanDropdown from '../dropdown-menu/PlanDropdown';
+import ThemeDropdown from '../dropdown-menu/ThemeDropdown';
 
 declare const require: any;
 
@@ -13,41 +13,54 @@ type Props = {
 	themes: Theme[];
 	pagebuilders: PagebuilderCategory[];
 	currentPagebuilder: string;
-	searchParams: URLSearchParams;
-	setSearchParams: (value: URLSearchParams) => void;
 	plans: Record<string, string>;
+	theme: string;
 };
 
-const Header = ({
-	themes,
-	pagebuilders,
-	currentPagebuilder,
-	searchParams,
-	setSearchParams,
-	plans,
-}: Props) => {
-	const { search, theme, setTheme, setSearch } = useDemoContext();
-	const handleThemeClick = (tab: string) => {
-		setTheme(tab);
-	};
+const Header = ({ themes, pagebuilders, currentPagebuilder, plans, theme }: Props) => {
+	// const { search, theme, setTheme, setSearch } = useDemoContext();
+	const [searchParams, setSearchParams] = useSearchParams();
+	const search = searchParams.get('search') || '';
+	let activeTheme = null;
 
-	const checkImageExists = (key: string): string => {
-		try {
-			return require(`../../assets/images/${key}.png`);
-		} catch {
-			return '';
-		}
-	};
+	if (theme !== 'all') {
+		activeTheme = themes.find((th) => th.slug === theme);
+	}
+	// const handleThemeClick = (tab: string) => {
+	// 	setTheme(tab);
+	// };
+
+	// const checkImageExists = (key: string): string => {
+	// 	try {
+	// 		return require(`../../assets/images/${key}.png`);
+	// 	} catch {
+	// 		return '';
+	// 	}
+	// };
 
 	const removeSearchInput = () => {
 		if (search) {
-			setSearch('');
+			setSearchParams((prev) => {
+				prev.delete('search');
+				return new URLSearchParams(prev);
+			});
 		}
 	};
 
 	const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const value = event.target.value;
-		setSearch(value);
+		setSearchParams((prev) => {
+			prev.set('search', value);
+			return prev;
+		});
+	};
+
+	const checkImageExists = (key: string): string => {
+		try {
+			return require(`../../images/${key}.png`);
+		} catch {
+			return '';
+		}
 	};
 
 	return (
@@ -55,7 +68,7 @@ const Header = ({
 			className="flex gap-y-4 sm:gap-x-8 items-center px-[20px] py-[20px] flex-wrap sm:px-[40px]"
 			style={{ backgroundColor: '#fff' }}
 		>
-			<TabsList className="border-[1px] border-solid border-[#f4f4f4] p-0 rounded-md overflow-hidden">
+			{/* <TabsList className="border-[1px] border-solid border-[#f4f4f4] p-0 rounded-md overflow-auto justify-normal flex-1 sm:flex-none">
 				{themes.map((item, index) => (
 					<TabsTrigger
 						value={item.slug}
@@ -69,7 +82,18 @@ const Header = ({
 						<span>{item.name}</span>
 					</TabsTrigger>
 				))}
-			</TabsList>
+			</TabsList> */}
+
+			{theme !== 'all' && activeTheme ? (
+				<div className="flex items-center gap-2 w-full sm:w-[132px] bg-white px-5 py-[9px] border border-solid border-[#f4f4f4] rounded-md">
+					{checkImageExists(activeTheme.slug) !== '' && (
+						<img src={require(`../../images/${activeTheme.slug}.png`)} alt="" width="24px" />
+					)}
+					<span className="text-[14px]">{activeTheme.name}</span>
+				</div>
+			) : (
+				<ThemeDropdown themes={themes} />
+			)}
 
 			<PagebuilderDropdownMenu
 				pagebuilders={pagebuilders}
@@ -106,7 +130,7 @@ const Header = ({
 				</Button>
 			</div>
 
-			<PlanDropdown plans={plans} searchParams={searchParams} setSearchParams={setSearchParams} />
+			<PlanDropdown plans={plans} />
 		</div>
 	);
 };

@@ -1,10 +1,9 @@
 import { __ } from '@wordpress/i18n';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useDemoContext } from '../../context';
 import { DialogClose, DialogFooter, DialogHeader, DialogTitle } from '../../controls/Dialog';
 import { themes } from '../../lib/themes';
-import { SearchResultType } from '../../lib/types';
+import { SearchResultType, TDIDashboardType } from '../../lib/types';
 
 declare const require: any;
 
@@ -21,22 +20,24 @@ type PluginItem = {
 export const DialogConsent = ({
 	onConfirm,
 	demo,
-	initialTheme,
 	installTheme,
 	setInstallTheme,
 	plugins,
 	setPlugins,
+	data,
 }: {
 	onConfirm: () => void;
-	initialTheme: string;
 	demo: SearchResultType;
 	installTheme: boolean;
 	setInstallTheme: React.Dispatch<React.SetStateAction<boolean>>;
 	plugins: PluginItem[];
 	setPlugins: React.Dispatch<React.SetStateAction<PluginItem[]>>;
+	data: TDIDashboardType;
 }) => {
 	const navigate = useNavigate();
-	const { currentTheme } = useDemoContext();
+	// const { data } = useLocalizedData();
+	// const { current_theme: currentTheme } = data || {};
+	const currentTheme = data.current_theme;
 	const [isConsentChecked, setIsConsentChecked] = useState(false);
 	const matchedTheme = themes.find((theme) => theme.slug === demo.theme);
 
@@ -134,7 +135,10 @@ export const DialogConsent = ({
 								</div>
 							)}
 							{plugins.map((item, index) => (
-								<div className="border border-solid border-[#EBEBEB] rounded px-[16px] py-[14px] mb-[16px]">
+								<div
+									className="border border-solid border-[#EBEBEB] rounded px-[16px] py-[14px] mb-[16px]"
+									key={index}
+								>
 									<div className="flex items-center justify-between" key={index}>
 										<div className="flex items-center gap-[7px]">
 											<p className="m-0 text-[14px] sm:text-[14px] text-[#111]">{item.content}</p>

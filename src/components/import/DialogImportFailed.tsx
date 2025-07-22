@@ -1,11 +1,8 @@
 import { __ } from '@wordpress/i18n';
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { DialogClose, DialogFooter, DialogHeader, DialogTitle } from '../../controls/Dialog';
 
-const DialogImportFailed = ({ handleReimport }: { handleReimport: () => void }) => {
-	const navigate = useNavigate();
-
+const DialogImportFailed = ({ handleTryAgain }: { handleTryAgain: () => void }) => {
 	return (
 		<>
 			<DialogHeader className="flex-row border-0 border-b border-solid border-[#f4f4f4] px-[40px] py-[20px] items-center gap-[8px]">
@@ -19,23 +16,23 @@ const DialogImportFailed = ({ handleReimport }: { handleReimport: () => void }) 
 					<path
 						d="M11.999 22.0005C17.5219 22.0005 21.999 17.5233 21.999 12.0005C21.999 6.47764 17.5219 2.00049 11.999 2.00049C6.47618 2.00049 1.99902 6.47764 1.99902 12.0005C1.99902 17.5233 6.47618 22.0005 11.999 22.0005Z"
 						stroke="#E74C3C"
-						stroke-width="2"
-						stroke-linecap="round"
-						stroke-linejoin="round"
+						strokeWidth="2"
+						strokeLinecap="round"
+						strokeLinejoin="round"
 					/>
 					<path
 						d="M12 8.00049V12.0005"
 						stroke="#E74C3C"
-						stroke-width="2"
-						stroke-linecap="round"
-						stroke-linejoin="round"
+						strokeWidth="2"
+						strokeLinecap="round"
+						strokeLinejoin="round"
 					/>
 					<path
 						d="M12 15.9995H12.0101"
 						stroke="#E74C3C"
-						stroke-width="2"
-						stroke-linecap="round"
-						stroke-linejoin="round"
+						strokeWidth="2"
+						strokeLinecap="round"
+						strokeLinejoin="round"
 					/>
 				</svg>
 				<DialogTitle className="my-0 text-[18px] text-[#383838] !mt-0">
@@ -64,7 +61,7 @@ const DialogImportFailed = ({ handleReimport }: { handleReimport: () => void }) 
 				<button
 					type="button"
 					className="cursor-pointer bg-[#2563EB] text-white border-0 rounded px-[24px] py-[10px] text-[16px] disabled:opacity-50 disabled:cursor-not-allowed"
-					onClick={handleReimport}
+					onClick={handleTryAgain}
 				>
 					{__('Try Again', 'themegrill-demo-importer')}
 				</button>

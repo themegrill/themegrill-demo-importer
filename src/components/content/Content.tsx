@@ -1,19 +1,24 @@
 import React, { useMemo } from 'react';
-import { useDemoContext } from '../../context';
-import { TabsContent } from '../../controls/Tabs';
-import { PagebuilderCategory } from '../../lib/types';
+import { useSearchParams } from 'react-router-dom';
+import { PagebuilderCategory, SearchResultType } from '../../lib/types';
 import CategoryMenu from './CategoryMenu';
 import Demos from './Demos';
 
 type Props = {
 	categories: PagebuilderCategory[];
-	searchParams: URLSearchParams;
+	allDemos: SearchResultType[];
 };
 
-const Content = ({ categories, searchParams }: Props) => {
-	const { theme, pagebuilder, category, plan, search, searchResults } = useDemoContext();
+const Content = ({ categories, allDemos }: Props) => {
+	// const { plan, search, searchResults } = useDemoContext();
+	const [searchParams] = useSearchParams();
+	const theme = searchParams.get('tab') || 'all';
+	const pagebuilder = searchParams.get('pagebuilder') || 'all';
+	const category = searchParams.get('category') || 'all';
+	const plan = searchParams.get('plan') || 'all';
+	const search = searchParams.get('search') || '';
 	const demos = useMemo(() => {
-		return searchResults
+		return allDemos
 			.filter((d) => ('all' !== theme ? d.theme == theme : true))
 			.filter((d) =>
 				'all' !== pagebuilder ? Object.keys(d.pagebuilders).some((p) => p === pagebuilder) : true,
@@ -25,17 +30,26 @@ const Content = ({ categories, searchParams }: Props) => {
 				'all' !== plan ? (plan === 'pro' ? d.pro || d.premium : !d.pro && !d.premium) : true,
 			)
 			.filter((d) => (search ? d.name.toLowerCase().indexOf(search.toLowerCase()) !== -1 : true));
-	}, [theme, category, pagebuilder, plan, search, searchParams]);
+	}, [theme, category, pagebuilder, plan, search, allDemos]);
 
 	return (
-		<TabsContent value={theme} className="mt-0">
+		<div className="mt-0">
 			{categories && (
 				<>
 					<CategoryMenu categories={categories} />
 					<Demos demos={demos} />
 				</>
 			)}
-		</TabsContent>
+		</div>
+
+		// <TabsContent value={theme} className="mt-0">
+		// 	{categories && (
+		// 		<>
+		// 			<CategoryMenu categories={categories} searchParams={searchParams} />
+		// 			<Demos demos={demos} />
+		// 		</>
+		// 	)}
+		// </TabsContent>
 	);
 };
 

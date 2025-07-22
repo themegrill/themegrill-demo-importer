@@ -76,7 +76,7 @@ export type Page = {
 	post_name: string;
 	post_title: string;
 	content: string;
-	featured_image: string;
+	screenshot: string;
 };
 
 export type PageWithSelection = Page & {

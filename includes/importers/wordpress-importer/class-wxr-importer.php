@@ -2483,4 +2483,8 @@ class TG_WXR_Importer extends WP_Importer {
 	public function get_term_new_id( $nav_menu ) {
 		return $this->mapping['term_id'][ $nav_menu ] ?? null;
 	}
+
+	public function get_mapping_data() {
+		return $this->mapping;
+	}
 }

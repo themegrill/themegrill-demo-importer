@@ -1,5 +1,5 @@
 import React from 'react';
-import { useDemoContext } from '../../context';
+import { useSearchParams } from 'react-router-dom';
 import { Button } from '../../controls/Button';
 import {
 	DropdownMenuContent,
@@ -9,18 +9,15 @@ import {
 	DropdownMenu as TGDropdownMenu,
 } from '../../controls/DropdownMenu';
 
-type Props = {
-	plans: Record<string, string>;
-	searchParams: URLSearchParams;
-	setSearchParams: (value: URLSearchParams) => void;
-};
-
-const PlanDropdown = ({ plans, searchParams, setSearchParams }: Props) => {
-	const { plan, setPlan } = useDemoContext();
+const PlanDropdown = ({ plans }: { plans: Record<string, string> }) => {
+	// const { plan, setPlan } = useDemoContext();
+	const [searchParams, setSearchParams] = useSearchParams();
+	const plan = searchParams.get('plan') || 'all';
 	const handleClick = (value: string) => {
-		setPlan(value);
-		searchParams.set('option', value);
-		setSearchParams(searchParams);
+		setSearchParams((prev) => {
+			prev.set('plan', value);
+			return prev;
+		});
 	};
 	return (
 		<TGDropdownMenu>

@@ -6,9 +6,11 @@ import { DialogFooter, DialogHeader, DialogTitle } from '../../controls/Dialog';
 import { SearchResultType, TDIDashboardType } from '../../lib/types';
 
 const DialogImported = ({ demo, data }: { demo: SearchResultType; data: TDIDashboardType }) => {
+	// const { data } = useLocalizedData();
+
 	return (
 		<>
-			<p className="text-[#4CC741] absolute bottom-[480px] left-[15%] sm:bottom-[370px] sm:left-[22%] text-[30px] sm:text-[48px] lily-script-one-regular">
+			<p className="text-[#4CC741] absolute bottom-[480px] left-[15%] sm:bottom-[418px] sm:left-[22%] text-[30px] sm:text-[48px] lily-script-one-regular m-0 mb-[32px]">
 				{__('Congratulation!!', 'themegrill-demo-importer')}
 			</p>
 			<DialogHeader className="border-0 border-b border-solid border-[#f4f4f4] px-[40px] py-[20px]">

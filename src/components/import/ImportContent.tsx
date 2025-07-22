@@ -1,66 +1,89 @@
 import apiFetch from '@wordpress/api-fetch';
 import { __, sprintf } from '@wordpress/i18n';
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useDemoContext } from '../../context';
+import Lottie from 'lottie-react';
+import React, { useEffect, useState } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import loader from '../../assets/animation/loader.json';
 import { themes } from '../../lib/themes';
 import { __TDI_DASHBOARD__, SearchResultType, TDIDashboardType } from '../../lib/types';
-import { useLocalizedData } from '../../LocalizedDataContext';
 import Template from '../template/Template';
 import ImportButton from './ImportButton';
 
 type Props = {
 	demo: SearchResultType;
-	initialTheme: string;
+	theme: string;
 	iframeRef: React.RefObject<HTMLIFrameElement>;
 	siteTitle: string;
 	siteTagline: string;
 	siteLogoId: number;
+	// currentTheme: string;
+	// zakraProInstalled: boolean;
+	// zakraProActivated: boolean;
+	data: TDIDashboardType;
+	setData: (value: TDIDashboardType) => void;
+	device: string;
 };
 
 const ImportContent = ({
 	demo,
-	initialTheme,
+	theme,
 	iframeRef,
 	siteTitle,
 	siteTagline,
 	siteLogoId,
+	// currentTheme,
+	// zakraProActivated,
+	// zakraProInstalled,
+	data,
+	setData,
+	device,
 }: Props) => {
 	const navigate = useNavigate();
-	const {
-		pagebuilder,
-		setPagebuilder,
-		theme,
-		setTheme,
-		setCategory,
-		currentTheme,
-		setCurrentTheme,
-		zakraProInstalled,
-		zakraProActivated,
-	} = useDemoContext();
+	// const {
+	// 	pagebuilder,
+	// 	setPagebuilder,
+	// 	theme,
+	// 	setTheme,
+	// 	setCategory,
+	// 	currentTheme,
+	// 	setCurrentTheme,
+	// 	zakraProInstalled,
+	// 	zakraProActivated,
+	// } = useDemoContext();
+	// const { data, setData } = useLocalizedData();
+	// const {
+	// 	current_theme: currentTheme,
+	// 	zakra_pro_installed: zakraProInstalled,
+	// 	zakra_pro_activated: zakraProActivated,
+	// } = data || {};
+	const { pagebuilder = '' } = useParams();
+	const [isIframeLoading, setIsIframeLoading] = useState(true);
+	const [deviceClass, setDeviceClass] = useState('');
 	const [collapseTemplate, setCollapseTemplate] = useState(false);
-	// const [currentTheme, setCurrentTheme] = useState(__TDI_DASHBOARD__.current_theme);
+	const [isActivating, setIsActivating] = useState(false);
 	const count = demo.pagebuilder_data[pagebuilder]?.pages.length || 0;
 	const matchedTheme = themes.find((theme) => theme.slug === demo.theme);
-	const { setData } = useLocalizedData();
+
+	const location = useLocation();
 
 	const handleExitClick = (currentTheme: string) => {
 		const baseTheme = currentTheme.endsWith('-pro')
 			? currentTheme.replace('-pro', '')
 			: currentTheme;
-		const activeTab = baseTheme === demo.theme ? baseTheme : 'all';
+		const activeTheme = baseTheme === demo.theme ? baseTheme : 'all';
 
-		setTheme(activeTab);
-		setPagebuilder('all');
-		setCategory('all');
+		// setTheme(activeTheme);
+		// setPagebuilder('all');
+		// setCategory('all');
 
 		const newParams = new URLSearchParams({
-			tab: activeTab,
+			theme: activeTheme,
 			category: 'all',
 			pagebuilder: 'all',
 		});
 
 		window.location.hash = `/?${newParams.toString()}`;
+		// navigate(-1);
 	};
 
 	const handleClick = (collapse: Boolean) => {
@@ -70,7 +93,7 @@ const ImportContent = ({
 	const checkThemeExists = (demo: SearchResultType) => {
 		const proTheme = demo.theme + '-pro';
 		if (demo.theme === 'zakra') {
-			if (zakraProInstalled) {
+			if (data.zakra_pro_installed) {
 				return true;
 			}
 			return false;
@@ -80,6 +103,7 @@ const ImportContent = ({
 	};
 
 	const activatePro = async (slug: string) => {
+		setIsActivating(true);
 		const proSlug = slug + '-pro';
 		const response = await apiFetch<{
 			success: boolean;
@@ -92,11 +116,11 @@ const ImportContent = ({
 			},
 		});
 		if (response.success) {
-			setCurrentTheme(proSlug);
 			const updated = await apiFetch<TDIDashboardType>({
 				path: '/tg-demo-importer/v1/localized-data',
 			});
 			setData(updated);
+			setIsActivating(false);
 		}
 	};
 
@@ -105,9 +129,9 @@ const ImportContent = ({
 			<>
 				<button
 					type="button"
-					className="bg-white rounded-full px-[16px] py-[4px] border border-solid border-[#f4f4f4] cursor-pointer absolute bottom-[400px] sm:bottom-[350px] left-[50%] shadow"
+					className="leading-none bg-white rounded-full px-[16px] py-[8px] border border-solid border-[#E9E9E9] cursor-pointer absolute bottom-[500px] sm:bottom-[364px] left-[50%]"
 					onClick={() => handleClick(collapseTemplate)}
-					style={{ zIndex: 100 }}
+					style={{ zIndex: 100, boxShadow: '0px 4px 8px 0px rgba(0, 0, 0, 0.15)' }}
 				>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
@@ -128,53 +152,55 @@ const ImportContent = ({
 				<Template
 					pages={demo.pagebuilder_data[pagebuilder]?.pages || []}
 					demo={demo}
-					initialTheme={initialTheme}
+					theme={theme}
 					siteTitle={siteTitle}
 					siteTagline={siteTagline}
 					siteLogoId={siteLogoId}
+					data={data}
+					setData={setData}
 				/>
 			</>
 		) : (
 			<>
 				<div
-					className="absolute bottom-0 w-full border-0 border-t border-t-[#E1E1E1] border-solid"
+					className="absolute bottom-0 box-border w-full border-0 border-t border-t-[#E1E1E1] border-solid flex flex-wrap justify-between items-center bg-white px-[32px] py-[24px] gap-[24px]"
 					style={{ boxShadow: '0px -8px 25px 0px rgba(0, 0, 0, 0.04)' }}
 				>
-					<div className="flex flex-wrap justify-between items-center bg-white px-[32px] py-[24px]">
-						<div>
-							<h4 className="text-[22px] m-0 mb-[8px] text-[#383838]">{demo.name}</h4>
-							<p className="text-[#7a7a7a] text-[14px] mt-4 sm:m-0">
-								{sprintf(
-									__(
-										'%s Templates (You can select pages manually by clicking on templates.)',
-										'themegrill-demo-importer',
-									),
-									count,
-								)}
-							</p>
-						</div>
-						<div className=" flex flex-wrap gap-[16px]">
-							<ImportButton
-								buttonTitle="Import All"
-								initialTheme={initialTheme}
-								demo={demo}
-								siteTitle={siteTitle}
-								siteTagline={siteTagline}
-								siteLogoId={siteLogoId}
-							/>
-							<button
-								className="bg-white rounded-[2px] px-[16px] py-[8px] border border-solid border-[#2563EB] text-[#2563EB] font-[600] cursor-pointer"
-								onClick={() => handleClick(false)}
-							>
-								{__('Select Pages', 'themegrill-demo-importer')}
-							</button>
-						</div>
+					<div>
+						<h4 className="text-[22px] m-0 mb-[8px] text-[#383838]">{demo.name}</h4>
+						<p className="text-[#7a7a7a] text-[14px] mt-4 sm:m-0">
+							{sprintf(
+								__(
+									'%s Templates (You can select pages manually by clicking on templates.)',
+									'themegrill-demo-importer',
+								),
+								count,
+							)}
+						</p>
+					</div>
+					<div className=" flex flex-wrap gap-[16px]">
+						<ImportButton
+							buttonTitle="Import All"
+							theme={theme}
+							demo={demo}
+							siteTitle={siteTitle}
+							siteTagline={siteTagline}
+							siteLogoId={siteLogoId}
+							data={data}
+							setData={setData}
+						/>
+						<button
+							className="bg-white rounded-[2px] px-[16px] py-[8px] border border-solid border-[#2563EB] text-[#2563EB] font-[600] cursor-pointer"
+							onClick={() => handleClick(false)}
+						>
+							{__('Select Pages', 'themegrill-demo-importer')}
+						</button>
 					</div>
 				</div>
 
 				<button
 					type="button"
-					className="bg-[#1E1E1E] rounded-full px-[18px] py-[8px] border border-solid border-[#E1E1E1] cursor-pointer absolute bottom-20 left-[5%] sm:left-[50%] sm:translate-x-[-50%]"
+					className="leading-none bg-[#1E1E1E] rounded-full px-[16px] py-[8px] border border-solid border-[#E1E1E1] cursor-pointer absolute bottom-20 sm:left-[50%] shadow-lg"
 					onClick={() => handleClick(collapseTemplate)}
 				>
 					<svg
@@ -185,14 +211,14 @@ const ImportContent = ({
 						fill="none"
 					>
 						<path
-							d="M7 10.8182V3.18187"
+							d="M7 10.8188V3.18248"
 							stroke="white"
 							strokeWidth="1.09091"
 							strokeLinecap="round"
 							strokeLinejoin="round"
 						/>
 						<path
-							d="M3.18187 7.00006L7.00006 3.18188L10.8182 7.00006"
+							d="M3.182 7.00049L7.00018 3.18231L10.8184 7.00049"
 							stroke="white"
 							strokeWidth="1.09091"
 							strokeLinecap="round"
@@ -203,13 +229,27 @@ const ImportContent = ({
 			</>
 		);
 
+	useEffect(() => {
+		if (device === 'desktop') {
+			setDeviceClass('w-full');
+		} else if (device === 'tablet') {
+			setDeviceClass('w-[768px]');
+		} else if (device === 'mobile') {
+			setDeviceClass('w-[375px]');
+		}
+	}, [device]);
+
+	useEffect(() => {
+		setIsIframeLoading(true);
+	}, [pagebuilder]);
+
 	return (
 		<div className="tg-full-overlay-content bg-[#f4f4f4] w-full relative">
 			<button
 				type="button"
-				className="bg-[#0E0E0E] rounded-full px-[16px] py-[8px] border border-solid border-[#0E0E0E] cursor-pointer absolute top-[32px] left-[32px]"
+				className="bg-[#0E0E0E] rounded-full px-[18px] py-[10px] border border-solid border-[#0E0E0E] cursor-pointer absolute top-[32px] left-[32px] flex items-center gap-[8px]"
 				style={{ boxShadow: '0px 8px 10px 0px rgba(0, 0, 0, 0.04)' }}
-				onClick={() => handleExitClick(currentTheme)}
+				onClick={() => handleExitClick(data.current_theme)}
 			>
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
@@ -230,62 +270,138 @@ const ImportContent = ({
 						</clipPath>
 					</defs>
 				</svg>
-				<span className="ml-[8px] text-white font-[600]">
+				<span className="text-white font-[600] text-[15px]">
 					{__('Exit', 'themegrill-demo-importer')}
 				</span>
 			</button>
 
+			{isIframeLoading && (
+				<div
+					style={{
+						display: 'flex',
+						justifyContent: 'center',
+						alignItems: 'center',
+						height: '200px',
+					}}
+				>
+					<p>Loading iframe...</p>
+				</div>
+			)}
 			<iframe
 				ref={iframeRef}
-				src={demo.url}
+				src={demo.pagebuilder_data[pagebuilder]?.url}
 				title={`${demo.name} Preview`}
-				className="w-full h-full"
+				className={`h-full ml-auto mr-auto ${deviceClass}`}
+				style={{ display: isIframeLoading ? 'none' : 'block' }}
+				onLoad={() => setIsIframeLoading(false)}
 			></iframe>
-
 			{demo.pro || demo.premium ? (
 				checkThemeExists(demo) ? (
-					(demo.theme === 'zakra' ? zakraProActivated : demo.theme + '-pro' === currentTheme) ? (
+					(
+						demo.theme === 'zakra'
+							? data.zakra_pro_activated
+							: demo.theme + '-pro' === data.current_theme
+					) ? (
 						renderImportSection()
 					) : (
-						<div className="h-[120px] sm:h-[120px] w-full bg-white p-[25px] sm:p-[32px] shadow absolute bottom-0 box-border">
-							<div className="mb-[24px] flex flex-wrap justify-between items-center">
-								<div>
-									<h4 className="text-[22px] m-0 mb-[8px] text-[#383838]">{demo.name}</h4>
-									<p className="text-[#7a7a7a] text-[14px] mt-4 sm:m-0">
-										{__('This is pro demo.', 'themegrill-demo-importer')}
-									</p>
-								</div>
-								<div className="flex flex-wrap gap-[16px]">
-									<button
-										className="cursor-pointer bg-[#2563EB] text-white border-0 rounded p-[16px] text-[16px] font-[600] no-underline capitalize hover:text-white visited:text-white"
-										onClick={() => activatePro(demo.theme)}
-									>
-										{__('Activate Pro', 'themegrill-demo-importer')}
-									</button>
-								</div>
-							</div>
+						<div className="w-full bg-[#3F76ED] px-[20px] py-[11px] shadow absolute bottom-0 box-border flex flex-wrap justify-center items-center">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width="23"
+								height="22"
+								viewBox="0 0 23 22"
+								fill="none"
+							>
+								<path
+									d="M11.0988 2.99362C11.1384 2.92176 11.1965 2.86184 11.2671 2.8201C11.3377 2.77836 11.4183 2.75635 11.5003 2.75635C11.5823 2.75635 11.6629 2.77836 11.7335 2.8201C11.8041 2.86184 11.8622 2.92176 11.9018 2.99362L14.6078 8.13062C14.6723 8.24957 14.7624 8.35276 14.8715 8.43277C14.9807 8.51279 15.1062 8.56765 15.239 8.59341C15.3719 8.61917 15.5088 8.6152 15.6399 8.58178C15.7711 8.54837 15.8932 8.48633 15.9975 8.40012L19.9181 5.04146C19.9933 4.98024 20.0861 4.94449 20.1829 4.93934C20.2798 4.93419 20.3758 4.95991 20.4571 5.01281C20.5385 5.0657 20.6009 5.14303 20.6355 5.23367C20.6701 5.32431 20.675 5.42359 20.6496 5.5172L18.0517 14.9094C17.9987 15.1016 17.8845 15.2712 17.7263 15.3926C17.5682 15.5141 17.3748 15.5806 17.1754 15.5822H5.82614C5.62661 15.5808 5.43299 15.5144 5.27467 15.3929C5.11634 15.2715 5.00196 15.1017 4.94889 14.9094L2.35197 5.51812C2.32654 5.4245 2.33146 5.32523 2.36604 5.23459C2.40061 5.14395 2.46306 5.06661 2.54438 5.01372C2.62571 4.96083 2.72172 4.93511 2.81859 4.94026C2.91547 4.9454 3.00821 4.98116 3.08347 5.04237L7.00314 8.40104C7.10746 8.48724 7.22956 8.54928 7.3607 8.5827C7.49183 8.61612 7.62874 8.62009 7.76159 8.59433C7.89444 8.56856 8.01994 8.5137 8.12908 8.43369C8.23821 8.35367 8.32828 8.25049 8.39281 8.13154L11.0988 2.99362Z"
+									fill="#FFB81C"
+								/>
+								<path
+									d="M5.08398 19.25H17.9173"
+									stroke="#FFB81C"
+									strokeWidth="1.83333"
+									strokeLinecap="round"
+									strokeLinejoin="round"
+								/>
+							</svg>
+							<p className="text-[#fff] text-[14px] m-0 ml-[6px] mr-[12px]">
+								{__(
+									'This template is only available with a Pro subscription. Activate Pro to access this and other premium templates !',
+									'themegrill-demo-importer',
+								)}
+							</p>
+							{isActivating ? (
+								<button className="bg-[#fff]/90 text-[#2563EB] border-0 rounded px-[8px] py-[5px] text-[13px] font-[600] no-underline capitalize flex items-center gap-[4px] cursor-not-allowed">
+									<Lottie animationData={loader} loop={true} autoplay={true} className="h-4" />
+									{__('Activating...', 'themegrill-demo-importer')}
+								</button>
+							) : (
+								<button
+									className="cursor-pointer bg-[#fff] text-[#2563EB] border-0 rounded px-[8px] py-[5px] text-[13px] font-[600] no-underline capitalize flex items-center gap-[4px]"
+									onClick={() => activatePro(demo.theme)}
+								>
+									{__('Activate Pro', 'themegrill-demo-importer')}
+								</button>
+							)}
 						</div>
 					)
 				) : (
-					<div className="h-[50px] sm:h-[50px] w-full bg-white p-[25px] sm:p-[32px] shadow absolute bottom-0 ">
-						<div className="mb-[24px] flex flex-wrap justify-between items-center">
-							<div>
-								<h4 className="text-[22px] m-0 mb-[8px] text-[#383838]">{demo.name}</h4>
-								<p className="text-[#7a7a7a] text-[14px] mt-4 sm:m-0">
-									{__('This is pro demo.', 'themegrill-demo-importer')}
-								</p>
-							</div>
-							<div className="mr-[70px] flex flex-wrap gap-[16px]">
-								<a
-									href={matchedTheme?.pricing_link ?? '#'}
-									target="_blank"
-									rel="noopener noreferrer"
-									className="cursor-pointer bg-[#2563EB] text-white border-0 rounded p-[16px] text-[16px] w-[80%] font-[600] no-underline capitalize hover:text-white visited:text-white"
-								>
-									{__('Upgrade to Pro', 'themegrill-demo-importer')}
-								</a>
-							</div>
-						</div>
+					<div className="w-full bg-[#3F76ED] px-[20px] py-[11px] absolute bottom-0 box-border flex flex-wrap justify-center items-center shadow-custom-top">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							width="23"
+							height="22"
+							viewBox="0 0 23 22"
+							fill="none"
+						>
+							<path
+								d="M11.0988 2.99362C11.1384 2.92176 11.1965 2.86184 11.2671 2.8201C11.3377 2.77836 11.4183 2.75635 11.5003 2.75635C11.5823 2.75635 11.6629 2.77836 11.7335 2.8201C11.8041 2.86184 11.8622 2.92176 11.9018 2.99362L14.6078 8.13062C14.6723 8.24957 14.7624 8.35276 14.8715 8.43277C14.9807 8.51279 15.1062 8.56765 15.239 8.59341C15.3719 8.61917 15.5088 8.6152 15.6399 8.58178C15.7711 8.54837 15.8932 8.48633 15.9975 8.40012L19.9181 5.04146C19.9933 4.98024 20.0861 4.94449 20.1829 4.93934C20.2798 4.93419 20.3758 4.95991 20.4571 5.01281C20.5385 5.0657 20.6009 5.14303 20.6355 5.23367C20.6701 5.32431 20.675 5.42359 20.6496 5.5172L18.0517 14.9094C17.9987 15.1016 17.8845 15.2712 17.7263 15.3926C17.5682 15.5141 17.3748 15.5806 17.1754 15.5822H5.82614C5.62661 15.5808 5.43299 15.5144 5.27467 15.3929C5.11634 15.2715 5.00196 15.1017 4.94889 14.9094L2.35197 5.51812C2.32654 5.4245 2.33146 5.32523 2.36604 5.23459C2.40061 5.14395 2.46306 5.06661 2.54438 5.01372C2.62571 4.96083 2.72172 4.93511 2.81859 4.94026C2.91547 4.9454 3.00821 4.98116 3.08347 5.04237L7.00314 8.40104C7.10746 8.48724 7.22956 8.54928 7.3607 8.5827C7.49183 8.61612 7.62874 8.62009 7.76159 8.59433C7.89444 8.56856 8.01994 8.5137 8.12908 8.43369C8.23821 8.35367 8.32828 8.25049 8.39281 8.13154L11.0988 2.99362Z"
+								fill="#FFB81C"
+							/>
+							<path
+								d="M5.08398 19.25H17.9173"
+								stroke="#FFB81C"
+								strokeWidth="1.83333"
+								strokeLinecap="round"
+								strokeLinejoin="round"
+							/>
+						</svg>
+						<p className="text-[#fff] text-[14px] m-0 ml-[6px] mr-[12px]">
+							{__(
+								'This template is only available with a Pro subscription. Upgrade to Pro to access this and other premium templates !',
+								'themegrill-demo-importer',
+							)}
+						</p>
+						<a
+							href={matchedTheme?.pricing_link ?? '#'}
+							target="_blank"
+							rel="noopener noreferrer"
+							className="cursor-pointer bg-[#fff] text-[#2563EB] border-0 rounded px-[8px] py-[5px] text-[13px] font-[600] no-underline capitalize flex items-center gap-[4px] visited:text-[#2563EB]"
+						>
+							{__('Upgrade Now', 'themegrill-demo-importer')}
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width="16"
+								height="16"
+								viewBox="0 0 16 16"
+								fill="none"
+							>
+								<path
+									d="M4.875 4.875H11.125V11.125"
+									stroke="#2563EB"
+									strokeWidth="1.25"
+									strokeLinecap="round"
+									strokeLinejoin="round"
+								/>
+								<path
+									d="M4.875 11.125L11.125 4.875"
+									stroke="#2563EB"
+									strokeWidth="1.25"
+									strokeLinecap="round"
+									strokeLinejoin="round"
+								/>
+							</svg>
+						</a>
 					</div>
 				)
 			) : (
