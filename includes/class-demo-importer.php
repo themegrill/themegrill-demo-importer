@@ -28,6 +28,8 @@ class TG_Demo_Importer {
 	 * @var TG_WXR_Importer
 	 */
 	public static $importer;
+	public static $themegrill_base_url = 'http://themegrill-demos-api.test/wp-json/tgda/v1';
+	// public static $themegrill_base_url = 'https://themegrilldemos.com/wp-json/tgda/v1';
 
 	/**
 	 * Constructor.
@@ -135,12 +137,12 @@ class TG_Demo_Importer {
 			$is_pro_theme = strpos( $theme, '-pro' ) !== false;
 			if ( $is_pro_theme ) {
 				$base_theme = $is_pro_theme ? str_replace( '-pro', '', $theme ) : $theme;
-				$data       = wp_remote_get( 'http://themegrill-demos-api.test/wp-json/tgda/v1/sites?theme=' . $base_theme );
+				$data       = wp_remote_get( static::$themegrill_base_url . '/sites?theme=' . $base_theme );
 			} else {
-				$data = wp_remote_get( 'http://themegrill-demos-api.test/wp-json/tgda/v1/sites?theme=' . $theme );
+				$data = wp_remote_get( static::$themegrill_base_url . '/sites?theme=' . $theme );
 			}
 		} else {
-			$data = wp_remote_get( 'http://themegrill-demos-api.test/wp-json/tgda/v1/sites' );
+			$data = wp_remote_get( static::$themegrill_base_url . '/sites' );
 		}
 		if ( is_wp_error( $data ) ) {
 			return;
