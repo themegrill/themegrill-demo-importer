@@ -32,7 +32,7 @@ if ( ! class_exists( 'ThemeGrill_Demo_Importer' ) ) {
  *
  * Returns the main instance of TGDM to prevent the need to use globals.
  *
- * @since  1.3.4
+ * @since  1.9.9
  * @return ThemeGrill_Demo_Importer
  */
 function tgdm() {

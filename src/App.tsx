@@ -5,16 +5,17 @@ import Home from './Home';
 import { __TDI_DASHBOARD__, TDIDashboardType } from './lib/types';
 
 const App = () => {
-	const [data, setData] = useState<TDIDashboardType>(__TDI_DASHBOARD__);
+	const [localizedData, setLocalizedData] = useState<TDIDashboardType>(__TDI_DASHBOARD__);
+	const allProps = {
+		localizedData,
+		setLocalizedData,
+	};
 
 	return (
 		<HashRouter>
 			<Routes>
-				<Route path="/" element={<Home data={data} setData={setData} />} />
-				<Route
-					path="/import-detail/:slug/:pagebuilder"
-					element={<Import data={data} setData={setData} />}
-				/>
+				<Route path="/" element={<Home {...allProps} />} />
+				<Route path="/import-detail/:slug/:pagebuilder" element={<Import {...allProps} />} />
 			</Routes>
 		</HashRouter>
 	);

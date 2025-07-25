@@ -1,12 +1,12 @@
 import { __ } from '@wordpress/i18n';
 import React, { useMemo } from 'react';
 import { useParams } from 'react-router-dom';
-import { SearchResultType } from '../../lib/types';
+import { Demo, PagebuilderCategory } from '../../lib/types';
 import PagebuilderDropdownMenu from '../dropdown-menu/PagebuilderDropdownMenu';
 import LogoUploader from '../uploader/LogoUploader';
 
 type Props = {
-	demo: SearchResultType;
+	demo: Demo;
 	iframeRef: React.RefObject<HTMLIFrameElement>;
 	handleSiteTitleChange: (value: string) => void;
 	setSiteTagline: (value: string) => void;
@@ -24,32 +24,29 @@ const ImportSidebar = ({
 	device,
 	setDevice,
 }: Props) => {
-	// const {
-	// 	theme,
-	// 	pagebuilder,
-	// 	category,
-	// 	plan,
-	// 	search,
-	// 	searchResults,
-	// 	setTheme,
-	// 	setPagebuilder,
-	// 	setCategory,
-	// 	setPlan,
-	// 	setSearchResults,
-	// } = useDemoContext();
 	const { pagebuilder = '' } = useParams();
 
-	const pagebuilders = Object.entries(demo?.pagebuilders || {}).map(([key, value]) => {
-		return {
+	const currentPagebuilder = useMemo(() => {
+		if (!demo?.pagebuilders || !pagebuilder) return '';
+
+		const pb = demo.pagebuilders[pagebuilder];
+		return pb ? `${pb}` : '';
+	}, [demo?.pagebuilders, pagebuilder]);
+
+	const transformPagebuilders = (
+		pagebuilders: Record<string, string> | null | undefined,
+	): PagebuilderCategory[] => {
+		if (!pagebuilders) return [];
+		return Object.entries(pagebuilders).map(([key, value]) => ({
 			slug: key,
 			value: value,
-		};
-	});
+			count: 0,
+		}));
+	};
 
-	const currentPagebuilder = useMemo(() => {
-		const pb = pagebuilders.find((p) => p.slug === pagebuilder);
-		return pb ? `${pb.value}` : '';
-	}, [pagebuilders, pagebuilder]);
+	const transformedPagebuilders = useMemo(() => {
+		return transformPagebuilders(demo?.pagebuilders);
+	}, [demo?.pagebuilders]);
 
 	// let currentPagebuilder = '';
 
@@ -84,13 +81,13 @@ const ImportSidebar = ({
 					</p>
 				</div>
 				<hr className="mt-[24px] border-b-[#EDEDED]" />
-				{pagebuilders.length > 1 && (
+				{Object.entries(demo.pagebuilders || {}).length > 1 && (
 					<div className="my-[24px]">
 						<h4 className="text-[17px] mb-[16px] text-[#383838]">
 							{__('Choose Builder', 'themegrill-demo-importer')}
 						</h4>
 						<PagebuilderDropdownMenu
-							pagebuilders={pagebuilders}
+							pagebuilders={transformedPagebuilders}
 							currentPagebuilder={currentPagebuilder}
 							isSidebar={true}
 						/>

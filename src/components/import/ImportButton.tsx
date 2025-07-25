@@ -2,7 +2,7 @@ import apiFetch from '@wordpress/api-fetch';
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Dialog, DialogContent, DialogTrigger } from '../../controls/Dialog';
-import { PageWithSelection, SearchResultType, TDIDashboardType } from '../../lib/types';
+import { Demo, PageWithSelection, TDIDashboardType } from '../../lib/types';
 import DialogCleanup from './DialogCleanup';
 import { DialogConsent } from './DialogConsent';
 import DialogImported from './DialogImported';
@@ -12,8 +12,7 @@ import DialogImporting from './DialogImporting';
 type Props = {
 	buttonTitle: string;
 	pages?: PageWithSelection[];
-	theme: string;
-	demo: SearchResultType;
+	demo: Demo;
 	siteTitle: string;
 	siteTagline: string;
 	siteLogoId: number;
@@ -27,7 +26,6 @@ type Props = {
 
 const ImportButton = ({
 	buttonTitle,
-	theme,
 	demo,
 	siteTitle,
 	siteTagline,
@@ -57,7 +55,7 @@ const ImportButton = ({
 	const { pagebuilder = '' } = useParams();
 
 	const IMPORT_ACTIONS = {
-		...(data.current_theme !== demo.theme
+		...(data.current_theme !== demo.theme_slug
 			? {
 					'install-theme': {
 						progressWeight: 10,
@@ -124,8 +122,6 @@ const ImportButton = ({
 	const [isImportFailed, setIsImportFailed] = useState(false);
 	const [isCleanInstall, setIsCleanInstall] = useState(false);
 	const [isCleanInstallCompleted, setIsCleanInstallCompleted] = useState(false);
-
-	const totalPagebuilders = Object.entries(demo?.pagebuilders)?.length ?? 0;
 
 	const handleInstallation = async () => {
 		const selectedAdditionalPlugins = plugins
@@ -208,7 +204,7 @@ const ImportButton = ({
 			method: 'POST',
 		});
 		if (response.success) {
-			if (data.current_theme !== demo.theme) {
+			if (data.current_theme !== demo.theme_slug) {
 				let key: 'install-theme' = 'install-theme';
 				const step = IMPORT_ACTIONS[key]!;
 				setImportAction(key);

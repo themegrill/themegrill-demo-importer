@@ -3,15 +3,14 @@ import { __, sprintf } from '@wordpress/i18n';
 import Lottie from 'lottie-react';
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import loader from '../../assets/animation/loader.json';
+import spinner from '../../assets/animation/spinner.json';
 import { themes } from '../../lib/themes';
-import { __TDI_DASHBOARD__, SearchResultType, TDIDashboardType } from '../../lib/types';
+import { __TDI_DASHBOARD__, Demo, TDIDashboardType } from '../../lib/types';
 import Template from '../template/Template';
 import ImportButton from './ImportButton';
 
 type Props = {
-	demo: SearchResultType;
-	theme: string;
+	demo: Demo;
 	iframeRef: React.RefObject<HTMLIFrameElement>;
 	siteTitle: string;
 	siteTagline: string;
@@ -26,7 +25,6 @@ type Props = {
 
 const ImportContent = ({
 	demo,
-	theme,
 	iframeRef,
 	siteTitle,
 	siteTagline,
@@ -61,8 +59,8 @@ const ImportContent = ({
 	const [deviceClass, setDeviceClass] = useState('');
 	const [collapseTemplate, setCollapseTemplate] = useState(false);
 	const [isActivating, setIsActivating] = useState(false);
-	const count = demo.pagebuilder_data[pagebuilder]?.pages.length || 0;
-	const matchedTheme = themes.find((theme) => theme.slug === demo.theme);
+	const count = demo?.pagebuilder_data[pagebuilder]?.pages.length || 0;
+	const matchedTheme = themes.find((theme) => theme.slug === demo.theme_slug);
 
 	const location = useLocation();
 
@@ -70,7 +68,7 @@ const ImportContent = ({
 		const baseTheme = currentTheme.endsWith('-pro')
 			? currentTheme.replace('-pro', '')
 			: currentTheme;
-		const activeTheme = baseTheme === demo.theme ? baseTheme : 'all';
+		const activeTheme = baseTheme === demo.theme_slug ? baseTheme : 'all';
 
 		// setTheme(activeTheme);
 		// setPagebuilder('all');
@@ -90,9 +88,9 @@ const ImportContent = ({
 		setCollapseTemplate(!collapse);
 	};
 
-	const checkThemeExists = (demo: SearchResultType) => {
-		const proTheme = demo.theme + '-pro';
-		if (demo.theme === 'zakra') {
+	const checkThemeExists = (demo: Demo) => {
+		const proTheme = demo.theme_slug + '-pro';
+		if (demo.theme_slug === 'zakra') {
 			if (data.zakra_pro_installed) {
 				return true;
 			}
@@ -152,7 +150,6 @@ const ImportContent = ({
 				<Template
 					pages={demo.pagebuilder_data[pagebuilder]?.pages || []}
 					demo={demo}
-					theme={theme}
 					siteTitle={siteTitle}
 					siteTagline={siteTagline}
 					siteLogoId={siteLogoId}
@@ -181,7 +178,6 @@ const ImportContent = ({
 					<div className=" flex flex-wrap gap-[16px]">
 						<ImportButton
 							buttonTitle="Import All"
-							theme={theme}
 							demo={demo}
 							siteTitle={siteTitle}
 							siteTagline={siteTagline}
@@ -235,7 +231,7 @@ const ImportContent = ({
 		} else if (device === 'tablet') {
 			setDeviceClass('w-[768px]');
 		} else if (device === 'mobile') {
-			setDeviceClass('w-[375px]');
+			setDeviceClass('w-[420px]');
 		}
 	}, [device]);
 
@@ -298,9 +294,9 @@ const ImportContent = ({
 			{demo.pro || demo.premium ? (
 				checkThemeExists(demo) ? (
 					(
-						demo.theme === 'zakra'
+						demo.theme_slug === 'zakra'
 							? data.zakra_pro_activated
-							: demo.theme + '-pro' === data.current_theme
+							: demo.theme_slug + '-pro' === data.current_theme
 					) ? (
 						renderImportSection()
 					) : (
@@ -332,13 +328,13 @@ const ImportContent = ({
 							</p>
 							{isActivating ? (
 								<button className="bg-[#fff]/90 text-[#2563EB] border-0 rounded px-[8px] py-[5px] text-[13px] font-[600] no-underline capitalize flex items-center gap-[4px] cursor-not-allowed">
-									<Lottie animationData={loader} loop={true} autoplay={true} className="h-4" />
+									<Lottie animationData={spinner} loop={true} autoplay={true} className="h-4" />
 									{__('Activating...', 'themegrill-demo-importer')}
 								</button>
 							) : (
 								<button
 									className="cursor-pointer bg-[#fff] text-[#2563EB] border-0 rounded px-[8px] py-[5px] text-[13px] font-[600] no-underline capitalize flex items-center gap-[4px]"
-									onClick={() => activatePro(demo.theme)}
+									onClick={() => activatePro(demo.theme_slug)}
 								>
 									{__('Activate Pro', 'themegrill-demo-importer')}
 								</button>

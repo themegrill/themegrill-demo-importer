@@ -8,6 +8,10 @@ class TG_Importer_REST_Controller extends WP_REST_Controller {
 
 	protected $fetch_attachments = true;
 
+	protected $themegrill_base_url = 'http://themegrill-demos-api.test/';
+
+	protected $namespace2 = 'wp-json/themegrill-demos/v1';
+
 	public function __construct() {
 		$this->includes();
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_nav_menu_items' ) );
@@ -40,6 +44,28 @@ class TG_Importer_REST_Controller extends WP_REST_Controller {
 	}
 
 	public function register_routes() {
+		register_rest_route(
+			$this->namespace,
+			'/sites',
+			array(
+				array(
+					'methods'             => 'GET',
+					'callback'            => array( $this, 'tgdi_get_sites' ),
+					'permission_callback' => '__return_true',
+				),
+			)
+		);
+		register_rest_route(
+			$this->namespace,
+			'/data',
+			array(
+				array(
+					'methods'             => 'GET',
+					'callback'            => array( $this, 'tgdi_site_data' ),
+					'permission_callback' => '__return_true',
+				),
+			)
+		);
 		register_rest_route(
 			$this->namespace,
 			'/install',
@@ -123,6 +149,84 @@ class TG_Importer_REST_Controller extends WP_REST_Controller {
 					'permission_callback' => '__return_true',
 				),
 			)
+		);
+	}
+
+	public function tgdi_get_sites( $request ) {
+		$theme = $request->get_param( 'theme' );
+		// $category    = $request->get_param( 'category' );
+		// $pagebuilder = $request->get_param( 'pagebuilder' );
+		// $plan        = $request->get_param( 'plan' );
+		// $search      = $request->get_param( 'search' );
+
+		// Build query parameters array
+		$query_params = array();
+
+		if ( ! empty( $theme ) ) {
+			$query_params['theme'] = $theme;
+		}
+
+		// if ( ! empty( $category ) ) {
+		//  $query_params['category'] = $category;
+		// }
+
+		// if ( ! empty( $pagebuilder ) ) {
+		//  $query_params['pagebuilder'] = $pagebuilder;
+		// }
+
+		// if ( ! empty( $plan ) ) {
+		//  $query_params['plan'] = $plan;
+		// }
+
+		// if ( ! empty( $search ) ) {
+		//  $query_params['search'] = $search;
+		// }
+
+		// Build the URL with query parameters
+		$url = $this->themegrill_base_url . $this->namespace2 . '/sites';
+		if ( ! empty( $query_params ) ) {
+			$url = add_query_arg( $query_params, $url );
+		}
+
+		$all_data = wp_remote_get( $url );
+		$data     = json_decode( wp_remote_retrieve_body( $all_data ) );
+		return new WP_REST_Response(
+			array(
+				'success'        => true,
+				'data'           => $data->data,
+				'filter_options' => $data->filter_options,
+			),
+			200
+		);
+
+		// $theme            = get_option( 'template' );
+		// $instance         = ThemeGrill_Demo_Importer::instance();
+		// $supported_themes = $instance->get_core_supported_themes();
+		// if ( in_array( $theme, $supported_themes, true ) ) {
+		//  $is_pro_theme = strpos( $theme, '-pro' ) !== false;
+		//  if ( $is_pro_theme ) {
+		//      $base_theme = $is_pro_theme ? str_replace( '-pro', '', $theme ) : $theme;
+		//      $data       = wp_remote_get( static::$themegrill_base_url . '/sites?theme=' . $base_theme );
+		//  } else {
+		//      $data = wp_remote_get( static::$themegrill_base_url . '/sites?theme=' . $theme );
+		//  }
+		// } else {
+		//  $data = wp_remote_get( static::$themegrill_base_url . '/sites' );
+		// }
+	}
+
+	public function tgdi_site_data( $request ) {
+		$site = $request->get_param( 'slug' );
+		$url  = $this->themegrill_base_url . $site . '/' . $this->namespace2 . '/data';
+
+		$site_data = wp_remote_get( $url );
+		$data      = json_decode( wp_remote_retrieve_body( $site_data ) );
+		return new WP_REST_Response(
+			array(
+				'success' => true,
+				'data'    => $data,
+			),
+			200
 		);
 	}
 
@@ -434,63 +538,20 @@ class TG_Importer_REST_Controller extends WP_REST_Controller {
 		if ( 'companion-elementor/companion-elementor.php' === $plugin ) {
 			$plugin_data = get_plugin_data( $plugin_file );
 
-			$url = 'https://d1sb0nhp4t2db4.cloudfront.net/packages/companion-elementor.zip';
-			if ( is_plugin_active( $plugin ) ) {
+			$response = apply_filters( 'tgda_install_companion_elementor', 'companion-elementor/companion-elementor.php' );
+			if ( is_array( $response ) && isset( $response['success'] ) && ! $response['success'] ) {
+				$this->tgdi_log_error( 'Failed to install plugin ' . $pg[0] . ': ' . $response['message'] );
+				$results[ $pg[0] ] = array(
+					'status'  => 'error',
+					'message' => $response['message'],
+				);
+			} else {
 				$results[ $pg[0] ] = array(
 					'status'  => 'success',
-					'message' => $plugin_data['Name'] . ' already activated.',
-				);
-				return $results;
-			}
-			$temp_file = download_url( $url );
-
-			if ( is_wp_error( $temp_file ) ) {
-				$this->tgdi_log_error( 'Failed to download companion elementor zip.' );
-
-				$results[ $pg[0] ] = array(
-					'status'  => 'success',
-					'message' => 'Failed to download companion elementor zip.',
-					$temp_file->get_error_message(),
-				);
-				return $results;
-			}
-
-			$upgrader = new Plugin_Upgrader( new WP_Ajax_Upgrader_Skin() );
-			$result   = $upgrader->install( $temp_file );
-			wp_delete_file( $temp_file );
-			if ( is_wp_error( $result ) ) {
-				$this->tgdi_log_error( 'Failed to install plugin ' . $pg[0] . ': ' . $result->get_error_message() );
-
-				$results[ $pg[0] ] = array(
-					'status'  => 'error',
-					'message' => $result->get_error_message(),
+					/* translators: %s Plugin name */
+					'message' => sprintf( __( '%s installed and activated.', 'themegrill-demo-importer' ), $plugin_data['Name'] ),
 				);
 			}
-			if ( ! $result || ! $upgrader->plugin_info() ) {
-				$this->tgdi_log_error( 'Plugin install failed or no plugin info. ' . $pg[0] . ': ' . $result->get_error_message() );
-
-				$results[ $pg[0] ] = array(
-					'status'  => 'error',
-					'message' => $result->get_error_message(),
-				);
-			}
-
-			$plugin_file = $upgrader->plugin_info();
-			$activate    = activate_plugin( $plugin_file );
-
-			if ( is_wp_error( $activate ) ) {
-				$results[ $pg[0] ] = array(
-					'status'  => 'error',
-					'message' => $result->get_error_message(),
-				);
-				$this->tgdi_log_error( 'Failed to activate plugin after install ' . $pg[0] . ': ' . $activate->get_error_message() );
-			}
-
-			$results[ $pg[0] ] = array(
-				'status'  => 'success',
-				/* translators: %s Plugin name */
-				'message' => sprintf( __( '%s installed and activated.', 'themegrill-demo-importer' ), $plugin_data['Name'] ),
-			);
 		} else {
 			if ( file_exists( $plugin_file ) ) {
 				$plugin_data = get_plugin_data( $plugin_file );

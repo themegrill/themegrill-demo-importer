@@ -11,7 +11,7 @@ use Elementor\Plugin;
 defined( 'ABSPATH' ) || exit;
 
 // Include core functions (available in both admin and frontend).
-require_once TGDM_ABSPATH . 'includes/functions-demo-update.php';
+// require_once TGDM_ABSPATH . 'includes/functions-demo-update.php';
 
 // Disable Masteriyo setup wizard.
 add_filter( 'masteriyo_enable_setup_wizard', '__return_false' );
@@ -28,119 +28,119 @@ add_filter( 'blockart_activation_redirect', '__return_false' );
  *
  * @global WP_Filesystem_Base $wp_filesystem Subclass
  */
-function tg_ajax_install_required_plugin() {
-	check_ajax_referer( 'updates' );
+// function tg_ajax_install_required_plugin() {
+//  check_ajax_referer( 'updates' );
 
-	if ( empty( $_POST['plugin'] ) || empty( $_POST['slug'] ) ) {
-		wp_send_json_error(
-			array(
-				'slug'         => '',
-				'errorCode'    => 'no_plugin_specified',
-				'errorMessage' => __( 'No plugin specified.', 'themegrill-demo-importer' ),
-			)
-		);
-	}
+//  if ( empty( $_POST['plugin'] ) || empty( $_POST['slug'] ) ) {
+//      wp_send_json_error(
+//          array(
+//              'slug'         => '',
+//              'errorCode'    => 'no_plugin_specified',
+//              'errorMessage' => __( 'No plugin specified.', 'themegrill-demo-importer' ),
+//          )
+//      );
+//  }
 
-	$slug   = sanitize_key( wp_unslash( $_POST['slug'] ) );
-	$plugin = plugin_basename( sanitize_text_field( wp_unslash( $_POST['plugin'] ) ) );
+//  $slug   = sanitize_key( wp_unslash( $_POST['slug'] ) );
+//  $plugin = plugin_basename( sanitize_text_field( wp_unslash( $_POST['plugin'] ) ) );
 
-	$status = array(
-		'install' => 'plugin',
-		'slug'    => sanitize_key( wp_unslash( $_POST['slug'] ) ),
-	);
+//  $status = array(
+//      'install' => 'plugin',
+//      'slug'    => sanitize_key( wp_unslash( $_POST['slug'] ) ),
+//  );
 
-	if ( ! current_user_can( 'install_plugins' ) ) {
-		$status['errorMessage'] = __( 'Sorry, you are not allowed to install plugins on this site.', 'themegrill-demo-importer' );
-		wp_send_json_error( $status );
-	}
+//  if ( ! current_user_can( 'install_plugins' ) ) {
+//      $status['errorMessage'] = __( 'Sorry, you are not allowed to install plugins on this site.', 'themegrill-demo-importer' );
+//      wp_send_json_error( $status );
+//  }
 
-	include_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
-	include_once ABSPATH . 'wp-admin/includes/plugin-install.php';
+//  include_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
+//  include_once ABSPATH . 'wp-admin/includes/plugin-install.php';
 
-	// Looks like a plugin is installed, but not active.
-	if ( file_exists( WP_PLUGIN_DIR . '/' . $slug ) ) {
-		$plugin_data          = get_plugin_data( WP_PLUGIN_DIR . '/' . $plugin );
-		$status['plugin']     = $plugin;
-		$status['pluginName'] = $plugin_data['Name'];
+//  // Looks like a plugin is installed, but not active.
+//  if ( file_exists( WP_PLUGIN_DIR . '/' . $slug ) ) {
+//      $plugin_data          = get_plugin_data( WP_PLUGIN_DIR . '/' . $plugin );
+//      $status['plugin']     = $plugin;
+//      $status['pluginName'] = $plugin_data['Name'];
 
-		if ( current_user_can( 'activate_plugin', $plugin ) && is_plugin_inactive( $plugin ) ) {
-			$result = activate_plugin( $plugin );
+//      if ( current_user_can( 'activate_plugin', $plugin ) && is_plugin_inactive( $plugin ) ) {
+//          $result = activate_plugin( $plugin );
 
-			if ( is_wp_error( $result ) ) {
-				$status['errorCode']    = $result->get_error_code();
-				$status['errorMessage'] = $result->get_error_message();
-				wp_send_json_error( $status );
-			}
+//          if ( is_wp_error( $result ) ) {
+//              $status['errorCode']    = $result->get_error_code();
+//              $status['errorMessage'] = $result->get_error_message();
+//              wp_send_json_error( $status );
+//          }
 
-			wp_send_json_success( $status );
-		}
-	}
+//          wp_send_json_success( $status );
+//      }
+//  }
 
-	$api = plugins_api(
-		'plugin_information',
-		array(
-			'slug'   => sanitize_key( wp_unslash( $_POST['slug'] ) ),
-			'fields' => array(
-				'sections' => false,
-			),
-		)
-	);
+//  $api = plugins_api(
+//      'plugin_information',
+//      array(
+//          'slug'   => sanitize_key( wp_unslash( $_POST['slug'] ) ),
+//          'fields' => array(
+//              'sections' => false,
+//          ),
+//      )
+//  );
 
-	if ( is_wp_error( $api ) ) {
-		$status['errorMessage'] = $api->get_error_message();
-		wp_send_json_error( $status );
-	}
+//  if ( is_wp_error( $api ) ) {
+//      $status['errorMessage'] = $api->get_error_message();
+//      wp_send_json_error( $status );
+//  }
 
-	$status['pluginName'] = $api->name;
+//  $status['pluginName'] = $api->name;
 
-	$skin     = new WP_Ajax_Upgrader_Skin();
-	$upgrader = new Plugin_Upgrader( $skin );
-	$result   = $upgrader->install( $api->download_link );
+//  $skin     = new WP_Ajax_Upgrader_Skin();
+//  $upgrader = new Plugin_Upgrader( $skin );
+//  $result   = $upgrader->install( $api->download_link );
 
-	if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-		$status['debug'] = $skin->get_upgrade_messages();
-	}
+//  if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+//      $status['debug'] = $skin->get_upgrade_messages();
+//  }
 
-	if ( is_wp_error( $result ) ) {
-		$status['errorCode']    = $result->get_error_code();
-		$status['errorMessage'] = $result->get_error_message();
-		wp_send_json_error( $status );
-	} elseif ( is_wp_error( $skin->result ) ) {
-		$status['errorCode']    = $skin->result->get_error_code();
-		$status['errorMessage'] = $skin->result->get_error_message();
-		wp_send_json_error( $status );
-	} elseif ( $skin->get_errors()->get_error_code() ) {
-		$status['errorMessage'] = $skin->get_error_messages();
-		wp_send_json_error( $status );
-	} elseif ( is_null( $result ) ) {
-		global $wp_filesystem;
+//  if ( is_wp_error( $result ) ) {
+//      $status['errorCode']    = $result->get_error_code();
+//      $status['errorMessage'] = $result->get_error_message();
+//      wp_send_json_error( $status );
+//  } elseif ( is_wp_error( $skin->result ) ) {
+//      $status['errorCode']    = $skin->result->get_error_code();
+//      $status['errorMessage'] = $skin->result->get_error_message();
+//      wp_send_json_error( $status );
+//  } elseif ( $skin->get_errors()->get_error_code() ) {
+//      $status['errorMessage'] = $skin->get_error_messages();
+//      wp_send_json_error( $status );
+//  } elseif ( is_null( $result ) ) {
+//      global $wp_filesystem;
 
-		$status['errorCode']    = 'unable_to_connect_to_filesystem';
-		$status['errorMessage'] = __( 'Unable to connect to the filesystem. Please confirm your credentials.', 'themegrill-demo-importer' );
+//      $status['errorCode']    = 'unable_to_connect_to_filesystem';
+//      $status['errorMessage'] = __( 'Unable to connect to the filesystem. Please confirm your credentials.', 'themegrill-demo-importer' );
 
-		// Pass through the error from WP_Filesystem if one was raised.
-		if ( $wp_filesystem instanceof WP_Filesystem_Base && is_wp_error( $wp_filesystem->errors ) && $wp_filesystem->errors->get_error_code() ) {
-			$status['errorMessage'] = esc_html( $wp_filesystem->errors->get_error_message() );
-		}
+//      // Pass through the error from WP_Filesystem if one was raised.
+//      if ( $wp_filesystem instanceof WP_Filesystem_Base && is_wp_error( $wp_filesystem->errors ) && $wp_filesystem->errors->get_error_code() ) {
+//          $status['errorMessage'] = esc_html( $wp_filesystem->errors->get_error_message() );
+//      }
 
-		wp_send_json_error( $status );
-	}
+//      wp_send_json_error( $status );
+//  }
 
-	$install_status = install_plugin_install_status( $api );
+//  $install_status = install_plugin_install_status( $api );
 
-	if ( current_user_can( 'activate_plugin', $install_status['file'] ) && is_plugin_inactive( $install_status['file'] ) ) {
-		$result = activate_plugin( $install_status['file'] );
+//  if ( current_user_can( 'activate_plugin', $install_status['file'] ) && is_plugin_inactive( $install_status['file'] ) ) {
+//      $result = activate_plugin( $install_status['file'] );
 
-		if ( is_wp_error( $result ) ) {
-			$status['errorCode']    = $result->get_error_code();
-			$status['errorMessage'] = $result->get_error_message();
-			wp_send_json_error( $status );
-		}
-	}
+//      if ( is_wp_error( $result ) ) {
+//          $status['errorCode']    = $result->get_error_code();
+//          $status['errorMessage'] = $result->get_error_message();
+//          wp_send_json_error( $status );
+//      }
+//  }
 
-	wp_send_json_success( $status );
-}
-add_action( 'wp_ajax_install-required-plugin', 'tg_ajax_install_required_plugin', 1 );
+//  wp_send_json_success( $status );
+// }
+// add_action( 'wp_ajax_install-required-plugin', 'tg_ajax_install_required_plugin', 1 );
 
 /**
  * Get an attachment ID from the filename.

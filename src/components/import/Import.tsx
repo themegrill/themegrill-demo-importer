@@ -1,58 +1,28 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import apiFetch from '@wordpress/api-fetch';
+import Lottie from 'lottie-react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useAllDemos } from '../../hooks/useAllDemos';
-import { TDIDashboardType } from '../../lib/types';
+import spinner from '../../assets/animation/spinner.json';
+import { Demo, TDIDashboardType } from '../../lib/types';
 import ImportContent from './ImportContent';
 import ImportSidebar from './ImportSidebar';
 
-// type Props = {
-// 	demos: SearchResultType[];
-// 	initialTheme: string;
-// 	data: DataObjectType;
-// };
-
 const Import = ({
-	data,
-	setData,
+	localizedData,
+	setLocalizedData,
 }: {
-	data: TDIDashboardType;
-	setData: React.Dispatch<React.SetStateAction<TDIDashboardType>>;
+	localizedData: TDIDashboardType;
+	setLocalizedData: React.Dispatch<React.SetStateAction<TDIDashboardType>>;
 }) => {
-	// const {
-	// 	data,
-	// 	theme,
-	// 	pagebuilder,
-	// 	category,
-	// 	plan,
-	// 	search,
-	// 	searchResults,
-	// 	searchTerms,
-	// 	setTheme,
-	// 	setPagebuilder,
-	// 	setCategory,
-	// 	setPlan,
-	// 	setSearch,
-	// 	setSearchResults,
-	// } = useDemoContext();
-
 	const iframeRef = useRef<HTMLIFrameElement>(null);
 	const { slug } = useParams();
-	const allDemos = useAllDemos(data, 'all');
-	const demo = useMemo(() => {
-		return allDemos.filter((demo) => demo.slug === slug)[0];
-	}, [slug]);
-	// const demo = allDemos.find((d) => d.slug === slug)!;
-	const theme = demo.theme;
-
+	const [demo, setDemo] = useState({} as Demo);
+	const [loading, setLoading] = useState(true);
 	const [siteTitle, setSiteTitle] = useState('');
 	const [siteTagline, setSiteTagline] = useState('');
 	const [siteLogoId, setSiteLogoId] = useState<number>(0);
 	const [collapse, setCollapse] = useState(false);
 	const [device, setDevice] = useState('desktop');
-
-	// const demo = useMemo(() => {
-	// 	return searchTerms.filter((demo) => demo.slug === slug)[0];
-	// }, [slug]);
 
 	const handleClick = (collapse: Boolean) => {
 		setCollapse(!collapse);
@@ -99,14 +69,7 @@ const Import = ({
 		document.body.classList.add('tg-full-overlay-active');
 		document.documentElement.classList.remove('wp-toolbar');
 
-		// Remove the class when the component unmounts
-		return () => {
-			document.body.classList.remove('tg-full-overlay-active');
-			document.documentElement.classList.add('wp-toolbar');
-		};
-	}, []);
-
-	useEffect(() => {
+		// Handle resize logic
 		const handleResize = () => {
 			if (window.innerWidth <= 768) {
 				setCollapse(true);
@@ -115,90 +78,134 @@ const Import = ({
 			}
 		};
 
+		// Set initial resize state
 		handleResize();
-
 		window.addEventListener('resize', handleResize);
 
-		return () => {
-			window.removeEventListener('resize', handleResize);
+		const fetchSiteData = async () => {
+			try {
+				const response = await apiFetch<{ success: boolean; data: any }>({
+					path: `tg-demo-importer/v1/data?slug=${slug}`,
+					method: 'GET',
+				});
+				if (response.success) {
+					setDemo(response.data);
+					setLoading(false);
+				} else {
+					console.error('Failed to fetch site data:', response);
+				}
+			} catch (e) {
+				console.error('Failed to fetch site data:', e);
+			}
 		};
-	}, []);
+
+		// Small delay to ensure DOM changes are applied before showing loading
+		const timer = setTimeout(() => {
+			fetchSiteData();
+		}, 10);
+
+		return () => {
+			document.body.classList.remove('tg-full-overlay-active');
+			document.documentElement.classList.add('wp-toolbar');
+			window.removeEventListener('resize', handleResize);
+			clearTimeout(timer);
+		};
+	}, [slug]);
 
 	return (
-		<div className="tg-full-overlay relative">
-			{collapse ? (
-				<button
-					type="button"
-					className="bg-white rounded-full px-[8px] py-[16px] border border-solid border-[#E1E1E1] cursor-pointer absolute top-[45%] left-[1%] shadow-custom-light"
-					style={{ zIndex: 100 }}
-					onClick={() => handleClick(collapse)}
-				>
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						width="12"
-						height="12"
-						viewBox="0 0 12 12"
-						fill="none"
-					>
-						<path d="M2.5 6L9.5 6" stroke="#383838" strokeLinecap="round" strokeLinejoin="round" />
-						<path
-							d="M6 2.5L9.5 6L6 9.5"
-							stroke="#383838"
-							strokeLinecap="round"
-							strokeLinejoin="round"
-						/>
-					</svg>
-				</button>
+		<>
+			{loading && Object.keys(demo).length === 0 ? (
+				<div className="tg-full-overlay relative">
+					<div className="tg-full-overlay-content bg-[#f4f4f4] w-full relative">
+						<Lottie animationData={spinner} loop={true} autoplay={true} className="h-16 py-20" />
+					</div>
+				</div>
 			) : (
-				<>
-					<button
-						type="button"
-						className="bg-white rounded-full px-[8px] py-[16px] border border-solid border-[#E1E1E1] cursor-pointer absolute top-[45%] left-[285px] shadow-custom-light"
-						style={{ zIndex: 100 }}
-						onClick={() => handleClick(collapse)}
-					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							width="12"
-							height="12"
-							viewBox="0 0 12 12"
-							fill="none"
+				<div className="tg-full-overlay relative">
+					{collapse ? (
+						<button
+							type="button"
+							className="bg-white rounded-full px-[8px] py-[16px] border border-solid border-[#E1E1E1] cursor-pointer absolute top-[45%] left-[1%] shadow-custom-light"
+							style={{ zIndex: 100 }}
+							onClick={() => handleClick(collapse)}
 						>
-							<path d="M9.5 6H2.5" stroke="#383838" strokeLinecap="round" strokeLinejoin="round" />
-							<path
-								d="M6 9.5L2.5 6L6 2.5"
-								stroke="#383838"
-								strokeLinecap="round"
-								strokeLinejoin="round"
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width="12"
+								height="12"
+								viewBox="0 0 12 12"
+								fill="none"
+							>
+								<path
+									d="M2.5 6L9.5 6"
+									stroke="#383838"
+									strokeLinecap="round"
+									strokeLinejoin="round"
+								/>
+								<path
+									d="M6 2.5L9.5 6L6 9.5"
+									stroke="#383838"
+									strokeLinecap="round"
+									strokeLinejoin="round"
+								/>
+							</svg>
+						</button>
+					) : (
+						<>
+							<button
+								type="button"
+								className="bg-white rounded-full px-[8px] py-[16px] border border-solid border-[#E1E1E1] cursor-pointer absolute top-[45%] left-[285px] shadow-custom-light"
+								style={{ zIndex: 100 }}
+								onClick={() => handleClick(collapse)}
+							>
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									width="12"
+									height="12"
+									viewBox="0 0 12 12"
+									fill="none"
+								>
+									<path
+										d="M9.5 6H2.5"
+										stroke="#383838"
+										strokeLinecap="round"
+										strokeLinejoin="round"
+									/>
+									<path
+										d="M6 9.5L2.5 6L6 2.5"
+										stroke="#383838"
+										strokeLinecap="round"
+										strokeLinejoin="round"
+									/>
+								</svg>
+							</button>
+							<ImportSidebar
+								demo={demo}
+								iframeRef={iframeRef}
+								handleSiteTitleChange={handleSiteTitleChange}
+								setSiteTagline={setSiteTagline}
+								setSiteLogoId={setSiteLogoId}
+								device={device}
+								setDevice={setDevice}
 							/>
-						</svg>
-					</button>
-					<ImportSidebar
+						</>
+					)}
+					<ImportContent
 						demo={demo}
 						iframeRef={iframeRef}
-						handleSiteTitleChange={handleSiteTitleChange}
-						setSiteTagline={setSiteTagline}
-						setSiteLogoId={setSiteLogoId}
+						siteTitle={siteTitle}
+						siteTagline={siteTagline}
+						siteLogoId={siteLogoId}
+						// currentTheme={data.current_theme}
+						// zakraProInstalled={data.zakra_pro_installed}
+						// zakraProActivated={data.zakra_pro_activated}
+						data={localizedData}
+						setData={setLocalizedData}
 						device={device}
-						setDevice={setDevice}
 					/>
-				</>
+				</div>
 			)}
-			<ImportContent
-				demo={demo}
-				theme={theme}
-				iframeRef={iframeRef}
-				siteTitle={siteTitle}
-				siteTagline={siteTagline}
-				siteLogoId={siteLogoId}
-				// currentTheme={data.current_theme}
-				// zakraProInstalled={data.zakra_pro_installed}
-				// zakraProActivated={data.zakra_pro_activated}
-				data={data}
-				setData={setData}
-				device={device}
-			/>
-		</div>
+		</>
 	);
 };
 

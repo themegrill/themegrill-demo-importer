@@ -8,23 +8,21 @@ import {
 	DropdownMenuTrigger,
 	DropdownMenu as ThemeDropdownMenu,
 } from '../../controls/DropdownMenu';
-import { Theme } from '../../lib/types';
 
 declare const require: any;
 
 type Props = {
-	themes: Theme[];
+	themes: Record<string, string>;
+	// themes: Theme[];
 };
 
 const ThemeDropdown = ({ themes }: Props) => {
-	// const { theme, setTheme } = useDemoContext();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const theme = searchParams.get('theme') || 'all';
 
 	const handleThemeChange = (theme: string) => {
 		setSearchParams((prev) => {
 			prev.set('theme', theme);
-			// prev.set('pagebuilder', 'all');
 			prev.set('category', 'all');
 			return prev;
 		});
@@ -74,6 +72,23 @@ const ThemeDropdown = ({ themes }: Props) => {
 			</DropdownMenuTrigger>
 			<DropdownMenuContent className={`w-full sm:w-[172px] bg-white p-0`}>
 				{themes &&
+					Object.entries(themes)
+						.filter(([key]) => key !== theme)
+						.map(([key, value]) => (
+							<div key={key}>
+								<DropdownMenuItem
+									className="p-[16px] gap-[8px]"
+									onClick={() => handleThemeChange(key)}
+								>
+									{key !== 'all' && checkImageExists(key) !== '' && (
+										<img src={require(`../../assets/images/${key}.png`)} alt="" />
+									)}
+									<span className="text-[14px]">{value}</span>
+								</DropdownMenuItem>
+								<DropdownMenuSeparator className="m-0" />
+							</div>
+						))}
+				{/* {themes &&
 					themes
 						.filter((t) => t.slug !== theme)
 						.map((th) => (
@@ -89,7 +104,7 @@ const ThemeDropdown = ({ themes }: Props) => {
 								</DropdownMenuItem>
 								<DropdownMenuSeparator className="m-0" />
 							</div>
-						))}
+						))} */}
 			</DropdownMenuContent>
 		</ThemeDropdownMenu>
 	);

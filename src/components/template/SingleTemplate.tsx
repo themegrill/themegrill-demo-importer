@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { PageWithSelection, SearchResultType } from '../../lib/types';
+import { Demo, PageWithSelection } from '../../lib/types';
 
 declare const require: any;
 
 type Props = {
 	page: PageWithSelection;
 	setAllPages: React.Dispatch<React.SetStateAction<PageWithSelection[]>>;
-	demo: SearchResultType;
+	demo: Demo;
 };
 
 const SingleTemplate = ({ page, setAllPages, demo }: Props) => {
@@ -31,7 +31,7 @@ const SingleTemplate = ({ page, setAllPages, demo }: Props) => {
 						alt={page.post_title}
 						className="w-full h-full border border-solid border-[#F4F4F4] rounded-[2px]"
 					/>
-				) : demo.theme === 'colormag' || demo.theme === 'colornews' ? (
+				) : demo.theme_slug === 'colormag' || demo.theme_slug === 'colornews' ? (
 					<img
 						src={require(`../../assets/images/colormag-skeleton.jpg`)}
 						alt={page.post_title}

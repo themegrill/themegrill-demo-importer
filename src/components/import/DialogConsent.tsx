@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DialogClose, DialogFooter, DialogHeader, DialogTitle } from '../../controls/Dialog';
 import { themes } from '../../lib/themes';
-import { SearchResultType, TDIDashboardType } from '../../lib/types';
+import { Demo, TDIDashboardType } from '../../lib/types';
 
 declare const require: any;
 
@@ -27,7 +27,7 @@ export const DialogConsent = ({
 	data,
 }: {
 	onConfirm: () => void;
-	demo: SearchResultType;
+	demo: Demo;
 	installTheme: boolean;
 	setInstallTheme: React.Dispatch<React.SetStateAction<boolean>>;
 	plugins: PluginItem[];
@@ -39,7 +39,7 @@ export const DialogConsent = ({
 	// const { current_theme: currentTheme } = data || {};
 	const currentTheme = data.current_theme;
 	const [isConsentChecked, setIsConsentChecked] = useState(false);
-	const matchedTheme = themes.find((theme) => theme.slug === demo.theme);
+	const matchedTheme = themes.find((theme) => theme.slug === demo.theme_slug);
 
 	const handlePluginToggle = (index: number) => {
 		setPlugins((prevItems: PluginItem[]) =>
@@ -81,9 +81,9 @@ export const DialogConsent = ({
 					<div>
 						<h3 className="text-[16px] text-[#383838]">Install and Activate</h3>
 						<div className="my-[20px]">
-							{('zakra' !== demo.theme && (demo.pro || demo.premium)
-								? `${demo.theme}-pro`
-								: demo.theme) !== currentTheme && (
+							{('zakra' !== demo.theme_slug && (demo.pro || demo.premium)
+								? `${demo.theme_slug}-pro`
+								: demo.theme_slug) !== currentTheme && (
 								<div className="flex items-center justify-between bg-[#FAFBFF] border border-solid border-[#EBEBEB] rounded px-[16px] py-[18px] mb-[16px]">
 									<div className="flex items-center gap-[10px] capitalize">
 										{/* <svg
@@ -110,11 +110,13 @@ export const DialogConsent = ({
 												fill="white"
 											/>
 										</svg> */}
-										{checkImageExists(demo.theme) && (
-											<img src={checkImageExists(demo.theme)} alt="" width="38px" />
+										{checkImageExists(demo.theme_slug) && (
+											<img src={checkImageExists(demo.theme_slug)} alt="" width="38px" />
 										)}
 										<div>
-											<h6 className="text-[15px] text-[#111] m-0 mb-[4px]">{demo.theme} Theme</h6>
+											<h6 className="text-[15px] text-[#111] m-0 mb-[4px]">
+												{demo.theme_slug} Theme
+											</h6>
 											<p className="text-[13px] text-[#383838] tracking-[0.13px] m-0">
 												{matchedTheme?.description}
 											</p>

@@ -1,25 +1,27 @@
-import React, { useMemo } from 'react';
+import Lottie from 'lottie-react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { PagebuilderCategory, SearchResultType } from '../../lib/types';
+import loader from '../../assets/animation/loader.json';
+import { PagebuilderCategory, ThemeItem } from '../../lib/types';
 import CategoryMenu from './CategoryMenu';
 import Demos from './Demos';
 
 type Props = {
 	categories: PagebuilderCategory[];
-	allDemos: SearchResultType[];
+	demos: ThemeItem[];
 };
 
-const Content = ({ categories, allDemos }: Props) => {
-	// const { plan, search, searchResults } = useDemoContext();
+const Content = ({ categories, demos }: Props) => {
 	const [searchParams] = useSearchParams();
 	const theme = searchParams.get('tab') || 'all';
 	const pagebuilder = searchParams.get('pagebuilder') || 'all';
 	const category = searchParams.get('category') || 'all';
 	const plan = searchParams.get('plan') || 'all';
 	const search = searchParams.get('search') || '';
-	const demos = useMemo(() => {
-		return allDemos
-			.filter((d) => ('all' !== theme ? d.theme == theme : true))
+	const [demoLoading, setDemoLoading] = useState(true);
+	const newDemos = useMemo(() => {
+		return demos
+			.filter((d) => ('all' !== theme ? d.theme_slug == theme : true))
 			.filter((d) =>
 				'all' !== pagebuilder ? Object.keys(d.pagebuilders).some((p) => p === pagebuilder) : true,
 			)
@@ -30,26 +32,35 @@ const Content = ({ categories, allDemos }: Props) => {
 				'all' !== plan ? (plan === 'pro' ? d.pro || d.premium : !d.pro && !d.premium) : true,
 			)
 			.filter((d) => (search ? d.name.toLowerCase().indexOf(search.toLowerCase()) !== -1 : true));
-	}, [theme, category, pagebuilder, plan, search, allDemos]);
+	}, [theme, category, pagebuilder, plan, search, demos]);
+
+	useEffect(() => {
+		setDemoLoading(true);
+	}, [theme, category, pagebuilder, plan, search]);
+
+	useEffect(() => {
+		if (newDemos) {
+			const timer = setTimeout(() => {
+				setDemoLoading(false);
+			}, 1000);
+
+			return () => clearTimeout(timer);
+		}
+	}, [newDemos]);
 
 	return (
-		<div className="mt-0">
+		<>
 			{categories && (
 				<>
 					<CategoryMenu categories={categories} />
-					<Demos demos={demos} />
+					{demoLoading ? (
+						<Lottie animationData={loader} loop={true} autoplay={true} className="h-40" />
+					) : (
+						<Demos demos={newDemos} />
+					)}
 				</>
 			)}
-		</div>
-
-		// <TabsContent value={theme} className="mt-0">
-		// 	{categories && (
-		// 		<>
-		// 			<CategoryMenu categories={categories} searchParams={searchParams} />
-		// 			<Demos demos={demos} />
-		// 		</>
-		// 	)}
-		// </TabsContent>
+		</>
 	);
 };
 

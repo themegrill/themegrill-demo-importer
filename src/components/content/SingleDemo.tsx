@@ -1,16 +1,16 @@
 import React from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { SearchResultType } from '../../lib/types';
+import { ThemeItem } from '../../lib/types';
 
 declare const require: any;
 
 type DemoProps = {
-	demo: SearchResultType;
+	demo: ThemeItem;
 };
 
 const SingleDemo = ({ demo }: DemoProps) => {
 	const [searchParams] = useSearchParams();
-	const pagebuilder = searchParams.get('pagebuilder');
+	const pagebuilder = searchParams.get('pagebuilder') || 'all';
 	const pagebuilders = Object.entries(demo?.pagebuilders || {}).map(([key, value]) => {
 		return {
 			slug: key,

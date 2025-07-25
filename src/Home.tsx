@@ -1,18 +1,19 @@
-import { __ } from '@wordpress/i18n';
+import apiFetch from '@wordpress/api-fetch';
+import Lottie from 'lottie-react';
 import React, { useEffect, useMemo, useState } from 'react';
-import { matchPath, useLocation, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
+import loader from './assets/animation/loader.json';
+import spinner from './assets/animation/spinner.json';
 import Content from './components/content/Content';
 import Header from './components/header/Header';
-import { useAllDemos } from './hooks/useAllDemos';
-import { TDIDashboardType } from './lib/types';
+import { FilterItem, TDIDashboardType, ThemeDataResponse, ThemeItem } from './lib/types';
 
-const Home = ({
-	data,
-	setData,
-}: {
-	data: TDIDashboardType;
-	setData: React.Dispatch<React.SetStateAction<TDIDashboardType>>;
-}) => {
+type Props = {
+	localizedData: TDIDashboardType;
+	setLocalizedData: React.Dispatch<React.SetStateAction<TDIDashboardType>>;
+};
+
+const Home = ({ localizedData, setLocalizedData }: Props) => {
 	// const {
 	// 	theme,
 	// 	pagebuilder,
@@ -33,116 +34,248 @@ const Home = ({
 		free: 'Free',
 		pro: 'Pro',
 	};
-	// const { data } = useLocalizedData();
-	const themeBasedData = data?.data || {};
-	const themeData = data?.theme || 'all';
+
+	// const themeBasedData = data?.data || {};
+	const themeData = localizedData?.theme || 'all';
 	const baseTheme = themeData.endsWith('-pro') ? themeData.replace('-pro', '') : themeData;
-	const { pathname } = useLocation();
-	const [searchParams, setSearchParams] = useSearchParams();
+	// const { pathname } = useLocation();
+	// const match = matchPath('/import-detail/:slug/:pagebuilder', pathname);
+	// const showTabs = !match;
+
+	const [data, setData] = useState<ThemeItem[]>([]);
+	const [categoryFilter, setCategoryFilter] = useState<FilterItem>({});
+	const [pagebuilderFilter, setPagebuilderFilter] = useState<FilterItem>({});
+	const [themes, setThemes] = useState<Record<string, string>>({});
 	const [loading, setLoading] = useState(true);
-
-	const match = matchPath('/import-detail/:slug/:pagebuilder', pathname);
-	const showTabs = !match;
-
+	const [contentLoading, setContentLoading] = useState(true);
+	const [searchParams, setSearchParams] = useSearchParams();
 	const { theme, pagebuilder, plan, search } = useMemo(() => {
 		return {
-			theme: searchParams.get('theme') || 'all',
+			theme: searchParams.get('theme') || baseTheme || 'all',
 			pagebuilder: searchParams.get('pagebuilder') || 'all',
 			plan: searchParams.get('plan') || 'all',
 			search: searchParams.get('search') || '',
 		};
-	}, [searchParams]);
+	}, [searchParams, baseTheme]);
 
-	const allDemos = useAllDemos(data, theme);
+	useEffect(() => {
+		setSearchParams((prev) => {
+			prev.set('theme', baseTheme);
+			prev.set('pagebuilder', 'all');
+			prev.set('category', 'all');
+			return prev;
+		});
+	}, []);
 
-	const themes = useMemo(() => {
-		if (!themeBasedData || Object.keys(themeBasedData).length === 0) {
-			return [];
-		}
+	// const [data, setData] = useState<TDIDashboardType>(__TDI_DASHBOARD__);
+	useEffect(() => {
+		setContentLoading(true);
+		const fetchSites = async () => {
+			const params = new URLSearchParams();
 
-		const allThemes = Object.entries(themeBasedData).map(([key, value]) => ({
-			slug: key,
-			name: value.name,
-		}));
+			if (theme && theme !== 'all') {
+				params.append('theme', theme);
+			}
 
-		// Add "All" option if we have multiple themes
-		if (allThemes.length > 1) {
-			return [{ slug: 'all', name: 'All' }, ...allThemes];
-		}
+			// Build the path
+			const queryString = params.toString();
+			const path = `tg-demo-importer/v1/sites${queryString ? `?${queryString}` : ''}`;
 
-		return allThemes;
-	}, [themeBasedData]);
+			try {
+				const response = await apiFetch<ThemeDataResponse>({
+					path: path,
+					method: 'GET',
+				});
+				if (response.success) {
+					if (response.data.length === 0) {
+						setSearchParams((prev) => {
+							prev.set('theme', 'all');
+							return prev;
+						});
+					}
+					setData(response.data);
+					setCategoryFilter(response.filter_options.categories);
+					setPagebuilderFilter(response.filter_options.pagebuilders);
+					setThemes(response.filter_options.themes || {});
+					setLoading(false);
+					setContentLoading(false);
+				} else {
+					console.error('Failed to fetch sites:', response);
+				}
+			} catch (e) {
+				// Handle error
+				console.error('Failed to fetch sites:', e);
+			}
+		};
 
-	// Generate pagebuilders list with counts
+		fetchSites();
+	}, [theme]);
+
 	const pagebuilders = useMemo(() => {
-		if (!themeBasedData) return [];
+		if (
+			!data ||
+			data.length === 0 ||
+			!pagebuilderFilter ||
+			Object.keys(pagebuilderFilter).length === 0
+		) {
+			return [
+				{
+					slug: 'all',
+					value: 'All',
+					count: 0,
+				},
+			];
+		}
 
-		const filteredResults = allDemos.filter((d) => {
-			const themeMatch = theme === 'all' || d.theme === theme;
+		const filteredResults = data.filter((d) => {
+			// const themeMatch = theme === 'all' || d.theme_slug === theme;
 			const planMatch =
 				plan === 'all' || (plan === 'pro' ? d.pro || d.premium : !d.pro && !d.premium);
 			const searchMatch = !search || d.name.toLowerCase().includes(search.toLowerCase());
 
-			return themeMatch && planMatch && searchMatch;
+			return planMatch && searchMatch;
+			// return themeMatch && planMatch && searchMatch;
 		});
 
-		const pagebuilderMap = new Map();
+		const result = [
+			{
+				slug: 'all',
+				value: 'All',
+				count: filteredResults.length,
+			},
+		];
 
-		// Get pagebuilders from data structure
-		Object.entries(themeBasedData).forEach(([themeKey, themeValue]) => {
-			if (theme !== 'all' && themeKey !== theme) return;
+		Object.entries(pagebuilderFilter).forEach(([pbKey, pbValue]) => {
+			const count = filteredResults.filter(
+				(d) => d.pagebuilders && Object.keys(d.pagebuilders).includes(pbKey),
+			).length;
 
-			if (themeValue.pagebuilders) {
-				Object.entries(themeValue.pagebuilders).forEach(([pbKey, pbValue]) => {
-					if (!pagebuilderMap.has(pbKey)) {
-						pagebuilderMap.set(pbKey, {
-							slug: pbKey,
-							value: pbValue,
-							count: 0,
-						});
-					}
+			if (count > 0) {
+				result.push({
+					slug: pbKey,
+					value: pbValue,
+					count: count,
 				});
 			}
 		});
 
-		// Calculate counts
-		pagebuilderMap.forEach((pb, key) => {
-			if (key === 'all') {
-				pb.count = filteredResults.length;
-			} else {
-				pb.count = filteredResults.filter(
-					(d) => d.pagebuilders && Object.keys(d.pagebuilders).includes(key),
-				).length;
+		return result;
+	}, [data, plan, search, pagebuilderFilter]);
+
+	const categories = useMemo(() => {
+		if (!data || data.length === 0) return [];
+
+		const filteredResults = data.filter((item) => {
+			const pagebuilderMatch =
+				pagebuilder === 'all' ||
+				(item.pagebuilders && Object.keys(item.pagebuilders).includes(pagebuilder));
+
+			const planMatch =
+				plan === 'all' || (plan === 'pro' ? item.pro || item.premium : !item.pro && !item.premium);
+
+			const searchMatch = !search || item.name.toLowerCase().includes(search.toLowerCase());
+
+			return pagebuilderMatch && planMatch && searchMatch;
+		});
+
+		const result = [
+			{
+				slug: 'all',
+				value: 'All',
+				count: filteredResults.length,
+			},
+		];
+
+		Object.entries(categoryFilter).forEach(([pbKey, pbValue]) => {
+			const count = filteredResults.filter(
+				(d) => d.categories && Object.keys(d.categories).includes(pbKey),
+			).length;
+
+			if (count > 0) {
+				result.push({
+					slug: pbKey,
+					value: pbValue,
+					count: count,
+				});
 			}
 		});
 
-		return Array.from(pagebuilderMap.values());
-	}, [themeBasedData, theme, plan, search]);
+		return result;
+	}, [data, pagebuilder, plan, search, categoryFilter]);
 
-	// const pagebuilders = useMemo(() => {
-	// 	if (!data || !searchResults) return [];
+	// // const pagebuilders = useMemo(() => {
+	// // 	if (!data || !searchResults) return [];
 
-	// 	const filteredResults = searchResults.filter((d) => {
+	// // 	const filteredResults = searchResults.filter((d) => {
+	// // 		const themeMatch = theme === 'all' || d.theme === theme;
+	// // 		const planMatch =
+	// // 			plan === 'all' || (plan === 'pro' ? d.pro || d.premium : !d.pro && !d.premium);
+	// // 		const searchMatch = !search || d.name.toLowerCase().includes(search.toLowerCase());
+
+	// // 		return themeMatch && planMatch && searchMatch;
+	// // 	});
+
+	// // 	const pagebuilderMap = new Map();
+
+	// // 	// Get pagebuilders from data structure
+	// // 	Object.entries(data).forEach(([themeKey, themeValue]) => {
+	// // 		if (theme !== 'all' && themeKey !== theme) return;
+
+	// // 		if (themeValue.pagebuilders) {
+	// // 			Object.entries(themeValue.pagebuilders).forEach(([pbKey, pbValue]) => {
+	// // 				if (!pagebuilderMap.has(pbKey)) {
+	// // 					pagebuilderMap.set(pbKey, {
+	// // 						slug: pbKey,
+	// // 						value: pbValue,
+	// // 						count: 0,
+	// // 					});
+	// // 				}
+	// // 			});
+	// // 		}
+	// // 	});
+
+	// // 	// Calculate counts
+	// // 	pagebuilderMap.forEach((pb, key) => {
+	// // 		if (key === 'all') {
+	// // 			pb.count = filteredResults.length;
+	// // 		} else {
+	// // 			pb.count = filteredResults.filter(
+	// // 				(d) => d.pagebuilders && Object.keys(d.pagebuilders).includes(key),
+	// // 			).length;
+	// // 		}
+	// // 	});
+
+	// // 	return Array.from(pagebuilderMap.values());
+	// // }, [data, theme, searchResults, plan, search]);
+
+	// // Generate categories list with counts
+	// const categories = useMemo(() => {
+	// 	if (!themeBasedData || !allDemos) return [];
+
+	// 	const filteredResults = allDemos.filter((d) => {
 	// 		const themeMatch = theme === 'all' || d.theme === theme;
+	// 		const pagebuilderMatch =
+	// 			pagebuilder === 'all' ||
+	// 			(d.pagebuilders && Object.keys(d.pagebuilders).includes(pagebuilder));
 	// 		const planMatch =
 	// 			plan === 'all' || (plan === 'pro' ? d.pro || d.premium : !d.pro && !d.premium);
 	// 		const searchMatch = !search || d.name.toLowerCase().includes(search.toLowerCase());
 
-	// 		return themeMatch && planMatch && searchMatch;
+	// 		return themeMatch && pagebuilderMatch && planMatch && searchMatch;
 	// 	});
 
-	// 	const pagebuilderMap = new Map();
+	// 	const categoryMap = new Map();
 
-	// 	// Get pagebuilders from data structure
-	// 	Object.entries(data).forEach(([themeKey, themeValue]) => {
+	// 	// Get categories from data structure
+	// 	Object.entries(themeBasedData).forEach(([themeKey, themeValue]) => {
 	// 		if (theme !== 'all' && themeKey !== theme) return;
 
-	// 		if (themeValue.pagebuilders) {
-	// 			Object.entries(themeValue.pagebuilders).forEach(([pbKey, pbValue]) => {
-	// 				if (!pagebuilderMap.has(pbKey)) {
-	// 					pagebuilderMap.set(pbKey, {
-	// 						slug: pbKey,
-	// 						value: pbValue,
+	// 		if (themeValue.categories) {
+	// 			Object.entries(themeValue.categories).forEach(([catKey, catValue]) => {
+	// 				if (!categoryMap.has(catKey)) {
+	// 					categoryMap.set(catKey, {
+	// 						slug: catKey,
+	// 						value: catValue,
 	// 						count: 0,
 	// 					});
 	// 				}
@@ -151,67 +284,18 @@ const Home = ({
 	// 	});
 
 	// 	// Calculate counts
-	// 	pagebuilderMap.forEach((pb, key) => {
+	// 	categoryMap.forEach((cat, key) => {
 	// 		if (key === 'all') {
-	// 			pb.count = filteredResults.length;
+	// 			cat.count = filteredResults.length;
 	// 		} else {
-	// 			pb.count = filteredResults.filter(
-	// 				(d) => d.pagebuilders && Object.keys(d.pagebuilders).includes(key),
+	// 			cat.count = filteredResults.filter(
+	// 				(d) => d.categories && Object.keys(d.categories).includes(key),
 	// 			).length;
 	// 		}
 	// 	});
 
-	// 	return Array.from(pagebuilderMap.values());
-	// }, [data, theme, searchResults, plan, search]);
-
-	// Generate categories list with counts
-	const categories = useMemo(() => {
-		if (!themeBasedData || !allDemos) return [];
-
-		const filteredResults = allDemos.filter((d) => {
-			const themeMatch = theme === 'all' || d.theme === theme;
-			const pagebuilderMatch =
-				pagebuilder === 'all' ||
-				(d.pagebuilders && Object.keys(d.pagebuilders).includes(pagebuilder));
-			const planMatch =
-				plan === 'all' || (plan === 'pro' ? d.pro || d.premium : !d.pro && !d.premium);
-			const searchMatch = !search || d.name.toLowerCase().includes(search.toLowerCase());
-
-			return themeMatch && pagebuilderMatch && planMatch && searchMatch;
-		});
-
-		const categoryMap = new Map();
-
-		// Get categories from data structure
-		Object.entries(themeBasedData).forEach(([themeKey, themeValue]) => {
-			if (theme !== 'all' && themeKey !== theme) return;
-
-			if (themeValue.categories) {
-				Object.entries(themeValue.categories).forEach(([catKey, catValue]) => {
-					if (!categoryMap.has(catKey)) {
-						categoryMap.set(catKey, {
-							slug: catKey,
-							value: catValue,
-							count: 0,
-						});
-					}
-				});
-			}
-		});
-
-		// Calculate counts
-		categoryMap.forEach((cat, key) => {
-			if (key === 'all') {
-				cat.count = filteredResults.length;
-			} else {
-				cat.count = filteredResults.filter(
-					(d) => d.categories && Object.keys(d.categories).includes(key),
-				).length;
-			}
-		});
-
-		return Array.from(categoryMap.values());
-	}, [themeBasedData, theme, pagebuilder, plan, search]);
+	// 	return Array.from(categoryMap.values());
+	// }, [themeBasedData, theme, pagebuilder, plan, search]);
 
 	// const categories = useMemo(() => {
 	// 	if (!data || !searchResults) return [];
@@ -261,38 +345,24 @@ const Home = ({
 	// 	return Array.from(categoryMap.values());
 	// }, [data, theme, pagebuilder, searchResults, plan, search]);
 
+	// const currentPagebuilder = useMemo(() => {
+	// 	const pb = pagebuilderCount[pagebuilder];
+	// 	return pb ? `${pb.name} (${pb.count})` : '';
+	// }, [pagebuilderCount, pagebuilder]);
+
 	const currentPagebuilder = useMemo(() => {
 		const pb = pagebuilders.find((p) => p.slug === pagebuilder);
 		return pb ? `${pb.value} (${pb.count})` : '';
 	}, [pagebuilders, pagebuilder]);
 
 	useEffect(() => {
-		setLoading(allDemos.length === 0);
-	}, [allDemos]);
-
-	useEffect(() => {
-		if (!currentPagebuilder && pagebuilders.length > 0) {
+		if (!currentPagebuilder && Object.entries(pagebuilderFilter).length > 0) {
 			setSearchParams((prev) => {
 				prev.set('pagebuilder', 'all');
 				return prev;
 			});
 		}
-	}, [currentPagebuilder, pagebuilders]);
-
-	useEffect(() => {
-		setSearchParams((prev) => {
-			prev.set('theme', baseTheme);
-			prev.set('pagebuilder', 'all');
-			prev.set('category', 'all');
-			return prev;
-		});
-	}, []);
-	// useEffect(() => {
-	// 	setSearchParams((prev) => {
-	// 		prev.set('category', 'all');
-	// 		return prev;
-	// 	});
-	// }, [theme, pagebuilder]);
+	}, [currentPagebuilder, pagebuilderFilter]);
 
 	// Update URL params when filters change
 	// useEffect(() => {
@@ -548,34 +618,24 @@ const Home = ({
 
 	return (
 		<>
-			{loading ? (
-				<p className="px-4">{__('Loading...', 'themegrill-demo-importer')}</p>
+			{loading || data.length === 0 || pagebuilders.length === 0 || categories.length === 0 ? (
+				<Lottie animationData={spinner} loop={true} autoplay={true} className="h-16 my-8" />
 			) : (
-				showTabs && (
-					<>
-						<Header
-							themes={themes}
-							pagebuilders={pagebuilders}
-							currentPagebuilder={currentPagebuilder}
-							plans={plans}
-							theme={baseTheme}
-						/>
-						<div className="bg-[#FAFAFC]">
-							<Content categories={categories} allDemos={allDemos} />
-						</div>
-					</>
-					// <Tabs defaultValue={themes[0]?.slug || 'all'}>
-					// 	<Header
-					// 		themes={themes}
-					// 		pagebuilders={pagebuilders}
-					// 		currentPagebuilder={currentPagebuilder}
-					// 		plans={plans}
-					// 	/>
-					// 	<div className="bg-[#FAFAFC]">
-					// 		<Content categories={categories} searchParams={searchParams} />
-					// 	</div>
-					// </Tabs>
-				)
+				<>
+					<Header
+						themes={themes}
+						pagebuilders={pagebuilders}
+						currentPagebuilder={currentPagebuilder}
+						plans={plans}
+						theme={baseTheme}
+						data={data}
+					/>
+					{contentLoading ? (
+						<Lottie animationData={loader} loop={true} autoplay={true} className="h-40" />
+					) : (
+						<Content categories={categories} demos={data} />
+					)}
+				</>
 			)}
 		</>
 	);

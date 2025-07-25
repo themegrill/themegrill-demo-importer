@@ -20,7 +20,7 @@ class TG_Demo_Importer {
 	 * @var array
 	 */
 	protected $fetch_attachments = true;
-	public $demo_packages;
+	// public $demo_packages;
 
 	/**
 	 * The importer class object
@@ -28,7 +28,7 @@ class TG_Demo_Importer {
 	 * @var TG_WXR_Importer
 	 */
 	public static $importer;
-	public static $themegrill_base_url = 'http://themegrill-demos-api.test/wp-json/tgda/v1';
+	public static $themegrill_base_url = 'http://themegrill-demos-api.test/wp-json/themegrill-demos/v1';
 	// public static $themegrill_base_url = 'https://themegrilldemos.com/wp-json/tgda/v1';
 
 	/**
@@ -90,13 +90,21 @@ class TG_Demo_Importer {
 	 * Demo importer setup.
 	 */
 	public function setup() {
-		$this->demo_packages = $this->get_demo_packages();
+		// $this->demo_packages = $this->get_demo_packages();
 
 		// Include WXR Importer.
 		require __DIR__ . '/importers/wordpress-importer/class-wxr-importer.php';
 		static::$importer = new TG_WXR_Importer( $this->get_import_options() );
 	}
 
+	/**
+	 * Include required core files.
+	 */
+	public function includes() {
+		include_once __DIR__ . '/importers/class-widget-importer.php';
+		include_once __DIR__ . '/importers/class-customizer-importer.php';
+		include_once __DIR__ . '/admin/class-demo-importer-status.php';
+	}
 
 	/**
 	 * check whether the current active theme is in core supported themes list
@@ -116,50 +124,80 @@ class TG_Demo_Importer {
 	}
 
 	/**
-	 * Include required core files.
-	 */
-	public function includes() {
-		include_once __DIR__ . '/importers/class-widget-importer.php';
-		include_once __DIR__ . '/importers/class-customizer-importer.php';
-		include_once __DIR__ . '/admin/class-demo-importer-status.php';
-	}
-
-	/**
 	 * Get demo packages.
 	 *
 	 * @return array of objects
 	 */
-	private function get_demo_packages() {
-		$theme            = get_option( 'template' );
-		$instance         = ThemeGrill_Demo_Importer::instance();
-		$supported_themes = $instance->get_core_supported_themes();
-		if ( in_array( $theme, $supported_themes, true ) ) {
-			$is_pro_theme = strpos( $theme, '-pro' ) !== false;
-			if ( $is_pro_theme ) {
-				$base_theme = $is_pro_theme ? str_replace( '-pro', '', $theme ) : $theme;
-				$data       = wp_remote_get( static::$themegrill_base_url . '/sites?theme=' . $base_theme );
-			} else {
-				$data = wp_remote_get( static::$themegrill_base_url . '/sites?theme=' . $theme );
-			}
-		} else {
-			$data = wp_remote_get( static::$themegrill_base_url . '/sites' );
-		}
-		if ( is_wp_error( $data ) ) {
-			return;
-		}
+	// private function get_demo_packages() {
+	//  $theme            = get_option( 'template' );
+	//  $instance         = ThemeGrill_Demo_Importer::instance();
+	//  $supported_themes = $instance->get_core_supported_themes();
+	//  if ( in_array( $theme, $supported_themes, true ) ) {
+	//      $is_pro_theme = strpos( $theme, '-pro' ) !== false;
+	//      if ( $is_pro_theme ) {
+	//          $base_theme = $is_pro_theme ? str_replace( '-pro', '', $theme ) : $theme;
+	//          $data       = wp_remote_get( static::$themegrill_base_url . '/sites?theme=' . $base_theme );
+	//      } else {
+	//          $data = wp_remote_get( static::$themegrill_base_url . '/sites?theme=' . $theme );
+	//      }
+	//  } else {
+	//      $data = wp_remote_get( static::$themegrill_base_url . '/sites' );
+	//  }
+	//  if ( is_wp_error( $data ) ) {
+	//      return;
+	//  }
 
-		$all_demos = json_decode( wp_remote_retrieve_body( $data ) );
-		// $theme            = get_option( 'template' );
-		// if ( in_array( $theme, $supported_themes, true ) ) {
-		//  $properties = get_object_vars( $all_demos );
-		//  $keys       = array_keys( $properties );
-		//  if ( in_array( $theme, $keys, true ) ) {
-		//      $demos = $all_demos->$theme;
-		//      return apply_filters( 'themegrill_demo_importer_packages_template', $demos );
-		//  }
-		// }
-		return apply_filters( 'themegrill_demo_importer_packages_template', $all_demos );
-	}
+	//  $all_demos     = json_decode( wp_remote_retrieve_body( $data ) );
+	//  $grouped_demos = array();
+	//  foreach ( $all_demos->data as $demo ) {
+	//      if ( ! isset( $demo->theme ) ) {
+	//          continue;
+	//      }
+	//      $theme = $demo->theme;
+
+	//      // Initialize group if not set
+	//      if ( ! isset( $grouped_demos[ $theme ] ) ) {
+	//          $grouped_demos[ $theme ] = array(
+	//              'slug'         => $theme,
+	//              'name'         => $demo->theme_name ?? $theme,
+	//              'categories'   => array( 'all' => 'All' ),
+	//              'pagebuilders' => array( 'all' => 'All' ),
+	//              'demos'        => array(),
+	//          );
+	//      }
+
+	//      if ( isset( $demo->categories ) ) {
+	//          $grouped_demos[ $theme ]['categories'] = array_unique(
+	//              array_merge(
+	//                  $grouped_demos[ $theme ]['categories'],
+	//                  (array) $demo->categories
+	//              )
+	//          );
+	//      }
+	//      if ( isset( $demo->pagebuilders ) ) {
+	//          $grouped_demos[ $theme ]['pagebuilders'] = array_unique(
+	//              array_merge(
+	//                  $grouped_demos[ $theme ]['pagebuilders'],
+	//                  (array) $demo->pagebuilders
+	//              )
+	//          );
+	//      }
+
+	//      // Add demo to the theme group
+	//      $grouped_demos[ $theme ]['demos'][ $demo->slug ] = $demo;
+
+	//  }
+	//  // $theme            = get_option( 'template' );
+	//  // if ( in_array( $theme, $supported_themes, true ) ) {
+	//  //  $properties = get_object_vars( $all_demos );
+	//  //  $keys       = array_keys( $properties );
+	//  //  if ( in_array( $theme, $keys, true ) ) {
+	//  //      $demos = $all_demos->$theme;
+	//  //      return apply_filters( 'themegrill_demo_importer_packages_template', $demos );
+	//  //  }
+	//  // }
+	//  return apply_filters( 'themegrill_demo_importer_packages_template', $grouped_demos );
+	// }
 
 	/**
 	 * Get the import file path.
@@ -221,7 +259,7 @@ class TG_Demo_Importer {
 					'__TDI_DASHBOARD__',
 					array(
 						'theme'               => $this->get_theme(),
-						'data'                => $this->demo_packages,
+						// 'data'                => $this->demo_packages,
 						'siteUrl'             => site_url(),
 						'installed_themes'    => $installed_themes,
 						'current_theme'       => get_option( 'template' ),
@@ -282,68 +320,68 @@ class TG_Demo_Importer {
 		wp_register_script( 'jquery-tiptip', $assets_path . 'js/jquery-tiptip/jquery.tipTip' . $suffix . '.js', array( 'jquery' ), '1.3', true );
 		wp_register_script( 'jquery-confirm', $assets_path . 'js/jquery-confirm/jquery-confirm' . $suffix . '.js', array( 'jquery' ), TGDM_VERSION, true );
 		wp_register_script( 'tg-demo-updates', $assets_path . 'js/admin/demo-updates' . $suffix . '.js', array( 'jquery', 'updates', 'wp-i18n' ), TGDM_VERSION, true );
-		wp_register_script( 'tg-demo-importer', $assets_path . 'js/admin/demo-importer' . $suffix . '.js', array( 'jquery', 'jquery-tiptip', 'wp-backbone', 'wp-a11y', 'tg-demo-updates', 'jquery-confirm' ), TGDM_VERSION, true );
+		// wp_register_script( 'tg-demo-importer', $assets_path . 'js/admin/demo-importer' . $suffix . '.js', array( 'jquery', 'jquery-tiptip', 'wp-backbone', 'wp-a11y', 'tg-demo-updates', 'jquery-confirm' ), TGDM_VERSION, true );
 
-		wp_localize_script(
-			'tg-demo-importer',
-			'_demoImporterSettings',
-			array(
-				// 'demos'    => $this->ajax_query_demos( true ),
-				'settings' => array(
-					'isNew'         => false,
-					'ajaxUrl'       => admin_url( 'admin-ajax.php' ),
-					'adminUrl'      => wp_parse_url( self_admin_url(), PHP_URL_PATH ),
-					'suggestURI'    => apply_filters( 'themegrill_demo_importer_suggest_new', 'https://themegrill.com/contact/' ),
-					'confirmImport' => sprintf(
-					/* translators: Before import warning texts */
-						'<h2>' . __( 'Things to Know </h2> %1$s %2$s %3$s %4$s %5$s %6$s', 'themegrill-demo-importer' ),
-						__( 'Importing demo data ensures that your website looks similar to the theme demo. So, you can work on modifying the demo content rather than creating it from scratch. However, please consider the following points before importing the demo', 'themegrill-demo-importer' ),
-						'<ol><li class="warning">' . __( 'It’s highly discouraged to import the demo if you’ve already added content to your website.', 'themegrill-demo-importer' ) . '</li>',
-						'<li>' . __( 'To replicate the theme demo accurately, you must import the demo on a fresh WordPress installation.', 'themegrill-demo-importer' ) . '</li>',
-						'<li>' . __( 'The import process will install and activate the plugins required for the theme demo to function properly on your site.', 'themegrill-demo-importer' ) . '</li>',
-						'<li>' . __( 'To avoid copyright infringement, replace all demo images with your own after importing the demo.', 'themegrill-demo-importer' ) . '</li>',
-						'<li>' . __( 'None of the existing posts, pages, attachments, and other data on your site will be modified or deleted during the import.', 'themegrill-demo-importer' ) . '</li>',
-						'<li>' . __( 'It will take some time to import the theme demo.', 'themegrill-demo-importer' ) . '</li></ol>'
-					),
-					'ceAddonNotice' => "<div class='demo-import-notice demo-import-notice-warning'><p>" . sprintf(
-						/* translators: %s: Companion Elementor plugin name */
-						__( 'This demo requires %1$s plugin to be installed and activated. %2$s', 'themegrill-demo-importer' ),
-						'<strong>' . __( 'Companion Elementor', 'themegrill-demo-importer' ) . '</strong>',
-						'<span>' . sprintf(
-							__( 'You can refer to this %1$s documentation %2$s for its installation.', 'themegrill-demo-importer' ),
-							'<a href="https://docs.zakratheme.com/en/article/how-to-import-zakra-premium-templates-9wj04y/" target="_blank">',
-							'</a>'
-						) . '</span>'
-					) . '</p></div>',
-				),
-				'l10n'     => array(
-					'search'              => __( 'Search Demos', 'themegrill-demo-importer' ),
-					'searchPlaceholder'   => __( 'Search demos...', 'themegrill-demo-importer' ), // placeholder (no ellipsis)
-					/* translators: %s: support forums URL */
-					'error'               => sprintf( __( 'An unexpected error occurred. Something may be wrong with ThemeGrill demo server&#8217;s configuration. If you continue to have problems, please try the <a href="%s">support forums</a>.', 'themegrill-demo-importer' ), 'https://wordpress.org/support/plugin/themegrill-demo-importer' ),
-					'tryAgain'            => __( 'Try Again', 'themegrill-demo-importer' ),
-					'suggestNew'          => __( 'Please suggest us!', 'themegrill-demo-importer' ),
-					/* translators: %d: Number of demos. */
-					'demosFound'          => __( 'Number of Demos found: %d', 'themegrill-demo-importer' ),
-					'noDemosFound'        => __( 'No demos found. Try a different search.', 'themegrill-demo-importer' ),
-					'collapseSidebar'     => __( 'Collapse Sidebar', 'themegrill-demo-importer' ),
-					'expandSidebar'       => __( 'Expand Sidebar', 'themegrill-demo-importer' ),
-					/* translators: accessibility text */
-					'selectFeatureFilter' => __( 'Select one or more Demo features to filter by', 'themegrill-demo-importer' ),
-					'confirmMsg'          => __( 'Continue', 'themegrill-demo-importer' ),
-				),
-				'routes'   => apply_filters(
-					'themegrill_demo_importer_routes',
-					array(
-						'themes.php?page=demo-importer&demo=:slug' => 'preview',
-						'themes.php?page=demo-importer&browse=:sort' => 'sort',
-						'themes.php?page=demo-importer&search=:query' => 'search',
-						'themes.php?page=demo-importer' => 'sort',
-					)
-				),
-				'baseURL'  => apply_filters( 'themegrill_demo_importer_baseURL', 'themes.php?page=demo-importer' ),
-			)
-		);
+		// wp_localize_script(
+		//  'tg-demo-importer',
+		//  '_demoImporterSettings',
+		//  array(
+		//      // 'demos'    => $this->ajax_query_demos( true ),
+		//      'settings' => array(
+		//          'isNew'         => false,
+		//          'ajaxUrl'       => admin_url( 'admin-ajax.php' ),
+		//          'adminUrl'      => wp_parse_url( self_admin_url(), PHP_URL_PATH ),
+		//          'suggestURI'    => apply_filters( 'themegrill_demo_importer_suggest_new', 'https://themegrill.com/contact/' ),
+		//          'confirmImport' => sprintf(
+		//          /* translators: Before import warning texts */
+		//              '<h2>' . __( 'Things to Know </h2> %1$s %2$s %3$s %4$s %5$s %6$s', 'themegrill-demo-importer' ),
+		//              __( 'Importing demo data ensures that your website looks similar to the theme demo. So, you can work on modifying the demo content rather than creating it from scratch. However, please consider the following points before importing the demo', 'themegrill-demo-importer' ),
+		//              '<ol><li class="warning">' . __( 'It’s highly discouraged to import the demo if you’ve already added content to your website.', 'themegrill-demo-importer' ) . '</li>',
+		//              '<li>' . __( 'To replicate the theme demo accurately, you must import the demo on a fresh WordPress installation.', 'themegrill-demo-importer' ) . '</li>',
+		//              '<li>' . __( 'The import process will install and activate the plugins required for the theme demo to function properly on your site.', 'themegrill-demo-importer' ) . '</li>',
+		//              '<li>' . __( 'To avoid copyright infringement, replace all demo images with your own after importing the demo.', 'themegrill-demo-importer' ) . '</li>',
+		//              '<li>' . __( 'None of the existing posts, pages, attachments, and other data on your site will be modified or deleted during the import.', 'themegrill-demo-importer' ) . '</li>',
+		//              '<li>' . __( 'It will take some time to import the theme demo.', 'themegrill-demo-importer' ) . '</li></ol>'
+		//          ),
+		//          'ceAddonNotice' => "<div class='demo-import-notice demo-import-notice-warning'><p>" . sprintf(
+		//              /* translators: %s: Companion Elementor plugin name */
+		//              __( 'This demo requires %1$s plugin to be installed and activated. %2$s', 'themegrill-demo-importer' ),
+		//              '<strong>' . __( 'Companion Elementor', 'themegrill-demo-importer' ) . '</strong>',
+		//              '<span>' . sprintf(
+		//                  __( 'You can refer to this %1$s documentation %2$s for its installation.', 'themegrill-demo-importer' ),
+		//                  '<a href="https://docs.zakratheme.com/en/article/how-to-import-zakra-premium-templates-9wj04y/" target="_blank">',
+		//                  '</a>'
+		//              ) . '</span>'
+		//          ) . '</p></div>',
+		//      ),
+		//      'l10n'     => array(
+		//          'search'              => __( 'Search Demos', 'themegrill-demo-importer' ),
+		//          'searchPlaceholder'   => __( 'Search demos...', 'themegrill-demo-importer' ), // placeholder (no ellipsis)
+		//          /* translators: %s: support forums URL */
+		//          'error'               => sprintf( __( 'An unexpected error occurred. Something may be wrong with ThemeGrill demo server&#8217;s configuration. If you continue to have problems, please try the <a href="%s">support forums</a>.', 'themegrill-demo-importer' ), 'https://wordpress.org/support/plugin/themegrill-demo-importer' ),
+		//          'tryAgain'            => __( 'Try Again', 'themegrill-demo-importer' ),
+		//          'suggestNew'          => __( 'Please suggest us!', 'themegrill-demo-importer' ),
+		//          /* translators: %d: Number of demos. */
+		//          'demosFound'          => __( 'Number of Demos found: %d', 'themegrill-demo-importer' ),
+		//          'noDemosFound'        => __( 'No demos found. Try a different search.', 'themegrill-demo-importer' ),
+		//          'collapseSidebar'     => __( 'Collapse Sidebar', 'themegrill-demo-importer' ),
+		//          'expandSidebar'       => __( 'Expand Sidebar', 'themegrill-demo-importer' ),
+		//          /* translators: accessibility text */
+		//          'selectFeatureFilter' => __( 'Select one or more Demo features to filter by', 'themegrill-demo-importer' ),
+		//          'confirmMsg'          => __( 'Continue', 'themegrill-demo-importer' ),
+		//      ),
+		//      'routes'   => apply_filters(
+		//          'themegrill_demo_importer_routes',
+		//          array(
+		//              'themes.php?page=demo-importer&demo=:slug' => 'preview',
+		//              'themes.php?page=demo-importer&browse=:sort' => 'sort',
+		//              'themes.php?page=demo-importer&search=:query' => 'search',
+		//              'themes.php?page=demo-importer' => 'sort',
+		//          )
+		//      ),
+		//      'baseURL'  => apply_filters( 'themegrill_demo_importer_baseURL', 'themes.php?page=demo-importer' ),
+		//  )
+		// );
 
 		wp_enqueue_media();
 
@@ -461,16 +499,16 @@ class TG_Demo_Importer {
 	/**
 	 * Demo Importer page output.
 	 */
-	public function demo_importer() {
-		include_once __DIR__ . '/admin/views/html-admin-page-importer.php';
-	}
+	// public function demo_importer() {
+	//  include_once __DIR__ . '/admin/views/html-admin-page-importer.php';
+	// }
 
 	/**
 	 * Demo Importer status page output.
 	 */
-	public function status_menu() {
-		include_once __DIR__ . '/admin/views/html-admin-page-status.php';
-	}
+	// public function status_menu() {
+	//  include_once __DIR__ . '/admin/views/html-admin-page-status.php';
+	// }
 
 	/**
 	 * Check for Zakra Premium theme plan.
@@ -503,301 +541,301 @@ class TG_Demo_Importer {
 	/**
 	 * Ajax handler for getting demos from github.
 	 */
-	public function ajax_query_demos( $return = true ) {
-		$prepared_demos        = array();
-		$current_template      = get_option( 'template' );
-		$current_theme_name    = wp_get_theme()->get( 'Name' );
-		$current_theme_version = wp_get_theme()->get( 'Version' );
-		$is_pro_theme_demo     = strpos( $current_template, '-pro' ) !== false;
-		$demo_activated_id     = get_option( 'themegrill_demo_importer_activated_id' );
-		$available_packages    = $this->demo_packages;
+	// public function ajax_query_demos( $return = true ) {
+	//  $prepared_demos        = array();
+	//  $current_template      = get_option( 'template' );
+	//  $current_theme_name    = wp_get_theme()->get( 'Name' );
+	//  $current_theme_version = wp_get_theme()->get( 'Version' );
+	//  $is_pro_theme_demo     = strpos( $current_template, '-pro' ) !== false;
+	//  $demo_activated_id     = get_option( 'themegrill_demo_importer_activated_id' );
+	//  $available_packages    = $this->demo_packages;
 
-		// Condition for Zakra Pro.
-		$zakra_pro_plugin_version        = is_plugin_active( 'zakra-pro/zakra-pro.php' ) ? ZAKRA_PRO_VERSION : false;
-		$companion_elementor_plugin_name = is_plugin_active( 'companion-elementor/companion-elementor.php' ) ? COMPANION_ELEMENTOR_VERSION : false;
+	//  // Condition for Zakra Pro.
+	//  $zakra_pro_plugin_version        = is_plugin_active( 'zakra-pro/zakra-pro.php' ) ? ZAKRA_PRO_VERSION : false;
+	//  $companion_elementor_plugin_name = is_plugin_active( 'companion-elementor/companion-elementor.php' ) ? COMPANION_ELEMENTOR_VERSION : false;
 
-		// Condition if child theme is being used.
-		if ( is_child_theme() ) {
-			$current_theme_name    = wp_get_theme()->parent()->get( 'Name' );
-			$current_theme_version = wp_get_theme()->parent()->get( 'Version' );
-		}
+	//  // Condition if child theme is being used.
+	//  if ( is_child_theme() ) {
+	//      $current_theme_name    = wp_get_theme()->parent()->get( 'Name' );
+	//      $current_theme_version = wp_get_theme()->parent()->get( 'Version' );
+	//  }
 
-		/**
-		 * Filters demo data before it is prepared for JavaScript.
-		 *
-		 * @param array      $prepared_demos     An associative array of demo data. Default empty array.
-		 * @param null|array $available_packages An array of demo package config to prepare, if any.
-		 * @param string     $demo_activated_id  The current demo activated id.
-		 */
-		$prepared_demos = (array) apply_filters( 'themegrill_demo_importer_pre_prepare_demos_for_js', array(), $available_packages, $demo_activated_id );
+	//  /**
+	//   * Filters demo data before it is prepared for JavaScript.
+	//   *
+	//   * @param array      $prepared_demos     An associative array of demo data. Default empty array.
+	//   * @param null|array $available_packages An array of demo package config to prepare, if any.
+	//   * @param string     $demo_activated_id  The current demo activated id.
+	//   */
+	//  $prepared_demos = (array) apply_filters( 'themegrill_demo_importer_pre_prepare_demos_for_js', array(), $available_packages, $demo_activated_id );
 
-		if ( ! empty( $prepared_demos ) ) {
-			return $prepared_demos;
-		}
+	//  if ( ! empty( $prepared_demos ) ) {
+	//      return $prepared_demos;
+	//  }
 
-		if ( ! $return ) {
-			$request = wp_parse_args(
-				wp_unslash( $_REQUEST['request'] ),
-				array(
-					'browse' => 'all',
-				)
-			);
-		} else {
-			$request = array(
-				'browse' => 'all',
-			);
-		}
+	//  if ( ! $return ) {
+	//      $request = wp_parse_args(
+	//          wp_unslash( $_REQUEST['request'] ),
+	//          array(
+	//              'browse' => 'all',
+	//          )
+	//      );
+	//  } else {
+	//      $request = array(
+	//          'browse' => 'all',
+	//      );
+	//  }
 
-		if ( isset( $available_packages->demos ) ) {
-			foreach ( $available_packages->demos as $package_slug => $package_data ) {
-				$plugins_list   = isset( $package_data->plugins_list ) ? $package_data->plugins_list : array();
-				$screenshot_url = "https://d1sb0nhp4t2db4.cloudfront.net/resources/{$available_packages->slug}/{$package_slug}/screenshot.jpg";
+	//  if ( isset( $available_packages->demos ) ) {
+	//      foreach ( $available_packages->demos as $package_slug => $package_data ) {
+	//          $plugins_list   = isset( $package_data->plugins_list ) ? $package_data->plugins_list : array();
+	//          $screenshot_url = "https://d1sb0nhp4t2db4.cloudfront.net/resources/{$available_packages->slug}/{$package_slug}/screenshot.jpg";
 
-				if ( isset( $request['browse'], $package_data->category ) && ! in_array( $request['browse'], $package_data->category, true ) ) {
-					continue;
-				}
+	//          if ( isset( $request['browse'], $package_data->category ) && ! in_array( $request['browse'], $package_data->category, true ) ) {
+	//              continue;
+	//          }
 
-				if ( isset( $request['builder'], $package_data->pagebuilder ) && ! in_array( $request['builder'], $package_data->pagebuilder, true ) ) {
-					continue;
-				}
+	//          if ( isset( $request['builder'], $package_data->pagebuilder ) && ! in_array( $request['builder'], $package_data->pagebuilder, true ) ) {
+	//              continue;
+	//          }
 
-				$plugins_list = is_object( $plugins_list ) ? $plugins_list : new stdClass();
+	//          $plugins_list = is_object( $plugins_list ) ? $plugins_list : new stdClass();
 
-				// Zakra: check if BlockArt is in plugin list if not add it.
-				if ( 'Zakra' === $current_theme_name && ! isset( $plugins_list->{'blockart-blocks'} ) ) {
-					$plugins_list->{'blockart-blocks'} = (object) array(
-						'name' => 'BlockArt',
-						'slug' => 'blockart-blocks/blockart.php',
-					);
-				}
+	//          // Zakra: check if BlockArt is in plugin list if not add it.
+	//          if ( 'Zakra' === $current_theme_name && ! isset( $plugins_list->{'blockart-blocks'} ) ) {
+	//              $plugins_list->{'blockart-blocks'} = (object) array(
+	//                  'name' => 'BlockArt',
+	//                  'slug' => 'blockart-blocks/blockart.php',
+	//              );
+	//          }
 
-				// CM: check if Magazine blocks is in plugin list if not add it.
-				if ( 'ColorMag' === $current_theme_name && ! isset( $plugins_list->{'magazine-blocks'} ) ) {
-					$plugins_list->{'magazine-blocks'} = (object) array(
-						'name' => 'Magazine Blocks',
-						'slug' => 'magazine-blocks/magazine-blocks.php',
-					);
-				}
+	//          // CM: check if Magazine blocks is in plugin list if not add it.
+	//          if ( 'ColorMag' === $current_theme_name && ! isset( $plugins_list->{'magazine-blocks'} ) ) {
+	//              $plugins_list->{'magazine-blocks'} = (object) array(
+	//                  'name' => 'Magazine Blocks',
+	//                  'slug' => 'magazine-blocks/magazine-blocks.php',
+	//              );
+	//          }
 
-				// Plugins status.
-				foreach ( $plugins_list as $plugin => $plugin_data ) {
+	//          // Plugins status.
+	//          foreach ( $plugins_list as $plugin => $plugin_data ) {
 
-					if ( 'companion-elementor' === $plugin && ! is_plugin_active( $plugin_data->slug ) ) {
-						$package_data->require_ce = true;
-					}
+	//              if ( 'companion-elementor' === $plugin && ! is_plugin_active( $plugin_data->slug ) ) {
+	//                  $package_data->require_ce = true;
+	//              }
 
-					$plugin_data->is_active = 'learning-management-system/lms.php' === $plugin_data->slug ? ( is_plugin_active( 'learning-management-system/lms.php' ) || is_plugin_active( 'learning-management-system-pro/lms.php' ) ) : is_plugin_active( $plugin_data->slug );
+	//              $plugin_data->is_active = 'learning-management-system/lms.php' === $plugin_data->slug ? ( is_plugin_active( 'learning-management-system/lms.php' ) || is_plugin_active( 'learning-management-system-pro/lms.php' ) ) : is_plugin_active( $plugin_data->slug );
 
-					// Looks like a plugin is installed, but not active.
-					if ( file_exists( WP_PLUGIN_DIR . '/' . $plugin ) ) {
-						$plugins = get_plugins( '/' . $plugin );
-						if ( ! empty( $plugins ) ) {
-							$plugin_data->is_install = true;
-						}
-					} else {
-						$plugin_data->is_install = false;
-					}
-				}
+	//              // Looks like a plugin is installed, but not active.
+	//              if ( file_exists( WP_PLUGIN_DIR . '/' . $plugin ) ) {
+	//                  $plugins = get_plugins( '/' . $plugin );
+	//                  if ( ! empty( $plugins ) ) {
+	//                      $plugin_data->is_install = true;
+	//                  }
+	//              } else {
+	//                  $plugin_data->is_install = false;
+	//              }
+	//          }
 
-				// Get the required theme versions.
-				$required_version_installed           = false;
-				$required_version                     = false;
-				$zakra_pro_required_version           = false;
-				$companion_elementor_required_version = false;
-				if ( isset( $package_data->minimum_version ) && is_object( $package_data->minimum_version ) ) {
-					foreach ( $package_data->minimum_version as $theme => $minimum_version ) {
-						if ( 'zakra' === $current_template ) {
-							if (
-								version_compare( $minimum_version, $current_theme_version, '>' ) ||
-								( 'zakra-pro' === $theme && version_compare( $minimum_version, $zakra_pro_plugin_version, '>' ) ) ||
-								( 'companion-elementor' === $theme && version_compare( $minimum_version, $companion_elementor_plugin_name, '>' ) )
-							) {
-								$required_version_installed = true;
+	//          // Get the required theme versions.
+	//          $required_version_installed           = false;
+	//          $required_version                     = false;
+	//          $zakra_pro_required_version           = false;
+	//          $companion_elementor_required_version = false;
+	//          if ( isset( $package_data->minimum_version ) && is_object( $package_data->minimum_version ) ) {
+	//              foreach ( $package_data->minimum_version as $theme => $minimum_version ) {
+	//                  if ( 'zakra' === $current_template ) {
+	//                      if (
+	//                          version_compare( $minimum_version, $current_theme_version, '>' ) ||
+	//                          ( 'zakra-pro' === $theme && version_compare( $minimum_version, $zakra_pro_plugin_version, '>' ) ) ||
+	//                          ( 'companion-elementor' === $theme && version_compare( $minimum_version, $companion_elementor_plugin_name, '>' ) )
+	//                      ) {
+	//                          $required_version_installed = true;
 
-								if ( 'zakra' === $theme ) {
-									$required_version = $minimum_version;
-								}
+	//                          if ( 'zakra' === $theme ) {
+	//                              $required_version = $minimum_version;
+	//                          }
 
-								if ( 'zakra-pro' === $theme ) {
-									$zakra_pro_required_version = $minimum_version;
-								}
+	//                          if ( 'zakra-pro' === $theme ) {
+	//                              $zakra_pro_required_version = $minimum_version;
+	//                          }
 
-								if ( 'companion-elementor' === $theme ) {
-									$companion_elementor_required_version = $minimum_version;
-								}
-							}
-						} elseif (
-								$current_template === $theme && version_compare( $minimum_version, $current_theme_version, '>' ) ||
-								( 'companion-elementor' === $theme && version_compare( $minimum_version, $companion_elementor_plugin_name, '>' ) )
-							) {
+	//                          if ( 'companion-elementor' === $theme ) {
+	//                              $companion_elementor_required_version = $minimum_version;
+	//                          }
+	//                      }
+	//                  } elseif (
+	//                          $current_template === $theme && version_compare( $minimum_version, $current_theme_version, '>' ) ||
+	//                          ( 'companion-elementor' === $theme && version_compare( $minimum_version, $companion_elementor_plugin_name, '>' ) )
+	//                      ) {
 
-								$required_version_installed = true;
+	//                          $required_version_installed = true;
 
-							if ( $current_template === $theme ) {
-								$required_version = $minimum_version;
-							}
+	//                      if ( $current_template === $theme ) {
+	//                          $required_version = $minimum_version;
+	//                      }
 
-							if ( 'companion-elementor' === $theme ) {
-								$companion_elementor_required_version = $minimum_version;
-							}
-						}
-					}
-				}
+	//                      if ( 'companion-elementor' === $theme ) {
+	//                          $companion_elementor_required_version = $minimum_version;
+	//                      }
+	//                  }
+	//              }
+	//          }
 
-				// For required message.
-				$required_message = false;
-				if ( 'zakra' === $current_template ) {
-					if ( $required_version ) {
-						$required_message = sprintf( esc_html__( 'This demo requires %1$s version of %2$s theme to get imported', 'themegrill-demo-importer' ), $required_version, $current_theme_name );
-					}
+	//          // For required message.
+	//          $required_message = false;
+	//          if ( 'zakra' === $current_template ) {
+	//              if ( $required_version ) {
+	//                  $required_message = sprintf( esc_html__( 'This demo requires %1$s version of %2$s theme to get imported', 'themegrill-demo-importer' ), $required_version, $current_theme_name );
+	//              }
 
-					if ( $zakra_pro_required_version ) {
-						if ( $required_version && $companion_elementor_required_version ) {
-							$required_message = sprintf(
-								esc_html__( 'This demo requires %1$s version of %2$s theme and %3$s version of %4$s as well as %5$s version of %6$s plugins to get imported', 'themegrill-demo-importer' ),
-								$required_version,
-								$current_theme_name,
-								$zakra_pro_required_version,
-								esc_html__( 'Zakra Pro', 'themegrill-demo-importer' ),
-								$companion_elementor_required_version,
-								esc_html__( 'Companion Elementor', 'themegrill-demo-importer' )
-							);
-						} elseif ( $required_version ) {
-							$required_message = sprintf(
-								esc_html__( 'This demo requires %1$s version of %2$s theme and %3$s version of %4$s plugin to get imported', 'themegrill-demo-importer' ),
-								$required_version,
-								$current_theme_name,
-								$zakra_pro_required_version,
-								esc_html__( 'Zakra Pro', 'themegrill-demo-importer' )
-							);
-						} else {
-							$required_message = sprintf(
-								esc_html__( 'This demo requires %1$s version of %2$s plugin to get imported', 'themegrill-demo-importer' ),
-								$zakra_pro_required_version,
-								esc_html__( 'Zakra Pro', 'themegrill-demo-importer' )
-							);
-						}
-					}
+	//              if ( $zakra_pro_required_version ) {
+	//                  if ( $required_version && $companion_elementor_required_version ) {
+	//                      $required_message = sprintf(
+	//                          esc_html__( 'This demo requires %1$s version of %2$s theme and %3$s version of %4$s as well as %5$s version of %6$s plugins to get imported', 'themegrill-demo-importer' ),
+	//                          $required_version,
+	//                          $current_theme_name,
+	//                          $zakra_pro_required_version,
+	//                          esc_html__( 'Zakra Pro', 'themegrill-demo-importer' ),
+	//                          $companion_elementor_required_version,
+	//                          esc_html__( 'Companion Elementor', 'themegrill-demo-importer' )
+	//                      );
+	//                  } elseif ( $required_version ) {
+	//                      $required_message = sprintf(
+	//                          esc_html__( 'This demo requires %1$s version of %2$s theme and %3$s version of %4$s plugin to get imported', 'themegrill-demo-importer' ),
+	//                          $required_version,
+	//                          $current_theme_name,
+	//                          $zakra_pro_required_version,
+	//                          esc_html__( 'Zakra Pro', 'themegrill-demo-importer' )
+	//                      );
+	//                  } else {
+	//                      $required_message = sprintf(
+	//                          esc_html__( 'This demo requires %1$s version of %2$s plugin to get imported', 'themegrill-demo-importer' ),
+	//                          $zakra_pro_required_version,
+	//                          esc_html__( 'Zakra Pro', 'themegrill-demo-importer' )
+	//                      );
+	//                  }
+	//              }
 
-					if ( $companion_elementor_required_version ) {
-						if ( $required_version && $zakra_pro_required_version ) {
-							$required_message = sprintf(
-								esc_html__( 'This demo requires %1$s version of %2$s theme and %3$s version of %4$s as well as %5$s version of %6$s plugins to get imported', 'themegrill-demo-importer' ),
-								$required_version,
-								$current_theme_name,
-								$zakra_pro_required_version,
-								esc_html__( 'Zakra Pro', 'themegrill-demo-importer' ),
-								$companion_elementor_required_version,
-								esc_html__( 'Companion Elementor', 'themegrill-demo-importer' )
-							);
-						} elseif ( $required_version ) {
-							$required_message = sprintf(
-								esc_html__( 'This demo requires %1$s version of %2$s theme and %3$s version of %4$s plugin to get imported', 'themegrill-demo-importer' ),
-								$required_version,
-								$current_theme_name,
-								$companion_elementor_required_version,
-								esc_html__( 'Companion Elementor', 'themegrill-demo-importer' )
-							);
-						} else {
-							$required_message = sprintf(
-								esc_html__( 'This demo requires %1$s version of %2$s plugin to get imported', 'themegrill-demo-importer' ),
-								$companion_elementor_required_version,
-								esc_html__( 'Companion Elementor', 'themegrill-demo-importer' )
-							);
-						}
-					}
+	//              if ( $companion_elementor_required_version ) {
+	//                  if ( $required_version && $zakra_pro_required_version ) {
+	//                      $required_message = sprintf(
+	//                          esc_html__( 'This demo requires %1$s version of %2$s theme and %3$s version of %4$s as well as %5$s version of %6$s plugins to get imported', 'themegrill-demo-importer' ),
+	//                          $required_version,
+	//                          $current_theme_name,
+	//                          $zakra_pro_required_version,
+	//                          esc_html__( 'Zakra Pro', 'themegrill-demo-importer' ),
+	//                          $companion_elementor_required_version,
+	//                          esc_html__( 'Companion Elementor', 'themegrill-demo-importer' )
+	//                      );
+	//                  } elseif ( $required_version ) {
+	//                      $required_message = sprintf(
+	//                          esc_html__( 'This demo requires %1$s version of %2$s theme and %3$s version of %4$s plugin to get imported', 'themegrill-demo-importer' ),
+	//                          $required_version,
+	//                          $current_theme_name,
+	//                          $companion_elementor_required_version,
+	//                          esc_html__( 'Companion Elementor', 'themegrill-demo-importer' )
+	//                      );
+	//                  } else {
+	//                      $required_message = sprintf(
+	//                          esc_html__( 'This demo requires %1$s version of %2$s plugin to get imported', 'themegrill-demo-importer' ),
+	//                          $companion_elementor_required_version,
+	//                          esc_html__( 'Companion Elementor', 'themegrill-demo-importer' )
+	//                      );
+	//                  }
+	//              }
 
-					if ( ! $required_version && ( $zakra_pro_required_version && $companion_elementor_required_version ) ) {
-						$required_message = sprintf(
-							esc_html__( 'This demo requires %1$s version of %2$s as well as %3$s version of %4$s plugins to get imported', 'themegrill-demo-importer' ),
-							$zakra_pro_required_version,
-							esc_html__( 'Zakra Pro', 'themegrill-demo-importer' ),
-							$companion_elementor_required_version,
-							esc_html__( 'Companion Elementor', 'themegrill-demo-importer' )
-						);
-					}
-				} else {
-					if ( $required_version ) {
-						$required_message = sprintf(
-							esc_html__( 'This demo requires %1$s version of %2$s theme to get imported', 'themegrill-demo-importer' ),
-							$required_version,
-							$current_theme_name
-						);
-					}
+	//              if ( ! $required_version && ( $zakra_pro_required_version && $companion_elementor_required_version ) ) {
+	//                  $required_message = sprintf(
+	//                      esc_html__( 'This demo requires %1$s version of %2$s as well as %3$s version of %4$s plugins to get imported', 'themegrill-demo-importer' ),
+	//                      $zakra_pro_required_version,
+	//                      esc_html__( 'Zakra Pro', 'themegrill-demo-importer' ),
+	//                      $companion_elementor_required_version,
+	//                      esc_html__( 'Companion Elementor', 'themegrill-demo-importer' )
+	//                  );
+	//              }
+	//          } else {
+	//              if ( $required_version ) {
+	//                  $required_message = sprintf(
+	//                      esc_html__( 'This demo requires %1$s version of %2$s theme to get imported', 'themegrill-demo-importer' ),
+	//                      $required_version,
+	//                      $current_theme_name
+	//                  );
+	//              }
 
-					if ( $companion_elementor_required_version ) {
-						if ( $required_version ) {
-							$required_message = sprintf(
-								esc_html__( 'This demo requires %1$s version of %2$s theme and %3$s version of %4$s plugin to get imported', 'themegrill-demo-importer' ),
-								$required_version,
-								$current_theme_name,
-								$companion_elementor_required_version,
-								esc_html__( 'Companion Elementor', 'themegrill-demo-importer' )
-							);
-						} else {
-							$required_message = sprintf(
-								esc_html__( 'This demo requires %1$s version of %2$s plugin to get imported', 'themegrill-demo-importer' ),
-								$companion_elementor_required_version,
-								esc_html__( 'Companion Elementor', 'themegrill-demo-importer' )
-							);
-						}
-					}
-				}
+	//              if ( $companion_elementor_required_version ) {
+	//                  if ( $required_version ) {
+	//                      $required_message = sprintf(
+	//                          esc_html__( 'This demo requires %1$s version of %2$s theme and %3$s version of %4$s plugin to get imported', 'themegrill-demo-importer' ),
+	//                          $required_version,
+	//                          $current_theme_name,
+	//                          $companion_elementor_required_version,
+	//                          esc_html__( 'Companion Elementor', 'themegrill-demo-importer' )
+	//                      );
+	//                  } else {
+	//                      $required_message = sprintf(
+	//                          esc_html__( 'This demo requires %1$s version of %2$s plugin to get imported', 'themegrill-demo-importer' ),
+	//                          $companion_elementor_required_version,
+	//                          esc_html__( 'Companion Elementor', 'themegrill-demo-importer' )
+	//                      );
+	//                  }
+	//              }
+	//          }
 
-				// Prepare all demos.
-				$prepared_demos[ $package_slug ] = array(
-					'slug'              => $package_slug,
-					'name'              => $package_data->title,
-					'theme'             => $is_pro_theme_demo ? sprintf( esc_html__( '%s Pro', 'themegrill-demo-importer' ), $available_packages->name ) : $available_packages->name,
-					'isPro'             => $is_pro_theme_demo ? false : isset( $package_data->isPro ),
-					'isPremium'         => $this->zakra_is_premium_theme_plan() ? false : isset( $package_data->isPremium ),
-					'isAllThemePlan'    => $this->themegrill_is_all_themes_plan() ? false : isset( $package_data->isAllThemePlan ),
-					'active'            => $package_slug === $demo_activated_id,
-					'author'            => isset( $package_data->author ) ? $package_data->author : __( 'ThemeGrill', 'themegrill-demo-importer' ),
-					'version'           => isset( $package_data->version ) ? $package_data->version : $available_packages->version,
-					'description'       => isset( $package_data->description ) ? $package_data->description : '',
-					'homepage'          => $available_packages->homepage,
-					'preview_url'       => set_url_scheme( $package_data->preview ),
-					'screenshot_url'    => $screenshot_url,
-					'plugins'           => $plugins_list,
-					'requiredTheme'     => isset( $package_data->template ) && ! in_array( $current_template, $package_data->template, true ),
-					'requiredPlugins'   => wp_list_filter( json_decode( wp_json_encode( $plugins_list ), true ), array( 'is_active' => false ) ) ? true : false,
-					'requiredVersion'   => $required_version_installed,
-					'updateThemeNotice' => $required_message,
-					'ceAddonNotice'     => isset( $package_data->require_ce ) && $package_data->require_ce ? __( 'CE required' ) : '',
-				);
+	//          // Prepare all demos.
+	//          $prepared_demos[ $package_slug ] = array(
+	//              'slug'              => $package_slug,
+	//              'name'              => $package_data->title,
+	//              'theme'             => $is_pro_theme_demo ? sprintf( esc_html__( '%s Pro', 'themegrill-demo-importer' ), $available_packages->name ) : $available_packages->name,
+	//              'isPro'             => $is_pro_theme_demo ? false : isset( $package_data->isPro ),
+	//              'isPremium'         => $this->zakra_is_premium_theme_plan() ? false : isset( $package_data->isPremium ),
+	//              'isAllThemePlan'    => $this->themegrill_is_all_themes_plan() ? false : isset( $package_data->isAllThemePlan ),
+	//              'active'            => $package_slug === $demo_activated_id,
+	//              'author'            => isset( $package_data->author ) ? $package_data->author : __( 'ThemeGrill', 'themegrill-demo-importer' ),
+	//              'version'           => isset( $package_data->version ) ? $package_data->version : $available_packages->version,
+	//              'description'       => isset( $package_data->description ) ? $package_data->description : '',
+	//              'homepage'          => $available_packages->homepage,
+	//              'preview_url'       => set_url_scheme( $package_data->preview ),
+	//              'screenshot_url'    => $screenshot_url,
+	//              'plugins'           => $plugins_list,
+	//              'requiredTheme'     => isset( $package_data->template ) && ! in_array( $current_template, $package_data->template, true ),
+	//              'requiredPlugins'   => wp_list_filter( json_decode( wp_json_encode( $plugins_list ), true ), array( 'is_active' => false ) ) ? true : false,
+	//              'requiredVersion'   => $required_version_installed,
+	//              'updateThemeNotice' => $required_message,
+	//              'ceAddonNotice'     => isset( $package_data->require_ce ) && $package_data->require_ce ? __( 'CE required' ) : '',
+	//          );
 
-				unset( $required_version );
-				unset( $zakra_pro_required_version );
-				unset( $companion_elementor_required_version );
-			}
-		}
+	//          unset( $required_version );
+	//          unset( $zakra_pro_required_version );
+	//          unset( $companion_elementor_required_version );
+	//      }
+	//  }
 
-		/**
-		 * Filters the demos prepared for JavaScript.
-		 *
-		 * Could be useful for changing the order, which is by name by default.
-		 *
-		 * @param array $prepared_demos Array of demos.
-		 */
-		$prepared_demos = apply_filters( 'themegrill_demo_importer_prepare_demos_for_js', $prepared_demos );
-		$prepared_demos = array_values( $prepared_demos );
+	//  /**
+	//   * Filters the demos prepared for JavaScript.
+	//   *
+	//   * Could be useful for changing the order, which is by name by default.
+	//   *
+	//   * @param array $prepared_demos Array of demos.
+	//   */
+	//  $prepared_demos = apply_filters( 'themegrill_demo_importer_prepare_demos_for_js', $prepared_demos );
+	//  $prepared_demos = array_values( $prepared_demos );
 
-		if ( $return ) {
-			return $prepared_demos;
-		}
+	//  if ( $return ) {
+	//      return $prepared_demos;
+	//  }
 
-		wp_send_json_success(
-			array(
-				'info'  => array(
-					'page'    => 1,
-					'pages'   => 1,
-					'results' => count( $prepared_demos ),
-				),
-				'demos' => array_filter( $prepared_demos ),
-			)
-		);
-	}
+	//  wp_send_json_success(
+	//      array(
+	//          'info'  => array(
+	//              'page'    => 1,
+	//              'pages'   => 1,
+	//              'results' => count( $prepared_demos ),
+	//          ),
+	//          'demos' => array_filter( $prepared_demos ),
+	//      )
+	//  );
+	// }
 
 	/**
 	 * Ajax handler for importing a demo.
@@ -806,102 +844,102 @@ class TG_Demo_Importer {
 	 *
 	 * @global WP_Filesystem_Base $wp_filesystem Subclass
 	 */
-	public function ajax_import_demo() {
-		check_ajax_referer( 'updates' );
+	// public function ajax_import_demo() {
+	//  check_ajax_referer( 'updates' );
 
-		if ( empty( $_POST['slug'] ) ) {
-			wp_send_json_error(
-				array(
-					'slug'         => '',
-					'errorCode'    => 'no_demo_specified',
-					'errorMessage' => __( 'No demo specified.', 'themegrill-demo-importer' ),
-				)
-			);
-		}
+	//  if ( empty( $_POST['slug'] ) ) {
+	//      wp_send_json_error(
+	//          array(
+	//              'slug'         => '',
+	//              'errorCode'    => 'no_demo_specified',
+	//              'errorMessage' => __( 'No demo specified.', 'themegrill-demo-importer' ),
+	//          )
+	//      );
+	//  }
 
-		$slug   = sanitize_key( wp_unslash( $_POST['slug'] ) );
-		$status = array(
-			'import' => 'demo',
-			'slug'   => $slug,
-		);
+	//  $slug   = sanitize_key( wp_unslash( $_POST['slug'] ) );
+	//  $status = array(
+	//      'import' => 'demo',
+	//      'slug'   => $slug,
+	//  );
 
-		if ( ! defined( 'WP_LOAD_IMPORTERS' ) ) {
-			define( 'WP_LOAD_IMPORTERS', true );
-		}
+	//  if ( ! defined( 'WP_LOAD_IMPORTERS' ) ) {
+	//      define( 'WP_LOAD_IMPORTERS', true );
+	//  }
 
-		if ( ! current_user_can( 'import' ) ) {
-			$status['errorMessage'] = __( 'Sorry, you are not allowed to import content.', 'themegrill-demo-importer' );
-			wp_send_json_error( $status );
-		}
+	//  if ( ! current_user_can( 'import' ) ) {
+	//      $status['errorMessage'] = __( 'Sorry, you are not allowed to import content.', 'themegrill-demo-importer' );
+	//      wp_send_json_error( $status );
+	//  }
 
-		include_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
-		include_once __DIR__ . '/admin/class-demo-pack-upgrader.php';
+	//  include_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
+	//  include_once __DIR__ . '/admin/class-demo-pack-upgrader.php';
 
-		$skin     = new WP_Ajax_Upgrader_Skin();
-		$upgrader = new TG_Demo_Pack_Upgrader( $skin );
-		$template = strtolower( str_replace( '-pro', '', get_option( 'template' ) ) );
-		$packages = isset( $this->demo_packages->demos ) ? json_decode( wp_json_encode( $this->demo_packages->demos ), true ) : array();
-		$result   = $upgrader->install( "https://d1sb0nhp4t2db4.cloudfront.net/packages/{$template}/{$slug}.zip" );
+	//  $skin     = new WP_Ajax_Upgrader_Skin();
+	//  $upgrader = new TG_Demo_Pack_Upgrader( $skin );
+	//  $template = strtolower( str_replace( '-pro', '', get_option( 'template' ) ) );
+	//  $packages = isset( $this->demo_packages->demos ) ? json_decode( wp_json_encode( $this->demo_packages->demos ), true ) : array();
+	//  $result   = $upgrader->install( "https://d1sb0nhp4t2db4.cloudfront.net/packages/{$template}/{$slug}.zip" );
 
-		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-			$status['debug'] = $skin->get_upgrade_messages();
-		}
+	//  if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+	//      $status['debug'] = $skin->get_upgrade_messages();
+	//  }
 
-		if ( is_wp_error( $result ) ) {
-			$status['errorCode']    = $result->get_error_code();
-			$status['errorMessage'] = $result->get_error_message();
-			wp_send_json_error( $status );
-		} elseif ( is_wp_error( $skin->result ) ) {
-			$status['errorCode']    = $skin->result->get_error_code();
-			$status['errorMessage'] = $skin->result->get_error_message();
-			wp_send_json_error( $status );
-		} elseif ( $skin->get_errors()->get_error_code() ) {
-			$status['errorMessage'] = $skin->get_error_messages();
-			wp_send_json_error( $status );
-		} elseif ( is_null( $result ) ) {
-			global $wp_filesystem;
+	//  if ( is_wp_error( $result ) ) {
+	//      $status['errorCode']    = $result->get_error_code();
+	//      $status['errorMessage'] = $result->get_error_message();
+	//      wp_send_json_error( $status );
+	//  } elseif ( is_wp_error( $skin->result ) ) {
+	//      $status['errorCode']    = $skin->result->get_error_code();
+	//      $status['errorMessage'] = $skin->result->get_error_message();
+	//      wp_send_json_error( $status );
+	//  } elseif ( $skin->get_errors()->get_error_code() ) {
+	//      $status['errorMessage'] = $skin->get_error_messages();
+	//      wp_send_json_error( $status );
+	//  } elseif ( is_null( $result ) ) {
+	//      global $wp_filesystem;
 
-			$status['errorCode']    = 'unable_to_connect_to_filesystem';
-			$status['errorMessage'] = __( 'Unable to connect to the filesystem. Please confirm your credentials.', 'themegrill-demo-importer' );
+	//      $status['errorCode']    = 'unable_to_connect_to_filesystem';
+	//      $status['errorMessage'] = __( 'Unable to connect to the filesystem. Please confirm your credentials.', 'themegrill-demo-importer' );
 
-			// Pass through the error from WP_Filesystem if one was raised.
-			if ( $wp_filesystem instanceof WP_Filesystem_Base && is_wp_error( $wp_filesystem->errors ) && $wp_filesystem->errors->get_error_code() ) {
-				$status['errorMessage'] = esc_html( $wp_filesystem->errors->get_error_message() );
-			}
+	//      // Pass through the error from WP_Filesystem if one was raised.
+	//      if ( $wp_filesystem instanceof WP_Filesystem_Base && is_wp_error( $wp_filesystem->errors ) && $wp_filesystem->errors->get_error_code() ) {
+	//          $status['errorMessage'] = esc_html( $wp_filesystem->errors->get_error_message() );
+	//      }
 
-			wp_send_json_error( $status );
-		}
+	//      wp_send_json_error( $status );
+	//  }
 
-		$demo_data            = $packages[ $slug ];
-		$status['demoName']   = $demo_data['title'];
-		$status['previewUrl'] = get_site_url( null, '/' );
+	//  $demo_data            = $packages[ $slug ];
+	//  $status['demoName']   = $demo_data['title'];
+	//  $status['previewUrl'] = get_site_url( null, '/' );
 
-		do_action( 'themegrill_ajax_before_demo_import' );
+	//  do_action( 'themegrill_ajax_before_demo_import' );
 
-		if ( ! empty( $demo_data ) ) {
-			$this->import_dummy_xml( $slug, $demo_data, $status );
-			$this->import_core_options( $slug, $demo_data );
-			$this->import_elementor_schemes( $slug, $demo_data );
-			$this->import_customizer_data( $slug, $demo_data, $status );
-			$this->import_widget_settings( $slug, $demo_data, $status );
-			// Update imported demo ID.
-			update_option( 'themegrill_demo_importer_activated_id', $slug );
-			do_action( 'themegrill_ajax_demo_imported', $slug, $demo_data );
-		}
-		wp_send_json_success( $status );
-	}
+	//  if ( ! empty( $demo_data ) ) {
+	//      $this->import_dummy_xml( $slug, $demo_data, $status );
+	//      $this->import_core_options( $slug, $demo_data );
+	//      $this->import_elementor_schemes( $slug, $demo_data );
+	//      $this->import_customizer_data( $slug, $demo_data, $status );
+	//      $this->import_widget_settings( $slug, $demo_data, $status );
+	//      // Update imported demo ID.
+	//      update_option( 'themegrill_demo_importer_activated_id', $slug );
+	//      do_action( 'themegrill_ajax_demo_imported', $slug, $demo_data );
+	//  }
+	//  wp_send_json_success( $status );
+	// }
 
 	/**
 	 * Triggered when clicking the rating footer.
 	 */
-	public function ajax_footer_text_rated() {
-		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( -1 );
-		}
+	// public function ajax_footer_text_rated() {
+	//  if ( ! current_user_can( 'manage_options' ) ) {
+	//      wp_die( -1 );
+	//  }
 
-		update_option( 'themegrill_demo_importer_admin_footer_text_rated', 1 );
-		wp_die();
-	}
+	//  update_option( 'themegrill_demo_importer_admin_footer_text_rated', 1 );
+	//  wp_die();
+	// }
 
 	/**
 	 * Import dummy content from a XML file.
@@ -911,62 +949,62 @@ class TG_Demo_Importer {
 	 * @param  array  $status
 	 * @return bool
 	 */
-	public function import_dummy_xml( $demo_id, $demo_data, $status ) {
+	// public function import_dummy_xml( $demo_id, $demo_data, $status ) {
 
-		$import_file = $this->get_import_file_path( 'dummy-data.xml' );
+	//  $import_file = $this->get_import_file_path( 'dummy-data.xml' );
 
-		// Load Importer API.
-		require_once ABSPATH . 'wp-admin/includes/import.php';
+	//  // Load Importer API.
+	//  require_once ABSPATH . 'wp-admin/includes/import.php';
 
-		if ( ! class_exists( 'WP_Importer' ) ) {
-			$class_wp_importer = ABSPATH . 'wp-admin/includes/class-wp-importer.php';
+	//  if ( ! class_exists( 'WP_Importer' ) ) {
+	//      $class_wp_importer = ABSPATH . 'wp-admin/includes/class-wp-importer.php';
 
-			if ( file_exists( $class_wp_importer ) ) {
-				require $class_wp_importer;
-			}
-		}
+	//      if ( file_exists( $class_wp_importer ) ) {
+	//          require $class_wp_importer;
+	//      }
+	//  }
 
-		// Include WXR Importer.
-		require __DIR__ . '/importers/wordpress-importer/class-wxr-importer.php';
+	//  // Include WXR Importer.
+	//  require __DIR__ . '/importers/wordpress-importer/class-wxr-importer.php';
 
-		do_action( 'themegrill_ajax_before_dummy_xml_import', $demo_data, $demo_id );
+	//  do_action( 'themegrill_ajax_before_dummy_xml_import', $demo_data, $demo_id );
 
-		// Import XML file demo content.
-		if ( is_file( $import_file ) ) {
-			$importer = $this->get_importer();
-			ob_start();
-			$data = $importer->import( $import_file );
-			ob_end_clean();
-			if ( is_wp_error( $data ) ) {
-				return $data;
-			}
+	//  // Import XML file demo content.
+	//  if ( is_file( $import_file ) ) {
+	//      $importer = $this->get_importer();
+	//      ob_start();
+	//      $data = $importer->import( $import_file );
+	//      ob_end_clean();
+	//      if ( is_wp_error( $data ) ) {
+	//          return $data;
+	//      }
 
-			// $wp_import = new TG_WXR_Importer();
-			// ob_start();
-			// $wp_import->import( $import_file );
-			// ob_end_clean();
+	//      // $wp_import = new TG_WXR_Importer();
+	//      // ob_start();
+	//      // $wp_import->import( $import_file );
+	//      // ob_end_clean();
 
-			do_action( 'themegrill_ajax_dummy_xml_imported', $demo_data, $demo_id );
-			flush_rewrite_rules();
-		} else {
-			$status['errorMessage'] = __( 'The XML file dummy content is missing.', 'themegrill-demo-importer' );
-			wp_send_json_error( $status );
-		}
+	//      do_action( 'themegrill_ajax_dummy_xml_imported', $demo_data, $demo_id );
+	//      flush_rewrite_rules();
+	//  } else {
+	//      $status['errorMessage'] = __( 'The XML file dummy content is missing.', 'themegrill-demo-importer' );
+	//      wp_send_json_error( $status );
+	//  }
 
-		return true;
-	}
+	//  return true;
+	// }
 	/**
 	 * Get the importer instance.
 	 *
 	 * @return TG_WXR_Importer
 	 */
-	protected function get_importer() {
-		$this->importer = new TG_WXR_Importer( $this->get_import_options() );
-		$logger         = new WP_Importer_Logger_ServerSentEvents();
-		$this->importer->set_logger( $logger );
+	// protected function get_importer() {
+	//  $this->importer = new TG_WXR_Importer( $this->get_import_options() );
+	//  $logger         = new WP_Importer_Logger_ServerSentEvents();
+	//  $this->importer->set_logger( $logger );
 
-		return $this->importer;
-	}
+	//  return $this->importer;
+	// }
 
 	/**
 	 * Get options for the importer.
@@ -994,38 +1032,38 @@ class TG_Demo_Importer {
 	 * @param  array  $demo_data
 	 * @return bool
 	 */
-	public function import_core_options( $demo_id, $demo_data ) {
-		if ( ! empty( $demo_data['core_options'] ) ) {
-			foreach ( $demo_data['core_options'] as $option_key => $option_value ) {
-				if ( ! in_array( $option_key, array( 'blogname', 'blogdescription', 'show_on_front', 'page_on_front', 'page_for_posts' ) ) ) {
-					continue;
-				}
+	// public function import_core_options( $demo_id, $demo_data ) {
+	//  if ( ! empty( $demo_data['core_options'] ) ) {
+	//      foreach ( $demo_data['core_options'] as $option_key => $option_value ) {
+	//          if ( ! in_array( $option_key, array( 'blogname', 'blogdescription', 'show_on_front', 'page_on_front', 'page_for_posts' ) ) ) {
+	//              continue;
+	//          }
 
-				// Format the value based on option key.
-				switch ( $option_key ) {
-					case 'show_on_front':
-						if ( in_array( $option_value, array( 'posts', 'page' ) ) ) {
-							update_option( 'show_on_front', $option_value );
-						}
-						break;
-					case 'page_on_front':
-					case 'page_for_posts':
-						$page = $this->get_page_by_title( $option_value );
+	//          // Format the value based on option key.
+	//          switch ( $option_key ) {
+	//              case 'show_on_front':
+	//                  if ( in_array( $option_value, array( 'posts', 'page' ) ) ) {
+	//                      update_option( 'show_on_front', $option_value );
+	//                  }
+	//                  break;
+	//              case 'page_on_front':
+	//              case 'page_for_posts':
+	//                  $page = $this->get_page_by_title( $option_value );
 
-						if ( is_object( $page ) && $page->ID ) {
-							update_option( $option_key, $page->ID );
-							update_option( 'show_on_front', 'page' );
-						}
-						break;
-					default:
-						update_option( $option_key, sanitize_text_field( $option_value ) );
-						break;
-				}
-			}
-		}
+	//                  if ( is_object( $page ) && $page->ID ) {
+	//                      update_option( $option_key, $page->ID );
+	//                      update_option( 'show_on_front', 'page' );
+	//                  }
+	//                  break;
+	//              default:
+	//                  update_option( $option_key, sanitize_text_field( $option_value ) );
+	//                  break;
+	//          }
+	//      }
+	//  }
 
-		return true;
-	}
+	//  return true;
+	// }
 
 	/**
 	 * Import elementor schemes from its ID.
@@ -1034,29 +1072,29 @@ class TG_Demo_Importer {
 	 * @param array  $demo_data Demo Data.
 	 * @return bool
 	 */
-	public function import_elementor_schemes( $demo_id, $demo_data ) {
-		$elementor_version = defined( 'ELEMENTOR_VERSION' ) ? ELEMENTOR_VERSION : false;
+	// public function import_elementor_schemes( $demo_id, $demo_data ) {
+	//  $elementor_version = defined( 'ELEMENTOR_VERSION' ) ? ELEMENTOR_VERSION : false;
 
-		if ( version_compare( $elementor_version, '3.0.0', '<=' ) ) {
+	//  if ( version_compare( $elementor_version, '3.0.0', '<=' ) ) {
 
-			if ( ! empty( $demo_data['elementor_schemes'] ) ) {
-				foreach ( $demo_data['elementor_schemes'] as $scheme_key => $scheme_value ) {
-					if ( ! in_array( $scheme_key, array( 'color', 'typography', 'color-picker' ) ) ) {
-						continue;
-					}
+	//      if ( ! empty( $demo_data['elementor_schemes'] ) ) {
+	//          foreach ( $demo_data['elementor_schemes'] as $scheme_key => $scheme_value ) {
+	//              if ( ! in_array( $scheme_key, array( 'color', 'typography', 'color-picker' ) ) ) {
+	//                  continue;
+	//              }
 
-					// Change scheme index to start from 1 instead.
-					$scheme_value = array_combine( range( 1, count( $scheme_value ) ), $scheme_value );
+	//              // Change scheme index to start from 1 instead.
+	//              $scheme_value = array_combine( range( 1, count( $scheme_value ) ), $scheme_value );
 
-					if ( ! empty( $scheme_value ) ) {
-						update_option( 'elementor_scheme_' . $scheme_key, $scheme_value );
-					}
-				}
-			}
-		}
+	//              if ( ! empty( $scheme_value ) ) {
+	//                  update_option( 'elementor_scheme_' . $scheme_key, $scheme_value );
+	//              }
+	//          }
+	//      }
+	//  }
 
-		return true;
-	}
+	//  return true;
+	// }
 
 	/**
 	 * Import customizer data from a DAT file.
@@ -1066,19 +1104,19 @@ class TG_Demo_Importer {
 	 * @param  array  $status
 	 * @return bool
 	 */
-	public function import_customizer_data( $demo_id, $demo_data, $status ) {
-		$import_file = $this->get_import_file_path( 'dummy-customizer.dat' );
+	// public function import_customizer_data( $demo_id, $demo_data, $status ) {
+	//  $import_file = $this->get_import_file_path( 'dummy-customizer.dat' );
 
-		if ( is_file( $import_file ) ) {
-			$results = TG_Customizer_Importer::import( $import_file, $demo_id, $demo_data );
+	//  if ( is_file( $import_file ) ) {
+	//      $results = TG_Customizer_Importer::import( $import_file, $demo_id, $demo_data );
 
-			if ( is_wp_error( $results ) ) {
-				return false;
-			}
-		}
+	//      if ( is_wp_error( $results ) ) {
+	//          return false;
+	//      }
+	//  }
 
-		return true;
-	}
+	//  return true;
+	// }
 
 	/**
 	 * Import widgets settings from WIE or JSON file.
@@ -1088,46 +1126,46 @@ class TG_Demo_Importer {
 	 * @param  array  $status
 	 * @return bool
 	 */
-	public function import_widget_settings( $demo_id, $demo_data, $status ) {
-		$import_file = $this->get_import_file_path( 'dummy-widgets.wie' );
-		if ( is_file( $import_file ) ) {
-			$results = TG_Widget_Importer::import( $import_file, $demo_id, $demo_data );
+	// public function import_widget_settings( $demo_id, $demo_data, $status ) {
+	//  $import_file = $this->get_import_file_path( 'dummy-widgets.wie' );
+	//  if ( is_file( $import_file ) ) {
+	//      $results = TG_Widget_Importer::import( $import_file, $demo_id, $demo_data );
 
-			if ( is_wp_error( $results ) ) {
-				return false;
-			}
-		}
+	//      if ( is_wp_error( $results ) ) {
+	//          return false;
+	//      }
+	//  }
 
-		return true;
-	}
+	//  return true;
+	// }
 
 	/**
 	 * Update custom nav menu items URL.
 	 */
-	public function update_nav_menu_items() {
-		$menu_locations = get_nav_menu_locations();
+	// public function update_nav_menu_items() {
+	//  $menu_locations = get_nav_menu_locations();
 
-		foreach ( $menu_locations as $location => $menu_id ) {
-			if ( is_nav_menu( $menu_id ) ) {
-				$menu_items = wp_get_nav_menu_items( $menu_id, array( 'post_status' => 'any' ) );
+	//  foreach ( $menu_locations as $location => $menu_id ) {
+	//      if ( is_nav_menu( $menu_id ) ) {
+	//          $menu_items = wp_get_nav_menu_items( $menu_id, array( 'post_status' => 'any' ) );
 
-				if ( ! empty( $menu_items ) ) {
-					foreach ( $menu_items as $menu_item ) {
-						if ( isset( $menu_item->url ) && isset( $menu_item->db_id ) && 'custom' == $menu_item->type ) {
-							$site_parts = parse_url( home_url( '/' ) );
-							$menu_parts = parse_url( $menu_item->url );
+	//          if ( ! empty( $menu_items ) ) {
+	//              foreach ( $menu_items as $menu_item ) {
+	//                  if ( isset( $menu_item->url ) && isset( $menu_item->db_id ) && 'custom' == $menu_item->type ) {
+	//                      $site_parts = parse_url( home_url( '/' ) );
+	//                      $menu_parts = parse_url( $menu_item->url );
 
-							// Update existing custom nav menu item URL.
-							if ( isset( $menu_parts['path'] ) && isset( $menu_parts['host'] ) && apply_filters( 'themegrill_demo_importer_nav_menu_item_url_hosts', in_array( $menu_parts['host'], array( 'demo.themegrill.com', 'zakrademos.com' ) ) ) ) {
-								$menu_item->url = str_replace( array( $menu_parts['scheme'], $menu_parts['host'], $menu_parts['path'] ), array( $site_parts['scheme'], $site_parts['host'], trailingslashit( $site_parts['path'] ) ), $menu_item->url );
-								update_post_meta( $menu_item->db_id, '_menu_item_url', esc_url_raw( $menu_item->url ) );
-							}
-						}
-					}
-				}
-			}
-		}
-	}
+	//                      // Update existing custom nav menu item URL.
+	//                      if ( isset( $menu_parts['path'] ) && isset( $menu_parts['host'] ) && apply_filters( 'themegrill_demo_importer_nav_menu_item_url_hosts', in_array( $menu_parts['host'], array( 'demo.themegrill.com', 'zakrademos.com' ) ) ) ) {
+	//                          $menu_item->url = str_replace( array( $menu_parts['scheme'], $menu_parts['host'], $menu_parts['path'] ), array( $site_parts['scheme'], $site_parts['host'], trailingslashit( $site_parts['path'] ) ), $menu_item->url );
+	//                          update_post_meta( $menu_item->db_id, '_menu_item_url', esc_url_raw( $menu_item->url ) );
+	//                      }
+	//                  }
+	//              }
+	//          }
+	//      }
+	//  }
+	// }
 
 	/**
 	 * Updates widgets settings data.
@@ -1138,61 +1176,61 @@ class TG_Demo_Importer {
 	 * @param  array  $demo_data
 	 * @return array
 	 */
-	public function update_widget_data( $widget, $widget_type, $instance_id, $demo_data ) {
-		if ( 'nav_menu' === $widget_type ) {
-			$menu     = isset( $widget['title'] ) ? $widget['title'] : $this->importer->get_term_new_id( $widget['nav_menu'] );
-			$nav_menu = wp_get_nav_menu_object( $menu );
+	// public function update_widget_data( $widget, $widget_type, $instance_id, $demo_data ) {
+	//  if ( 'nav_menu' === $widget_type ) {
+	//      $menu     = isset( $widget['title'] ) ? $widget['title'] : $this->importer->get_term_new_id( $widget['nav_menu'] );
+	//      $nav_menu = wp_get_nav_menu_object( $menu );
 
-			if ( is_object( $nav_menu ) && $nav_menu->term_id ) {
-				$widget['nav_menu'] = $nav_menu->term_id;
-			}
-		} elseif ( ! empty( $demo_data['widgets_data_update'] ) ) {
-			foreach ( $demo_data['widgets_data_update'] as $dropdown_type => $dropdown_data ) {
-				if ( ! in_array( $dropdown_type, array( 'dropdown_pages', 'dropdown_categories' ), true ) ) {
-					continue;
-				}
+	//      if ( is_object( $nav_menu ) && $nav_menu->term_id ) {
+	//          $widget['nav_menu'] = $nav_menu->term_id;
+	//      }
+	//  } elseif ( ! empty( $demo_data['widgets_data_update'] ) ) {
+	//      foreach ( $demo_data['widgets_data_update'] as $dropdown_type => $dropdown_data ) {
+	//          if ( ! in_array( $dropdown_type, array( 'dropdown_pages', 'dropdown_categories' ), true ) ) {
+	//              continue;
+	//          }
 
-				// Format the value based on dropdown type.
-				switch ( $dropdown_type ) {
-					case 'dropdown_pages':
-						foreach ( $dropdown_data as $widget_id => $widget_data ) {
-							if ( ! empty( $widget_data[ $instance_id ] ) && $widget_id === $widget_type ) {
-								foreach ( $widget_data[ $instance_id ] as $widget_key => $widget_value ) {
-									$page = $this->get_page_by_title( $widget_value );
+	//          // Format the value based on dropdown type.
+	//          switch ( $dropdown_type ) {
+	//              case 'dropdown_pages':
+	//                  foreach ( $dropdown_data as $widget_id => $widget_data ) {
+	//                      if ( ! empty( $widget_data[ $instance_id ] ) && $widget_id === $widget_type ) {
+	//                          foreach ( $widget_data[ $instance_id ] as $widget_key => $widget_value ) {
+	//                              $page = $this->get_page_by_title( $widget_value );
 
-									if ( is_object( $page ) && $page->ID ) {
-										$widget[ $widget_key ] = $page->ID;
-									}
-								}
-							}
-						}
-						break;
-					default:
-					case 'dropdown_categories':
-						foreach ( $dropdown_data as $taxonomy => $taxonomy_data ) {
-							if ( ! taxonomy_exists( $taxonomy ) ) {
-								continue;
-							}
+	//                              if ( is_object( $page ) && $page->ID ) {
+	//                                  $widget[ $widget_key ] = $page->ID;
+	//                              }
+	//                          }
+	//                      }
+	//                  }
+	//                  break;
+	//              default:
+	//              case 'dropdown_categories':
+	//                  foreach ( $dropdown_data as $taxonomy => $taxonomy_data ) {
+	//                      if ( ! taxonomy_exists( $taxonomy ) ) {
+	//                          continue;
+	//                      }
 
-							foreach ( $taxonomy_data as $widget_id => $widget_data ) {
-								if ( ! empty( $widget_data[ $instance_id ] ) && $widget_id === $widget_type ) {
-									foreach ( $widget_data[ $instance_id ] as $widget_key => $widget_value ) {
-										$term = get_term_by( 'name', $widget_value, $taxonomy );
+	//                      foreach ( $taxonomy_data as $widget_id => $widget_data ) {
+	//                          if ( ! empty( $widget_data[ $instance_id ] ) && $widget_id === $widget_type ) {
+	//                              foreach ( $widget_data[ $instance_id ] as $widget_key => $widget_value ) {
+	//                                  $term = get_term_by( 'name', $widget_value, $taxonomy );
 
-										if ( is_object( $term ) && $term->term_id ) {
-											$widget[ $widget_key ] = $term->term_id;
-										}
-									}
-								}
-							}
-						}
-						break;
-				}
-			}
-		}
+	//                                  if ( is_object( $term ) && $term->term_id ) {
+	//                                      $widget[ $widget_key ] = $term->term_id;
+	//                                  }
+	//                              }
+	//                          }
+	//                      }
+	//                  }
+	//                  break;
+	//          }
+	//      }
+	//  }
 
-		return $widget;
-	}
+	//  return $widget;
+	// }
 
 	/**
 	 * Update customizer settings data.
@@ -1201,64 +1239,64 @@ class TG_Demo_Importer {
 	 * @param  array $demo_data
 	 * @return array
 	 */
-	public function update_customizer_data( $data, $demo_data ) {
-		if ( ! empty( $demo_data['customizer_data_update'] ) ) {
-			foreach ( $demo_data['customizer_data_update'] as $data_type => $data_value ) {
-				if ( ! in_array( $data_type, array( 'pages', 'categories', 'nav_menu_locations' ) ) ) {
-					continue;
-				}
+	// public function update_customizer_data( $data, $demo_data ) {
+	//  if ( ! empty( $demo_data['customizer_data_update'] ) ) {
+	//      foreach ( $demo_data['customizer_data_update'] as $data_type => $data_value ) {
+	//          if ( ! in_array( $data_type, array( 'pages', 'categories', 'nav_menu_locations' ) ) ) {
+	//              continue;
+	//          }
 
-				// Format the value based on data type.
-				switch ( $data_type ) {
-					case 'pages':
-						foreach ( $data_value as $option_key => $option_value ) {
-							if ( ! empty( $data['mods'][ $option_key ] ) ) {
-								$page = $this->get_page_by_title( $option_value );
+	//          // Format the value based on data type.
+	//          switch ( $data_type ) {
+	//              case 'pages':
+	//                  foreach ( $data_value as $option_key => $option_value ) {
+	//                      if ( ! empty( $data['mods'][ $option_key ] ) ) {
+	//                          $page = $this->get_page_by_title( $option_value );
 
-								if ( is_object( $page ) && $page->ID ) {
-									$data['mods'][ $option_key ] = $page->ID;
-								}
-							}
-						}
-						break;
-					case 'categories':
-						foreach ( $data_value as $taxonomy => $taxonomy_data ) {
-							if ( ! taxonomy_exists( $taxonomy ) ) {
-								continue;
-							}
+	//                          if ( is_object( $page ) && $page->ID ) {
+	//                              $data['mods'][ $option_key ] = $page->ID;
+	//                          }
+	//                      }
+	//                  }
+	//                  break;
+	//              case 'categories':
+	//                  foreach ( $data_value as $taxonomy => $taxonomy_data ) {
+	//                      if ( ! taxonomy_exists( $taxonomy ) ) {
+	//                          continue;
+	//                      }
 
-							foreach ( $taxonomy_data as $option_key => $option_value ) {
-								if ( ! empty( $data['mods'][ $option_key ] ) ) {
-									$term = get_term_by( 'name', $option_value, $taxonomy );
+	//                      foreach ( $taxonomy_data as $option_key => $option_value ) {
+	//                          if ( ! empty( $data['mods'][ $option_key ] ) ) {
+	//                              $term = get_term_by( 'name', $option_value, $taxonomy );
 
-									if ( is_object( $term ) && $term->term_id ) {
-										$data['mods'][ $option_key ] = $term->term_id;
-									}
-								}
-							}
-						}
-						break;
-					case 'nav_menu_locations':
-						$nav_menus = wp_get_nav_menus();
+	//                              if ( is_object( $term ) && $term->term_id ) {
+	//                                  $data['mods'][ $option_key ] = $term->term_id;
+	//                              }
+	//                          }
+	//                      }
+	//                  }
+	//                  break;
+	//              case 'nav_menu_locations':
+	//                  $nav_menus = wp_get_nav_menus();
 
-						if ( ! empty( $nav_menus ) ) {
-							foreach ( $nav_menus as $nav_menu ) {
-								if ( is_object( $nav_menu ) ) {
-									foreach ( $data_value as $location => $location_name ) {
-										if ( $nav_menu->name == $location_name ) {
-											$data['mods'][ $data_type ][ $location ] = $nav_menu->term_id;
-										}
-									}
-								}
-							}
-						}
-						break;
-				}
-			}
-		}
+	//                  if ( ! empty( $nav_menus ) ) {
+	//                      foreach ( $nav_menus as $nav_menu ) {
+	//                          if ( is_object( $nav_menu ) ) {
+	//                              foreach ( $data_value as $location => $location_name ) {
+	//                                  if ( $nav_menu->name == $location_name ) {
+	//                                      $data['mods'][ $data_type ][ $location ] = $nav_menu->term_id;
+	//                                  }
+	//                              }
+	//                          }
+	//                      }
+	//                  }
+	//                  break;
+	//          }
+	//      }
+	//  }
 
-		return $data;
-	}
+	//  return $data;
+	// }
 
 	/**
 	 * Recursive function to address n level deep elementor data update.
@@ -1268,64 +1306,64 @@ class TG_Demo_Importer {
 	 * @param  array  $data_value
 	 * @return array
 	 */
-	public function elementor_recursive_update( $elementor_data, $data_type, $data_value ) {
-		$elementor_data = json_decode( stripslashes( $elementor_data ), true );
+	// public function elementor_recursive_update( $elementor_data, $data_type, $data_value ) {
+	//  $elementor_data = json_decode( stripslashes( $elementor_data ), true );
 
-		// Recursively update elementor data.
-		foreach ( $elementor_data as $element_id => $element_data ) {
-			if ( ! empty( $element_data['elements'] ) ) {
-				foreach ( $element_data['elements'] as $el_key => $el_data ) {
-					if ( ! empty( $el_data['elements'] ) ) {
-						foreach ( $el_data['elements'] as $el_child_key => $child_el_data ) {
-							if ( 'widget' === $child_el_data['elType'] ) {
-								$settings   = isset( $child_el_data['settings'] ) ? $child_el_data['settings'] : array();
-								$widgetType = isset( $child_el_data['widgetType'] ) ? $child_el_data['widgetType'] : '';
+	//  // Recursively update elementor data.
+	//  foreach ( $elementor_data as $element_id => $element_data ) {
+	//      if ( ! empty( $element_data['elements'] ) ) {
+	//          foreach ( $element_data['elements'] as $el_key => $el_data ) {
+	//              if ( ! empty( $el_data['elements'] ) ) {
+	//                  foreach ( $el_data['elements'] as $el_child_key => $child_el_data ) {
+	//                      if ( 'widget' === $child_el_data['elType'] ) {
+	//                          $settings   = isset( $child_el_data['settings'] ) ? $child_el_data['settings'] : array();
+	//                          $widgetType = isset( $child_el_data['widgetType'] ) ? $child_el_data['widgetType'] : '';
 
-								if ( isset( $settings['display_type'] ) && 'categories' === $settings['display_type'] ) {
-									$categories_selected = isset( $settings['categories_selected'] ) ? $settings['categories_selected'] : '';
+	//                          if ( isset( $settings['display_type'] ) && 'categories' === $settings['display_type'] ) {
+	//                              $categories_selected = isset( $settings['categories_selected'] ) ? $settings['categories_selected'] : '';
 
-									if ( ! empty( $data_value['data_update'] ) ) {
-										foreach ( $data_value['data_update'] as $taxonomy => $taxonomy_data ) {
-											if ( ! taxonomy_exists( $taxonomy ) ) {
-												continue;
-											}
+	//                              if ( ! empty( $data_value['data_update'] ) ) {
+	//                                  foreach ( $data_value['data_update'] as $taxonomy => $taxonomy_data ) {
+	//                                      if ( ! taxonomy_exists( $taxonomy ) ) {
+	//                                          continue;
+	//                                      }
 
-											foreach ( $taxonomy_data as $widget_id => $widget_data ) {
-												if ( ! empty( $widget_data ) && $widget_id == $widgetType ) {
-													if ( is_array( $categories_selected ) ) {
-														foreach ( $categories_selected as $cat_key => $cat_id ) {
-															if ( isset( $widget_data[ $cat_id ] ) ) {
-																$term = get_term_by( 'name', $widget_data[ $cat_id ], $taxonomy );
+	//                                      foreach ( $taxonomy_data as $widget_id => $widget_data ) {
+	//                                          if ( ! empty( $widget_data ) && $widget_id == $widgetType ) {
+	//                                              if ( is_array( $categories_selected ) ) {
+	//                                                  foreach ( $categories_selected as $cat_key => $cat_id ) {
+	//                                                      if ( isset( $widget_data[ $cat_id ] ) ) {
+	//                                                          $term = get_term_by( 'name', $widget_data[ $cat_id ], $taxonomy );
 
-																if ( is_object( $term ) && $term->term_id ) {
-																	$categories_selected[ $cat_key ] = $term->term_id;
-																}
-															}
-														}
-													} elseif ( isset( $widget_data[ $categories_selected ] ) ) {
-														$term = get_term_by( 'name', $widget_data[ $categories_selected ], $taxonomy );
+	//                                                          if ( is_object( $term ) && $term->term_id ) {
+	//                                                              $categories_selected[ $cat_key ] = $term->term_id;
+	//                                                          }
+	//                                                      }
+	//                                                  }
+	//                                              } elseif ( isset( $widget_data[ $categories_selected ] ) ) {
+	//                                                  $term = get_term_by( 'name', $widget_data[ $categories_selected ], $taxonomy );
 
-														if ( is_object( $term ) && $term->term_id ) {
-															$categories_selected = $term->term_id;
-														}
-													}
-												}
-											}
-										}
-									}
+	//                                                  if ( is_object( $term ) && $term->term_id ) {
+	//                                                      $categories_selected = $term->term_id;
+	//                                                  }
+	//                                              }
+	//                                          }
+	//                                      }
+	//                                  }
+	//                              }
 
-									// Update the elementor data.
-									$elementor_data[ $element_id ]['elements'][ $el_key ]['elements'][ $el_child_key ]['settings']['categories_selected'] = $categories_selected;
-								}
-							}
-						}
-					}
-				}
-			}
-		}
+	//                              // Update the elementor data.
+	//                              $elementor_data[ $element_id ]['elements'][ $el_key ]['elements'][ $el_child_key ]['settings']['categories_selected'] = $categories_selected;
+	//                          }
+	//                      }
+	//                  }
+	//              }
+	//          }
+	//      }
+	//  }
 
-		return wp_json_encode( $elementor_data );
-	}
+	//  return wp_json_encode( $elementor_data );
+	// }
 
 	/**
 	 * Update elementor settings data.
@@ -1333,26 +1371,26 @@ class TG_Demo_Importer {
 	 * @param string $demo_id Demo ID.
 	 * @param array  $demo_data Demo Data.
 	 */
-	public function update_elementor_data( $demo_id, $demo_data ) {
-		if ( ! empty( $demo_data['elementor_data_update'] ) ) {
-			foreach ( $demo_data['elementor_data_update'] as $data_type => $data_value ) {
-				if ( ! empty( $data_value['post_title'] ) ) {
-					$page = $this->get_page_by_title( $data_value['post_title'] );
+	// public function update_elementor_data( $demo_id, $demo_data ) {
+	//  if ( ! empty( $demo_data['elementor_data_update'] ) ) {
+	//      foreach ( $demo_data['elementor_data_update'] as $data_type => $data_value ) {
+	//          if ( ! empty( $data_value['post_title'] ) ) {
+	//              $page = $this->get_page_by_title( $data_value['post_title'] );
 
-					if ( is_object( $page ) && $page->ID ) {
-						$elementor_data = get_post_meta( $page->ID, '_elementor_data', true );
+	//              if ( is_object( $page ) && $page->ID ) {
+	//                  $elementor_data = get_post_meta( $page->ID, '_elementor_data', true );
 
-						if ( ! empty( $elementor_data ) ) {
-							$elementor_data = $this->elementor_recursive_update( $elementor_data, $data_type, $data_value );
-						}
+	//                  if ( ! empty( $elementor_data ) ) {
+	//                      $elementor_data = $this->elementor_recursive_update( $elementor_data, $data_type, $data_value );
+	//                  }
 
-						// Update elementor data.
-						update_post_meta( $page->ID, '_elementor_data', $elementor_data );
-					}
-				}
-			}
-		}
-	}
+	//                  // Update elementor data.
+	//                  update_post_meta( $page->ID, '_elementor_data', $elementor_data );
+	//              }
+	//          }
+	//      }
+	//  }
+	// }
 
 	/**
 	 * Recursive function to address n level deep layoutbuilder data update.
@@ -1362,126 +1400,126 @@ class TG_Demo_Importer {
 	 * @param  array  $data_value
 	 * @return array
 	 */
-	public function siteorigin_recursive_update( $panels_data, $data_type, $data_value ) {
-		static $instance = 0;
+	// public function siteorigin_recursive_update( $panels_data, $data_type, $data_value ) {
+	//  static $instance = 0;
 
-		foreach ( $panels_data as $panel_type => $panel_data ) {
-			// Format the value based on panel type.
-			switch ( $panel_type ) {
-				case 'grids':
-					foreach ( $panel_data as $instance_id => $grid_instance ) {
-						if ( ! empty( $data_value['data_update']['grids_data'] ) ) {
-							foreach ( $data_value['data_update']['grids_data'] as $grid_id => $grid_data ) {
-								if ( ! empty( $grid_data['style'] ) && $instance_id === $grid_id ) {
-									$level = isset( $grid_data['level'] ) ? $grid_data['level'] : (int) 0;
-									if ( $level == $instance ) {
-										foreach ( $grid_data['style'] as $style_key => $style_value ) {
-											if ( empty( $style_value ) ) {
-												continue;
-											}
+	//  foreach ( $panels_data as $panel_type => $panel_data ) {
+	//      // Format the value based on panel type.
+	//      switch ( $panel_type ) {
+	//          case 'grids':
+	//              foreach ( $panel_data as $instance_id => $grid_instance ) {
+	//                  if ( ! empty( $data_value['data_update']['grids_data'] ) ) {
+	//                      foreach ( $data_value['data_update']['grids_data'] as $grid_id => $grid_data ) {
+	//                          if ( ! empty( $grid_data['style'] ) && $instance_id === $grid_id ) {
+	//                              $level = isset( $grid_data['level'] ) ? $grid_data['level'] : (int) 0;
+	//                              if ( $level == $instance ) {
+	//                                  foreach ( $grid_data['style'] as $style_key => $style_value ) {
+	//                                      if ( empty( $style_value ) ) {
+	//                                          continue;
+	//                                      }
 
-											// Format the value based on style key.
-											switch ( $style_key ) {
-												case 'background_image_attachment':
-													$attachment_id = tg_get_attachment_id( $style_value );
+	//                                      // Format the value based on style key.
+	//                                      switch ( $style_key ) {
+	//                                          case 'background_image_attachment':
+	//                                              $attachment_id = tg_get_attachment_id( $style_value );
 
-													if ( 0 !== $attachment_id ) {
-														$grid_instance['style'][ $style_key ] = $attachment_id;
-													}
-													break;
-												default:
-													$grid_instance['style'][ $style_key ] = $style_value;
-													break;
-											}
-										}
-									}
-								}
-							}
-						}
+	//                                              if ( 0 !== $attachment_id ) {
+	//                                                  $grid_instance['style'][ $style_key ] = $attachment_id;
+	//                                              }
+	//                                              break;
+	//                                          default:
+	//                                              $grid_instance['style'][ $style_key ] = $style_value;
+	//                                              break;
+	//                                      }
+	//                                  }
+	//                              }
+	//                          }
+	//                      }
+	//                  }
 
-						// Update panel grids data.
-						$panels_data['grids'][ $instance_id ] = $grid_instance;
-					}
-					break;
+	//                  // Update panel grids data.
+	//                  $panels_data['grids'][ $instance_id ] = $grid_instance;
+	//              }
+	//              break;
 
-				case 'widgets':
-					foreach ( $panel_data as $instance_id => $widget_instance ) {
-						if ( isset( $widget_instance['panels_data']['widgets'] ) ) {
-							$instance          = $instance + 1;
-							$child_panels_data = $widget_instance['panels_data'];
-							$panels_data['widgets'][ $instance_id ]['panels_data'] = $this->siteorigin_recursive_update( $child_panels_data, $data_type, $data_value );
-							$instance = $instance - 1;
-							continue;
-						}
+	//          case 'widgets':
+	//              foreach ( $panel_data as $instance_id => $widget_instance ) {
+	//                  if ( isset( $widget_instance['panels_data']['widgets'] ) ) {
+	//                      $instance          = $instance + 1;
+	//                      $child_panels_data = $widget_instance['panels_data'];
+	//                      $panels_data['widgets'][ $instance_id ]['panels_data'] = $this->siteorigin_recursive_update( $child_panels_data, $data_type, $data_value );
+	//                      $instance = $instance - 1;
+	//                      continue;
+	//                  }
 
-						if ( isset( $widget_instance['nav_menu'] ) && isset( $widget_instance['title'] ) ) {
-							$nav_menu = wp_get_nav_menu_object( $widget_instance['title'] );
+	//                  if ( isset( $widget_instance['nav_menu'] ) && isset( $widget_instance['title'] ) ) {
+	//                      $nav_menu = wp_get_nav_menu_object( $widget_instance['title'] );
 
-							if ( is_object( $nav_menu ) && $nav_menu->term_id ) {
-								$widget_instance['nav_menu'] = $nav_menu->term_id;
-							}
-						} elseif ( ! empty( $data_value['data_update']['widgets_data'] ) ) {
-							$instance_class = $widget_instance['panels_info']['class'];
+	//                      if ( is_object( $nav_menu ) && $nav_menu->term_id ) {
+	//                          $widget_instance['nav_menu'] = $nav_menu->term_id;
+	//                      }
+	//                  } elseif ( ! empty( $data_value['data_update']['widgets_data'] ) ) {
+	//                      $instance_class = $widget_instance['panels_info']['class'];
 
-							foreach ( $data_value['data_update']['widgets_data'] as $dropdown_type => $dropdown_data ) {
-								if ( ! in_array( $dropdown_type, array( 'dropdown_pages', 'dropdown_categories' ) ) ) {
-									continue;
-								}
+	//                      foreach ( $data_value['data_update']['widgets_data'] as $dropdown_type => $dropdown_data ) {
+	//                          if ( ! in_array( $dropdown_type, array( 'dropdown_pages', 'dropdown_categories' ) ) ) {
+	//                              continue;
+	//                          }
 
-								// Format the value based on data type.
-								switch ( $dropdown_type ) {
-									case 'dropdown_pages':
-										foreach ( $dropdown_data as $widget_id => $widget_data ) {
-											if ( ! empty( $widget_data[ $instance_id ] ) && $widget_id == $instance_class ) {
-												$level = isset( $widget_data['level'] ) ? $widget_data['level'] : (int) 0;
+	//                          // Format the value based on data type.
+	//                          switch ( $dropdown_type ) {
+	//                              case 'dropdown_pages':
+	//                                  foreach ( $dropdown_data as $widget_id => $widget_data ) {
+	//                                      if ( ! empty( $widget_data[ $instance_id ] ) && $widget_id == $instance_class ) {
+	//                                          $level = isset( $widget_data['level'] ) ? $widget_data['level'] : (int) 0;
 
-												if ( $level == $instance ) {
-													foreach ( $widget_data[ $instance_id ] as $widget_key => $widget_value ) {
-														$page = $this->get_page_by_title( $widget_value );
+	//                                          if ( $level == $instance ) {
+	//                                              foreach ( $widget_data[ $instance_id ] as $widget_key => $widget_value ) {
+	//                                                  $page = $this->get_page_by_title( $widget_value );
 
-														if ( is_object( $page ) && $page->ID ) {
-															$widget_instance[ $widget_key ] = $page->ID;
-														}
-													}
-												}
-											}
-										}
-										break;
-									case 'dropdown_categories':
-										foreach ( $dropdown_data as $taxonomy => $taxonomy_data ) {
-											if ( ! taxonomy_exists( $taxonomy ) ) {
-												continue;
-											}
+	//                                                  if ( is_object( $page ) && $page->ID ) {
+	//                                                      $widget_instance[ $widget_key ] = $page->ID;
+	//                                                  }
+	//                                              }
+	//                                          }
+	//                                      }
+	//                                  }
+	//                                  break;
+	//                              case 'dropdown_categories':
+	//                                  foreach ( $dropdown_data as $taxonomy => $taxonomy_data ) {
+	//                                      if ( ! taxonomy_exists( $taxonomy ) ) {
+	//                                          continue;
+	//                                      }
 
-											foreach ( $taxonomy_data as $widget_id => $widget_data ) {
-												if ( ! empty( $widget_data[ $instance_id ] ) && $widget_id == $instance_class ) {
-													$level = isset( $widget_data['level'] ) ? $widget_data['level'] : (int) 0;
+	//                                      foreach ( $taxonomy_data as $widget_id => $widget_data ) {
+	//                                          if ( ! empty( $widget_data[ $instance_id ] ) && $widget_id == $instance_class ) {
+	//                                              $level = isset( $widget_data['level'] ) ? $widget_data['level'] : (int) 0;
 
-													if ( $level == $instance ) {
-														foreach ( $widget_data[ $instance_id ] as $widget_key => $widget_value ) {
-															$term = get_term_by( 'name', $widget_value, $taxonomy );
+	//                                              if ( $level == $instance ) {
+	//                                                  foreach ( $widget_data[ $instance_id ] as $widget_key => $widget_value ) {
+	//                                                      $term = get_term_by( 'name', $widget_value, $taxonomy );
 
-															if ( is_object( $term ) && $term->term_id ) {
-																$widget_instance[ $widget_key ] = $term->term_id;
-															}
-														}
-													}
-												}
-											}
-										}
-										break;
-								}
-							}
-						}
+	//                                                      if ( is_object( $term ) && $term->term_id ) {
+	//                                                          $widget_instance[ $widget_key ] = $term->term_id;
+	//                                                      }
+	//                                                  }
+	//                                              }
+	//                                          }
+	//                                      }
+	//                                  }
+	//                                  break;
+	//                          }
+	//                      }
+	//                  }
 
-						$panels_data['widgets'][ $instance_id ] = $widget_instance;
-					}
-					break;
-			}
-		}
+	//                  $panels_data['widgets'][ $instance_id ] = $widget_instance;
+	//              }
+	//              break;
+	//      }
+	//  }
 
-		return $panels_data;
-	}
+	//  return $panels_data;
+	// }
 
 	/**
 	 * Update siteorigin panel settings data.
@@ -1489,26 +1527,26 @@ class TG_Demo_Importer {
 	 * @param string $demo_id Demo ID.
 	 * @param array  $demo_data Demo Data.
 	 */
-	public function update_siteorigin_data( $demo_id, $demo_data ) {
-		if ( ! empty( $demo_data['siteorigin_panels_data_update'] ) ) {
-			foreach ( $demo_data['siteorigin_panels_data_update'] as $data_type => $data_value ) {
-				if ( ! empty( $data_value['post_title'] ) ) {
-					$page = $this->get_page_by_title( $data_value['post_title'] );
+	// public function update_siteorigin_data( $demo_id, $demo_data ) {
+	//  if ( ! empty( $demo_data['siteorigin_panels_data_update'] ) ) {
+	//      foreach ( $demo_data['siteorigin_panels_data_update'] as $data_type => $data_value ) {
+	//          if ( ! empty( $data_value['post_title'] ) ) {
+	//              $page = $this->get_page_by_title( $data_value['post_title'] );
 
-					if ( is_object( $page ) && $page->ID ) {
-						$panels_data = get_post_meta( $page->ID, 'panels_data', true );
+	//              if ( is_object( $page ) && $page->ID ) {
+	//                  $panels_data = get_post_meta( $page->ID, 'panels_data', true );
 
-						if ( ! empty( $panels_data ) ) {
-							$panels_data = $this->siteorigin_recursive_update( $panels_data, $data_type, $data_value );
-						}
+	//                  if ( ! empty( $panels_data ) ) {
+	//                      $panels_data = $this->siteorigin_recursive_update( $panels_data, $data_type, $data_value );
+	//                  }
 
-						// Update siteorigin panels data.
-						update_post_meta( $page->ID, 'panels_data', $panels_data );
-					}
-				}
-			}
-		}
-	}
+	//                  // Update siteorigin panels data.
+	//                  update_post_meta( $page->ID, 'panels_data', $panels_data );
+	//              }
+	//          }
+	//      }
+	//  }
+	// }
 
 	/**
 	 * Refreshes the demo lists.
@@ -1537,30 +1575,30 @@ class TG_Demo_Importer {
 	 * @param string $title The title of the page to retrieve.
 	 * @return WP_Post|null The retrieved page object or null if not found.
 	 */
-	public function get_page_by_title( $title ) {
-		if ( ! $title ) {
-			return null;
-		}
+	// public function get_page_by_title( $title ) {
+	//  if ( ! $title ) {
+	//      return null;
+	//  }
 
-		$query = new WP_Query(
-			array(
-				'post_type'              => 'page',
-				'title'                  => $title,
-				'post_status'            => 'all',
-				'posts_per_page'         => 1,
-				'no_found_rows'          => true,
-				'ignore_sticky_posts'    => true,
-				'update_post_term_cache' => false,
-				'update_post_meta_cache' => false,
-			)
-		);
+	//  $query = new WP_Query(
+	//      array(
+	//          'post_type'              => 'page',
+	//          'title'                  => $title,
+	//          'post_status'            => 'all',
+	//          'posts_per_page'         => 1,
+	//          'no_found_rows'          => true,
+	//          'ignore_sticky_posts'    => true,
+	//          'update_post_term_cache' => false,
+	//          'update_post_meta_cache' => false,
+	//      )
+	//  );
 
-		if ( ! $query->have_posts() ) {
-			return null;
-		}
+	//  if ( ! $query->have_posts() ) {
+	//      return null;
+	//  }
 
-		return current( $query->posts );
-	}
+	//  return current( $query->posts );
+	// }
 }
 
 new TG_Demo_Importer();

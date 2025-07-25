@@ -3,9 +3,9 @@ import Lottie from 'lottie-react';
 import React from 'react';
 import confetti from '../../assets/animation/confetti.json';
 import { DialogFooter, DialogHeader, DialogTitle } from '../../controls/Dialog';
-import { SearchResultType, TDIDashboardType } from '../../lib/types';
+import { Demo, TDIDashboardType } from '../../lib/types';
 
-const DialogImported = ({ demo, data }: { demo: SearchResultType; data: TDIDashboardType }) => {
+const DialogImported = ({ demo, data }: { demo: Demo; data: TDIDashboardType }) => {
 	// const { data } = useLocalizedData();
 
 	return (

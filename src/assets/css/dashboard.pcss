@@ -60,6 +60,10 @@
 		@apply pl-0;
 	}
 
+	#wpbody {
+		@apply bg-[#FAFAFC] min-h-screen;
+	}
+
 	#wpbody-content {
 		@apply pb-0;
 	}
@@ -85,32 +89,38 @@
 	}
 
 	#tg-demo-importer {
-		.tg-demos {
-			@apply px-[20px] py-[20px] sm:py-[40px] sm:px-[40px] lg:mb-[40px];
-		}
-
-		.tg-demo-pro {
-			@apply absolute bg-[#F96666] py-[3px] px-[5px] rounded-[2px] top-[15px] right-[15px];
-			box-shadow: '0px 10px 10px 0px rgba(0, 0, 0, 0.25)';
-		}
-		.tg-demo:hover .tg-pagebuilder {
-			display: flex;
-			gap: 8px;
-		}
-
-		.tg-pagebuilder:hover {
-			padding-left: 8px;
-			padding-right: 8px;
-			span {
-				display: inline;
+		.tg-demo {
+			&:hover {
+				.tg-pagebuilder {
+					display: flex;
+					gap: 8px;
+				}
 			}
 		}
 
+		.tg-pagebuilder {
+			&:hover {
+				padding-left: 8px;
+				padding-right: 8px;
+				span {
+					display: inline;
+				}
+			}
+		}
 		.tg-overflow-category-button {
 			order: 99;
 			position: sticky;
 			right: 0;
 			visibility: visible;
+		}
+
+		.tg-demos {
+			@apply px-[20px] py-[20px] sm:py-[40px] sm:px-[40px];
+		}
+
+		.tg-demo-pro {
+			@apply absolute bg-[#F96666] py-[3px] px-[5px] rounded-[2px] top-[15px] right-[15px];
+			box-shadow: '0px 10px 10px 0px rgba(0, 0, 0, 0.25)';
 		}
 
 		.tgdi-category-filter {
@@ -175,7 +185,7 @@
 		/* -------sidebar---------- */
 		.tg-full-overlay-sidebar {
 			padding: 32px;
-			height: 92vh;
+			height: 94vh;
 			background-color: #fafafa;
 			overflow-y: auto;
 			overflow-x: hidden;
@@ -231,22 +241,26 @@
 		}
 
 		/*--------Toggle-----------*/
-		.toggle-bg:after {
-			content: '';
-			@apply absolute top-[3px] left-1 bg-[#111] border border-white rounded-full h-3 w-3 transition;
+		.toggle-bg {
+			&:after {
+				content: '';
+				@apply absolute top-[3px] left-1 bg-[#111] border border-white rounded-full h-3 w-3 transition;
+			}
 		}
 
-		#import-toggle:checked + .toggle-bg {
-			@apply bg-[#2563EB] border-[#2563EB];
-		}
+		#import-toggle {
+			&:checked + .toggle-bg {
+				@apply bg-[#2563EB] border-[#2563EB];
 
-		#import-toggle:checked + .toggle-bg:after {
-			transform: translateX(120%);
-			@apply bg-white border-white;
-		}
+				&:after {
+					transform: translateX(120%);
+					@apply bg-white border-white;
+				}
+			}
 
-		#import-toggle:disabled + .toggle-bg {
-			@apply bg-[#bed1f9] border-[#bed1f9];
+			&:disabled + .toggle-bg {
+				@apply bg-[#bed1f9] border-[#bed1f9];
+			}
 		}
 	}
 }

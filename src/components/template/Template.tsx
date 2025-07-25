@@ -1,14 +1,13 @@
 import { __, sprintf } from '@wordpress/i18n';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Page, PageWithSelection, SearchResultType, TDIDashboardType } from '../../lib/types';
+import { Demo, Page, PageWithSelection, TDIDashboardType } from '../../lib/types';
 import ImportButton from '../import/ImportButton';
 import SingleTemplate from './SingleTemplate';
 
 type Props = {
 	pages: Page[];
-	demo: SearchResultType;
-	theme: string;
+	demo: Demo;
 	siteTitle: string;
 	siteTagline: string;
 	siteLogoId: number;
@@ -17,16 +16,7 @@ type Props = {
 	setData: (value: TDIDashboardType) => void;
 };
 
-const Template = ({
-	pages,
-	demo,
-	theme,
-	siteTitle,
-	siteTagline,
-	siteLogoId,
-	data,
-	setData,
-}: Props) => {
+const Template = ({ pages, demo, siteTitle, siteTagline, siteLogoId, data, setData }: Props) => {
 	const { pagebuilder = '' } = useParams();
 	const [disabled, setDisabled] = useState(true);
 	const [allPages, setAllPages] = useState<PageWithSelection[]>(() => {
@@ -80,7 +70,6 @@ const Template = ({
 				<div className="flex flex-wrap gap-[16px]">
 					<ImportButton
 						buttonTitle={__('Import All', 'themegrill-demo-importer')}
-						theme={theme}
 						demo={demo}
 						siteTitle={siteTitle}
 						siteTagline={siteTagline}
@@ -93,7 +82,6 @@ const Template = ({
 					<ImportButton
 						buttonTitle={__('Import Selected Pages', 'themegrill-demo-importer')}
 						pages={allPages}
-						theme={theme}
 						demo={demo}
 						siteTitle={siteTitle}
 						siteTagline={siteTagline}
