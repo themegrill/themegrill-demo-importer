@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import spinner from '../../assets/animation/spinner.json';
 import { themes } from '../../lib/themes';
-import { __TDI_DASHBOARD__, Demo, TDIDashboardType } from '../../lib/types';
+import { Demo, TDIDashboardType } from '../../lib/types';
 import Template from '../template/Template';
 import ImportButton from './ImportButton';
 
@@ -96,7 +96,7 @@ const ImportContent = ({
 			}
 			return false;
 		}
-		const themeExists = __TDI_DASHBOARD__.installed_themes.includes(proTheme);
+		const themeExists = data.installed_themes.includes(proTheme);
 		return themeExists;
 	};
 
@@ -148,7 +148,7 @@ const ImportContent = ({
 					</svg>
 				</button>
 				<Template
-					pages={demo.pagebuilder_data[pagebuilder]?.pages || []}
+					pages={demo?.pagebuilder_data[pagebuilder]?.pages || []}
 					demo={demo}
 					siteTitle={siteTitle}
 					siteTagline={siteTagline}
@@ -272,20 +272,11 @@ const ImportContent = ({
 			</button>
 
 			{isIframeLoading && (
-				<div
-					style={{
-						display: 'flex',
-						justifyContent: 'center',
-						alignItems: 'center',
-						height: '200px',
-					}}
-				>
-					<p>Loading iframe...</p>
-				</div>
+				<Lottie animationData={spinner} loop={true} autoplay={true} className="h-4 py-20" />
 			)}
 			<iframe
 				ref={iframeRef}
-				src={demo.pagebuilder_data[pagebuilder]?.url}
+				src={demo?.pagebuilder_data[pagebuilder]?.url}
 				title={`${demo.name} Preview`}
 				className={`h-full ml-auto mr-auto ${deviceClass}`}
 				style={{ display: isIframeLoading ? 'none' : 'block' }}

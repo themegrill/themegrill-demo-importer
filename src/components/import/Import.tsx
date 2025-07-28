@@ -114,10 +114,35 @@ const Import = ({
 
 	return (
 		<>
-			{loading && Object.keys(demo).length === 0 ? (
-				<div className="tg-full-overlay relative">
-					<div className="tg-full-overlay-content bg-[#f4f4f4] w-full relative">
-						<Lottie animationData={spinner} loop={true} autoplay={true} className="h-16 py-20" />
+			{loading || !demo || Object.keys(demo).length === 0 ? (
+				<div className="tg-full-overlay">
+					<div className="w-[375px]">
+						<div className="tg-full-overlay-sidebar">
+							<div className="space-y-6">
+								<div className="space-y-2">
+									<div className="h-6 bg-gray-300 rounded w-full animate-pulse" />
+									<div className="h-6 bg-gray-300 rounded w-full animate-pulse" />
+								</div>
+								<div className="space-y-2">
+									<div className="h-6 bg-gray-300 rounded w-1/2 animate-pulse" />
+									<div className="h-32 bg-gray-300 rounded animate-pulse" />
+								</div>
+								<div className="space-y-2">
+									<div className="h-6 bg-gray-300 rounded w-1/2 animate-pulse" />
+									<div className="h-10 bg-gray-200 rounded animate-pulse" />
+								</div>
+								<div className="space-y-2">
+									<div className="h-6 bg-gray-300 rounded w-1/2 animate-pulse" />
+									<div className="h-10 bg-gray-200 rounded animate-pulse" />
+								</div>
+							</div>
+						</div>
+						<div className="sticky left-0 bottom-0 w-full p-[24px] flex justify-center gap-[10px] box-border border-0 border-t border-r border-solid border-[#E9E9E9] bg-white">
+							<div className="h-6 bg-gray-300 rounded w-full animate-pulse" />
+						</div>
+					</div>
+					<div className="tg-full-overlay-content bg-[#f4f4f4] w-full">
+						<Lottie animationData={spinner} loop={true} autoplay={true} className="h-4 py-20" />
 					</div>
 				</div>
 			) : (

@@ -109,7 +109,7 @@ class TG_Demo_Importer {
 	/**
 	 * check whether the current active theme is in core supported themes list
 	 */
-	public function get_theme() {
+	public static function get_theme() {
 		$instance         = ThemeGrill_Demo_Importer::instance();
 		$supported_themes = $instance->get_core_supported_themes(); // need to change this by checking it with api data
 		$theme            = get_option( 'template' );
@@ -234,10 +234,10 @@ class TG_Demo_Importer {
 					if ( defined( 'TDI_DEVELOPMENT' ) && TDI_DEVELOPMENT ) {
 						return 'http://localhost:8887/' . $filename;
 					}
-					return plugin_dir_url( TGDM_PLUGIN_FILE ) . 'build/' . $filename;
+					return plugin_dir_url( TGDM_PLUGIN_FILE ) . 'dist/' . $filename;
 				};
 				$asset     = function ( $prefix ) {
-					$asset_file = plugin_dir_path( TGDM_PLUGIN_FILE ) . DIRECTORY_SEPARATOR . 'build' . DIRECTORY_SEPARATOR . $prefix . '.asset.php';
+					$asset_file = plugin_dir_path( TGDM_PLUGIN_FILE ) . DIRECTORY_SEPARATOR . 'dist' . DIRECTORY_SEPARATOR . $prefix . '.asset.php';
 					if ( file_exists( $asset_file ) ) {
 						return require $asset_file;
 					}
@@ -258,7 +258,7 @@ class TG_Demo_Importer {
 					'tdi-dashboard',
 					'__TDI_DASHBOARD__',
 					array(
-						'theme'               => $this->get_theme(),
+						'theme'               => static::get_theme(),
 						// 'data'                => $this->demo_packages,
 						'siteUrl'             => site_url(),
 						'installed_themes'    => $installed_themes,

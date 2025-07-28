@@ -159,6 +159,7 @@ const ImportButton = ({
 					parse: false,
 				});
 				const data = await response.json();
+				console.log(data);
 				// update state here
 				results[action] = data;
 				setImportProgress((prev) => {

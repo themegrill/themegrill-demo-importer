@@ -47,6 +47,7 @@ const Home = ({ localizedData, setLocalizedData }: Props) => {
 	const [pagebuilderFilter, setPagebuilderFilter] = useState<FilterItem>({});
 	const [themes, setThemes] = useState<Record<string, string>>({});
 	const [loading, setLoading] = useState(true);
+	const [errorNotice, setErrorNotice] = useState(true);
 	const [contentLoading, setContentLoading] = useState(true);
 	const [searchParams, setSearchParams] = useSearchParams();
 	const { theme, pagebuilder, plan, search } = useMemo(() => {
@@ -72,10 +73,35 @@ const Home = ({ localizedData, setLocalizedData }: Props) => {
 		setContentLoading(true);
 		const fetchSites = async () => {
 			const params = new URLSearchParams();
-
-			if (theme && theme !== 'all') {
-				params.append('theme', theme);
+			/**
+			 * Theme validation logic:
+			 * - If baseTheme is 'all': Allow any valid theme, reset invalid ones to 'all'
+			 * - If baseTheme is specific: Force that theme only, correct URL if different theme selected
+			 */
+			const validThemes = ['zakra', 'colormag', 'elearning'];
+			if (baseTheme === 'all') {
+				if (validThemes.includes(theme)) {
+					params.append('theme', theme);
+				} else {
+					setSearchParams((prev) => {
+						prev.set('theme', 'all');
+						return prev;
+					});
+				}
+			} else {
+				if (theme === baseTheme) {
+					params.append('theme', theme);
+				} else {
+					setSearchParams((prev) => {
+						prev.set('theme', baseTheme);
+						return prev;
+					});
+					params.append('theme', baseTheme);
+				}
 			}
+			// if (theme && theme !== 'all') {
+			// 	params.append('theme', theme);
+			// }
 
 			// Build the path
 			const queryString = params.toString();
@@ -87,7 +113,7 @@ const Home = ({ localizedData, setLocalizedData }: Props) => {
 					method: 'GET',
 				});
 				if (response.success) {
-					if (response.data.length === 0) {
+					if (response.data.length === 0 && theme !== 'all') {
 						setSearchParams((prev) => {
 							prev.set('theme', 'all');
 							return prev;
@@ -99,8 +125,10 @@ const Home = ({ localizedData, setLocalizedData }: Props) => {
 					setThemes(response.filter_options.themes || {});
 					setLoading(false);
 					setContentLoading(false);
+					// setErrorNotice(false);
 				} else {
 					console.error('Failed to fetch sites:', response);
+					// setErrorNotice(true);
 				}
 			} catch (e) {
 				// Handle error
@@ -616,6 +644,9 @@ const Home = ({ localizedData, setLocalizedData }: Props) => {
 	// 	setSearchParams(newParams);
 	// }, []);
 
+	// if (errorNotice) {
+	// 	return <div className="p-4 text-center">Something went wrong.</div>;
+	// }
 	return (
 		<>
 			{loading || data.length === 0 || pagebuilders.length === 0 || categories.length === 0 ? (

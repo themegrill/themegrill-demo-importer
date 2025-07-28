@@ -7,7 +7,7 @@ export const __TDI_DASHBOARD__: TDIDashboardType = (window as any).__TDI_DASHBOA
 
 export type TDIDashboardType = {
 	theme: string;
-	data: DataObjectType;
+	// data: DataObjectType;
 	siteUrl: string;
 	installed_themes: string[];
 	current_theme: string;
@@ -83,7 +83,6 @@ export type PageWithSelection = Page & {
 	isSelected: boolean;
 };
 
-// Individual theme item type
 export type ThemeItem = {
 	id: string;
 	theme_slug: string;
@@ -101,20 +100,18 @@ export type ThemeItem = {
 };
 
 export type FilterItem = Record<string, string>;
-export type FilterCounts = {
+export type FilterOptions = {
 	categories: FilterItem;
 	pagebuilders: FilterItem;
 	themes: Record<string, string>;
 };
 
-// Main response type
 export type ThemeDataResponse = {
 	success: boolean;
 	data: ThemeItem[];
-	filter_options: FilterCounts;
+	filter_options: FilterOptions;
 };
 
-// Page data structure
 export type PageData = {
 	ID: number;
 	post_title: string;
@@ -123,14 +120,12 @@ export type PageData = {
 	content: string;
 };
 
-// Core options structure
 export type CoreOptions = {
 	blogname: string;
 	page_on_front: string;
 	page_for_posts: string;
 };
 
-// Customizer data update structure
 export type CustomizerDataUpdate = {
 	nav_menu_locations: {
 		primary: string;
@@ -139,7 +134,6 @@ export type CustomizerDataUpdate = {
 	};
 };
 
-// Individual demo type
 export type Demo = {
 	id: number;
 	theme_slug: string;

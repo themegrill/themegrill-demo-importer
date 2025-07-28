@@ -8,7 +8,8 @@ class TG_Importer_REST_Controller extends WP_REST_Controller {
 
 	protected $fetch_attachments = true;
 
-	protected $themegrill_base_url = 'http://themegrill-demos-api.test/';
+	protected $themegrill_base_url = 'https://themegrilldemos.com/';
+	// protected $themegrill_base_url = 'http://themegrill-demos-api.test/';
 
 	protected $namespace2 = 'wp-json/themegrill-demos/v1';
 
@@ -71,7 +72,7 @@ class TG_Importer_REST_Controller extends WP_REST_Controller {
 			'/install',
 			array(
 				array(
-					'methods'             => WP_REST_Server::CREATABLE,
+					'methods'             => 'POST',
 					'callback'            => array( $this, 'install' ),
 					'permission_callback' => function () {
 						return current_user_can( 'install_themes' );
@@ -118,7 +119,7 @@ class TG_Importer_REST_Controller extends WP_REST_Controller {
 			'/cleanup',
 			array(
 				array(
-					'methods'             => WP_REST_Server::CREATABLE,
+					'methods'             => 'POST',
 					'callback'            => array( $this, 'tgdi_cleanup' ),
 					'permission_callback' => function () {
 						return current_user_can( 'install_themes' );
@@ -131,7 +132,7 @@ class TG_Importer_REST_Controller extends WP_REST_Controller {
 			'/activate-pro',
 			array(
 				array(
-					'methods'             => WP_REST_Server::CREATABLE,
+					'methods'             => 'POST',
 					'callback'            => array( $this, 'tgdi_activate_pro' ),
 					'permission_callback' => function () {
 						return current_user_can( 'install_themes' );
@@ -189,7 +190,20 @@ class TG_Importer_REST_Controller extends WP_REST_Controller {
 		}
 
 		$all_data = wp_remote_get( $url );
-		$data     = json_decode( wp_remote_retrieve_body( $all_data ) );
+
+		error_log( print_r( $all_data, true ) );
+
+		if ( is_wp_error( $all_data ) ) {
+			return new WP_REST_Response(
+				array(
+					'success'        => false,
+					'data'           => array(),
+					'filter_options' => array(),
+				),
+				200
+			);
+		}
+		$data = json_decode( wp_remote_retrieve_body( $all_data ) );
 		return new WP_REST_Response(
 			array(
 				'success'        => true,
@@ -239,19 +253,20 @@ class TG_Importer_REST_Controller extends WP_REST_Controller {
 			$is_pro_theme = strpos( $theme, '-pro' ) !== false;
 			if ( $is_pro_theme ) {
 				$base_theme = $is_pro_theme ? str_replace( '-pro', '', $theme ) : $theme;
-				$data       = wp_remote_get( TG_Demo_Importer::$themegrill_base_url . '/sites?theme=' . $base_theme );
-			} else {
-				$data = wp_remote_get( TG_Demo_Importer::$themegrill_base_url . '/sites?theme=' . $theme );
+				// $data       = wp_remote_get( TG_Demo_Importer::$themegrill_base_url . '/sites?theme=' . $base_theme );
 			}
+			// else {
+			//  $data = wp_remote_get( TG_Demo_Importer::$themegrill_base_url . '/sites?theme=' . $theme );
+			// }
 		} else {
-			$data  = wp_remote_get( TG_Demo_Importer::$themegrill_base_url . '/sites' );
+			// $data  = wp_remote_get( TG_Demo_Importer::$themegrill_base_url . '/sites' );
 			$theme = 'all';
 		}
-		if ( is_wp_error( $data ) ) {
-			return;
-		}
+		// if ( is_wp_error( $data ) ) {
+		//  return;
+		// }
 
-		$all_demos              = json_decode( wp_remote_retrieve_body( $data ) );
+		// $all_demos              = json_decode( wp_remote_retrieve_body( $data ) );
 		$installed_plugins      = array_keys( get_plugins() );
 		$is_installed_zakra_pro = in_array( 'zakra-pro/zakra-pro.php', $installed_plugins, true ) ? true : false;
 		$is_active_zakra_pro    = false;
@@ -261,7 +276,7 @@ class TG_Importer_REST_Controller extends WP_REST_Controller {
 
 		return array(
 			'theme'               => $theme,
-			'data'                => $all_demos,
+			// 'data'                => $all_demos,
 			'siteUrl'             => site_url(),
 			'installed_themes'    => $installed_themes,
 			'current_theme'       => $theme,
@@ -329,9 +344,9 @@ class TG_Importer_REST_Controller extends WP_REST_Controller {
 			}
 		}
 
-		foreach ( $imported_users as $user_id ) {
-			wp_delete_user( $user_id );
-		}
+		// foreach ( $imported_users as $user_id ) {
+		//  wp_delete_user( $user_id );
+		// }
 
 		delete_option( 'themegrill_demo_importer_imported_posts' );
 		delete_option( 'themegrill_demo_importer_imported_terms' );
@@ -340,7 +355,7 @@ class TG_Importer_REST_Controller extends WP_REST_Controller {
 		return new WP_REST_Response(
 			array(
 				'success' => true,
-				'message' => __( 'Reimported successfully.', 'themegrill-demo-importer' ),
+				'message' => __( 'Cleaned up successfully.', 'themegrill-demo-importer' ),
 			),
 			200
 		);
@@ -380,11 +395,11 @@ class TG_Importer_REST_Controller extends WP_REST_Controller {
 					$response = rest_ensure_response( true );
 					break;
 				}
-				if ( 'zakra' !== $demo_config['theme'] && ( $demo_config['pro'] || $demo_config['premium'] ) ) {
+				if ( 'zakra' !== $demo_config['theme_slug'] && ( $demo_config['pro'] || $demo_config['premium'] ) ) {
 					$response = rest_ensure_response( true );
 					break;
 				}
-				$theme_slug = isset( $demo_config['theme'] ) ? sanitize_key( $demo_config['theme'] ) : '';
+				$theme_slug = isset( $demo_config['theme_slug'] ) ? sanitize_key( $demo_config['theme_slug'] ) : '';
 				if ( ! $theme_slug ) {
 					$response = new WP_Error(
 						'no_theme_specified',
@@ -510,7 +525,7 @@ class TG_Importer_REST_Controller extends WP_REST_Controller {
 			}
 
 			update_option( 'themegrill_demo_importer_old_theme', get_option( 'template' ) );
-			$demo_theme = 'zakra' !== $demo_config['theme'] && ( $demo_config['pro'] || $demo_config['premium'] ) ? $demo_config['theme'] . '-pro' : $demo_config['theme'];
+			$demo_theme = 'zakra' !== $demo_config['theme_slug'] && ( $demo_config['pro'] || $demo_config['premium'] ) ? $demo_config['theme_slug'] . '-pro' : $demo_config['theme_slug'];
 			switch_theme( $demo_theme );
 
 			return new WP_REST_Response(
@@ -537,8 +552,7 @@ class TG_Importer_REST_Controller extends WP_REST_Controller {
 		$results     = array();
 		if ( 'companion-elementor/companion-elementor.php' === $plugin ) {
 			$plugin_data = get_plugin_data( $plugin_file );
-
-			$response = apply_filters( 'tgda_install_companion_elementor', 'companion-elementor/companion-elementor.php' );
+			$response    = apply_filters( 'tgda_install_companion_elementor', 'companion-elementor/companion-elementor.php' );
 			if ( is_array( $response ) && isset( $response['success'] ) && ! $response['success'] ) {
 				$this->tgdi_log_error( 'Failed to install plugin ' . $pg[0] . ': ' . $response['message'] );
 				$results[ $pg[0] ] = array(
