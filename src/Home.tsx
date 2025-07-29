@@ -1,4 +1,3 @@
-import apiFetch from '@wordpress/api-fetch';
 import Lottie from 'lottie-react';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -6,14 +5,15 @@ import loader from './assets/animation/loader.json';
 import spinner from './assets/animation/spinner.json';
 import Content from './components/content/Content';
 import Header from './components/header/Header';
-import { FilterItem, TDIDashboardType, ThemeDataResponse, ThemeItem } from './lib/types';
+import { DataObjectType, ThemeItem } from './lib/types';
+import { useLocalizedData } from './LocalizedDataContext';
 
-type Props = {
-	localizedData: TDIDashboardType;
-	setLocalizedData: React.Dispatch<React.SetStateAction<TDIDashboardType>>;
-};
+// type Props = {
+// 	localizedData: TDIDashboardType;
+// 	setLocalizedData: React.Dispatch<React.SetStateAction<TDIDashboardType>>;
+// };
 
-const Home = ({ localizedData, setLocalizedData }: Props) => {
+const Home = () => {
 	// const {
 	// 	theme,
 	// 	pagebuilder,
@@ -29,6 +29,9 @@ const Home = ({ localizedData, setLocalizedData }: Props) => {
 	// 	setSearch,
 	// 	setSearchResults,
 	// } = useDemoContext();
+
+	const { localizedData, setLocalizedData } = useLocalizedData();
+
 	const plans = {
 		all: 'All',
 		free: 'Free',
@@ -36,20 +39,25 @@ const Home = ({ localizedData, setLocalizedData }: Props) => {
 	};
 
 	// const themeBasedData = data?.data || {};
-	const themeData = localizedData?.theme || 'all';
-	const baseTheme = themeData.endsWith('-pro') ? themeData.replace('-pro', '') : themeData;
+	const themeSlug = localizedData?.theme || 'all';
+	const baseTheme = themeSlug.endsWith('-pro') ? themeSlug.replace('-pro', '') : themeSlug;
+	const themeName = localizedData?.theme_name || 'All';
+	const baseThemeName = localizedData?.theme_name.endsWith(' Pro')
+		? themeName.replace(' Pro', '')
+		: themeName;
 	// const { pathname } = useLocation();
 	// const match = matchPath('/import-detail/:slug/:pagebuilder', pathname);
 	// const showTabs = !match;
+	// const [categoryFilter, setCategoryFilter] = useState<FilterItem>({});
+	// const [pagebuilderFilter, setPagebuilderFilter] = useState<FilterItem>({});
+	// const [themeFilter, setThemeFilter] = useState<Record<string, string>>({});
 
-	const [data, setData] = useState<ThemeItem[]>([]);
-	const [categoryFilter, setCategoryFilter] = useState<FilterItem>({});
-	const [pagebuilderFilter, setPagebuilderFilter] = useState<FilterItem>({});
-	const [themes, setThemes] = useState<Record<string, string>>({});
+	const [data, setData] = useState<DataObjectType>(localizedData?.data || []);
 	const [loading, setLoading] = useState(true);
-	const [errorNotice, setErrorNotice] = useState(true);
 	const [contentLoading, setContentLoading] = useState(true);
 	const [searchParams, setSearchParams] = useSearchParams();
+	const [isDataEmpty, setIsDataEmpty] = useState(false);
+
 	const { theme, pagebuilder, plan, search } = useMemo(() => {
 		return {
 			theme: searchParams.get('theme') || baseTheme || 'all',
@@ -68,84 +76,61 @@ const Home = ({ localizedData, setLocalizedData }: Props) => {
 		});
 	}, []);
 
-	// const [data, setData] = useState<TDIDashboardType>(__TDI_DASHBOARD__);
+	const validatedTheme = useMemo(() => {
+		const validThemes = ['zakra', 'colormag', 'elearning'];
+
+		if (baseTheme === 'all') {
+			return validThemes.includes(theme) || theme === 'all' ? theme : 'all';
+		} else {
+			return theme === baseTheme ? theme : baseTheme;
+		}
+	}, [theme, baseTheme]);
+
 	useEffect(() => {
-		setContentLoading(true);
-		const fetchSites = async () => {
-			const params = new URLSearchParams();
-			/**
-			 * Theme validation logic:
-			 * - If baseTheme is 'all': Allow any valid theme, reset invalid ones to 'all'
-			 * - If baseTheme is specific: Force that theme only, correct URL if different theme selected
-			 */
-			const validThemes = ['zakra', 'colormag', 'elearning'];
-			if (baseTheme === 'all') {
-				if (validThemes.includes(theme)) {
-					params.append('theme', theme);
-				} else {
-					setSearchParams((prev) => {
-						prev.set('theme', 'all');
-						return prev;
-					});
-				}
-			} else {
-				if (theme === baseTheme) {
-					params.append('theme', theme);
-				} else {
-					setSearchParams((prev) => {
-						prev.set('theme', baseTheme);
-						return prev;
-					});
-					params.append('theme', baseTheme);
-				}
+		if (validatedTheme !== theme) {
+			setSearchParams((prev) => {
+				prev.set('theme', validatedTheme);
+				return prev;
+			});
+		}
+	}, [validatedTheme, theme, setSearchParams]);
+
+	const demos = useMemo(() => {
+		let $demos = [];
+		if (validatedTheme === 'all') {
+			$demos = Object.values(data || {}).reduce((acc, curr) => {
+				acc = [...acc, ...(curr.demos || [])];
+				return acc;
+			}, [] as ThemeItem[]);
+		} else {
+			$demos = data?.[validatedTheme]?.demos || [];
+		}
+		return $demos;
+	}, [data, validatedTheme]);
+
+	const themes = useMemo(() => {
+		if (!data || Object.keys(data).length === 0) {
+			if (baseTheme && baseTheme !== 'all') {
+				return [{ slug: baseTheme, name: baseThemeName }];
 			}
-			// if (theme && theme !== 'all') {
-			// 	params.append('theme', theme);
-			// }
+			return [{ slug: 'all', name: 'All' }];
+		}
 
-			// Build the path
-			const queryString = params.toString();
-			const path = `tg-demo-importer/v1/sites${queryString ? `?${queryString}` : ''}`;
+		const allThemes = Object.entries(data).map(([key, value]) => ({
+			slug: key,
+			name: value.name,
+		}));
 
-			try {
-				const response = await apiFetch<ThemeDataResponse>({
-					path: path,
-					method: 'GET',
-				});
-				if (response.success) {
-					if (response.data.length === 0 && theme !== 'all') {
-						setSearchParams((prev) => {
-							prev.set('theme', 'all');
-							return prev;
-						});
-					}
-					setData(response.data);
-					setCategoryFilter(response.filter_options.categories);
-					setPagebuilderFilter(response.filter_options.pagebuilders);
-					setThemes(response.filter_options.themes || {});
-					setLoading(false);
-					setContentLoading(false);
-					// setErrorNotice(false);
-				} else {
-					console.error('Failed to fetch sites:', response);
-					// setErrorNotice(true);
-				}
-			} catch (e) {
-				// Handle error
-				console.error('Failed to fetch sites:', e);
-			}
-		};
+		// Add "All" option if we have multiple themes
+		if (allThemes.length > 1) {
+			return [{ slug: 'all', name: 'All' }, ...allThemes];
+		}
 
-		fetchSites();
-	}, [theme]);
+		return allThemes;
+	}, [data, baseTheme]);
 
 	const pagebuilders = useMemo(() => {
-		if (
-			!data ||
-			data.length === 0 ||
-			!pagebuilderFilter ||
-			Object.keys(pagebuilderFilter).length === 0
-		) {
+		if (!data || Object.entries(data).length === 0) {
 			return [
 				{
 					slug: 'all',
@@ -155,81 +140,241 @@ const Home = ({ localizedData, setLocalizedData }: Props) => {
 			];
 		}
 
-		const filteredResults = data.filter((d) => {
-			// const themeMatch = theme === 'all' || d.theme_slug === theme;
+		const filteredResults = demos.filter((d) => {
 			const planMatch =
 				plan === 'all' || (plan === 'pro' ? d.pro || d.premium : !d.pro && !d.premium);
 			const searchMatch = !search || d.name.toLowerCase().includes(search.toLowerCase());
 
 			return planMatch && searchMatch;
-			// return themeMatch && planMatch && searchMatch;
 		});
 
-		const result = [
-			{
-				slug: 'all',
-				value: 'All',
-				count: filteredResults.length,
-			},
-		];
+		const pagebuilderMap = new Map();
 
-		Object.entries(pagebuilderFilter).forEach(([pbKey, pbValue]) => {
-			const count = filteredResults.filter(
-				(d) => d.pagebuilders && Object.keys(d.pagebuilders).includes(pbKey),
-			).length;
+		Object.entries(data).forEach(([key, value]) => {
+			if (theme !== 'all' && key !== theme) return;
 
-			if (count > 0) {
-				result.push({
-					slug: pbKey,
-					value: pbValue,
-					count: count,
+			if (value.pagebuilders) {
+				Object.entries(value.pagebuilders).forEach(([pbKey, pbValue]) => {
+					if (!pagebuilderMap.has(pbKey)) {
+						pagebuilderMap.set(pbKey, {
+							slug: pbKey,
+							value: pbValue,
+							count: 0,
+						});
+					}
 				});
 			}
 		});
 
-		return result;
-	}, [data, plan, search, pagebuilderFilter]);
+		// Calculate counts
+		pagebuilderMap.forEach((pb, key) => {
+			if (key === 'all') {
+				pb.count = filteredResults.length;
+			} else {
+				pb.count = filteredResults.filter(
+					(d) => d.pagebuilders && Object.keys(d.pagebuilders).includes(key),
+				).length;
+			}
+		});
+
+		return Array.from(pagebuilderMap.values());
+	}, [data, demos, theme, plan, search]);
 
 	const categories = useMemo(() => {
-		if (!data || data.length === 0) return [];
+		if (!data || Object.entries(data).length === 0) {
+			return [
+				{
+					slug: 'all',
+					value: 'All',
+					count: 0,
+				},
+			];
+		}
 
-		const filteredResults = data.filter((item) => {
+		const filteredResults = demos.filter((d) => {
 			const pagebuilderMatch =
 				pagebuilder === 'all' ||
-				(item.pagebuilders && Object.keys(item.pagebuilders).includes(pagebuilder));
+				(d.pagebuilders && Object.keys(d.pagebuilders).includes(pagebuilder));
 
 			const planMatch =
-				plan === 'all' || (plan === 'pro' ? item.pro || item.premium : !item.pro && !item.premium);
+				plan === 'all' || (plan === 'pro' ? d.pro || d.premium : !d.pro && !d.premium);
 
-			const searchMatch = !search || item.name.toLowerCase().includes(search.toLowerCase());
+			const searchMatch = !search || d.name.toLowerCase().includes(search.toLowerCase());
 
 			return pagebuilderMatch && planMatch && searchMatch;
 		});
 
-		const result = [
-			{
-				slug: 'all',
-				value: 'All',
-				count: filteredResults.length,
-			},
-		];
+		const categoryMap = new Map();
 
-		Object.entries(categoryFilter).forEach(([pbKey, pbValue]) => {
-			const count = filteredResults.filter(
-				(d) => d.categories && Object.keys(d.categories).includes(pbKey),
-			).length;
+		Object.entries(data).forEach(([themeKey, themeValue]) => {
+			if (theme !== 'all' && themeKey !== theme) return;
 
-			if (count > 0) {
-				result.push({
-					slug: pbKey,
-					value: pbValue,
-					count: count,
+			if (themeValue.categories) {
+				Object.entries(themeValue.categories).forEach(([catKey, catValue]) => {
+					if (!categoryMap.has(catKey)) {
+						categoryMap.set(catKey, {
+							slug: catKey,
+							value: catValue,
+							count: 0,
+						});
+					}
 				});
 			}
 		});
 
-		return result;
-	}, [data, pagebuilder, plan, search, categoryFilter]);
+		// Calculate counts
+		categoryMap.forEach((cat, key) => {
+			if (key === 'all') {
+				cat.count = filteredResults.length;
+			} else {
+				cat.count = filteredResults.filter(
+					(d) => d.categories && Object.keys(d.categories).includes(key),
+				).length;
+			}
+		});
+
+		return Array.from(categoryMap.values());
+	}, [data, demos, theme, pagebuilder, plan, search]);
+
+	// const [data, setData] = useState<TDIDashboardType>(__TDI_DASHBOARD__);
+	// useEffect(() => {
+	// 	setContentLoading(true);
+	// 	const fetchSites = async () => {
+	// 		const params = new URLSearchParams();
+	// 		/**
+	// 		 * Theme validation logic:
+	// 		 * - If baseTheme is 'all': Allow any valid theme, reset invalid ones to 'all'
+	// 		 * - If baseTheme is specific: Force that theme only, correct URL if different theme selected
+	// 		 */
+	// const validThemes = ['zakra', 'colormag', 'elearning'];
+	// if (baseTheme === 'all') {
+	// 	if (validThemes.includes(theme)) {
+	// 		params.append('theme', theme);
+	// 	} else {
+	// 		setSearchParams((prev) => {
+	// 			prev.set('theme', 'all');
+	// 			return prev;
+	// 		});
+	// 	}
+	// } else {
+	// 	if (theme === baseTheme) {
+	// 		params.append('theme', theme);
+	// 	} else {
+	// 		setSearchParams((prev) => {
+	// 			prev.set('theme', baseTheme);
+	// 			return prev;
+	// 		});
+	// 		params.append('theme', baseTheme);
+	// 	}
+	// }
+	// 		// if (theme && theme !== 'all') {
+	// 		// 	params.append('theme', theme);
+	// 		// }
+
+	// 		// Build the path
+	// 		const queryString = params.toString();
+	// 		const path = `tg-demo-importer/v1/sites${queryString ? `?${queryString}` : ''}`;
+
+	// 		try {
+	// 			const response = await apiFetch<ThemeDataResponse>({
+	// 				path: path,
+	// 				method: 'GET',
+	// 			});
+	// 			if (response.success) {
+	// 				if (response.data.length === 0 && theme !== 'all') {
+	// 					setSearchParams((prev) => {
+	// 						prev.set('theme', 'all');
+	// 						return prev;
+	// 					});
+	// 				}
+	// 				setData(response.data);
+	// 				setCategoryFilter(response.filter_options.categories);
+	// 				setPagebuilderFilter(response.filter_options.pagebuilders);
+	// 				setThemes(response.filter_options.themes || {});
+	// 				setLoading(false);
+	// 				setContentLoading(false);
+	// 				// setErrorNotice(false);
+	// 			} else {
+	// 				console.error('Failed to fetch sites:', response);
+	// 				// setErrorNotice(true);
+	// 			}
+	// 		} catch (e) {
+	// 			// Handle error
+	// 			console.error('Failed to fetch sites:', e);
+	// 		}
+	// 	};
+
+	// 	fetchSites();
+	// }, [theme]);
+	// useEffect(() => {
+	// 	setContentLoading(true);
+	// 	const fetchSites = async () => {
+	// 		const params = new URLSearchParams();
+	// 		/**
+	// 		 * Theme validation logic:
+	// 		 * - If baseTheme is 'all': Allow any valid theme, reset invalid ones to 'all'
+	// 		 * - If baseTheme is specific: Force that theme only, correct URL if different theme selected
+	// 		 */
+	// 		const validThemes = ['zakra', 'colormag', 'elearning'];
+	// 		if (baseTheme === 'all') {
+	// 			if (validThemes.includes(theme)) {
+	// 				params.append('theme', theme);
+	// 			} else {
+	// 				setSearchParams((prev) => {
+	// 					prev.set('theme', 'all');
+	// 					return prev;
+	// 				});
+	// 			}
+	// 		} else {
+	// 			if (theme === baseTheme) {
+	// 				params.append('theme', theme);
+	// 			} else {
+	// 				setSearchParams((prev) => {
+	// 					prev.set('theme', baseTheme);
+	// 					return prev;
+	// 				});
+	// 				params.append('theme', baseTheme);
+	// 			}
+	// 		}
+	// 		// if (theme && theme !== 'all') {
+	// 		// 	params.append('theme', theme);
+	// 		// }
+
+	// 		// Build the path
+	// 		const queryString = params.toString();
+	// 		const path = `tg-demo-importer/v1/sites${queryString ? `?${queryString}` : ''}`;
+
+	// 		try {
+	// 			const response = await apiFetch<ThemeDataResponse>({
+	// 				path: path,
+	// 				method: 'GET',
+	// 			});
+	// 			if (response.success) {
+	// 				if (response.data.length === 0 && theme !== 'all') {
+	// 					setSearchParams((prev) => {
+	// 						prev.set('theme', 'all');
+	// 						return prev;
+	// 					});
+	// 				}
+	// 				setData(response.data);
+	// 				setCategoryFilter(response.filter_options.categories);
+	// 				setPagebuilderFilter(response.filter_options.pagebuilders);
+	// 				setThemes(response.filter_options.themes || {});
+	// 				setLoading(false);
+	// 				setContentLoading(false);
+	// 				// setErrorNotice(false);
+	// 			} else {
+	// 				console.error('Failed to fetch sites:', response);
+	// 				// setErrorNotice(true);
+	// 			}
+	// 		} catch (e) {
+	// 			// Handle error
+	// 			console.error('Failed to fetch sites:', e);
+	// 		}
+	// 	};
+
+	// 	fetchSites();
+	// }, [theme]);
 
 	// // const pagebuilders = useMemo(() => {
 	// // 	if (!data || !searchResults) return [];
@@ -384,13 +529,37 @@ const Home = ({ localizedData, setLocalizedData }: Props) => {
 	}, [pagebuilders, pagebuilder]);
 
 	useEffect(() => {
-		if (!currentPagebuilder && Object.entries(pagebuilderFilter).length > 0) {
+		if (!currentPagebuilder && pagebuilders.length > 0) {
 			setSearchParams((prev) => {
 				prev.set('pagebuilder', 'all');
 				return prev;
 			});
 		}
-	}, [currentPagebuilder, pagebuilderFilter]);
+	}, [currentPagebuilder, pagebuilders]);
+
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			const hasData =
+				demos.length !== 0 &&
+				pagebuilders.length !== 0 &&
+				categories.length !== 0 &&
+				themes.length > 0;
+
+			if (hasData) {
+				setIsDataEmpty(false);
+			} else {
+				setIsDataEmpty(true); // Indicate that data is empty
+			}
+
+			setLoading(false);
+			setContentLoading(false);
+		}, 100);
+		return () => clearTimeout(timer);
+	}, [demos, pagebuilders, categories, themes]);
+
+	useEffect(() => {
+		setContentLoading(true);
+	}, [theme, pagebuilder, plan, search]);
 
 	// Update URL params when filters change
 	// useEffect(() => {
@@ -647,9 +816,28 @@ const Home = ({ localizedData, setLocalizedData }: Props) => {
 	// if (errorNotice) {
 	// 	return <div className="p-4 text-center">Something went wrong.</div>;
 	// }
+
+	if (isDataEmpty) {
+		return (
+			<div
+				className="flex items-center p-4 m-4 text-sm text-blue-800 border border-solid border-blue-300 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400 dark:border-blue-800"
+				role="alert"
+			>
+				<svg
+					className="shrink-0 inline w-4 h-4 me-3"
+					xmlns="http://www.w3.org/2000/svg"
+					fill="currentColor"
+					viewBox="0 0 20 20"
+				>
+					<path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+				</svg>
+				<span className="font-medium">No demos available.</span>
+			</div>
+		);
+	}
 	return (
 		<>
-			{loading || data.length === 0 || pagebuilders.length === 0 || categories.length === 0 ? (
+			{loading ? (
 				<Lottie animationData={spinner} loop={true} autoplay={true} className="h-16 my-8" />
 			) : (
 				<>
@@ -659,12 +847,12 @@ const Home = ({ localizedData, setLocalizedData }: Props) => {
 						currentPagebuilder={currentPagebuilder}
 						plans={plans}
 						theme={baseTheme}
-						data={data}
+						data={demos}
 					/>
 					{contentLoading ? (
 						<Lottie animationData={loader} loop={true} autoplay={true} className="h-40" />
 					) : (
-						<Content categories={categories} demos={data} />
+						<Content categories={categories} demos={demos} />
 					)}
 				</>
 			)}

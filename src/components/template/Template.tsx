@@ -1,7 +1,8 @@
 import { __, sprintf } from '@wordpress/i18n';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Demo, Page, PageWithSelection, TDIDashboardType } from '../../lib/types';
+import { Demo, Page, PageWithSelection } from '../../lib/types';
+import { useLocalizedData } from '../../LocalizedDataContext';
 import ImportButton from '../import/ImportButton';
 import SingleTemplate from './SingleTemplate';
 
@@ -11,12 +12,14 @@ type Props = {
 	siteTitle: string;
 	siteTagline: string;
 	siteLogoId: number;
-	// currentTheme: string;
-	data: TDIDashboardType;
-	setData: (value: TDIDashboardType) => void;
+	// // currentTheme: string;
+	// data: TDIDashboardType;
+	// setData: (value: TDIDashboardType) => void;
 };
 
-const Template = ({ pages, demo, siteTitle, siteTagline, siteLogoId, data, setData }: Props) => {
+const Template = ({ pages, demo, siteTitle, siteTagline, siteLogoId }: Props) => {
+	const { localizedData, setLocalizedData } = useLocalizedData();
+
 	const { pagebuilder = '' } = useParams();
 	const [disabled, setDisabled] = useState(true);
 	const [allPages, setAllPages] = useState<PageWithSelection[]>(() => {
@@ -76,8 +79,6 @@ const Template = ({ pages, demo, siteTitle, siteTagline, siteLogoId, data, setDa
 						siteLogoId={siteLogoId}
 						additionalStyles="bg-white rounded-[2px] px-[16px] py-[8px] border border-solid border-[#2563EB] text-[#2563EB] font-[600] cursor-pointer"
 						textColor="#2563EB"
-						data={data}
-						setData={setData}
 					/>
 					<ImportButton
 						buttonTitle={__('Import Selected Pages', 'themegrill-demo-importer')}
@@ -87,8 +88,6 @@ const Template = ({ pages, demo, siteTitle, siteTagline, siteLogoId, data, setDa
 						siteTagline={siteTagline}
 						siteLogoId={siteLogoId}
 						disabled={disabled}
-						data={data}
-						setData={setData}
 					/>
 				</div>
 			</div>

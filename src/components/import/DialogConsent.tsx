@@ -3,7 +3,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DialogClose, DialogFooter, DialogHeader, DialogTitle } from '../../controls/Dialog';
 import { themes } from '../../lib/themes';
-import { Demo, TDIDashboardType } from '../../lib/types';
+import { Demo } from '../../lib/types';
+import { useLocalizedData } from '../../LocalizedDataContext';
 
 declare const require: any;
 
@@ -24,7 +25,6 @@ export const DialogConsent = ({
 	setInstallTheme,
 	plugins,
 	setPlugins,
-	data,
 }: {
 	onConfirm: () => void;
 	demo: Demo;
@@ -32,12 +32,12 @@ export const DialogConsent = ({
 	setInstallTheme: React.Dispatch<React.SetStateAction<boolean>>;
 	plugins: PluginItem[];
 	setPlugins: React.Dispatch<React.SetStateAction<PluginItem[]>>;
-	data: TDIDashboardType;
+	// data: TDIDashboardType;
 }) => {
 	const navigate = useNavigate();
-	// const { data } = useLocalizedData();
+	const { localizedData } = useLocalizedData();
 	// const { current_theme: currentTheme } = data || {};
-	const currentTheme = data.current_theme;
+	const currentTheme = localizedData.current_theme;
 	const [isConsentChecked, setIsConsentChecked] = useState(false);
 	const matchedTheme = themes.find((theme) => theme.slug === demo.theme_slug);
 

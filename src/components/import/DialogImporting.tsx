@@ -23,7 +23,7 @@ const DialogImporting = ({
 				<>
 					<p className="m-0 text-[14px] text-[#6B6B6B]">
 						{__(
-							'It might take around 5 to 10 minutes to complete the importation process. Please do not close or refresh this page!',
+							'It might take around 1 to 2 minutes to complete the importation process. Please do not close or refresh this page!',
 							'themegrill-demo-importer',
 						)}
 					</p>

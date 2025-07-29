@@ -10,7 +10,6 @@
     "composer/installers": "~1.2"
   },
   "require-dev": {
-    "wpeverest/wpeverest-sniffs": "^0.0.2",
     "wp-cli/i18n-command": "^2.2.5"
   },
   "scripts": {
@@ -24,13 +23,18 @@
       "phpcbf -p"
     ],
     "make-pot": [
-      "wp i18n make-pot . languages/themegrill-demo-importer.pot --exclude=\"vendor,node_modules,.github,.wordpress.org\" --slug=themegrill-demo-importer"
+      "\"vendor/bin/wp\" i18n make-pot . languages/themegrill-demo-importer.pot --exclude=\"vendor,node_modules,.github,.wordpress.org\" --slug=themegrill-demo-importer"
     ]
   },
   "extra": {
     "scripts-description": {
       "phpcs": "Analyze code against the WordPress coding standard with PHP_CodeSniffer",
       "phpcbf": "Fix coding standards warnings/errors automattically with PHP Code Beautifier"
+    }
+  },
+  "config": {
+    "allow-plugins": {
+      "composer/installers": true
     }
   }
 }

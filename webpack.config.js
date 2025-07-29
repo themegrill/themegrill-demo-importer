@@ -6,7 +6,7 @@ module.exports = {
 	...defaults,
 	output: {
 		filename: '[name].js',
-		path: resolve(process.cwd(), 'build'),
+		path: resolve(process.cwd(), 'dist'),
 	},
 	entry: {
 		dashboard: resolve(process.cwd(), 'src', 'dashboard.tsx'),

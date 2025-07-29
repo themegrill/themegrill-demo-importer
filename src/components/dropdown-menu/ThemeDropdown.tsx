@@ -8,12 +8,13 @@ import {
 	DropdownMenuTrigger,
 	DropdownMenu as ThemeDropdownMenu,
 } from '../../controls/DropdownMenu';
+import { Theme } from '../../lib/types';
 
 declare const require: any;
 
 type Props = {
-	themes: Record<string, string>;
-	// themes: Theme[];
+	// themes: Record<string, string>;
+	themes: Theme[];
 };
 
 const ThemeDropdown = ({ themes }: Props) => {
@@ -71,7 +72,7 @@ const ThemeDropdown = ({ themes }: Props) => {
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent className={`w-full sm:w-[172px] bg-white p-0`}>
-				{themes &&
+				{/* {themes &&
 					Object.entries(themes)
 						.filter(([key]) => key !== theme)
 						.map(([key, value]) => (
@@ -87,8 +88,8 @@ const ThemeDropdown = ({ themes }: Props) => {
 								</DropdownMenuItem>
 								<DropdownMenuSeparator className="m-0" />
 							</div>
-						))}
-				{/* {themes &&
+						))} */}
+				{themes &&
 					themes
 						.filter((t) => t.slug !== theme)
 						.map((th) => (
@@ -104,7 +105,7 @@ const ThemeDropdown = ({ themes }: Props) => {
 								</DropdownMenuItem>
 								<DropdownMenuSeparator className="m-0" />
 							</div>
-						))} */}
+						))}
 			</DropdownMenuContent>
 		</ThemeDropdownMenu>
 	);

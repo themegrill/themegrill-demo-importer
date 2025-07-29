@@ -45,17 +45,17 @@ class TG_Importer_REST_Controller extends WP_REST_Controller {
 	}
 
 	public function register_routes() {
-		register_rest_route(
-			$this->namespace,
-			'/sites',
-			array(
-				array(
-					'methods'             => 'GET',
-					'callback'            => array( $this, 'tgdi_get_sites' ),
-					'permission_callback' => '__return_true',
-				),
-			)
-		);
+		// register_rest_route(
+		//  $this->namespace,
+		//  '/sites',
+		//  array(
+		//      array(
+		//          'methods'             => 'GET',
+		//          'callback'            => array( $this, 'tgdi_get_sites' ),
+		//          'permission_callback' => '__return_true',
+		//      ),
+		//  )
+		// );
 		register_rest_route(
 			$this->namespace,
 			'/data',
@@ -153,88 +153,117 @@ class TG_Importer_REST_Controller extends WP_REST_Controller {
 		);
 	}
 
-	public function tgdi_get_sites( $request ) {
-		$theme = $request->get_param( 'theme' );
-		// $category    = $request->get_param( 'category' );
-		// $pagebuilder = $request->get_param( 'pagebuilder' );
-		// $plan        = $request->get_param( 'plan' );
-		// $search      = $request->get_param( 'search' );
+	// public function tgdi_get_sites( $request ) {
+	//  $theme = $request->get_param( 'theme' );
+	//  // $category    = $request->get_param( 'category' );
+	//  // $pagebuilder = $request->get_param( 'pagebuilder' );
+	//  // $plan        = $request->get_param( 'plan' );
+	//  // $search      = $request->get_param( 'search' );
 
-		// Build query parameters array
-		$query_params = array();
+	//  // Build query parameters array
+	//  $query_params = array();
 
-		if ( ! empty( $theme ) ) {
-			$query_params['theme'] = $theme;
-		}
+	//  if ( ! empty( $theme ) ) {
+	//      $query_params['theme'] = $theme;
+	//  }
 
-		// if ( ! empty( $category ) ) {
-		//  $query_params['category'] = $category;
-		// }
+	//  // if ( ! empty( $category ) ) {
+	//  //  $query_params['category'] = $category;
+	//  // }
 
-		// if ( ! empty( $pagebuilder ) ) {
-		//  $query_params['pagebuilder'] = $pagebuilder;
-		// }
+	//  // if ( ! empty( $pagebuilder ) ) {
+	//  //  $query_params['pagebuilder'] = $pagebuilder;
+	//  // }
 
-		// if ( ! empty( $plan ) ) {
-		//  $query_params['plan'] = $plan;
-		// }
+	//  // if ( ! empty( $plan ) ) {
+	//  //  $query_params['plan'] = $plan;
+	//  // }
 
-		// if ( ! empty( $search ) ) {
-		//  $query_params['search'] = $search;
-		// }
+	//  // if ( ! empty( $search ) ) {
+	//  //  $query_params['search'] = $search;
+	//  // }
 
-		// Build the URL with query parameters
-		$url = $this->themegrill_base_url . $this->namespace2 . '/sites';
-		if ( ! empty( $query_params ) ) {
-			$url = add_query_arg( $query_params, $url );
-		}
+	//  // Build the URL with query parameters
+	//  $url = $this->themegrill_base_url . $this->namespace2 . '/sites';
+	//  if ( ! empty( $query_params ) ) {
+	//      $url = add_query_arg( $query_params, $url );
+	//  }
 
-		$all_data = wp_remote_get( $url );
+	//  $all_data = wp_remote_get( $url );
 
-		error_log( print_r( $all_data, true ) );
+	//  if ( is_wp_error( $all_data ) ) {
+	//      return new WP_REST_Response(
+	//          array(
+	//              'success'        => false,
+	//              'data'           => array(),
+	//              'filter_options' => array(),
+	//          ),
+	//          200
+	//      );
+	//  }
+	//  $data = json_decode( wp_remote_retrieve_body( $all_data ) );
+	//  return new WP_REST_Response(
+	//      array(
+	//          'success'        => true,
+	//          'data'           => $data->data,
+	//          'filter_options' => $data->filter_options,
+	//      ),
+	//      200
+	//  );
 
-		if ( is_wp_error( $all_data ) ) {
-			return new WP_REST_Response(
-				array(
-					'success'        => false,
-					'data'           => array(),
-					'filter_options' => array(),
-				),
-				200
-			);
-		}
-		$data = json_decode( wp_remote_retrieve_body( $all_data ) );
-		return new WP_REST_Response(
-			array(
-				'success'        => true,
-				'data'           => $data->data,
-				'filter_options' => $data->filter_options,
-			),
-			200
-		);
-
-		// $theme            = get_option( 'template' );
-		// $instance         = ThemeGrill_Demo_Importer::instance();
-		// $supported_themes = $instance->get_core_supported_themes();
-		// if ( in_array( $theme, $supported_themes, true ) ) {
-		//  $is_pro_theme = strpos( $theme, '-pro' ) !== false;
-		//  if ( $is_pro_theme ) {
-		//      $base_theme = $is_pro_theme ? str_replace( '-pro', '', $theme ) : $theme;
-		//      $data       = wp_remote_get( static::$themegrill_base_url . '/sites?theme=' . $base_theme );
-		//  } else {
-		//      $data = wp_remote_get( static::$themegrill_base_url . '/sites?theme=' . $theme );
-		//  }
-		// } else {
-		//  $data = wp_remote_get( static::$themegrill_base_url . '/sites' );
-		// }
-	}
+	//  // $theme            = get_option( 'template' );
+	//  // $instance         = ThemeGrill_Demo_Importer::instance();
+	//  // $supported_themes = $instance->get_core_supported_themes();
+	//  // if ( in_array( $theme, $supported_themes, true ) ) {
+	//  //  $is_pro_theme = strpos( $theme, '-pro' ) !== false;
+	//  //  if ( $is_pro_theme ) {
+	//  //      $base_theme = $is_pro_theme ? str_replace( '-pro', '', $theme ) : $theme;
+	//  //      $data       = wp_remote_get( static::$themegrill_base_url . '/sites?theme=' . $base_theme );
+	//  //  } else {
+	//  //      $data = wp_remote_get( static::$themegrill_base_url . '/sites?theme=' . $theme );
+	//  //  }
+	//  // } else {
+	//  //  $data = wp_remote_get( static::$themegrill_base_url . '/sites' );
+	//  // }
+	// }
 
 	public function tgdi_site_data( $request ) {
 		$site = $request->get_param( 'slug' );
 		$url  = $this->themegrill_base_url . $site . '/' . $this->namespace2 . '/data';
 
 		$site_data = wp_remote_get( $url );
-		$data      = json_decode( wp_remote_retrieve_body( $site_data ) );
+
+		if ( is_wp_error( $site_data ) ) {
+			return new WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => $site_data->get_error_message(),
+				),
+				200
+			);
+		}
+		$data = json_decode( wp_remote_retrieve_body( $site_data ) );
+
+		if ( json_last_error() !== JSON_ERROR_NONE ) {
+			return new WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => 'Invalid JSON in API response.',
+				),
+				500
+			);
+		}
+
+		if ( empty( $data ) ) {
+			return new WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => 'No data found.',
+				),
+				200
+			);
+		}
+
 		return new WP_REST_Response(
 			array(
 				'success' => true,
@@ -253,20 +282,57 @@ class TG_Importer_REST_Controller extends WP_REST_Controller {
 			$is_pro_theme = strpos( $theme, '-pro' ) !== false;
 			if ( $is_pro_theme ) {
 				$base_theme = $is_pro_theme ? str_replace( '-pro', '', $theme ) : $theme;
-				// $data       = wp_remote_get( TG_Demo_Importer::$themegrill_base_url . '/sites?theme=' . $base_theme );
+				$data       = wp_remote_get( TG_Demo_Importer::$themegrill_base_url . '/sites?theme=' . $base_theme );
+			} else {
+				$data = wp_remote_get( TG_Demo_Importer::$themegrill_base_url . '/sites?theme=' . $theme );
 			}
-			// else {
-			//  $data = wp_remote_get( TG_Demo_Importer::$themegrill_base_url . '/sites?theme=' . $theme );
-			// }
 		} else {
-			// $data  = wp_remote_get( TG_Demo_Importer::$themegrill_base_url . '/sites' );
+			$data  = wp_remote_get( TG_Demo_Importer::$themegrill_base_url . '/sites' );
 			$theme = 'all';
 		}
-		// if ( is_wp_error( $data ) ) {
-		//  return;
-		// }
+		if ( is_wp_error( $data ) ) {
+			return;
+		}
 
-		// $all_demos              = json_decode( wp_remote_retrieve_body( $data ) );
+		$all_demos     = json_decode( wp_remote_retrieve_body( $data ) );
+		$grouped_demos = array();
+		foreach ( $all_demos as $demo ) {
+			if ( ! isset( $demo->theme_slug ) ) {
+				continue;
+			}
+			$theme = $demo->theme_slug;
+
+			// Initialize group if not set
+			if ( ! isset( $grouped_demos[ $theme ] ) ) {
+				$grouped_demos[ $theme ] = array(
+					'slug'         => $theme,
+					'name'         => $demo->theme_name ?? $theme,
+					'categories'   => array( 'all' => 'All' ),
+					'pagebuilders' => array( 'all' => 'All' ),
+					'demos'        => array(),
+				);
+			}
+
+			if ( isset( $demo->categories ) ) {
+				$grouped_demos[ $theme ]['categories'] = array_unique(
+					array_merge(
+						$grouped_demos[ $theme ]['categories'],
+						(array) $demo->categories
+					)
+				);
+			}
+			if ( isset( $demo->pagebuilders ) ) {
+				$grouped_demos[ $theme ]['pagebuilders'] = array_unique(
+					array_merge(
+						$grouped_demos[ $theme ]['pagebuilders'],
+						(array) $demo->pagebuilders
+					)
+				);
+			}
+
+			// Add demo to the theme group
+			$grouped_demos[ $theme ]['demos'][] = $demo;
+		}
 		$installed_plugins      = array_keys( get_plugins() );
 		$is_installed_zakra_pro = in_array( 'zakra-pro/zakra-pro.php', $installed_plugins, true ) ? true : false;
 		$is_active_zakra_pro    = false;
@@ -276,10 +342,11 @@ class TG_Importer_REST_Controller extends WP_REST_Controller {
 
 		return array(
 			'theme'               => $theme,
-			// 'data'                => $all_demos,
+			'theme_name'          => 'all' !== $theme ? wp_get_theme()->get( 'Name' ) : 'All',
+			'data'                => $grouped_demos,
 			'siteUrl'             => site_url(),
 			'installed_themes'    => $installed_themes,
-			'current_theme'       => $theme,
+			'current_theme'       => get_option( 'template' ),
 			'zakra_pro_installed' => $is_installed_zakra_pro,
 			'zakra_pro_activated' => $is_active_zakra_pro,
 		);

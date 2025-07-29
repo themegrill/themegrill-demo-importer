@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Dialog, DialogContent, DialogTrigger } from '../../controls/Dialog';
 import { Demo, PageWithSelection, TDIDashboardType } from '../../lib/types';
+import { useLocalizedData } from '../../LocalizedDataContext';
 import DialogCleanup from './DialogCleanup';
 import { DialogConsent } from './DialogConsent';
 import DialogImported from './DialogImported';
@@ -20,8 +21,8 @@ type Props = {
 	textColor?: string;
 	disabled?: boolean;
 	// currentTheme: string;
-	data: TDIDashboardType;
-	setData: (value: TDIDashboardType) => void;
+	// data: TDIDashboardType;
+	// setData: (value: TDIDashboardType) => void;
 };
 
 const ImportButton = ({
@@ -34,8 +35,6 @@ const ImportButton = ({
 	textColor,
 	disabled,
 	pages,
-	data,
-	setData,
 }: Props) => {
 	// const {
 	// 	pagebuilder,
@@ -53,9 +52,10 @@ const ImportButton = ({
 	// const { data } = useLocalizedData();
 	// const { current_theme: currentTheme } = data || {};
 	const { pagebuilder = '' } = useParams();
+	const { localizedData, setLocalizedData } = useLocalizedData();
 
 	const IMPORT_ACTIONS = {
-		...(data.current_theme !== demo.theme_slug
+		...(localizedData.current_theme !== demo.theme_slug
 			? {
 					'install-theme': {
 						progressWeight: 10,
@@ -177,7 +177,7 @@ const ImportButton = ({
 					const updated = await apiFetch<TDIDashboardType>({
 						path: '/tg-demo-importer/v1/localized-data',
 					});
-					setData(updated);
+					setLocalizedData(updated);
 				}
 			} catch (e) {
 				setImportAction(null);
@@ -205,7 +205,7 @@ const ImportButton = ({
 			method: 'POST',
 		});
 		if (response.success) {
-			if (data.current_theme !== demo.theme_slug) {
+			if (localizedData.current_theme !== demo.theme_slug) {
 				let key: 'install-theme' = 'install-theme';
 				const step = IMPORT_ACTIONS[key]!;
 				setImportAction(key);
@@ -268,7 +268,6 @@ const ImportButton = ({
 					plugins={plugins}
 					setPlugins={setPlugins}
 					onConfirm={handleInstallation}
-					data={data}
 				/>
 			);
 		}
@@ -283,7 +282,7 @@ const ImportButton = ({
 			);
 		}
 
-		return <DialogImported demo={demo} data={data} />;
+		return <DialogImported demo={demo} />;
 	};
 
 	return (

@@ -7,7 +7,8 @@ export const __TDI_DASHBOARD__: TDIDashboardType = (window as any).__TDI_DASHBOA
 
 export type TDIDashboardType = {
 	theme: string;
-	// data: DataObjectType;
+	theme_name: string;
+	data: DataObjectType;
 	siteUrl: string;
 	installed_themes: string[];
 	current_theme: string;
@@ -20,12 +21,9 @@ export type DataObjectType = Record<string, ThemeDataType>;
 export type ThemeDataType = {
 	slug: string;
 	name: string;
-	description?: string;
-	pro: boolean;
-	premium: boolean;
 	categories: Record<string, string>;
 	pagebuilders?: Record<string, string>;
-	demos: Record<string, DemoDataType>;
+	demos: ThemeItem[];
 };
 
 export type DemoDataType = {

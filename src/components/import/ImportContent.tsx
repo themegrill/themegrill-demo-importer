@@ -2,10 +2,11 @@ import apiFetch from '@wordpress/api-fetch';
 import { __, sprintf } from '@wordpress/i18n';
 import Lottie from 'lottie-react';
 import React, { useEffect, useState } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import spinner from '../../assets/animation/spinner.json';
 import { themes } from '../../lib/themes';
 import { Demo, TDIDashboardType } from '../../lib/types';
+import { useLocalizedData } from '../../LocalizedDataContext';
 import Template from '../template/Template';
 import ImportButton from './ImportButton';
 
@@ -18,8 +19,8 @@ type Props = {
 	// currentTheme: string;
 	// zakraProInstalled: boolean;
 	// zakraProActivated: boolean;
-	data: TDIDashboardType;
-	setData: (value: TDIDashboardType) => void;
+	// data: TDIDashboardType;
+	// setData: (value: TDIDashboardType) => void;
 	device: string;
 };
 
@@ -32,11 +33,13 @@ const ImportContent = ({
 	// currentTheme,
 	// zakraProActivated,
 	// zakraProInstalled,
-	data,
-	setData,
+	// data,
+	// setData,
 	device,
 }: Props) => {
 	const navigate = useNavigate();
+	const { localizedData, setLocalizedData } = useLocalizedData();
+
 	// const {
 	// 	pagebuilder,
 	// 	setPagebuilder,
@@ -61,8 +64,6 @@ const ImportContent = ({
 	const [isActivating, setIsActivating] = useState(false);
 	const count = demo?.pagebuilder_data[pagebuilder]?.pages.length || 0;
 	const matchedTheme = themes.find((theme) => theme.slug === demo.theme_slug);
-
-	const location = useLocation();
 
 	const handleExitClick = (currentTheme: string) => {
 		const baseTheme = currentTheme.endsWith('-pro')
@@ -91,12 +92,12 @@ const ImportContent = ({
 	const checkThemeExists = (demo: Demo) => {
 		const proTheme = demo.theme_slug + '-pro';
 		if (demo.theme_slug === 'zakra') {
-			if (data.zakra_pro_installed) {
+			if (localizedData.zakra_pro_installed) {
 				return true;
 			}
 			return false;
 		}
-		const themeExists = data.installed_themes.includes(proTheme);
+		const themeExists = localizedData.installed_themes.includes(proTheme);
 		return themeExists;
 	};
 
@@ -117,7 +118,7 @@ const ImportContent = ({
 			const updated = await apiFetch<TDIDashboardType>({
 				path: '/tg-demo-importer/v1/localized-data',
 			});
-			setData(updated);
+			setLocalizedData(updated);
 			setIsActivating(false);
 		}
 	};
@@ -153,8 +154,6 @@ const ImportContent = ({
 					siteTitle={siteTitle}
 					siteTagline={siteTagline}
 					siteLogoId={siteLogoId}
-					data={data}
-					setData={setData}
 				/>
 			</>
 		) : (
@@ -182,8 +181,6 @@ const ImportContent = ({
 							siteTitle={siteTitle}
 							siteTagline={siteTagline}
 							siteLogoId={siteLogoId}
-							data={data}
-							setData={setData}
 						/>
 						<button
 							className="bg-white rounded-[2px] px-[16px] py-[8px] border border-solid border-[#2563EB] text-[#2563EB] font-[600] cursor-pointer"
@@ -245,7 +242,7 @@ const ImportContent = ({
 				type="button"
 				className="bg-[#0E0E0E] rounded-full px-[18px] py-[10px] border border-solid border-[#0E0E0E] cursor-pointer absolute top-[32px] left-[32px] flex items-center gap-[8px]"
 				style={{ boxShadow: '0px 8px 10px 0px rgba(0, 0, 0, 0.04)' }}
-				onClick={() => handleExitClick(data.current_theme)}
+				onClick={() => handleExitClick(localizedData.current_theme)}
 			>
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
@@ -286,8 +283,8 @@ const ImportContent = ({
 				checkThemeExists(demo) ? (
 					(
 						demo.theme_slug === 'zakra'
-							? data.zakra_pro_activated
-							: demo.theme_slug + '-pro' === data.current_theme
+							? localizedData.zakra_pro_activated
+							: demo.theme_slug + '-pro' === localizedData.current_theme
 					) ? (
 						renderImportSection()
 					) : (

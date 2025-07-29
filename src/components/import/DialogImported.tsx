@@ -3,10 +3,11 @@ import Lottie from 'lottie-react';
 import React from 'react';
 import confetti from '../../assets/animation/confetti.json';
 import { DialogFooter, DialogHeader, DialogTitle } from '../../controls/Dialog';
-import { Demo, TDIDashboardType } from '../../lib/types';
+import { Demo } from '../../lib/types';
+import { useLocalizedData } from '../../LocalizedDataContext';
 
-const DialogImported = ({ demo, data }: { demo: Demo; data: TDIDashboardType }) => {
-	// const { data } = useLocalizedData();
+const DialogImported = ({ demo }: { demo: Demo }) => {
+	const { localizedData } = useLocalizedData();
 
 	return (
 		<>
@@ -100,7 +101,7 @@ const DialogImported = ({ demo, data }: { demo: Demo; data: TDIDashboardType }) 
 				<a
 					type="button"
 					className="cursor-pointer px-0 bg-transparent text-[#2563EB] border-0 text-[16px] z-[50000] no-underline"
-					href={`${data.siteUrl}/wp-admin/`}
+					href={`${localizedData.siteUrl}/wp-admin/`}
 				>
 					{__('Go to Dashboard', 'themegrill-demo-importer')}
 				</a>
@@ -108,7 +109,7 @@ const DialogImported = ({ demo, data }: { demo: Demo; data: TDIDashboardType }) 
 					<a
 						type="button"
 						className="cursor-pointer mr-[10px] sm:mr-[24px] bg-transparent text-[#2563EB] border-0 text-[16px] no-underline"
-						href={`${data.siteUrl}/wp-admin/customize.php`}
+						href={`${localizedData.siteUrl}/wp-admin/customize.php`}
 					>
 						{__('Customizer', 'themegrill-demo-importer')}
 					</a>
@@ -116,7 +117,7 @@ const DialogImported = ({ demo, data }: { demo: Demo; data: TDIDashboardType }) 
 						type="button"
 						className="cursor-pointer bg-[#2563EB] text-white border-0 rounded px-[10px] sm:px-[24px] py-[10px] text-[16px] "
 						onClick={() => {
-							window.open(data.siteUrl, '_blank');
+							window.open(localizedData.siteUrl, '_blank');
 						}}
 					>
 						{__('View Website', 'themegrill-demo-importer')}
