@@ -58,7 +58,7 @@ const Header = ({ themes, pagebuilders, currentPagebuilder, plans, theme, data }
 			style={{ backgroundColor: '#fff' }}
 		>
 			{theme !== 'all' && activeTheme ? (
-				<div className="flex items-center gap-2 w-full sm:w-[132px] bg-white px-5 py-[9px] border border-solid border-[#f4f4f4] rounded-md">
+				<div className="flex items-center gap-2 w-full sm:w-[132px] bg-white px-5 py-[9px] rounded-md">
 					{checkImageExists(theme) !== '' && (
 						<img src={require(`../../images/${theme}.png`)} alt="" width="24px" />
 					)}

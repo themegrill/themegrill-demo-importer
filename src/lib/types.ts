@@ -9,6 +9,7 @@ export type TDIDashboardType = {
 	theme: string;
 	theme_name: string;
 	data: DataObjectType;
+	error_msg?: string;
 	siteUrl: string;
 	installed_themes: string[];
 	current_theme: string;
@@ -26,37 +27,37 @@ export type ThemeDataType = {
 	demos: ThemeItem[];
 };
 
-export type DemoDataType = {
-	id: number;
-	slug: string;
-	name: string;
-	description: string;
-	url: string;
-	image: string;
-	pro: boolean;
-	premium: boolean;
-	new?: boolean;
-	plugins: Array<string>;
-	pagebuilders?: Record<string, string>;
-	categories: Record<string, string>;
-	[key: string]: any;
-};
+// export type DemoDataType = {
+// 	id: number;
+// 	slug: string;
+// 	name: string;
+// 	description: string;
+// 	url: string;
+// 	image: string;
+// 	pro: boolean;
+// 	premium: boolean;
+// 	new?: boolean;
+// 	plugins: Array<string>;
+// 	pagebuilders?: Record<string, string>;
+// 	categories: Record<string, string>;
+// 	[key: string]: any;
+// };
 
-export type SearchResultType = {
-	id: number;
-	slug: string;
-	name: string;
-	description: string;
-	url: string;
-	image: string;
-	pro: boolean;
-	premium: boolean;
-	new?: boolean;
-	pagebuilders: Record<string, string>;
-	categories: Record<string, string>;
-	theme: string;
-	[k: string]: any;
-};
+// export type SearchResultType = {
+// 	id: number;
+// 	slug: string;
+// 	name: string;
+// 	description: string;
+// 	url: string;
+// 	image: string;
+// 	pro: boolean;
+// 	premium: boolean;
+// 	new?: boolean;
+// 	pagebuilders: Record<string, string>;
+// 	categories: Record<string, string>;
+// 	theme: string;
+// 	[k: string]: any;
+// };
 
 export type Theme = {
 	slug: string;
@@ -97,18 +98,18 @@ export type ThemeItem = {
 	related_sites?: Record<string, string>;
 };
 
-export type FilterItem = Record<string, string>;
-export type FilterOptions = {
-	categories: FilterItem;
-	pagebuilders: FilterItem;
-	themes: Record<string, string>;
-};
+// export type FilterItem = Record<string, string>;
+// export type FilterOptions = {
+// 	categories: FilterItem;
+// 	pagebuilders: FilterItem;
+// 	themes: Record<string, string>;
+// };
 
-export type ThemeDataResponse = {
-	success: boolean;
-	data: ThemeItem[];
-	filter_options: FilterOptions;
-};
+// export type ThemeDataResponse = {
+// 	success: boolean;
+// 	data: ThemeItem[];
+// 	filter_options: FilterOptions;
+// };
 
 export type PageData = {
 	ID: number;

@@ -1,7 +1,7 @@
 import Lottie from 'lottie-react';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import loader from '../../assets/animation/loader.json';
+import spinner from '../../assets/animation/spinner.json';
 import { PagebuilderCategory, ThemeItem } from '../../lib/types';
 import CategoryMenu from './CategoryMenu';
 import Demos from './Demos';
@@ -54,7 +54,7 @@ const Content = ({ categories, demos }: Props) => {
 				<>
 					<CategoryMenu categories={categories} />
 					{demoLoading ? (
-						<Lottie animationData={loader} loop={true} autoplay={true} className="h-40" />
+						<Lottie animationData={spinner} loop={true} autoplay={true} className="h-4 py-10" />
 					) : (
 						<Demos demos={newDemos} />
 					)}
