@@ -4,17 +4,14 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import spinner from '../../assets/animation/spinner.json';
 import { Demo } from '../../lib/types';
-import { useLocalizedData } from '../../LocalizedDataContext';
 import ImportContent from './ImportContent';
 import ImportSidebar from './ImportSidebar';
 
 declare const require: any;
 
 const Import = () => {
-	const { localizedData, setLocalizedData } = useLocalizedData();
-
 	const iframeRef = useRef<HTMLIFrameElement>(null);
-	const { slug } = useParams();
+	const { slug, demo_theme } = useParams();
 	const [demo, setDemo] = useState({} as Demo);
 	const [loading, setLoading] = useState(true);
 	const [siteTitle, setSiteTitle] = useState('');
@@ -86,7 +83,7 @@ const Import = () => {
 		const fetchSiteData = async () => {
 			try {
 				const response = await apiFetch<{ success: boolean; message?: string; data?: Demo }>({
-					path: `tg-demo-importer/v1/data?slug=${slug}`,
+					path: `tg-demo-importer/v1/data?slug=${slug}&theme=${demo_theme}`,
 					method: 'GET',
 				});
 
@@ -145,13 +142,27 @@ const Import = () => {
 						<div className="h-6 bg-gray-300 rounded w-full animate-pulse" />
 					</div>
 				</div>
-				<div className="tg-full-overlay-content bg-[#f4f4f4] w-full">
-					<Lottie animationData={spinner} loop={true} autoplay={true} className="h-4 py-20" />
-					{/* <img
-						src={require(`../../assets/images/iframe-skeleton.png`)}
-						alt={slug}
-						className="w-full h-full border border-solid border-[#F4F4F4] rounded-[2px]"
-					/> */}
+				<div className="tg-full-overlay-content bg-[#f4f4f4] w-full relative">
+					<div
+						className="animate-pulse bg-gray-300 rounded-full h-10 w-20 border border-solid border-gray-300 absolute top-[32px] left-[32px]"
+						style={{ boxShadow: '0px 8px 10px 0px rgba(0, 0, 0, 0.04)' }}
+					></div>
+					<div className="flex items-center justify-center h-[calc(100%-96px)]">
+						<Lottie animationData={spinner} loop={true} autoplay={true} className="h-4" />
+					</div>
+					<div
+						className="absolute bottom-0 w-full border-t border-[#E1E1E1] flex flex-wrap justify-between items-center bg-white px-8 py-6 gap-6 box-border"
+						style={{ boxShadow: '0px -8px 25px 0px rgba(0, 0, 0, 0.04)' }}
+					>
+						<div className="space-y-2 flex-1 min-w-0">
+							<div className="h-4 bg-gray-300 rounded w-1/2 animate-pulse" />
+							<div className="h-6 bg-gray-200 rounded w-3/4 animate-pulse" />
+						</div>
+						<div className="flex space-x-4 flex-shrink-0">
+							<div className="h-8 w-28 bg-gray-300 rounded animate-pulse" />
+							<div className="h-8 w-28 bg-gray-200 rounded animate-pulse" />
+						</div>
+					</div>
 				</div>
 			</div>
 		);
@@ -171,7 +182,7 @@ const Import = () => {
 					>
 						<path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
 					</svg>
-					<span className="font-medium">No demos available.</span>
+					<span className="font-medium">{error}</span>
 				</div>
 			</div>
 		);
@@ -273,11 +284,6 @@ const Import = () => {
 					siteTitle={siteTitle}
 					siteTagline={siteTagline}
 					siteLogoId={siteLogoId}
-					// currentTheme={data.current_theme}
-					// zakraProInstalled={data.zakra_pro_installed}
-					// zakraProActivated={data.zakra_pro_activated}
-					// data={localizedData}
-					// setData={setLocalizedData}
 					device={device}
 				/>
 			</div>
