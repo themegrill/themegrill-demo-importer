@@ -2,7 +2,7 @@ import apiFetch from '@wordpress/api-fetch';
 import { __, sprintf } from '@wordpress/i18n';
 import Lottie from 'lottie-react';
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import spinner from '../../assets/animation/spinner.json';
 import { themes } from '../../lib/themes';
 import { Demo, TDIDashboardType } from '../../lib/types';
@@ -16,47 +16,11 @@ type Props = {
 	siteTitle: string;
 	siteTagline: string;
 	siteLogoId: number;
-	// currentTheme: string;
-	// zakraProInstalled: boolean;
-	// zakraProActivated: boolean;
-	// data: TDIDashboardType;
-	// setData: (value: TDIDashboardType) => void;
 	device: string;
 };
 
-const ImportContent = ({
-	demo,
-	iframeRef,
-	siteTitle,
-	siteTagline,
-	siteLogoId,
-	// currentTheme,
-	// zakraProActivated,
-	// zakraProInstalled,
-	// data,
-	// setData,
-	device,
-}: Props) => {
-	const navigate = useNavigate();
+const ImportContent = ({ demo, iframeRef, siteTitle, siteTagline, siteLogoId, device }: Props) => {
 	const { localizedData, setLocalizedData } = useLocalizedData();
-
-	// const {
-	// 	pagebuilder,
-	// 	setPagebuilder,
-	// 	theme,
-	// 	setTheme,
-	// 	setCategory,
-	// 	currentTheme,
-	// 	setCurrentTheme,
-	// 	zakraProInstalled,
-	// 	zakraProActivated,
-	// } = useDemoContext();
-	// const { data, setData } = useLocalizedData();
-	// const {
-	// 	current_theme: currentTheme,
-	// 	zakra_pro_installed: zakraProInstalled,
-	// 	zakra_pro_activated: zakraProActivated,
-	// } = data || {};
 	const { pagebuilder = '' } = useParams();
 	const [isIframeLoading, setIsIframeLoading] = useState(true);
 	const [deviceClass, setDeviceClass] = useState('');
@@ -70,10 +34,6 @@ const ImportContent = ({
 			? currentTheme.replace('-pro', '')
 			: currentTheme;
 		const activeTheme = baseTheme === demo.theme_slug ? baseTheme : 'all';
-
-		// setTheme(activeTheme);
-		// setPagebuilder('all');
-		// setCategory('all');
 
 		const newParams = new URLSearchParams({
 			theme: activeTheme,
@@ -163,7 +123,10 @@ const ImportContent = ({
 					style={{ boxShadow: '0px -8px 25px 0px rgba(0, 0, 0, 0.04)' }}
 				>
 					<div>
-						<h4 className="text-[22px] m-0 mb-[8px] text-[#383838]">{demo.name}</h4>
+						<h4 className="text-[22px] m-0 mb-[8px] text-[#383838]">
+							{demo.name ||
+								demo.slug.replace(/-/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase())}
+						</h4>
 						<p className="text-[#7a7a7a] text-[14px] mt-4 sm:m-0">
 							{sprintf(
 								__(
@@ -236,6 +199,27 @@ const ImportContent = ({
 		setIsIframeLoading(true);
 	}, [pagebuilder]);
 
+	const getIframeHeight = () => {
+		if (demo.pro || demo.premium) {
+			if (checkThemeExists(demo)) {
+				const isProActivated =
+					demo.theme_slug === 'zakra'
+						? localizedData.zakra_pro_activated
+						: demo.theme_slug + '-pro' === localizedData.current_theme;
+
+				if (isProActivated) {
+					return collapseTemplate ? 'h-full' : 'h-[calc(100vh-96px)]';
+				} else {
+					return 'h-[calc(100vh-50px)]';
+				}
+			} else {
+				return 'h-[calc(100vh-50px)]';
+			}
+		} else {
+			return collapseTemplate ? 'h-[calc(100vh-382px)]' : 'h-[calc(100vh-96px)]';
+		}
+	};
+
 	return (
 		<div className="tg-full-overlay-content bg-[#f4f4f4] w-full relative">
 			<button
@@ -269,13 +253,17 @@ const ImportContent = ({
 			</button>
 
 			{isIframeLoading && (
-				<Lottie animationData={spinner} loop={true} autoplay={true} className="h-4 py-20" />
+				<div className={`flex items-center justify-center h-[calc(100%-96px)]`}>
+					<Lottie animationData={spinner} loop={true} autoplay={true} className="h-4" />
+				</div>
 			)}
 			<iframe
 				ref={iframeRef}
 				src={demo?.pagebuilder_data[pagebuilder]?.url}
-				title={`${demo.name} Preview`}
-				className={`h-full ml-auto mr-auto ${deviceClass}`}
+				title={`${
+					demo.name || demo.slug.replace(/-/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase())
+				} Preview`}
+				className={`${getIframeHeight()}  ml-auto mr-auto ${deviceClass}`}
 				style={{ display: isIframeLoading ? 'none' : 'block' }}
 				onLoad={() => setIsIframeLoading(false)}
 			></iframe>

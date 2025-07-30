@@ -12,9 +12,6 @@ type Props = {
 	siteTitle: string;
 	siteTagline: string;
 	siteLogoId: number;
-	// // currentTheme: string;
-	// data: TDIDashboardType;
-	// setData: (value: TDIDashboardType) => void;
 };
 
 const Template = ({ pages, demo, siteTitle, siteTagline, siteLogoId }: Props) => {
@@ -59,7 +56,10 @@ const Template = ({ pages, demo, siteTitle, siteTagline, siteLogoId }: Props) =>
 		<div className="w-full bg-[#FAFAFA] p-[25px] sm:p-[32px] shadow absolute bottom-0 box-border border-0 border-t border-solid border-t-[#E9E9E9]">
 			<div className="mb-[24px] flex flex-wrap justify-between items-center">
 				<div>
-					<h4 className="text-[22px] m-0 mb-[8px] text-[#383838]">{demo.name}</h4>
+					<h4 className="text-[22px] m-0 mb-[8px] text-[#383838]">
+						{demo.name ||
+							demo.slug.replace(/-/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase())}
+					</h4>
 					<p className="text-[#7a7a7a] text-[14px] mt-4 sm:m-0">
 						{sprintf(
 							__(
