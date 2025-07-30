@@ -43,7 +43,6 @@ function exec(command) {
 }
 
 const FILES = {
-	'dist/**/*': 'build/themegrill-demo-importer/dist',
 	'readme.txt': 'build/themegrill-demo-importer',
 	'themegrill-demo-importer.php': 'build/themegrill-demo-importer',
 	'composer.json': 'build/themegrill-demo-importer',
@@ -53,14 +52,32 @@ const FILES = {
 	'languages/**/*': 'build/themegrill-demo-importer/languages',
 };
 
-const copyTasks = Object.entries(FILES).map(([source, destination]) => {
-	const taskName = `copy:${path.basename(source.replace('/**/*', ''))}`;
-	const copyTask = function () {
-		return src(source).pipe(dest(destination));
-	};
-	copyTask.displayName = taskName;
-	return copyTask;
-});
+// Special handling for images to prevent corruption
+const copyDist = function () {
+	return src(['dist/**/*'], { encoding: false }).pipe(dest('build/themegrill-demo-importer/dist'));
+};
+copyDist.displayName = 'copy:dist';
+const copyDotOrgImages = function () {
+	return src(['.wordpress-org/**/*'], { encoding: false }).pipe(
+		dest('build/themegrill-demo-importer/.wordpress-org'),
+	);
+};
+copyDotOrgImages.displayName = 'copy:dotorgimages';
+
+// Handle other files (non-dist)
+const copyTasks = Object.entries(FILES)
+	.filter(([source]) => !source.startsWith('dist/'))
+	.map(([source, destination]) => {
+		const taskName = `copy:${path.basename(source.replace('/**/*', ''))}`;
+		const copyTask = function () {
+			return src(source).pipe(dest(destination));
+		};
+		copyTask.displayName = taskName;
+		return copyTask;
+	});
+
+// Add the special image and dist tasks to the copy tasks
+copyTasks.unshift(copyDotOrgImages, copyDist);
 
 const copy = parallel(...copyTasks);
 
@@ -78,7 +95,10 @@ const release = series(
 		);
 	},
 	function zip() {
-		return src(['./build/**/*', '!./build/**/composer.json', '!./build/**/composer.lock'])
+		return src(['./build/**/*', '!./build/**/composer.json', '!./build/**/composer.lock'], {
+			encoding: false,
+			dot: true,
+		})
 			.pipe(_zip('themegrill-demo-importer.zip'))
 			.pipe(dest('release'));
 	},
@@ -86,5 +106,4 @@ const release = series(
 		return exec(`rm -rf build/`);
 	},
 );
-
 export { release };
