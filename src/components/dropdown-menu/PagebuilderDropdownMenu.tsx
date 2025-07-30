@@ -13,7 +13,6 @@ import { PagebuilderCategory } from '../../lib/types';
 declare const require: any;
 
 type Props = {
-	// pagebuilders: FilterItem;
 	pagebuilders: PagebuilderCategory[];
 	currentPagebuilder: string;
 	isSidebar?: boolean;
@@ -107,25 +106,6 @@ const PagebuilderDropdownMenu = ({
 					minWidth: width ? `${width}px` : undefined,
 				}}
 			>
-				{/* {pagebuilders &&
-					Object.entries(pagebuilders)
-						.filter(([key]) => key !== pagebuilder)
-						.map(([slug, { name, count }]) => (
-							<div key={slug}>
-								<DropdownMenuItem
-									className="p-[16px] gap-[8px] w-full"
-									onClick={() => handlePagebuilderChange(slug, isSidebar)}
-								>
-									{slug !== 'all' && checkImageExists(slug) !== '' && (
-										<img src={require(`../../assets/images/${slug}.jpg`)} alt="" />
-									)}
-									<span className="text-[14px]">
-										{name} {!isSidebar && '(' + count + ')'}
-									</span>
-								</DropdownMenuItem>
-								<DropdownMenuSeparator className="m-0" />
-							</div>
-						))} */}
 				{pagebuilders &&
 					pagebuilders
 						.filter((pg) => pg.slug !== pagebuilder)

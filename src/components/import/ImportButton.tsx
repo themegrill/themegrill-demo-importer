@@ -36,21 +36,6 @@ const ImportButton = ({
 	disabled,
 	pages,
 }: Props) => {
-	// const {
-	// 	pagebuilder,
-	// 	category,
-	// 	plan,
-	// 	search,
-	// 	searchResults,
-	// 	setTheme,
-	// 	setPagebuilder,
-	// 	setCategory,
-	// 	setPlan,
-	// 	setSearchResults,
-	// 	currentTheme,
-	// } = useDemoContext();
-	// const { data } = useLocalizedData();
-	// const { current_theme: currentTheme } = data || {};
 	const { pagebuilder = '' } = useParams();
 	const { localizedData, setLocalizedData } = useLocalizedData();
 
@@ -159,8 +144,6 @@ const ImportButton = ({
 					parse: false,
 				});
 				const data = await response.json();
-				console.log(data);
-				// update state here
 				results[action] = data;
 				setImportProgress((prev) => {
 					let next = 0;
@@ -229,23 +212,7 @@ const ImportButton = ({
 		handleInstallation();
 	};
 
-	// const checkThemeExists = (demo: SearchResultType) => {
-	// 	const proTheme = demo.theme + '-pro';
-	// 	const themeExists = __TDI_DASHBOARD__.installed_themes.includes(proTheme);
-	// 	return themeExists;
-	// };
-
 	const renderDialog = () => {
-		// if (demo.pro || demo.premium) {
-		// 	if (checkThemeExists(demo)) {
-		// 		if (demo.theme + '-pro' !== __TDI_DASHBOARD__.current_theme) {
-		// 			return <DialogUpgradePro slug={demo.theme} buttonText={`Activate ${demo.theme} Pro`} />;
-		// 		}
-		// 	} else {
-		// 		return <DialogUpgradePro slug={demo.theme} buttonText="Upgrade to Pro" />;
-		// 	}
-		// }
-
 		if (isCleanInstall) {
 			return (
 				<DialogCleanup

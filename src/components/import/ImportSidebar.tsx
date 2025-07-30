@@ -48,22 +48,6 @@ const ImportSidebar = ({
 		return transformPagebuilders(demo?.pagebuilders);
 	}, [demo?.pagebuilders]);
 
-	// let currentPagebuilder = '';
-
-	// if (pagebuilder !== 'all') {
-	// 	currentPagebuilder = pagebuilders?.find((p) => p.slug === pagebuilder)?.value || '';
-	// } else {
-	// 	if (pagebuilders.length > 0) {
-	// 		currentPagebuilder = pagebuilders[0].value;
-	// 	}
-	// }
-
-	// useEffect(() => {
-	// 	if (pagebuilder === 'all' && pagebuilders.length > 0) {
-	// 		setPagebuilder(pagebuilders[0].slug);
-	// 	}
-	// }, [currentPagebuilder]);
-
 	return (
 		<div className="relative max-w-[300px]">
 			<div className="tg-full-overlay-sidebar">

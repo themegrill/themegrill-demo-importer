@@ -52,17 +52,6 @@ const CategoryMenu = ({ categories }: Props) => {
 						</>
 					}
 				>
-					{/* {Object.entries(categories).map(([slug, { name, count }]) => (
-						<MenuItem
-							key={slug}
-							onClick={() => handleClick(slug)}
-							className="tg-tabs tg-category-tabs"
-							data-state={$category === slug ? 'active' : 'inactive'}
-						>
-							<span className="text-[14px] leading-none mr-2">{name}</span>
-							<span className="tg-demo-count">{count}</span>
-						</MenuItem>
-					))} */}
 					{categories.map((cat) => (
 						<MenuItem
 							key={cat.slug}

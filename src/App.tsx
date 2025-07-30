@@ -5,18 +5,12 @@ import Home from './Home';
 import { LocalizedDataProvider } from './LocalizedDataContext';
 
 const App = () => {
-	// const [localizedData, setLocalizedData] = useState<TDIDashboardType>(__TDI_DASHBOARD__);
-	// const allProps = {
-	// 	localizedData,
-	// 	setLocalizedData,
-	// };
-
 	return (
 		<HashRouter>
 			<LocalizedDataProvider>
 				<Routes>
 					<Route path="/" element={<Home />} />
-					<Route path="/import-detail/:slug/:pagebuilder" element={<Import />} />
+					<Route path="/import-detail/:slug/:pagebuilder/:demo_theme" element={<Import />} />
 				</Routes>
 			</LocalizedDataProvider>
 		</HashRouter>

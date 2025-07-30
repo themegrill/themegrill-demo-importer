@@ -13,7 +13,6 @@ import { Theme } from '../../lib/types';
 declare const require: any;
 
 type Props = {
-	// themes: Record<string, string>;
 	themes: Theme[];
 };
 
@@ -72,23 +71,6 @@ const ThemeDropdown = ({ themes }: Props) => {
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent className={`w-full sm:w-[172px] bg-white p-0`}>
-				{/* {themes &&
-					Object.entries(themes)
-						.filter(([key]) => key !== theme)
-						.map(([key, value]) => (
-							<div key={key}>
-								<DropdownMenuItem
-									className="p-[16px] gap-[8px]"
-									onClick={() => handleThemeChange(key)}
-								>
-									{key !== 'all' && checkImageExists(key) !== '' && (
-										<img src={require(`../../assets/images/${key}.png`)} alt="" />
-									)}
-									<span className="text-[14px]">{value}</span>
-								</DropdownMenuItem>
-								<DropdownMenuSeparator className="m-0" />
-							</div>
-						))} */}
 				{themes &&
 					themes
 						.filter((t) => t.slug !== theme)
