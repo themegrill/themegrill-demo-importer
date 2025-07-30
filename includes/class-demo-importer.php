@@ -28,8 +28,11 @@ class TG_Demo_Importer {
 	 * @var TG_WXR_Importer
 	 */
 	public static $importer;
-	public static $themegrill_base_url = 'https://themegrilldemos.com/wp-json/themegrill-demos/v1';
-	// public static $themegrill_base_url = 'http://themegrill-demos-api.test/wp-json/themegrill-demos/v1';
+	// public static $themegrill_base_url = 'https://themegrilldemos.com/wp-json/themegrill-demos/v1';
+	public static $themegrill_base_url = 'https://themegrilldemos.com';
+	public static $zakra_base_url      = 'https://zakrademos.com';
+	// public static $themegrill_base_url = 'http://themegrill-demos-api.test';
+	public static $namespace = '/wp-json/themegrill-demos/v1';
 
 	/**
 	 * Constructor.
@@ -90,7 +93,7 @@ class TG_Demo_Importer {
 	 * Demo importer setup.
 	 */
 	public function setup() {
-		$this->demo_packages = $this->get_demo_packages();
+		$this->demo_packages = static::get_demo_packages();
 
 		// Include WXR Importer.
 		require __DIR__ . '/importers/wordpress-importer/class-wxr-importer.php';
@@ -128,7 +131,97 @@ class TG_Demo_Importer {
 	 *
 	 * @return array of objects
 	 */
-	private function get_demo_packages() {
+	public static function get_demo_packages() {
+		$template   = static::get_theme();
+		$need_fetch = false;
+		if ( 'all' === $template ) {
+			$demos = get_transient( 'themegrill_demo_importer_demos', array() );
+			if ( empty( $demos ) ) {
+				$need_fetch = true;
+			}
+		} else {
+			$need_fetch = true;
+		}
+
+		if ( $need_fetch ) {
+			$zakra_url   = static::$zakra_base_url . static::$namespace;
+			$zakra_demos = static::fetch_demo_data( $zakra_url );
+
+			if ( is_array( $zakra_demos ) && isset( $zakra_demos['message'] ) ) {
+				return array(
+					'success' => false,
+					'message' => 'Failed to fetch Zakra demos: ' . ( $zakra_demos['message'] ?? 'Unknown error' ),
+				);
+			}
+
+			$themegrill_url   = static::$themegrill_base_url . static::$namespace;
+			$themegrill_demos = static::fetch_demo_data( $themegrill_url );
+
+			if ( is_array( $themegrill_demos ) && isset( $themegrill_demos['message'] ) ) {
+				return array(
+					'success' => false,
+					'message' => 'Failed to fetch ThemeGrill demos: ' . ( $themegrill_demos['message'] ?? 'Unknown error' ),
+				);
+			}
+
+			$all_demos = array_merge( $zakra_demos, $themegrill_demos );
+			$demos     = array();
+			foreach ( $all_demos as $demo ) {
+				if ( ! isset( $demo->theme_slug ) ) {
+					continue;
+				}
+				$theme = $demo->theme_slug;
+
+				// Initialize group if not set
+				if ( ! isset( $demos[ $theme ] ) ) {
+					$demos[ $theme ] = array(
+						'slug'         => $theme,
+						'name'         => $demo->theme_name ?? $theme,
+						'categories'   => array( 'all' => 'All' ),
+						'pagebuilders' => array( 'all' => 'All' ),
+						'demos'        => array(),
+					);
+				}
+
+				if ( isset( $demo->categories ) ) {
+					$demos[ $theme ]['categories'] = array_unique(
+						array_merge(
+							$demos[ $theme ]['categories'],
+							(array) $demo->categories
+						)
+					);
+				}
+				if ( isset( $demo->pagebuilders ) ) {
+					$demos[ $theme ]['pagebuilders'] = array_unique(
+						array_merge(
+							$demos[ $theme ]['pagebuilders'],
+							(array) $demo->pagebuilders
+						)
+					);
+				}
+
+				// Add demo to the theme group
+				$demos[ $theme ]['demos'][] = $demo;
+			}
+			if ( 'all' === $template ) {
+				set_transient( 'themegrill_demo_importer_demos', $demos );
+			}
+			// $theme            = get_option( 'template' );
+			// if ( in_array( $theme, $supported_themes, true ) ) {
+			//  $properties = get_object_vars( $all_demos );
+			//  $keys       = array_keys( $properties );
+			//  if ( in_array( $theme, $keys, true ) ) {
+			//      $demos = $all_demos->$theme;
+			//      return apply_filters( 'themegrill_demo_importer_packages_template', $demos );
+			//  }
+			// }
+
+		}
+		return apply_filters( 'themegrill_demo_importer_packages_template', $demos );
+	}
+
+
+	public static function fetch_demo_data( $url ) {
 		$theme            = get_option( 'template' );
 		$instance         = ThemeGrill_Demo_Importer::instance();
 		$supported_themes = $instance->get_core_supported_themes();
@@ -136,68 +229,59 @@ class TG_Demo_Importer {
 			$is_pro_theme = strpos( $theme, '-pro' ) !== false;
 			if ( $is_pro_theme ) {
 				$base_theme = $is_pro_theme ? str_replace( '-pro', '', $theme ) : $theme;
-				$data       = wp_remote_get( static::$themegrill_base_url . '/sites?theme=' . $base_theme );
+				$api_url    = $url . '/sites?theme=' . $base_theme;
 			} else {
-				$data = wp_remote_get( static::$themegrill_base_url . '/sites?theme=' . $theme );
+				$api_url = $url . '/sites?theme=' . $theme;
 			}
 		} else {
-			$data = wp_remote_get( static::$themegrill_base_url . '/sites' );
+			$api_url = $url . '/sites';
 		}
+
+		$data = wp_remote_get(
+			$api_url,
+			array(
+				'headers'   => array(
+					'User-Agent'   => 'ThemeGrill/1.0',
+					'Content-Type' => 'application/json',
+				),
+				'sslverify' => false,
+			)
+		);
 
 		if ( is_wp_error( $data ) ) {
-			return;
+			return array(
+				'success' => false,
+				'message' => $data->get_error_message(),
+			);
 		}
 
-		$all_demos     = json_decode( wp_remote_retrieve_body( $data ) );
-		$grouped_demos = array();
-		foreach ( $all_demos as $demo ) {
-			if ( ! isset( $demo->theme_slug ) ) {
-				continue;
-			}
-			$theme = $demo->theme_slug;
+		$body = wp_remote_retrieve_body( $data );
 
-			// Initialize group if not set
-			if ( ! isset( $grouped_demos[ $theme ] ) ) {
-				$grouped_demos[ $theme ] = array(
-					'slug'         => $theme,
-					'name'         => $demo->theme_name ?? $theme,
-					'categories'   => array( 'all' => 'All' ),
-					'pagebuilders' => array( 'all' => 'All' ),
-					'demos'        => array(),
-				);
-			}
-
-			if ( isset( $demo->categories ) ) {
-				$grouped_demos[ $theme ]['categories'] = array_unique(
-					array_merge(
-						$grouped_demos[ $theme ]['categories'],
-						(array) $demo->categories
-					)
-				);
-			}
-			if ( isset( $demo->pagebuilders ) ) {
-				$grouped_demos[ $theme ]['pagebuilders'] = array_unique(
-					array_merge(
-						$grouped_demos[ $theme ]['pagebuilders'],
-						(array) $demo->pagebuilders
-					)
-				);
-			}
-
-			// Add demo to the theme group
-			$grouped_demos[ $theme ]['demos'][] = $demo;
+		if ( empty( $body ) ) {
+			return array(
+				'success' => false,
+				'message' => 'Empty response body',
+			);
 		}
-		// $theme            = get_option( 'template' );
-		// if ( in_array( $theme, $supported_themes, true ) ) {
-		//  $properties = get_object_vars( $all_demos );
-		//  $keys       = array_keys( $properties );
-		//  if ( in_array( $theme, $keys, true ) ) {
-		//      $demos = $all_demos->$theme;
-		//      return apply_filters( 'themegrill_demo_importer_packages_template', $demos );
-		//  }
-		// }
 
-		return apply_filters( 'themegrill_demo_importer_packages_template', $grouped_demos );
+		$response_code = wp_remote_retrieve_response_code( $data );
+		if ( 200 !== $response_code ) {
+			return array(
+				'success' => false,
+				'message' => 'Failed to fetch data.',
+			);
+		}
+
+		$all_demos = json_decode( $body );
+
+		if ( json_last_error() !== JSON_ERROR_NONE || ! is_array( $all_demos ) ) {
+			return array(
+				'success' => false,
+				'message' => 'Invalid JSON',
+			);
+		}
+
+		return $all_demos;
 	}
 
 	/**
@@ -248,32 +332,45 @@ class TG_Demo_Importer {
 					);
 				};
 				wp_enqueue_script( 'tdi-dashboard', $asset_url( 'dashboard.js' ), $asset( 'dashboard' )['dependencies'], $asset( 'dashboard' )['version'], true );
-				$installed_themes       = array_keys( wp_get_themes() );
-				$installed_plugins      = array_keys( get_plugins() );
-				$is_installed_zakra_pro = in_array( 'zakra-pro/zakra-pro.php', $installed_plugins, true ) ? true : false;
-				$is_active_zakra_pro    = false;
-				if ( $is_installed_zakra_pro ) {
-					$is_active_zakra_pro = is_plugin_active( 'zakra-pro/zakra-pro.php' ) ? true : false;
+				$localized_data = static::get_localized_data();
+				if ( array_key_exists( 'message', $this->demo_packages ) ) {
+					$localized_data['data']      = array();
+					$localized_data['error_msg'] = $this->demo_packages['message'];
+				} else {
+					$localized_data['data'] = $this->demo_packages;
 				}
-				$theme = static::get_theme();
 				wp_localize_script(
 					'tdi-dashboard',
 					'__TDI_DASHBOARD__',
-					array(
-						'theme'               => $theme,
-						'theme_name'          => 'all' !== $theme ? wp_get_theme()->get( 'Name' ) : 'All',
-						'data'                => $this->demo_packages,
-						'siteUrl'             => site_url(),
-						'installed_themes'    => $installed_themes,
-						'current_theme'       => get_option( 'template' ),
-						'zakra_pro_installed' => $is_installed_zakra_pro,
-						'zakra_pro_activated' => $is_active_zakra_pro,
-					)
+					$localized_data
 				);
 				wp_enqueue_style( 'tdi-dashboard', $asset_url( 'dashboard.css' ), array(), $asset( 'dashboard' )['version'] );
 			}
 		);
 		add_theme_page( __( 'Demo Importer Status', 'themegrill-demo-importer' ), __( 'Demo Importer Status', 'themegrill-demo-importer' ), 'switch_themes', 'demo-importer-status', array( $this, 'status_menu' ) );
+	}
+
+	public static function get_localized_data() {
+		$installed_themes       = array_keys( wp_get_themes() );
+		$installed_plugins      = array_keys( get_plugins() );
+		$is_installed_zakra_pro = in_array( 'zakra-pro/zakra-pro.php', $installed_plugins, true ) ? true : false;
+		$is_active_zakra_pro    = false;
+		if ( $is_installed_zakra_pro ) {
+			$is_active_zakra_pro = is_plugin_active( 'zakra-pro/zakra-pro.php' ) ? true : false;
+		}
+		$theme = static::get_theme();
+
+		$localized_data = array(
+			'theme'               => $theme,
+			'theme_name'          => 'all' !== $theme ? wp_get_theme()->get( 'Name' ) : 'All',
+			'siteUrl'             => site_url(),
+			'installed_themes'    => $installed_themes,
+			'current_theme'       => get_option( 'template' ),
+			'zakra_pro_installed' => $is_installed_zakra_pro,
+			'zakra_pro_activated' => $is_active_zakra_pro,
+		);
+
+		return $localized_data;
 	}
 
 	/**
