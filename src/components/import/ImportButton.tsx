@@ -2,7 +2,8 @@ import apiFetch from '@wordpress/api-fetch';
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Dialog, DialogContent, DialogTrigger } from '../../controls/Dialog';
-import { PageWithSelection, SearchResultType, TDIDashboardType } from '../../lib/types';
+import { Demo, PageWithSelection, TDIDashboardType } from '../../lib/types';
+import { useLocalizedData } from '../../LocalizedDataContext';
 import DialogCleanup from './DialogCleanup';
 import { DialogConsent } from './DialogConsent';
 import DialogImported from './DialogImported';
@@ -12,8 +13,7 @@ import DialogImporting from './DialogImporting';
 type Props = {
 	buttonTitle: string;
 	pages?: PageWithSelection[];
-	theme: string;
-	demo: SearchResultType;
+	demo: Demo;
 	siteTitle: string;
 	siteTagline: string;
 	siteLogoId: number;
@@ -21,13 +21,12 @@ type Props = {
 	textColor?: string;
 	disabled?: boolean;
 	// currentTheme: string;
-	data: TDIDashboardType;
-	setData: (value: TDIDashboardType) => void;
+	// data: TDIDashboardType;
+	// setData: (value: TDIDashboardType) => void;
 };
 
 const ImportButton = ({
 	buttonTitle,
-	theme,
 	demo,
 	siteTitle,
 	siteTagline,
@@ -36,28 +35,12 @@ const ImportButton = ({
 	textColor,
 	disabled,
 	pages,
-	data,
-	setData,
 }: Props) => {
-	// const {
-	// 	pagebuilder,
-	// 	category,
-	// 	plan,
-	// 	search,
-	// 	searchResults,
-	// 	setTheme,
-	// 	setPagebuilder,
-	// 	setCategory,
-	// 	setPlan,
-	// 	setSearchResults,
-	// 	currentTheme,
-	// } = useDemoContext();
-	// const { data } = useLocalizedData();
-	// const { current_theme: currentTheme } = data || {};
 	const { pagebuilder = '' } = useParams();
+	const { localizedData, setLocalizedData } = useLocalizedData();
 
 	const IMPORT_ACTIONS = {
-		...(data.current_theme !== demo.theme
+		...(localizedData.current_theme !== demo.theme_slug
 			? {
 					'install-theme': {
 						progressWeight: 10,
@@ -125,8 +108,6 @@ const ImportButton = ({
 	const [isCleanInstall, setIsCleanInstall] = useState(false);
 	const [isCleanInstallCompleted, setIsCleanInstallCompleted] = useState(false);
 
-	const totalPagebuilders = Object.entries(demo?.pagebuilders)?.length ?? 0;
-
 	const handleInstallation = async () => {
 		const selectedAdditionalPlugins = plugins
 			.filter((plugin) => plugin.toggle === true)
@@ -163,7 +144,6 @@ const ImportButton = ({
 					parse: false,
 				});
 				const data = await response.json();
-				// update state here
 				results[action] = data;
 				setImportProgress((prev) => {
 					let next = 0;
@@ -180,7 +160,7 @@ const ImportButton = ({
 					const updated = await apiFetch<TDIDashboardType>({
 						path: '/tg-demo-importer/v1/localized-data',
 					});
-					setData(updated);
+					setLocalizedData(updated);
 				}
 			} catch (e) {
 				setImportAction(null);
@@ -208,7 +188,7 @@ const ImportButton = ({
 			method: 'POST',
 		});
 		if (response.success) {
-			if (data.current_theme !== demo.theme) {
+			if (localizedData.current_theme !== demo.theme_slug) {
 				let key: 'install-theme' = 'install-theme';
 				const step = IMPORT_ACTIONS[key]!;
 				setImportAction(key);
@@ -232,23 +212,7 @@ const ImportButton = ({
 		handleInstallation();
 	};
 
-	// const checkThemeExists = (demo: SearchResultType) => {
-	// 	const proTheme = demo.theme + '-pro';
-	// 	const themeExists = __TDI_DASHBOARD__.installed_themes.includes(proTheme);
-	// 	return themeExists;
-	// };
-
 	const renderDialog = () => {
-		// if (demo.pro || demo.premium) {
-		// 	if (checkThemeExists(demo)) {
-		// 		if (demo.theme + '-pro' !== __TDI_DASHBOARD__.current_theme) {
-		// 			return <DialogUpgradePro slug={demo.theme} buttonText={`Activate ${demo.theme} Pro`} />;
-		// 		}
-		// 	} else {
-		// 		return <DialogUpgradePro slug={demo.theme} buttonText="Upgrade to Pro" />;
-		// 	}
-		// }
-
 		if (isCleanInstall) {
 			return (
 				<DialogCleanup
@@ -271,7 +235,6 @@ const ImportButton = ({
 					plugins={plugins}
 					setPlugins={setPlugins}
 					onConfirm={handleInstallation}
-					data={data}
 				/>
 			);
 		}
@@ -286,7 +249,7 @@ const ImportButton = ({
 			);
 		}
 
-		return <DialogImported demo={demo} data={data} />;
+		return <DialogImported demo={demo} />;
 	};
 
 	return (

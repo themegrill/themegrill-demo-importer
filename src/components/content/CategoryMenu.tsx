@@ -10,14 +10,10 @@ type Props = {
 };
 
 const CategoryMenu = ({ categories }: Props) => {
-	// const { setCategory, category } = useDemoContext();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const $category = searchParams.get('category') || 'all';
 
-	// const [activeTab, setActiveTab] = useState<string>(categories[0]?.slug || '');
-
 	const handleClick = (slug: string) => {
-		// setActiveTab(slug);
 		setSearchParams((prev) => {
 			prev.set('category', slug);
 			return prev;
@@ -26,7 +22,7 @@ const CategoryMenu = ({ categories }: Props) => {
 
 	return (
 		<>
-			<div className="flex items-center gap-[30px] md:gap-[35px] px-[20px] py-[20px] sm:px-[40px] sm:py-[20px] ">
+			<div className="flex items-center gap-[30px] md:gap-[35px] px-[20px] py-[20px] sm:px-[40px] sm:py-[20px] border-0 border-b border-solid border-[#f4f4f4]">
 				<p className="text-[#383838] uppercase font-semibold text-[14px] m-0 bg-[#FAFAFC]">
 					{__('Templates', 'themegrill-demo-importer')}
 				</p>
@@ -69,7 +65,6 @@ const CategoryMenu = ({ categories }: Props) => {
 					))}
 				</Menu>
 			</div>
-			<hr className="my-0 border-[#f4f4f4]" />
 		</>
 	);
 };

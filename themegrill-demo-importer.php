@@ -32,7 +32,7 @@ if ( ! class_exists( 'ThemeGrill_Demo_Importer' ) ) {
  *
  * Returns the main instance of TGDM to prevent the need to use globals.
  *
- * @since  1.3.4
+ * @since  1.9.9
  * @return ThemeGrill_Demo_Importer
  */
 function tgdm() {
@@ -57,8 +57,75 @@ function allow_iframe_in_import( $allowedposttags ) {
 }
 add_filter( 'wp_kses_allowed_html', 'allow_iframe_in_import', 10, 1 );
 
-function allow_iframe_after_import( $postdata, $post ) { //phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
+function allow_iframe_after_import( $postdata, $post, $term_id_map ) { //phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
 	$postdata['post_content'] = wp_kses( $postdata['post_content'], wp_kses_allowed_html( 'post' ) );
 	return $postdata;
 }
-add_filter( 'wp_import_post_data_processed', 'allow_iframe_after_import', 10, 2 );
+add_filter( 'wp_import_post_data_processed', 'allow_iframe_after_import', 10, 3 );
+
+
+add_filter(
+	'wp_import_post_data_processed',
+	function ( $post_data, $post, $term_id_map ) {
+		if ( isset( $post_data['post_content'] ) && has_blocks( $post_data['post_content'] ) ) {
+			$blocks = parse_blocks( $post_data['post_content'] );
+			update_block_term_ids( $blocks, $term_id_map );
+			$post_data['post_content'] = serialize_blocks( $blocks );
+		}
+		return $post_data;
+	},
+	10,
+	3
+);
+
+function update_block_term_ids( array &$blocks, array $term_id_map ) {
+	foreach ( $blocks as &$block ) {
+		if ( isset( $block['blockName'] ) && str_starts_with( $block['blockName'], 'magazine-blocks/' ) ) {
+			if ( isset( $block['attrs'] ) ) {
+				$key1 = array( 'category', 'category2', 'tag', 'tag2' );
+
+				foreach ( $key1 as $key ) {
+					if ( isset( $block['attrs'][ $key ] ) && isset( $term_id_map[ $block['attrs'][ $key ] ] ) ) {
+						$block['attrs'][ $key ] = (string) $term_id_map[ $block['attrs'][ $key ] ];
+					}
+				}
+
+				$key2 = array( 'excludedCategory', 'excludedCategory2' );
+
+				foreach ( $key2 as $key ) {
+					if ( isset( $block['attrs'][ $key ] ) && is_array( $block['attrs'][ $key ] ) ) {
+						$block['attrs'][ $key ] = array_map(
+							function ( $cat_id ) use ( $term_id_map ) {
+								return isset( $term_id_map[ $cat_id ] ) ? (string) $term_id_map[ $cat_id ] : false;
+							},
+							$block['attrs'][ $key ]
+						);
+					}
+				}
+			}
+
+			// Recursively update inner blocks
+			if ( ! empty( $block['innerBlocks'] ) ) {
+				update_block_term_ids( $block['innerBlocks'], $term_id_map );
+			}
+		}
+	}
+}
+
+add_action(
+	'themegrill_widget_importer_after_widgets_import',
+	function ( $term_id_map ) {
+		$widget_blocks = get_option( 'widget_block', array() );
+		if ( ! empty( $widget_blocks ) ) {
+			foreach ( $widget_blocks as $index => $widget ) {
+				if ( isset( $widget['content'] ) ) {
+					$blocks = parse_blocks( $widget['content'] );
+					update_block_term_ids( $blocks, $term_id_map );
+					$widget_blocks[ $index ]['content'] = serialize_blocks( $blocks );
+				}
+			}
+			update_option( 'widget_block', $widget_blocks );
+		}
+	},
+	10
+);

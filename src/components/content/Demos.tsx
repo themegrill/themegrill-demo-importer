@@ -1,17 +1,17 @@
 import { __ } from '@wordpress/i18n';
 import React from 'react';
-import { SearchResultType } from '../../lib/types';
+import { ThemeItem } from '../../lib/types';
 import SingleDemo from './SingleDemo';
 
 type Props = {
-	demos: SearchResultType[];
+	demos: ThemeItem[];
 };
 
 const Demos = ({ demos }: Props) => {
 	return (
 		<>
 			{demos.length > 0 ? (
-				<div className="tg-demos mt-0">
+				<div className="tg-demos mt-0 bg-[#FAFAFC]">
 					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-[40px]">
 						{demos.map((demo) => (
 							<SingleDemo key={demo.slug} demo={demo} />
@@ -19,7 +19,7 @@ const Demos = ({ demos }: Props) => {
 					</div>
 				</div>
 			) : (
-				<div className="text-center py-[20px]">
+				<div className="text-center pt-[100px] pb-[20px]">
 					<svg
 						width="141"
 						height="117"
@@ -34,9 +34,9 @@ const Demos = ({ demos }: Props) => {
 							height="82.5"
 							rx="4.25"
 							stroke="#BABABA"
-							stroke-opacity="0.8"
-							stroke-width="1.5"
-							stroke-dasharray="5 5"
+							strokeOpacity="0.8"
+							strokeWidth="1.5"
+							strokeDasharray="5 5"
 						/>
 						<path
 							d="M95.889 101.123L25.5376 101.123C23.1517 101.121 20.8644 100.172 19.1774 98.4844C17.4904 96.7972 16.5415 94.5098 16.5391 92.1239L16.5391 9.50196C16.5417 7.11622 17.4907 4.82897 19.1776 3.142C20.8646 1.45502 23.1519 0.506104 25.5376 0.503418L90.9881 0.503417L104.888 11.582L104.888 92.1239C104.885 94.5098 103.936 96.7972 102.249 98.4844C100.562 100.172 98.2749 101.121 95.889 101.123Z"
@@ -69,13 +69,13 @@ const Demos = ({ demos }: Props) => {
 						<path
 							d="M49.0488 45.9307C49.0488 45.9307 49.4845 35.5686 60.8242 35.5684C72.1639 35.5681 72.5996 45.9307 72.5996 45.9307"
 							stroke="#919191"
-							stroke-width="1.73741"
+							strokeWidth="1.73741"
 						/>
 						<path
 							d="M103.374 14.5613L92.5424 14.6741C91.7516 14.6823 90.9899 14.362 90.4246 13.7838C89.8594 13.2055 89.5371 12.4166 89.5285 11.5906L89.4415 3.23364C89.4411 3.19705 89.4506 3.16112 89.4689 3.12994C89.4872 3.09876 89.5136 3.07361 89.5449 3.05737C89.5763 3.04112 89.6114 3.03444 89.6463 3.03808C89.6811 3.04173 89.7143 3.05556 89.742 3.07798L103.486 14.2121C103.517 14.2369 103.539 14.271 103.55 14.3097C103.561 14.3484 103.561 14.3897 103.548 14.428C103.536 14.4663 103.513 14.4996 103.481 14.5233C103.45 14.5471 103.413 14.5609 103.374 14.5613Z"
 							fill="#C9C9C9"
 						/>
-						<g clip-path="url(#clip0_8619_17454)">
+						<g clipPath="url(#clip0_8619_17454)">
 							<path
 								d="M133.497 114.51C132.833 115.103 131.962 115.408 131.074 115.358C130.186 115.308 129.354 114.908 128.761 114.246L118.618 102.898L123.618 98.4273L133.76 109.788C134.349 110.451 134.651 111.319 134.602 112.204C134.552 113.088 134.155 113.918 133.497 114.51Z"
 								fill="#C9C9C9"
@@ -87,21 +87,21 @@ const Demos = ({ demos }: Props) => {
 								transform="rotate(-28.5251 106.979 83.8856)"
 								fill="#F5F5F5"
 								stroke="#D6D6D6"
-								stroke-width="1.79066"
+								strokeWidth="1.79066"
 							/>
 							<path
 								d="M112.823 79.024L101.496 89.1515"
 								stroke="#919191"
-								stroke-width="2.68599"
-								stroke-linecap="round"
-								stroke-linejoin="round"
+								strokeWidth="2.68599"
+								strokeLinecap="round"
+								strokeLinejoin="round"
 							/>
 							<path
 								d="M102.096 78.4243L112.223 89.7512"
 								stroke="#919191"
-								stroke-width="2.68599"
-								stroke-linecap="round"
-								stroke-linejoin="round"
+								strokeWidth="2.68599"
+								strokeLinecap="round"
+								strokeLinejoin="round"
 							/>
 						</g>
 						<defs>

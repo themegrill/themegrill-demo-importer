@@ -10,7 +10,6 @@ import {
 } from '../../controls/DropdownMenu';
 
 const PlanDropdown = ({ plans }: { plans: Record<string, string> }) => {
-	// const { plan, setPlan } = useDemoContext();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const plan = searchParams.get('plan') || 'all';
 	const handleClick = (value: string) => {

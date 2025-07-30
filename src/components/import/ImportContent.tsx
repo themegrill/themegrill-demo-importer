@@ -2,79 +2,38 @@ import apiFetch from '@wordpress/api-fetch';
 import { __, sprintf } from '@wordpress/i18n';
 import Lottie from 'lottie-react';
 import React, { useEffect, useState } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import loader from '../../assets/animation/loader.json';
+import { useParams } from 'react-router-dom';
+import spinner from '../../assets/animation/spinner.json';
 import { themes } from '../../lib/themes';
-import { __TDI_DASHBOARD__, SearchResultType, TDIDashboardType } from '../../lib/types';
+import { Demo, TDIDashboardType } from '../../lib/types';
+import { useLocalizedData } from '../../LocalizedDataContext';
 import Template from '../template/Template';
 import ImportButton from './ImportButton';
 
 type Props = {
-	demo: SearchResultType;
-	theme: string;
+	demo: Demo;
 	iframeRef: React.RefObject<HTMLIFrameElement>;
 	siteTitle: string;
 	siteTagline: string;
 	siteLogoId: number;
-	// currentTheme: string;
-	// zakraProInstalled: boolean;
-	// zakraProActivated: boolean;
-	data: TDIDashboardType;
-	setData: (value: TDIDashboardType) => void;
 	device: string;
 };
 
-const ImportContent = ({
-	demo,
-	theme,
-	iframeRef,
-	siteTitle,
-	siteTagline,
-	siteLogoId,
-	// currentTheme,
-	// zakraProActivated,
-	// zakraProInstalled,
-	data,
-	setData,
-	device,
-}: Props) => {
-	const navigate = useNavigate();
-	// const {
-	// 	pagebuilder,
-	// 	setPagebuilder,
-	// 	theme,
-	// 	setTheme,
-	// 	setCategory,
-	// 	currentTheme,
-	// 	setCurrentTheme,
-	// 	zakraProInstalled,
-	// 	zakraProActivated,
-	// } = useDemoContext();
-	// const { data, setData } = useLocalizedData();
-	// const {
-	// 	current_theme: currentTheme,
-	// 	zakra_pro_installed: zakraProInstalled,
-	// 	zakra_pro_activated: zakraProActivated,
-	// } = data || {};
+const ImportContent = ({ demo, iframeRef, siteTitle, siteTagline, siteLogoId, device }: Props) => {
+	const { localizedData, setLocalizedData } = useLocalizedData();
 	const { pagebuilder = '' } = useParams();
 	const [isIframeLoading, setIsIframeLoading] = useState(true);
 	const [deviceClass, setDeviceClass] = useState('');
 	const [collapseTemplate, setCollapseTemplate] = useState(false);
 	const [isActivating, setIsActivating] = useState(false);
-	const count = demo.pagebuilder_data[pagebuilder]?.pages.length || 0;
-	const matchedTheme = themes.find((theme) => theme.slug === demo.theme);
-
-	const location = useLocation();
+	const count = demo?.pagebuilder_data[pagebuilder]?.pages.length || 0;
+	const matchedTheme = themes.find((theme) => theme.slug === demo.theme_slug);
 
 	const handleExitClick = (currentTheme: string) => {
 		const baseTheme = currentTheme.endsWith('-pro')
 			? currentTheme.replace('-pro', '')
 			: currentTheme;
-		const activeTheme = baseTheme === demo.theme ? baseTheme : 'all';
-
-		// setTheme(activeTheme);
-		// setPagebuilder('all');
-		// setCategory('all');
+		const activeTheme = baseTheme === demo.theme_slug ? baseTheme : 'all';
 
 		const newParams = new URLSearchParams({
 			theme: activeTheme,
@@ -90,15 +49,15 @@ const ImportContent = ({
 		setCollapseTemplate(!collapse);
 	};
 
-	const checkThemeExists = (demo: SearchResultType) => {
-		const proTheme = demo.theme + '-pro';
-		if (demo.theme === 'zakra') {
-			if (data.zakra_pro_installed) {
+	const checkThemeExists = (demo: Demo) => {
+		const proTheme = demo.theme_slug + '-pro';
+		if (demo.theme_slug === 'zakra') {
+			if (localizedData.zakra_pro_installed) {
 				return true;
 			}
 			return false;
 		}
-		const themeExists = __TDI_DASHBOARD__.installed_themes.includes(proTheme);
+		const themeExists = localizedData.installed_themes.includes(proTheme);
 		return themeExists;
 	};
 
@@ -119,7 +78,7 @@ const ImportContent = ({
 			const updated = await apiFetch<TDIDashboardType>({
 				path: '/tg-demo-importer/v1/localized-data',
 			});
-			setData(updated);
+			setLocalizedData(updated);
 			setIsActivating(false);
 		}
 	};
@@ -150,14 +109,11 @@ const ImportContent = ({
 					</svg>
 				</button>
 				<Template
-					pages={demo.pagebuilder_data[pagebuilder]?.pages || []}
+					pages={demo?.pagebuilder_data[pagebuilder]?.pages || []}
 					demo={demo}
-					theme={theme}
 					siteTitle={siteTitle}
 					siteTagline={siteTagline}
 					siteLogoId={siteLogoId}
-					data={data}
-					setData={setData}
 				/>
 			</>
 		) : (
@@ -167,7 +123,10 @@ const ImportContent = ({
 					style={{ boxShadow: '0px -8px 25px 0px rgba(0, 0, 0, 0.04)' }}
 				>
 					<div>
-						<h4 className="text-[22px] m-0 mb-[8px] text-[#383838]">{demo.name}</h4>
+						<h4 className="text-[22px] m-0 mb-[8px] text-[#383838]">
+							{demo.name ||
+								demo.slug.replace(/-/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase())}
+						</h4>
 						<p className="text-[#7a7a7a] text-[14px] mt-4 sm:m-0">
 							{sprintf(
 								__(
@@ -181,13 +140,10 @@ const ImportContent = ({
 					<div className=" flex flex-wrap gap-[16px]">
 						<ImportButton
 							buttonTitle="Import All"
-							theme={theme}
 							demo={demo}
 							siteTitle={siteTitle}
 							siteTagline={siteTagline}
 							siteLogoId={siteLogoId}
-							data={data}
-							setData={setData}
 						/>
 						<button
 							className="bg-white rounded-[2px] px-[16px] py-[8px] border border-solid border-[#2563EB] text-[#2563EB] font-[600] cursor-pointer"
@@ -235,7 +191,7 @@ const ImportContent = ({
 		} else if (device === 'tablet') {
 			setDeviceClass('w-[768px]');
 		} else if (device === 'mobile') {
-			setDeviceClass('w-[375px]');
+			setDeviceClass('w-[420px]');
 		}
 	}, [device]);
 
@@ -243,13 +199,34 @@ const ImportContent = ({
 		setIsIframeLoading(true);
 	}, [pagebuilder]);
 
+	const getIframeHeight = () => {
+		if (demo.pro || demo.premium) {
+			if (checkThemeExists(demo)) {
+				const isProActivated =
+					demo.theme_slug === 'zakra'
+						? localizedData.zakra_pro_activated
+						: demo.theme_slug + '-pro' === localizedData.current_theme;
+
+				if (isProActivated) {
+					return collapseTemplate ? 'h-full' : 'h-[calc(100vh-96px)]';
+				} else {
+					return 'h-[calc(100vh-50px)]';
+				}
+			} else {
+				return 'h-[calc(100vh-50px)]';
+			}
+		} else {
+			return collapseTemplate ? 'h-[calc(100vh-382px)]' : 'h-[calc(100vh-96px)]';
+		}
+	};
+
 	return (
 		<div className="tg-full-overlay-content bg-[#f4f4f4] w-full relative">
 			<button
 				type="button"
 				className="bg-[#0E0E0E] rounded-full px-[18px] py-[10px] border border-solid border-[#0E0E0E] cursor-pointer absolute top-[32px] left-[32px] flex items-center gap-[8px]"
 				style={{ boxShadow: '0px 8px 10px 0px rgba(0, 0, 0, 0.04)' }}
-				onClick={() => handleExitClick(data.current_theme)}
+				onClick={() => handleExitClick(localizedData.current_theme)}
 			>
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
@@ -276,31 +253,26 @@ const ImportContent = ({
 			</button>
 
 			{isIframeLoading && (
-				<div
-					style={{
-						display: 'flex',
-						justifyContent: 'center',
-						alignItems: 'center',
-						height: '200px',
-					}}
-				>
-					<p>Loading iframe...</p>
+				<div className={`flex items-center justify-center h-[calc(100%-96px)]`}>
+					<Lottie animationData={spinner} loop={true} autoplay={true} className="h-4" />
 				</div>
 			)}
 			<iframe
 				ref={iframeRef}
-				src={demo.pagebuilder_data[pagebuilder]?.url}
-				title={`${demo.name} Preview`}
-				className={`h-full ml-auto mr-auto ${deviceClass}`}
+				src={demo?.pagebuilder_data[pagebuilder]?.url}
+				title={`${
+					demo.name || demo.slug.replace(/-/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase())
+				} Preview`}
+				className={`${getIframeHeight()}  ml-auto mr-auto ${deviceClass}`}
 				style={{ display: isIframeLoading ? 'none' : 'block' }}
 				onLoad={() => setIsIframeLoading(false)}
 			></iframe>
 			{demo.pro || demo.premium ? (
 				checkThemeExists(demo) ? (
 					(
-						demo.theme === 'zakra'
-							? data.zakra_pro_activated
-							: demo.theme + '-pro' === data.current_theme
+						demo.theme_slug === 'zakra'
+							? localizedData.zakra_pro_activated
+							: demo.theme_slug + '-pro' === localizedData.current_theme
 					) ? (
 						renderImportSection()
 					) : (
@@ -332,13 +304,13 @@ const ImportContent = ({
 							</p>
 							{isActivating ? (
 								<button className="bg-[#fff]/90 text-[#2563EB] border-0 rounded px-[8px] py-[5px] text-[13px] font-[600] no-underline capitalize flex items-center gap-[4px] cursor-not-allowed">
-									<Lottie animationData={loader} loop={true} autoplay={true} className="h-4" />
+									<Lottie animationData={spinner} loop={true} autoplay={true} className="h-4" />
 									{__('Activating...', 'themegrill-demo-importer')}
 								</button>
 							) : (
 								<button
 									className="cursor-pointer bg-[#fff] text-[#2563EB] border-0 rounded px-[8px] py-[5px] text-[13px] font-[600] no-underline capitalize flex items-center gap-[4px]"
-									onClick={() => activatePro(demo.theme)}
+									onClick={() => activatePro(demo.theme_slug)}
 								>
 									{__('Activate Pro', 'themegrill-demo-importer')}
 								</button>

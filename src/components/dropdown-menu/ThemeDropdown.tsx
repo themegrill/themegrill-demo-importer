@@ -17,14 +17,12 @@ type Props = {
 };
 
 const ThemeDropdown = ({ themes }: Props) => {
-	// const { theme, setTheme } = useDemoContext();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const theme = searchParams.get('theme') || 'all';
 
 	const handleThemeChange = (theme: string) => {
 		setSearchParams((prev) => {
 			prev.set('theme', theme);
-			// prev.set('pagebuilder', 'all');
 			prev.set('category', 'all');
 			return prev;
 		});

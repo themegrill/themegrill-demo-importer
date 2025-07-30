@@ -1,16 +1,17 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { SearchResultType } from '../../lib/types';
+import { ThemeItem } from '../../lib/types';
 
 declare const require: any;
 
 type DemoProps = {
-	demo: SearchResultType;
+	demo: ThemeItem;
 };
 
 const SingleDemo = ({ demo }: DemoProps) => {
 	const [searchParams] = useSearchParams();
-	const pagebuilder = searchParams.get('pagebuilder');
+	const pagebuilder = searchParams.get('pagebuilder') || 'all';
+	const [loading, setLoading] = useState(false);
 	const pagebuilders = Object.entries(demo?.pagebuilders || {}).map(([key, value]) => {
 		return {
 			slug: key,
@@ -35,14 +36,27 @@ const SingleDemo = ({ demo }: DemoProps) => {
 		}
 	};
 
+	useEffect(() => {
+		setLoading(true);
+		const loadingTimeout = setTimeout(() => {
+			setLoading(false);
+		}, 1000);
+
+		return () => clearTimeout(loadingTimeout);
+	}, [pagebuilder]);
+
 	return (
 		<Link
-			to={`/import-detail/${demo.slug}/${currentPagebuilder}`}
+			to={`/import-detail/${demo.slug}/${currentPagebuilder}/${demo.theme_slug}`}
 			className="text-[#383838] no-underline hover:text-[#383838] tg-demo flex flex-col gap-0"
 		>
 			<div className="shadow flex flex-col">
 				<div className="relative">
-					<img src={demo.image} alt="" className="w-full h-full" />
+					{loading ? (
+						<div className="aspect-[4/3] bg-gray-300 animate-pulse" />
+					) : (
+						<img src={demo.image} alt="" className="w-full aspect-[4/3]" />
+					)}
 					{demo.pro && (
 						<div className="tg-demo-pro">
 							<svg
@@ -86,7 +100,8 @@ const SingleDemo = ({ demo }: DemoProps) => {
 
 				<div className="bg-white px-[16px] py-[15px] border-[#f4f4f4]">
 					<h4 className="m-0 text-sm">
-						{demo.name}
+						{demo.name ||
+							demo.slug.replace(/-/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase())}
 						{demo.new && (
 							<span className="bg-[#27AE60] px-[4px] py-[1px] text-[10px] text-white rounded-[4px] ml-[8px]">
 								New

@@ -139,7 +139,7 @@ const LogoUploader = ({ iframeRef, setSiteLogoId }: Props) => {
 						allowedTypes={['image']}
 						onSelect={handleLogoSelect}
 						value={selectedLogo.id}
-						render={({ open }) => (
+						render={({ open }: { open: () => void }) => (
 							<button
 								type="button"
 								className="text-[#0073aa] hover:text-[#005a87] text-[12px] underline"
@@ -199,7 +199,7 @@ const LogoUploader = ({ iframeRef, setSiteLogoId }: Props) => {
 					<MediaUpload
 						allowedTypes={['image']}
 						onSelect={handleLogoSelect}
-						render={({ open }) => {
+						render={({ open }: { open: () => void }) => {
 							return (
 								<button
 									type="button"

@@ -900,7 +900,7 @@ class TG_WXR_Importer extends WP_Importer {
 			$postdata[ $key ] = $data[ $key ];
 		}
 
-		$postdata = apply_filters( 'wp_import_post_data_processed', $postdata, $data );
+		$postdata = apply_filters( 'wp_import_post_data_processed', $postdata, $data, $this->mapping['term_id'] );
 
 		$postdata = wp_slash( $postdata );
 
@@ -1946,8 +1946,12 @@ class TG_WXR_Importer extends WP_Importer {
 		$response = wp_remote_get(
 			$url,
 			array(
-				'stream'   => true,
-				'filename' => $upload['file'],
+				'stream'    => true,
+				'filename'  => $upload['file'],
+				'headers'   => array(
+					'User-Agent' => 'ThemeGrill/1.0',
+				),
+				'sslverify' => false,
 			)
 		);
 

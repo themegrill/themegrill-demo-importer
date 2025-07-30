@@ -27,13 +27,12 @@ class TG_Customizer_Importer {
 	 * @param  string  $pagebuilder   Pagebuilder key.
 	 * @return void|WP_Error
 	 */
-	public static function import( $import_file, $demo_id, $demo_data, $pagebuilder ) {
+	public static function import( $import_file, $demo_id, $demo_data, $pagebuilder, $term_id_map ) {
 		global $wp_customize;
 
 		$content = file_get_contents( $import_file );
 
 		$data = maybe_unserialize( $content );
-
 		// Data checks.
 		if ( ! is_array( $data ) && ( ! isset( $data['template'] ) || ! isset( $data['mods'] ) ) ) {
 			return new WP_Error( 'themegrill_customizer_import_data_error', __( 'The customizer import file is not in a correct format. Please make sure to use the correct customizer import file.', 'themegrill-demo-importer' ) );
@@ -75,6 +74,11 @@ class TG_Customizer_Importer {
 
 				$option->import( $option_value );
 			}
+		}
+
+		if ( isset( $data['mods']['colormag_footer_menu'] ) && ! empty( $data['mods']['colormag_footer_menu'] ) ) {
+			$footer_menu_id                       = isset( $term_id_map[ $data['mods']['colormag_footer_menu'] ] ) ? (string) $term_id_map[ $data['mods']['colormag_footer_menu'] ] : $data['mods']['colormag_footer_menu'];
+			$data['mods']['colormag_footer_menu'] = $footer_menu_id;
 		}
 
 		// If wp_css is set then import it.

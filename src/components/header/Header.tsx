@@ -2,7 +2,7 @@ import React from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Button } from '../../controls/Button';
 import { Input } from '../../controls/Input';
-import { PagebuilderCategory, Theme } from '../../lib/types';
+import { PagebuilderCategory, Theme, ThemeItem } from '../../lib/types';
 import PagebuilderDropdownMenu from '../dropdown-menu/PagebuilderDropdownMenu';
 import PlanDropdown from '../dropdown-menu/PlanDropdown';
 import ThemeDropdown from '../dropdown-menu/ThemeDropdown';
@@ -15,28 +15,17 @@ type Props = {
 	currentPagebuilder: string;
 	plans: Record<string, string>;
 	theme: string;
+	data: ThemeItem[];
 };
 
-const Header = ({ themes, pagebuilders, currentPagebuilder, plans, theme }: Props) => {
-	// const { search, theme, setTheme, setSearch } = useDemoContext();
+const Header = ({ themes, pagebuilders, currentPagebuilder, plans, theme, data }: Props) => {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const search = searchParams.get('search') || '';
 	let activeTheme = null;
 
 	if (theme !== 'all') {
-		activeTheme = themes.find((th) => th.slug === theme);
+		activeTheme = themes.find((t) => t.slug === theme);
 	}
-	// const handleThemeClick = (tab: string) => {
-	// 	setTheme(tab);
-	// };
-
-	// const checkImageExists = (key: string): string => {
-	// 	try {
-	// 		return require(`../../assets/images/${key}.png`);
-	// 	} catch {
-	// 		return '';
-	// 	}
-	// };
 
 	const removeSearchInput = () => {
 		if (search) {
@@ -68,26 +57,10 @@ const Header = ({ themes, pagebuilders, currentPagebuilder, plans, theme }: Prop
 			className="flex gap-y-4 sm:gap-x-8 items-center px-[20px] py-[20px] flex-wrap sm:px-[40px]"
 			style={{ backgroundColor: '#fff' }}
 		>
-			{/* <TabsList className="border-[1px] border-solid border-[#f4f4f4] p-0 rounded-md overflow-auto justify-normal flex-1 sm:flex-none">
-				{themes.map((item, index) => (
-					<TabsTrigger
-						value={item.slug}
-						className={`tg-tabs px-[20px] py-[11px] h-11 bg-white gap-2 ${index === 0 ? 'border-none' : 'border-[0px] border-l-[1px] border-solid border-[#f4f4f4]'}`}
-						onClick={() => handleThemeClick(item.slug)}
-						key={index}
-					>
-						{item.slug != 'all' && checkImageExists(item.slug) !== '' && (
-							<img src={require(`../../assets/images/${item.slug}.png`)} alt="" />
-						)}
-						<span>{item.name}</span>
-					</TabsTrigger>
-				))}
-			</TabsList> */}
-
 			{theme !== 'all' && activeTheme ? (
-				<div className="flex items-center gap-2 w-full sm:w-[132px] bg-white px-5 py-[9px] border border-solid border-[#f4f4f4] rounded-md">
-					{checkImageExists(activeTheme.slug) !== '' && (
-						<img src={require(`../../images/${activeTheme.slug}.png`)} alt="" width="24px" />
+				<div className="flex items-center gap-2 w-full sm:w-[132px] bg-white px-5 py-[9px] rounded-md">
+					{checkImageExists(theme) !== '' && (
+						<img src={require(`../../images/${theme}.png`)} alt="" width="24px" />
 					)}
 					<span className="text-[14px]">{activeTheme.name}</span>
 				</div>

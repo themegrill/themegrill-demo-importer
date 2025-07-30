@@ -1,9 +1,9 @@
 import { __ } from '@wordpress/i18n';
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { DialogClose, DialogFooter, DialogHeader, DialogTitle } from '../../controls/Dialog';
 import { themes } from '../../lib/themes';
-import { SearchResultType, TDIDashboardType } from '../../lib/types';
+import { Demo } from '../../lib/types';
+import { useLocalizedData } from '../../LocalizedDataContext';
 
 declare const require: any;
 
@@ -24,22 +24,18 @@ export const DialogConsent = ({
 	setInstallTheme,
 	plugins,
 	setPlugins,
-	data,
 }: {
 	onConfirm: () => void;
-	demo: SearchResultType;
+	demo: Demo;
 	installTheme: boolean;
 	setInstallTheme: React.Dispatch<React.SetStateAction<boolean>>;
 	plugins: PluginItem[];
 	setPlugins: React.Dispatch<React.SetStateAction<PluginItem[]>>;
-	data: TDIDashboardType;
 }) => {
-	const navigate = useNavigate();
-	// const { data } = useLocalizedData();
-	// const { current_theme: currentTheme } = data || {};
-	const currentTheme = data.current_theme;
+	const { localizedData } = useLocalizedData();
+	const currentTheme = localizedData.current_theme;
 	const [isConsentChecked, setIsConsentChecked] = useState(false);
-	const matchedTheme = themes.find((theme) => theme.slug === demo.theme);
+	const matchedTheme = themes.find((theme) => theme.slug === demo.theme_slug);
 
 	const handlePluginToggle = (index: number) => {
 		setPlugins((prevItems: PluginItem[]) =>
@@ -81,46 +77,23 @@ export const DialogConsent = ({
 					<div>
 						<h3 className="text-[16px] text-[#383838]">Install and Activate</h3>
 						<div className="my-[20px]">
-							{('zakra' !== demo.theme && (demo.pro || demo.premium)
-								? `${demo.theme}-pro`
-								: demo.theme) !== currentTheme && (
+							{('zakra' !== demo.theme_slug && (demo.pro || demo.premium)
+								? `${demo.theme_slug}-pro`
+								: demo.theme_slug) !== currentTheme && (
 								<div className="flex items-center justify-between bg-[#FAFBFF] border border-solid border-[#EBEBEB] rounded px-[16px] py-[18px] mb-[16px]">
 									<div className="flex items-center gap-[10px] capitalize">
-										{/* <svg
-											xmlns="http://www.w3.org/2000/svg"
-											width="38"
-											height="38"
-											viewBox="0 0 38 38"
-											fill="none"
-										>
-											<path
-												d="M37.9996 18.9998C37.9996 8.5065 29.4931 0 18.9998 0C8.5065 0 0 8.5065 0 18.9998C0 29.4931 8.5065 37.9996 18.9998 37.9996C29.4931 37.9996 37.9996 29.4931 37.9996 18.9998Z"
-												fill="#004846"
-											/>
-											<path
-												d="M24.6534 11.0835C24.3563 11.0832 24.0621 11.1415 23.7877 11.2552C23.5132 11.3689 23.264 11.5358 23.0542 11.7461L11.7446 23.055C11.3204 23.4792 11.082 24.0546 11.082 24.6545C11.082 25.2544 11.3204 25.8298 11.7446 26.254C12.1688 26.6783 12.7442 26.9166 13.3441 26.9166C13.9441 26.9166 14.5195 26.6783 14.9437 26.254L26.2525 14.9444C26.5688 14.6281 26.7841 14.2251 26.8714 13.7864C26.9586 13.3477 26.9138 12.893 26.7427 12.4798C26.5715 12.0665 26.2817 11.7133 25.9098 11.4648C25.5379 11.2162 25.1007 11.0836 24.6534 11.0835Z"
-												fill="white"
-											/>
-											<path
-												d="M11.8861 15.0724C12.1086 15.2509 12.3897 15.34 12.6745 15.3223C12.9592 15.3046 13.2271 15.1813 13.4258 14.9766L17.305 11.0975V11.0833H13.4393C12.8354 11.074 12.2516 11.3002 11.8117 11.714C11.3718 12.1278 11.1102 12.6966 11.0825 13.2999C11.0755 13.6366 11.144 13.9706 11.283 14.2774C11.4221 14.5841 11.6282 14.8558 11.8861 15.0724Z"
-												fill="white"
-											/>
-											<path
-												d="M24.6432 22.951L20.6777 26.9164H24.5648C25.166 26.9247 25.747 26.6992 26.1852 26.2874C26.6234 25.8757 26.8845 25.3099 26.9136 24.7093C26.9227 24.3405 26.8412 23.9751 26.6763 23.6451C26.5114 23.3151 26.268 23.0305 25.9676 22.8164C25.7663 22.6794 25.5231 22.6178 25.2809 22.6424C25.0386 22.667 24.8128 22.7763 24.6432 22.951Z"
-												fill="white"
-											/>
-										</svg> */}
-										{checkImageExists(demo.theme) && (
-											<img src={checkImageExists(demo.theme)} alt="" width="38px" />
+										{checkImageExists(demo.theme_slug) && (
+											<img src={checkImageExists(demo.theme_slug)} alt="" width="38px" />
 										)}
 										<div>
-											<h6 className="text-[15px] text-[#111] m-0 mb-[4px]">{demo.theme} Theme</h6>
+											<h6 className="text-[15px] text-[#111] m-0 mb-[4px]">
+												{demo.theme_slug} Theme
+											</h6>
 											<p className="text-[13px] text-[#383838] tracking-[0.13px] m-0">
 												{matchedTheme?.description}
 											</p>
 										</div>
 									</div>
-									{/* <Switch /> */}
 									<label className="flex items-center cursor-pointer relative">
 										<input
 											type="checkbox"
