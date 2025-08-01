@@ -109,7 +109,7 @@ add_action(
 		$widget_spacious_service_widget = get_option( 'widget_spacious_service_widget', array() );
 		if ( ! empty( $widget_spacious_service_widget ) ) {
 			foreach ( $widget_spacious_service_widget as $index => $widget ) {
-				if ( ! empty( $widget ) ) {
+				if ( ! empty( $widget ) && is_array( $widget ) ) {
 					$keys = array( 'page_id0', 'page_id1', 'page_id2', 'page_id3', 'page_id4', 'page_id5' );
 					foreach ( $widget as $key => $value ) {
 						if ( in_array( $key, $keys, true ) && isset( $post_id_map[ $value ] ) ) {
@@ -125,7 +125,7 @@ add_action(
 		$widget_spacious_recent_work_widget = get_option( 'widget_spacious_recent_work_widget', array() );
 		if ( ! empty( $widget_spacious_recent_work_widget ) ) {
 			foreach ( $widget_spacious_recent_work_widget as $index => $widget ) {
-				if ( ! empty( $widget ) ) {
+				if ( ! empty( $widget ) && is_array( $widget ) ) {
 					$keys = array( 'page_id0', 'page_id1', 'page_id2' );
 					foreach ( $widget as $key => $value ) {
 						if ( in_array( $key, $keys, true ) && isset( $post_id_map[ $value ] ) ) {
@@ -141,7 +141,7 @@ add_action(
 		$widget_spacious_featured_single_page_widget = get_option( 'widget_spacious_featured_single_page_widget', array() );
 		if ( ! empty( $widget_spacious_featured_single_page_widget ) ) {
 			foreach ( $widget_spacious_featured_single_page_widget as $index => $widget ) {
-				if ( ! empty( $widget ) ) {
+				if ( ! empty( $widget ) && is_array( $widget ) ) {
 					foreach ( $widget as $key => $value ) {
 						if ( 'page_id' === $key && isset( $post_id_map[ $value ] ) ) {
 							$widget[ $key ] = (string) $post_id_map[ $value ];
