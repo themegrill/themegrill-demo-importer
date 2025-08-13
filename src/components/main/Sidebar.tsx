@@ -187,7 +187,11 @@ const Sidebar = ({ pagebuilders, categories, handleRefetch }: Props) => {
 								onClick={() => handlePagebuilder(item.slug)}
 							>
 								{checkImageExists(item.slug) && item.slug && (
-									<img src={require(`../../assets/images/${item.slug}.jpg`)} alt="" />
+									<img
+										src={require(`../../assets/images/${item.slug}.jpg`)}
+										alt=""
+										className="w-6"
+									/>
 								)}
 								{item.value}
 							</Button>

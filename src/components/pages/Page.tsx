@@ -20,6 +20,9 @@ const Page = ({ page, setAllPages, demo }: Props) => {
 	return (
 		<div
 			className={`border-2 rounded-md border-solid cursor-pointer flex-shrink-0 self-start ${selected ? 'border-[#5182EF]' : 'border-[#EDEDED]'}`}
+			style={{
+				boxShadow: selected ? '0 4.089px 24.531px 0 rgba(0, 0, 0, 0.10)' : 'none',
+			}}
 			onClick={() => handleSelected(selected, page.id)}
 		>
 			<div style={{ aspectRatio: '.84 / 1' }}>
