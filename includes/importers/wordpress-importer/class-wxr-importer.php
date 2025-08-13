@@ -136,18 +136,13 @@ class TG_WXR_Importer extends WP_Importer {
 	 * @return XMLReader|WP_Error Reader instance on success, error otherwise.
 	 */
 	protected function get_reader( $file ) {
-		// Avoid loading external entities for security
-		$old_value = null;
-		if ( function_exists( 'libxml_disable_entity_loader' ) ) {
-			// $old_value = libxml_disable_entity_loader( true );
+		if ( ! class_exists( 'XMLReader' ) ) {
+			$this->logger->critical( __( 'The XMLReader class is missing! Please install the XMLReader PHP extension on your server', 'wordpress-importer' ) );
+			return new WP_Error( 'wxr_importer.cannot_parse', __( 'The XMLReader class is missing! Please install the XMLReader PHP extension on your server', 'wordpress-importer' ) );
 		}
 
 		$reader = new XMLReader();
 		$status = $reader->open( $file );
-
-		if ( ! is_null( $old_value ) ) {
-			// libxml_disable_entity_loader( $old_value );
-		}
 
 		if ( ! $status ) {
 			return new WP_Error( 'wxr_importer.cannot_parse', __( 'Could not open the file for parsing', 'themegrill-demo-importer' ) );
@@ -486,7 +481,6 @@ class TG_WXR_Importer extends WP_Importer {
 					$node = $reader->expand();
 
 					$parsed = $this->parse_term_node( $node );
-
 					if ( is_wp_error( $parsed ) ) {
 						$this->log_error( $parsed );
 
@@ -846,21 +840,7 @@ class TG_WXR_Importer extends WP_Importer {
 		}
 
 		// Map the author, or mark it as one we need to fix
-		$author = sanitize_user( $data['post_author'], true );
-		if ( empty( $author ) ) {
-			// Missing or invalid author, use default if available.
-			$data['post_author'] = $this->options['default_author'];
-		} elseif ( isset( $this->mapping['user_slug'][ $author ] ) ) {
-			$data['post_author'] = $this->mapping['user_slug'][ $author ];
-		} else {
-			$meta[]             = array(
-				'key'   => '_wxr_import_user_slug',
-				'value' => $author,
-			);
-			$requires_remapping = true;
-
-			$data['post_author'] = (int) get_current_user_id();
-		}
+		$data['post_author'] = (int) get_current_user_id();
 
 		// Does the post look like it contains attachment images?
 		if ( preg_match( self::REGEX_HAS_ATTACHMENT_REFS, $data['post_content'] ) ) {
@@ -999,6 +979,30 @@ class TG_WXR_Importer extends WP_Importer {
 
 				if ( isset( $this->mapping['term'][ $key ] ) ) {
 					$term_ids[ $taxonomy ][] = (int) $this->mapping['term'][ $key ];
+				} elseif ( 'post_format' === $taxonomy ) {
+						$term_exists = term_exists( $term['slug'], $taxonomy );
+						$term_id     = is_array( $term_exists ) ? $term_exists['term_id'] : $term_exists;
+
+					if ( empty( $term_id ) ) {
+						$t = wp_insert_term( $term['name'], $taxonomy, array( 'slug' => $term['slug'] ) );
+						if ( ! is_wp_error( $t ) ) {
+							$term_id                       = $t['term_id'];
+							$this->mapping['term'][ $key ] = $term_id;
+						} else {
+							$this->logger->warning(
+								sprintf(
+									esc_html__( 'Failed to import term: %1$s - %2$s', 'wordpress-importer' ),
+									esc_html( $taxonomy ),
+									esc_html( $term['name'] )
+								)
+							);
+							continue;
+						}
+					}
+
+					if ( ! empty( $term_id ) ) {
+						$term_ids[ $taxonomy ][] = intval( $term_id );
+					}
 				} else {
 					$meta[]             = array(
 						'key'   => '_wxr_import_term',
