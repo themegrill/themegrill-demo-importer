@@ -597,7 +597,7 @@ function tg_set_siteorigin_settings() {
  *
  * @see tg_update_masteriyo_settings()
  */
-add_action( 'themegrill_ajax_demo_imported', 'tg_update_masteriyo_settings', 10, 2 );
+add_action( 'themegrill_ajax_demo_imported', 'tg_update_masteriyo_settings', 10, 3 );
 
 /**
  * Update Masteriyo settings.
@@ -653,7 +653,7 @@ add_action(
 		) {
 			return;
 		}
-		if ( version_compare( ELEMENTOR_VERSION, '3.0.0', '>=' ) ) {
+		if ( defined( 'ELEMENTOR_VERSION' ) && version_compare( ELEMENTOR_VERSION, '3.0.0', '>=' ) ) {
 			$query = new WP_Query(
 				array(
 					'post_type' => 'elementor_library',
@@ -709,7 +709,7 @@ function tg_regenerate_elementor_styles() {
  *
  * @see tg_update_magazine_blocks_settings()
  */
-add_action( 'themegrill_ajax_demo_imported', 'tg_update_magazine_blocks_settings', 10, 2 );
+add_action( 'themegrill_ajax_demo_imported', 'tg_update_magazine_blocks_settings', 10, 3 );
 
 /**
  * Update Magazine Blocks settings.
@@ -719,12 +719,11 @@ add_action( 'themegrill_ajax_demo_imported', 'tg_update_magazine_blocks_settings
  * @return void
  */
 function tg_update_magazine_blocks_settings( $id, $data ) {
+	$settings = $data['magazine_blocks_settings'] ?? array();
 
-	if ( empty( $data['magazine_blocks_settings'] ) ) {
+	if ( empty( $settings ) ) {
 		return;
 	}
-
-	$settings = $data['magazine_blocks_settings'];
 
 	if ( is_string( $settings ) ) {
 		$decoded = json_decode( $settings, true );
@@ -741,7 +740,7 @@ function tg_update_magazine_blocks_settings( $id, $data ) {
  *
  * @see tg_update_blockart_blocks_settings()
  */
-add_action( 'themegrill_ajax_demo_imported', 'tg_update_blockart_blocks_settings', 10, 2 );
+add_action( 'themegrill_ajax_demo_imported', 'tg_update_blockart_blocks_settings', 10, 3 );
 
 /**
  * Update Blockart Blocks settings.
@@ -751,12 +750,11 @@ add_action( 'themegrill_ajax_demo_imported', 'tg_update_blockart_blocks_settings
  * @return void
  */
 function tg_update_blockart_blocks_settings( $id, $data ) {
+	$settings = $data['blockart_blocks_settings'] ?? array();
 
-	if ( empty( $data['blockart_blocks_settings'] ) ) {
+	if ( empty( $settings ) ) {
 		return;
 	}
-
-	$settings = $data['blockart_blocks_settings'];
 
 	if ( is_string( $settings ) ) {
 		$decoded = json_decode( $settings, true );
