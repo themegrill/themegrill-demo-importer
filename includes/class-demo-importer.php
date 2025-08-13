@@ -28,7 +28,6 @@ class TG_Demo_Importer {
 	 * @var TG_WXR_Importer
 	 */
 	public static $importer;
-	// public static $themegrill_base_url = 'https://themegrilldemos.com/wp-json/themegrill-demos/v1';
 	public static $themegrill_base_url = 'https://themegrilldemos.com';
 	public static $zakra_base_url      = 'https://zakrademos.com';
 	// public static $themegrill_base_url = 'http://themegrill-demos-api.test';
@@ -131,10 +130,14 @@ class TG_Demo_Importer {
 	 *
 	 * @return array of objects
 	 */
-	public static function get_demo_packages() {
+	public static function get_demo_packages( $force = true ) {
 		$template   = static::get_theme();
+		$demos      = [];
 		$need_fetch = false;
 		if ( 'all' === $template ) {
+			if ( $force ) {
+				delete_transient( 'themegrill_demo_importer_demos' );
+			}
 			$demos = get_transient( 'themegrill_demo_importer_demos', array() );
 			if ( empty( $demos ) ) {
 				$need_fetch = true;
@@ -144,9 +147,11 @@ class TG_Demo_Importer {
 		}
 
 		if ( $need_fetch ) {
+			$zakra_demos      = array();
+			$themegrill_demos = array();
+
 			$zakra_url   = static::$zakra_base_url . static::$namespace;
 			$zakra_demos = static::fetch_demo_data( $zakra_url );
-
 			if ( is_array( $zakra_demos ) && isset( $zakra_demos['message'] ) ) {
 				return array(
 					'success' => false,
@@ -156,7 +161,6 @@ class TG_Demo_Importer {
 
 			$themegrill_url   = static::$themegrill_base_url . static::$namespace;
 			$themegrill_demos = static::fetch_demo_data( $themegrill_url );
-
 			if ( is_array( $themegrill_demos ) && isset( $themegrill_demos['message'] ) ) {
 				return array(
 					'success' => false,
@@ -164,78 +168,158 @@ class TG_Demo_Importer {
 				);
 			}
 
-			$all_demos = array_merge( $zakra_demos, $themegrill_demos );
-			$demos     = array();
-			foreach ( $all_demos as $demo ) {
-				if ( ! isset( $demo->theme_slug ) ) {
-					continue;
+			$demos = array_merge( $zakra_demos, $themegrill_demos );
+			usort(
+				$demos,
+				function ( $a, $b ) {
+					return strtotime( $b->lastUpdated ) - strtotime( $a->lastUpdated );
 				}
-				$theme = $demo->theme_slug;
+			);
 
-				// Initialize group if not set
-				if ( ! isset( $demos[ $theme ] ) ) {
-					$demos[ $theme ] = array(
-						'slug'         => $theme,
-						'name'         => $demo->theme_name ?? $theme,
-						'categories'   => array( 'all' => 'All' ),
-						'pagebuilders' => array( 'all' => 'All' ),
-						'demos'        => array(),
-					);
-				}
-
-				if ( isset( $demo->categories ) ) {
-					$demos[ $theme ]['categories'] = array_unique(
-						array_merge(
-							$demos[ $theme ]['categories'],
-							(array) $demo->categories
-						)
-					);
-				}
-				if ( isset( $demo->pagebuilders ) ) {
-					$demos[ $theme ]['pagebuilders'] = array_unique(
-						array_merge(
-							$demos[ $theme ]['pagebuilders'],
-							(array) $demo->pagebuilders
-						)
-					);
-				}
-
-				// Add demo to the theme group
-				$demos[ $theme ]['demos'][] = $demo;
-			}
-			if ( 'all' === $template ) {
-				set_transient( 'themegrill_demo_importer_demos', $demos );
-			}
-			// $theme            = get_option( 'template' );
-			// if ( in_array( $theme, $supported_themes, true ) ) {
-			//  $properties = get_object_vars( $all_demos );
-			//  $keys       = array_keys( $properties );
-			//  if ( in_array( $theme, $keys, true ) ) {
-			//      $demos = $all_demos->$theme;
-			//      return apply_filters( 'themegrill_demo_importer_packages_template', $demos );
-			//  }
-			// }
+			set_transient( 'themegrill_demo_importer_demos', $demos );
 
 		}
-		return apply_filters( 'themegrill_demo_importer_packages_template', $demos );
+
+		$data = static::get_filtered_data( $demos, $template );
+		return apply_filters(
+			'themegrill_demo_importer_packages_template',
+			$data
+		);
 	}
 
+	public static function get_filtered_data( $demos, $template ) {
+		$filtered_demos = [];
+		if ( 'all' === $template ) {
+			$filtered_demos = array_filter(
+				$demos,
+				function ( $demo ) {
+					return in_array( $demo->theme_slug, [ 'zakra','colormag', 'spacious' ], true );
+				}
+			);
+		} else {
+			$filtered_demos = array_filter(
+				$demos,
+				function ( $demo ) use ( $template ) {
+					return $template === $demo->theme_slug;
+				}
+			);
+		}
+
+		$filtered_demos = array_values( $filtered_demos );
+
+		$categories   = array( 'all' => 'All' );
+		$pagebuilders = array();
+		foreach ( $filtered_demos as $demo ) {
+			foreach ( $demo->categories as $category ) {
+				$slug = strtolower( trim( str_replace( array( ' ', '_' ), '-', $category ) ) );
+				if ( ! isset( $categories[ $slug ] ) ) {
+					$value               = strtolower( trim( str_replace( array( '-', '_' ), ' ', $category ) ) );
+					$categories[ $slug ] = ucfirst( $value );
+				}
+			}
+			if ( ! empty( $demo->pagebuilder ) ) {
+				$slug = strtolower( trim( str_replace( array( ' ', '_' ), '-', $demo->pagebuilder ) ) );
+				if ( ! isset( $pagebuilders[ $slug ] ) ) {
+					$value                 = strtolower( trim( str_replace( array( '-', '_' ), ' ', $demo->pagebuilder ) ) );
+					$pagebuilders[ $slug ] = ucfirst( $value );
+				}
+			}
+		}
+
+		$categories = array_map(
+			function ( $label, $slug ) {
+				return array(
+					'slug'  => $slug,
+					'value' => $label,
+				);
+			},
+			$categories,
+			array_keys( $categories )
+		);
+
+		//sort categories as all, free and premium to be the first three categories
+		$priority_categories = array();
+		$regular_categories  = array();
+
+		foreach ( $categories as $category ) {
+			if ( in_array( $category['slug'], array( 'all', 'free', 'premium' ), true ) ) {
+				$priority_categories[] = $category;
+			} else {
+				$regular_categories[] = $category;
+			}
+		}
+
+		$sorted_categories = array();
+		foreach ( array( 'all', 'free', 'premium' ) as $priority_slug ) {
+			foreach ( $priority_categories as $cat ) {
+				if ( $cat['slug'] === $priority_slug ) {
+					$sorted_categories[] = $cat;
+					break;
+				}
+			}
+		}
+
+		usort(
+			$regular_categories,
+			function ( $a, $b ) {
+				return strcasecmp( $a['value'], $b['value'] );
+			}
+		);
+
+		$categories = array_merge( $sorted_categories, $regular_categories );
+
+		$pagebuilders = array_map(
+			function ( $label, $slug ) {
+				return array(
+					'slug'  => $slug,
+					'value' => $label,
+				);
+			},
+			$pagebuilders,
+			array_keys( $pagebuilders )
+		);
+
+		//sort pagebuilders as gutenberg to be first and elementor to be second and others
+		$priority_pagebuilders = array();
+		$regular_pagebuilders  = array();
+
+		foreach ( $pagebuilders as $pagebuilder ) {
+			if ( in_array( $pagebuilder['slug'], array( 'gutenberg', 'elementor' ), true ) ) {
+				$priority_pagebuilders[] = $pagebuilder;
+			} else {
+				$regular_pagebuilders[] = $pagebuilder;
+			}
+		}
+
+		$sorted_pagebuilders = array();
+		foreach ( array( 'gutenberg', 'elementor' ) as $priority_slug ) {
+			foreach ( $priority_pagebuilders as $cat ) {
+				if ( $cat['slug'] === $priority_slug ) {
+					$sorted_pagebuilders[] = $cat;
+					break;
+				}
+			}
+		}
+
+		usort(
+			$regular_pagebuilders,
+			function ( $a, $b ) {
+				return strcasecmp( $a['value'], $b['value'] );
+			}
+		);
+
+		$pagebuilders = array_merge( $sorted_pagebuilders, $regular_pagebuilders );
+
+		$data = array(
+			'categories'   => $categories,
+			'pagebuilders' => $pagebuilders,
+			'demos'        => $filtered_demos,
+		);
+		return $data;
+	}
 
 	public static function fetch_demo_data( $url ) {
-		$theme            = get_option( 'template' );
-		$instance         = ThemeGrill_Demo_Importer::instance();
-		$supported_themes = $instance->get_core_supported_themes();
-		if ( in_array( $theme, $supported_themes, true ) ) {
-			$is_pro_theme = strpos( $theme, '-pro' ) !== false;
-			if ( $is_pro_theme ) {
-				$base_theme = $is_pro_theme ? str_replace( '-pro', '', $theme ) : $theme;
-				$api_url    = $url . '/sites?theme=' . $base_theme;
-			} else {
-				$api_url = $url . '/sites?theme=' . $theme;
-			}
-		} else {
-			$api_url = $url . '/sites';
-		}
+		$api_url = $url . '/sites';
 
 		$data = wp_remote_get(
 			$api_url,
@@ -290,9 +374,9 @@ class TG_Demo_Importer {
 	 * @param  string $filename File name.
 	 * @return string The import file path.
 	 */
-	private function get_import_file_path( $filename ) {
-		return trailingslashit( TGDM_DEMO_DIR . '/dummy-data' ) . sanitize_file_name( $filename );
-	}
+	// private function get_import_file_path( $filename ) {
+	//  return trailingslashit( TGDM_DEMO_DIR . '/dummy-data' ) . sanitize_file_name( $filename );
+	// }
 
 	/**
 	 * Add menu item.
@@ -312,42 +396,45 @@ class TG_Demo_Importer {
 				echo '<div id="tg-demo-importer"></div>';
 			}
 		);
-		add_action(
-			"admin_print_scripts-$page",
-			function () {
-				$asset_url = function ( $filename ) {
-					if ( defined( 'TDI_DEVELOPMENT' ) && TDI_DEVELOPMENT ) {
-						return 'http://localhost:8887/' . $filename;
-					}
-					return plugin_dir_url( TGDM_PLUGIN_FILE ) . 'dist/' . $filename;
-				};
-				$asset     = function ( $prefix ) {
-					$asset_file = plugin_dir_path( TGDM_PLUGIN_FILE ) . DIRECTORY_SEPARATOR . 'dist' . DIRECTORY_SEPARATOR . $prefix . '.asset.php';
-					if ( file_exists( $asset_file ) ) {
-						return require $asset_file;
-					}
-					return array(
-						'dependencies' => array(),
-						'version'      => TGDM_VERSION,
-					);
-				};
-				wp_enqueue_script( 'tdi-dashboard', $asset_url( 'dashboard.js' ), $asset( 'dashboard' )['dependencies'], $asset( 'dashboard' )['version'], true );
-				$localized_data = static::get_localized_data();
-				if ( array_key_exists( 'message', $this->demo_packages ) ) {
-					$localized_data['data']      = array();
-					$localized_data['error_msg'] = $this->demo_packages['message'];
-				} else {
-					$localized_data['data'] = $this->demo_packages;
-				}
-				wp_localize_script(
-					'tdi-dashboard',
-					'__TDI_DASHBOARD__',
-					$localized_data
-				);
-				wp_enqueue_style( 'tdi-dashboard', $asset_url( 'dashboard.css' ), array(), $asset( 'dashboard' )['version'] );
-			}
-		);
+		add_action( "admin_print_scripts-$page", array( $this, 'enqueue_demo_importer_assets' ) );
 		add_theme_page( __( 'Demo Importer Status', 'themegrill-demo-importer' ), __( 'Demo Importer Status', 'themegrill-demo-importer' ), 'switch_themes', 'demo-importer-status', array( $this, 'status_menu' ) );
+	}
+
+	/**
+	 * Enqueue assets for the demo importer page
+	 */
+	public function enqueue_demo_importer_assets() {
+		$asset_url = function ( $filename ) {
+			if ( defined( 'TDI_DEVELOPMENT' ) && TDI_DEVELOPMENT ) {
+				return 'http://localhost:8887/' . $filename;
+			}
+			return plugin_dir_url( TGDM_PLUGIN_FILE ) . 'dist/' . $filename;
+		};
+		$asset     = function ( $prefix ) {
+			$asset_file = plugin_dir_path( TGDM_PLUGIN_FILE ) . DIRECTORY_SEPARATOR . 'dist' . DIRECTORY_SEPARATOR . $prefix . '.asset.php';
+			if ( file_exists( $asset_file ) ) {
+				return require $asset_file;
+			}
+			return array(
+				'dependencies' => array(),
+				'version'      => TGDM_VERSION,
+			);
+		};
+		wp_enqueue_script( 'tdi-dashboard', $asset_url( 'dashboard.js' ), $asset( 'dashboard' )['dependencies'], $asset( 'dashboard' )['version'], true );
+		$localized_data = static::get_localized_data();
+		if ( array_key_exists( 'message', $this->demo_packages ) ) {
+			$localized_data['data']      = array();
+			$localized_data['error_msg'] = $this->demo_packages['message'];
+		} else {
+			$localized_data['data'] = $this->demo_packages;
+		}
+
+		wp_localize_script(
+			'tdi-dashboard',
+			'__TDI_DASHBOARD__',
+			$localized_data
+		);
+		wp_enqueue_style( 'tdi-dashboard', $asset_url( 'dashboard.css' ), array(), $asset( 'dashboard' )['version'] );
 	}
 
 	public static function get_localized_data() {
@@ -362,7 +449,6 @@ class TG_Demo_Importer {
 
 		$localized_data = array(
 			'theme'               => $theme,
-			'theme_name'          => 'all' !== $theme ? wp_get_theme()->get( 'Name' ) : 'All',
 			'siteUrl'             => site_url(),
 			'installed_themes'    => $installed_themes,
 			'current_theme'       => get_option( 'template' ),
@@ -606,9 +692,9 @@ class TG_Demo_Importer {
 	/**
 	 * Demo Importer status page output.
 	 */
-	// public function status_menu() {
-	//  include_once __DIR__ . '/admin/views/html-admin-page-status.php';
-	// }
+	public function status_menu() {
+		include_once __DIR__ . '/admin/views/html-admin-page-status.php';
+	}
 
 	/**
 	 * Check for Zakra Premium theme plan.
