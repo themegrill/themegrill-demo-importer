@@ -7,7 +7,6 @@ export const __TDI_DASHBOARD__: TDIDashboardType = (window as any).__TDI_DASHBOA
 
 export type TDIDashboardType = {
 	theme: string;
-	theme_name: string;
 	data: DataObjectType;
 	error_msg?: string;
 	siteUrl: string;
@@ -17,15 +16,35 @@ export type TDIDashboardType = {
 	zakra_pro_activated: boolean;
 };
 
-export type DataObjectType = Record<string, ThemeDataType>;
-
-export type ThemeDataType = {
-	slug: string;
-	name: string;
-	categories: Record<string, string>;
-	pagebuilders?: Record<string, string>;
-	demos: ThemeItem[];
+export type DataObjectType = {
+	demos: DemoType[];
+	pagebuilders: PagebuilderCategory[];
+	categories: PagebuilderCategory[];
 };
+
+export type DemoType = {
+	id: number;
+	lastUpdated: string;
+	url: string;
+	keywords: string[];
+	categories: string[];
+	title: string;
+	description: string;
+	pagebuilder: string;
+	slug: string;
+	theme_slug: string;
+	previewImage: string;
+};
+
+// export type DataObjectType = Record<string, ThemeDataType>;
+
+// export type ThemeDataType = {
+// 	slug: string;
+// 	name: string;
+// 	categories: Record<string, string>;
+// 	pagebuilders?: Record<string, string>;
+// 	demos: ThemeItem[];
+// };
 
 // export type DemoDataType = {
 // 	id: number;
@@ -59,44 +78,47 @@ export type ThemeDataType = {
 // 	[k: string]: any;
 // };
 
-export type Theme = {
-	slug: string;
-	name: string;
-};
+// export type Theme = {
+// 	slug: string;
+// 	name: string;
+// };
 
 export type PagebuilderCategory = {
 	slug: string;
 	value: string;
-	count?: number;
 };
 
-export type Page = {
-	ID: number;
-	post_name: string;
-	post_title: string;
-	content: string;
-	screenshot: string;
-};
+// export type Page = {
+// 	ID: number;
+// 	post_name: string;
+// 	post_title: string;
+// 	content: string;
+// 	screenshot: string;
+// };
 
-export type PageWithSelection = Page & {
-	isSelected: boolean;
-};
+// export type PageType = {
+// 	ID: number;
+// 	post_name: string;
+// 	post_title: string;
+// 	content: string;
+// 	screenshot: string;
+// };
 
-export type ThemeItem = {
-	id: string;
-	theme_slug: string;
-	theme_name: string;
-	slug: string;
-	name: string;
-	description: string;
-	image: string;
-	pro: boolean;
-	premium: boolean;
-	new: boolean;
-	categories: Record<string, string>;
-	pagebuilders: Record<string, string>;
-	related_sites?: Record<string, string>;
-};
+// export type ThemeItem = {
+// 	id: string;
+// 	theme_slug: string;
+// 	theme_name: string;
+// 	slug: string;
+// 	name: string;
+// 	description: string;
+// 	image: string;
+// 	pro: boolean;
+// 	premium: boolean;
+// 	new: boolean;
+// 	categories: Record<string, string>;
+// 	pagebuilders: Record<string, string>;
+// 	related_sites?: Record<string, string>;
+// };
 
 // export type FilterItem = Record<string, string>;
 // export type FilterOptions = {
@@ -111,12 +133,16 @@ export type ThemeItem = {
 // 	filter_options: FilterOptions;
 // };
 
-export type PageData = {
-	ID: number;
-	post_title: string;
-	post_name: string;
+export type PageType = {
+	id: number;
+	title: string;
+	slug: string;
 	screenshot: string;
 	content: string;
+};
+
+export type PageWithSelection = PageType & {
+	isSelected: boolean;
 };
 
 export type CoreOptions = {
@@ -134,25 +160,55 @@ export type CustomizerDataUpdate = {
 };
 
 export type Demo = {
-	id: number;
-	theme_slug: string;
-	theme_name: string;
 	slug: string;
+	title: string;
+	themeMods: Record<string, any>;
+	widgets: Record<string, any>;
+	content: string;
+	show_on_front: string;
+	page_on_front: string;
+	page_for_posts: string;
+	url: string;
+	premium: boolean;
+	theme_slug: string;
+	plugins: Record<string, { name: string; description: string }>;
+	pages: PageType[];
+	// id: number;
+	// theme_slug: string;
+	// theme_name: string;
+	// slug: string;
+	// name: string;
+	// description: string;
+	// image: string;
+	// pro: boolean;
+	// premium: boolean;
+	// new: boolean;
+	// categories: Record<string, string>;
+	// pagebuilders: Record<string, string>;
+	// url: string;
+	// plugins: string[];
+	// content: string;
+	// widget: string;
+	// customizer: string;
+	// customizer_data_update: CustomizerDataUpdate;
+	// pages: PageData[];
+	// core_options: CoreOptions;
+	// pagebuilder_data: Record<string, Record<string, any>>;
+};
+
+// export type PluginItem = Record<
+// 	string,
+// 	{
+// 		name: string;
+// 		description: string;
+// 		isSelected: boolean;
+// 		isMandatory?: boolean;
+// 	}
+// >;
+export type PluginItem = {
+	plugin: string;
 	name: string;
 	description: string;
-	image: string;
-	pro: boolean;
-	premium: boolean;
-	new: boolean;
-	categories: Record<string, string>;
-	pagebuilders: Record<string, string>;
-	url: string;
-	plugins: string[];
-	content: string;
-	widget: string;
-	customizer: string;
-	customizer_data_update: CustomizerDataUpdate;
-	pages: PageData[];
-	core_options: CoreOptions;
-	pagebuilder_data: Record<string, Record<string, any>>;
+	isSelected: boolean;
+	isMandatory?: boolean;
 };

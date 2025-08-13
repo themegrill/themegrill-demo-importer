@@ -1,84 +1,79 @@
 import apiFetch from '@wordpress/api-fetch';
-import Lottie from 'lottie-react';
 import React, { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import spinner from '../../assets/animation/spinner.json';
-import { Demo } from '../../lib/types';
-import ImportContent from './ImportContent';
-import ImportSidebar from './ImportSidebar';
+import { Demo, PageType, PageWithSelection, PluginItem } from '../../lib/types';
+import { useLocalizedData } from '../../LocalizedDataContext';
+import Pages from '../pages/Pages';
+import Content from './Content';
+import FeatureSidebar from './FeatureSidebar';
+import Sidebar from './Sidebar';
+import StartImport from './StartImport';
 
 declare const require: any;
 
 const Import = () => {
+	const pluginsList = [
+		{
+			plugin: 'everest-forms/everest-forms.php',
+			name: 'Everest Form',
+			description: 'Let visitors reach you through easy-to-use contact forms.',
+			isSelected: false,
+		},
+		{
+			plugin: 'woocommerce/woocommerce.php',
+			name: 'Woocommerce',
+			description: 'Sell products online and accept secure payments.',
+			isSelected: false,
+		},
+	];
+
+	const { localizedData } = useLocalizedData();
+	const { slug, demo_theme, pagebuilder = '' } = useParams();
 	const iframeRef = useRef<HTMLIFrameElement>(null);
-	const { slug, demo_theme } = useParams();
-	const [demo, setDemo] = useState({} as Demo);
-	const [loading, setLoading] = useState(true);
-	const [siteTitle, setSiteTitle] = useState('');
-	const [siteTagline, setSiteTagline] = useState('');
 	const [siteLogoId, setSiteLogoId] = useState<number>(0);
-	const [collapse, setCollapse] = useState(false);
-	const [device, setDevice] = useState('desktop');
+
+	const [demo, setDemo] = useState({} as Demo);
 	const [error, setError] = useState<string | null>(null);
 	const [empty, setEmpty] = useState<boolean>(false);
-
-	const handleClick = (collapse: Boolean) => {
-		setCollapse(!collapse);
-	};
-
-	const handleSiteTitleChange = (value: string) => {
-		try {
-			if (!iframeRef?.current?.contentWindow) {
-				console.warn('Iframe not available');
-				return;
-			}
-
-			// Send message to iframe
-			iframeRef.current.contentWindow.postMessage(
-				{
-					type: 'UPDATE_SITE_TITLE',
-					siteTitle: value,
-				},
-				'*',
-			);
-
-			// Listen for confirmation
-			const handleMessage = (event: MessageEvent) => {
-				if (event.data.type === 'SITE_TITLE_UPDATED') {
-					// console.log('Site title updated successfully:', event.data.success);
-					window.removeEventListener('message', handleMessage);
-				}
+	const [loading, setLoading] = useState(true);
+	const [device, setDevice] = useState('desktop');
+	const [pageImport, setPageImport] = useState('all');
+	const [isPagesSelected, setIsPagesSelected] = useState(false);
+	const [showFeatureLayout, setShowFeatureLayout] = useState(false);
+	const [showSidebar, setShowSidebar] = useState(true);
+	const [plugins, setPlugins] = useState<PluginItem[]>(pluginsList);
+	const [open, setOpen] = useState(false);
+	const [pages, setPages] = useState<PageType[]>([]);
+	const [allPages, setAllPages] = useState<PageWithSelection[]>(() => {
+		return pages.map((p, index) => {
+			return {
+				id: index + 1,
+				slug: p.slug,
+				title: p.title,
+				content: p.content,
+				screenshot: p.screenshot,
+				isSelected: index === 0 ? true : false,
 			};
+		});
+	});
 
-			setSiteTitle(value);
-			window.addEventListener('message', handleMessage);
+	useEffect(() => {
+		const updatedPages = pages.map((p, index) => ({
+			id: p.id ?? index + 1,
+			slug: p.slug,
+			title: p.title,
+			content: p.content,
+			screenshot: p.screenshot,
+			isSelected: index === 0 ? true : false,
+		}));
 
-			// Cleanup after timeout
-			setTimeout(() => {
-				window.removeEventListener('message', handleMessage);
-			}, 5000);
-		} catch (error) {
-			console.error('Error sending site title update message:', error);
-		}
-	};
+		setAllPages(updatedPages);
+	}, [pagebuilder, pages]);
 
 	useEffect(() => {
 		// Add the class when the component mounts
 		document.body.classList.add('tg-full-overlay-active');
 		document.documentElement.classList.remove('wp-toolbar');
-
-		// Handle resize logic
-		const handleResize = () => {
-			if (window.innerWidth <= 768) {
-				setCollapse(true);
-			} else {
-				setCollapse(false);
-			}
-		};
-
-		// Set initial resize state
-		handleResize();
-		window.addEventListener('resize', handleResize);
 
 		const fetchSiteData = async () => {
 			try {
@@ -86,16 +81,29 @@ const Import = () => {
 					path: `tg-demo-importer/v1/data?slug=${slug}&theme=${demo_theme}`,
 					method: 'GET',
 				});
-
 				if (!response.success) {
 					setError(response.message || 'Something went wrong');
 				} else if (!response.data || Object.keys(response.data).length === 0) {
 					setEmpty(true);
 				} else {
 					setDemo(response.data);
+					setPages(response.data?.pages || []);
+					const mergedPlugins = mergePlugins(pluginsList, response.data?.plugins || {});
+					const sortedPlugins = mergedPlugins.sort((a, b) => {
+						const aMandatory = a.isMandatory || false;
+						const bMandatory = b.isMandatory || false;
+
+						// If both are mandatory or both are not mandatory, maintain original order
+						if (aMandatory === bMandatory) {
+							return 0;
+						}
+						// Put mandatory plugins first
+						return bMandatory ? 1 : -1;
+					});
+					setPlugins(sortedPlugins);
 					setEmpty(false);
+					setLoading(false);
 				}
-				setLoading(false);
 			} catch (e) {
 				console.error('Failed to fetch site data:', e);
 			}
@@ -105,189 +113,163 @@ const Import = () => {
 		const timer = setTimeout(() => {
 			fetchSiteData();
 		}, 10);
-
-		return () => {
-			document.body.classList.remove('tg-full-overlay-active');
-			document.documentElement.classList.add('wp-toolbar');
-			window.removeEventListener('resize', handleResize);
-			clearTimeout(timer);
-		};
 	}, [slug]);
+
+	const mergePlugins = (
+		pluginsList: PluginItem[],
+		plugins: Record<string, { name: string; description: string }>,
+	): PluginItem[] => {
+		const uniquePlugins = new Map();
+
+		// Add existing pluginsList items to the map
+		pluginsList.forEach((item) => {
+			uniquePlugins.set(item.plugin, {
+				plugin: item.plugin,
+				name: item.name,
+				description: item.description,
+				isSelected: item.isSelected,
+				isMandatory: false,
+			});
+		});
+
+		// Add/Override with plugins from the API object with isSelected and isMandatory true
+		Object.entries(plugins).forEach(([pluginPath, pluginData]) => {
+			uniquePlugins.set(pluginPath, {
+				plugin: pluginPath,
+				name: pluginData.name,
+				description: pluginData.description,
+				isSelected: true,
+				isMandatory: true,
+			});
+		});
+
+		// Convert Map values back to array
+		return Array.from(uniquePlugins.values());
+	};
+
+	const checkThemeExists = (demo: Demo) => {
+		const proTheme = demo.theme_slug + '-pro';
+		if (demo.theme_slug === 'zakra') {
+			if (localizedData.zakra_pro_installed) {
+				return true;
+			}
+			return false;
+		}
+		const themeExists = localizedData.installed_themes.includes(proTheme);
+		return themeExists;
+	};
 
 	if (loading)
 		return (
-			<div className="tg-full-overlay">
-				<div className="w-[375px]">
-					<div className="tg-full-overlay-sidebar">
-						<div className="space-y-6">
-							<div className="space-y-2">
-								<div className="h-6 bg-gray-300 rounded w-full animate-pulse" />
-								<div className="h-6 bg-gray-300 rounded w-full animate-pulse" />
+			<div className="flex h-screen">
+				<div className="w-[350px] h-screen flex flex-col">
+					<div className="p-6  border-0 border-r border-solid border-[#E9E9E9] flex flex-col gap-6 bg-[#FAFBFC] box-border flex-1">
+						<div className="pb-6 border-0 border-b border-solid border-[#E3E3E3]">
+							<div className="flex justify-between items-center">
+								<div className="w-[123px] h-6 bg-[#E7E8E9] rounded-sm animate-pulse"></div>
+								<div className="w-6 h-6 bg-[#E7E8E9] rounded animate-pulse"></div>
 							</div>
-							<div className="space-y-2">
-								<div className="h-6 bg-gray-300 rounded w-1/2 animate-pulse" />
-								<div className="h-32 bg-gray-300 rounded animate-pulse" />
-							</div>
-							<div className="space-y-2">
-								<div className="h-6 bg-gray-300 rounded w-1/2 animate-pulse" />
-								<div className="h-10 bg-gray-200 rounded animate-pulse" />
-							</div>
-							<div className="space-y-2">
-								<div className="h-6 bg-gray-300 rounded w-1/2 animate-pulse" />
-								<div className="h-10 bg-gray-200 rounded animate-pulse" />
+							<div className="w-[212px] h-[12px] bg-[#E7E8E9] rounded-sm animate-pulse mt-2"></div>
+						</div>
+						<div>
+							<div className="w-[139px] h-[18px] bg-[#E7E8E9] rounded-sm animate-pulse mb-5 "></div>
+							<div className="w-[302px] h-[48px] bg-[#E7E8E9] rounded-md animate-pulse "></div>
+						</div>
+						<div>
+							<div className="w-[139px] h-[18px] bg-[#E7E8E9] rounded-sm animate-pulse mb-5"></div>
+							<div className="grid grid-cols-2 gap-[14px] ">
+								{Array.from({ length: 6 }).map((_, outerIndex) => (
+									<div
+										className="h-[46px] w-[144px] bg-[#E7E8E9] rounded-md animate-pulse "
+										key={outerIndex}
+									></div>
+								))}
 							</div>
 						</div>
-					</div>
-					<div className="sticky left-0 bottom-0 w-full p-[24px] flex justify-center gap-[10px] box-border border-0 border-t border-r border-solid border-[#E9E9E9] bg-white">
-						<div className="h-6 bg-gray-300 rounded w-full animate-pulse" />
-					</div>
-				</div>
-				<div className="tg-full-overlay-content bg-[#f4f4f4] w-full relative">
-					<div
-						className="animate-pulse bg-gray-300 rounded-full h-10 w-20 border border-solid border-gray-300 absolute top-[32px] left-[32px]"
-						style={{ boxShadow: '0px 8px 10px 0px rgba(0, 0, 0, 0.04)' }}
-					></div>
-					<div className="flex items-center justify-center h-[calc(100%-96px)]">
-						<Lottie animationData={spinner} loop={true} autoplay={true} className="h-4" />
-					</div>
-					<div
-						className="absolute bottom-0 w-full border-t border-[#E1E1E1] flex flex-wrap justify-between items-center bg-white px-8 py-6 gap-6 box-border"
-						style={{ boxShadow: '0px -8px 25px 0px rgba(0, 0, 0, 0.04)' }}
-					>
-						<div className="space-y-2 flex-1 min-w-0">
-							<div className="h-4 bg-gray-300 rounded w-1/2 animate-pulse" />
-							<div className="h-6 bg-gray-200 rounded w-3/4 animate-pulse" />
-						</div>
-						<div className="flex space-x-4 flex-shrink-0">
-							<div className="h-8 w-28 bg-gray-300 rounded animate-pulse" />
-							<div className="h-8 w-28 bg-gray-200 rounded animate-pulse" />
+						<div>
+							<div className="w-[139px] h-[18px] bg-[#E7E8E9] rounded-sm animate-pulse mb-5"></div>
+							<div className="grid grid-cols-3 gap-[14px] ">
+								{Array.from({ length: 9 }).map((_, outerIndex) => (
+									<div className="h-[46px] w-[92px] bg-[#E7E8E9] rounded-md animate-pulse "></div>
+								))}
+							</div>
+							<div className="w-[139px] h-[18px] bg-[#E7E8E9] rounded-sm animate-pulse mt-5 mb-4"></div>
+							<div className="w-[302px] h-[48px] bg-[#E7E8E9] rounded-md animate-pulse"></div>
 						</div>
 					</div>
+					<div className="border-0 border-t border-r border-solid border-[#E9E9E9] bg-white p-[24px] pb-[12px]">
+						<div className="w-[302px] h-[51px] bg-[#E7E8E9] rounded-md animate-pulse mb-4"></div>
+						<div className="w-[74px] h-[24px] bg-[#E7E8E9] rounded-sm animate-pulse ml-auto mr-auto"></div>
+					</div>
 				</div>
-			</div>
-		);
-
-	if (error)
-		return (
-			<div className="tg-full-overlay">
-				<div
-					className="flex items-center p-4 mb-4 text-sm text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800"
-					role="alert"
-				>
-					<svg
-						className="shrink-0 inline w-4 h-4 me-3"
-						xmlns="http://www.w3.org/2000/svg"
-						fill="currentColor"
-						viewBox="0 0 20 20"
-					>
-						<path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
-					</svg>
-					<span className="font-medium">{error}</span>
-				</div>
-			</div>
-		);
-
-	if (empty)
-		return (
-			<div className="tg-full-overlay">
-				<div
-					className="flex items-center p-4 m-4 text-sm text-blue-800 border border-solid border-blue-300 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400 dark:border-blue-800"
-					role="alert"
-				>
-					<svg
-						className="shrink-0 inline w-4 h-4 me-3"
-						xmlns="http://www.w3.org/2000/svg"
-						fill="currentColor"
-						viewBox="0 0 20 20"
-					>
-						<path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
-					</svg>
-					<span className="font-medium">No data found for this demo.</span>
-				</div>
+				<div className="flex-1 p-[88px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[40px] overflow-y-auto bg-[#fff]"></div>
 			</div>
 		);
 
 	return (
-		<>
-			<div className="tg-full-overlay relative">
-				{collapse ? (
-					<button
-						type="button"
-						className="bg-white rounded-full px-[8px] py-[16px] border border-solid border-[#E1E1E1] cursor-pointer absolute top-[45%] left-[1%] shadow-custom-light"
-						style={{ zIndex: 100 }}
-						onClick={() => handleClick(collapse)}
-					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							width="12"
-							height="12"
-							viewBox="0 0 12 12"
-							fill="none"
-						>
-							<path
-								d="M2.5 6L9.5 6"
-								stroke="#383838"
-								strokeLinecap="round"
-								strokeLinejoin="round"
-							/>
-							<path
-								d="M6 2.5L9.5 6L6 9.5"
-								stroke="#383838"
-								strokeLinecap="round"
-								strokeLinejoin="round"
-							/>
-						</svg>
-					</button>
-				) : (
-					<>
-						<button
-							type="button"
-							className="bg-white rounded-full px-[8px] py-[16px] border border-solid border-[#E1E1E1] cursor-pointer absolute top-[45%] left-[285px] shadow-custom-light"
-							style={{ zIndex: 100 }}
-							onClick={() => handleClick(collapse)}
-						>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								width="12"
-								height="12"
-								viewBox="0 0 12 12"
-								fill="none"
-							>
-								<path
-									d="M9.5 6H2.5"
-									stroke="#383838"
-									strokeLinecap="round"
-									strokeLinejoin="round"
-								/>
-								<path
-									d="M6 9.5L2.5 6L6 2.5"
-									stroke="#383838"
-									strokeLinecap="round"
-									strokeLinejoin="round"
-								/>
-							</svg>
-						</button>
-						<ImportSidebar
-							demo={demo}
-							iframeRef={iframeRef}
-							handleSiteTitleChange={handleSiteTitleChange}
-							setSiteTagline={setSiteTagline}
-							setSiteLogoId={setSiteLogoId}
-							device={device}
-							setDevice={setDevice}
-						/>
-					</>
-				)}
-				<ImportContent
+		<div className="flex h-screen content-container">
+			{!showFeatureLayout ? (
+				<Sidebar
 					demo={demo}
 					iframeRef={iframeRef}
-					siteTitle={siteTitle}
-					siteTagline={siteTagline}
-					siteLogoId={siteLogoId}
+					setSiteLogoId={setSiteLogoId}
 					device={device}
+					setDevice={setDevice}
+					pageImport={pageImport}
+					setPageImport={setPageImport}
+					setIsPagesSelected={setIsPagesSelected}
+					onContinue={() => {
+						setPageImport('all');
+						if (demo.premium) {
+							if (checkThemeExists(demo)) {
+								if (
+									!(demo.theme_slug === 'zakra'
+										? localizedData.zakra_pro_activated
+										: demo.theme_slug + '-pro' === localizedData.current_theme)
+								) {
+									setOpen(true);
+								} else {
+									setOpen(false);
+									setShowFeatureLayout(true);
+								}
+							} else {
+								setOpen(true);
+							}
+						} else {
+							setOpen(false);
+							setShowFeatureLayout(true);
+						}
+					}}
 				/>
-			</div>
-		</>
+			) : (
+				showSidebar && (
+					<FeatureSidebar
+						demo={demo}
+						plugins={plugins}
+						setPlugins={setPlugins}
+						onOpen={() => setOpen(true)}
+						setShowFeatureLayout={setShowFeatureLayout}
+					/>
+				)
+			)}
+			{pageImport === 'all' ? (
+				<Content demo={demo} iframeRef={iframeRef} device={device} />
+			) : (
+				<Pages pages={allPages} setAllPages={setAllPages} demo={demo} />
+			)}
+			<StartImport
+				open={open}
+				setOpen={setOpen}
+				onOpen={() => setOpen(true)}
+				onClose={() => setOpen(false)}
+				demo={demo}
+				plugins={plugins}
+				siteLogoId={siteLogoId}
+				pages={allPages}
+				setShowSidebar={setShowSidebar}
+				isPagesSelected={isPagesSelected}
+			/>
+		</div>
 	);
 };
 
