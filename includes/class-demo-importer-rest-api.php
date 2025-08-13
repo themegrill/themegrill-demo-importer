@@ -139,16 +139,18 @@ class TG_Importer_REST_Controller extends WP_REST_Controller {
 	public function tgdi_site_data( $request ) {
 		$site       = $request->get_param( 'slug' );
 		$demo_theme = $request->get_param( 'theme' );
-		$url        = '';
+		$base_url   = '';
 
 		if ( 'zakra' === $demo_theme ) {
-			$url = TG_Demo_Importer::$zakra_base_url . '/' . $site . TG_Demo_Importer::$namespace . '/data';
+			$base_url = TG_Demo_Importer::$zakra_base_url;
 		} else {
-			$url = TG_Demo_Importer::$themegrill_base_url . '/' . $site . TG_Demo_Importer::$namespace . '/data';
+			$base_url = TG_Demo_Importer::$themegrill_base_url;
 		}
 
+		$api_url = $base_url . '/' . $site . TG_Demo_Importer::$namespace . '/sites/data';
+
 		$site_data = wp_remote_get(
-			$url,
+			$api_url,
 			array(
 				'headers'   => array(
 					'User-Agent'   => 'ThemeGrill/1.0',
