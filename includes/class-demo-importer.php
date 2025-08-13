@@ -134,15 +134,11 @@ class TG_Demo_Importer {
 		$template   = static::get_theme();
 		$demos      = [];
 		$need_fetch = false;
-		if ( 'all' === $template ) {
-			if ( $force ) {
-				delete_transient( 'themegrill_demo_importer_demos' );
-			}
-			$demos = get_transient( 'themegrill_demo_importer_demos', array() );
-			if ( empty( $demos ) ) {
-				$need_fetch = true;
-			}
-		} else {
+		if ( $force ) {
+			delete_transient( 'themegrill_demo_importer_demos' );
+		}
+		$demos = get_transient( 'themegrill_demo_importer_demos', array() );
+		if ( empty( $demos ) ) {
 			$need_fetch = true;
 		}
 
@@ -179,7 +175,6 @@ class TG_Demo_Importer {
 			set_transient( 'themegrill_demo_importer_demos', $demos );
 
 		}
-
 		$data = static::get_filtered_data( $demos, $template );
 		return apply_filters(
 			'themegrill_demo_importer_packages_template',
