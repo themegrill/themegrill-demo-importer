@@ -19,18 +19,17 @@ class TG_Widget_Importer {
 	 * Import widget JSON data.
 	 *
 	 * @global array $wp_registered_sidebars
-	 * @param  string $import_file Path to the import file.
+	 * @param  array $data Widgets
 	 * @param  string $demo_id     The ID of demo being imported.
 	 * @param  array  $demo_data   The data of demo being imported.
+	 * @param  array  $term_id_map   Processed Terms Map
 	 * @return WP_Error|array WP_Error on failure, $results on success.
 	 */
-	public static function import( $import_file, $demo_id, $demo_data, $term_id_map ) {
+	public static function import( $data, $demo_id, $demo_data, $term_id_map ) {
 		global $wp_registered_sidebars;
-
-		$data = json_decode( file_get_contents( $import_file ) );
 		// Have valid data? If no data or could not decode.
-		if ( empty( $data ) || ! is_object( $data ) ) {
-			return new WP_Error( 'themegrill_widget_import_data_error', __( 'Widget import data could not be read. Please try a different file.', 'themegrill-demo-importer' ) );
+		if ( empty( $data ) || ! is_array( $data ) ) {
+			return new WP_Error( 'themegrill_widget_import_data_error', __( 'Invalid data.', 'themegrill-demo-importer' ) );
 		}
 
 		// Hook before import.

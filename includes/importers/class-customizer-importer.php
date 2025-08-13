@@ -21,34 +21,24 @@ class TG_Customizer_Importer {
 	 *
 	 * Update: WP core customize_save actions were removed, because of some errors.
 	 *
-	 * @param  string $import_file Path to the import file.
+	 * @param  array $data Theme mods.
 	 * @param  string $demo_id     The ID of demo being imported.
 	 * @param  array  $demo_data   The data of demo being imported.
-	 * @param  string  $pagebuilder   Pagebuilder key.
+	 * @param  array  $term_id_map   Processed Terms Map
 	 * @return void|WP_Error
 	 */
-	public static function import( $import_file, $demo_id, $demo_data, $pagebuilder, $term_id_map ) {
+	public static function import( $data, $demo_id, $demo_data, $term_id_map ) {
 		global $wp_customize;
 
-		$content = file_get_contents( $import_file );
-
-		$data = maybe_unserialize( $content );
 		// Data checks.
-		if ( ! is_array( $data ) && ( ! isset( $data['template'] ) || ! isset( $data['mods'] ) ) ) {
-			return new WP_Error( 'themegrill_customizer_import_data_error', __( 'The customizer import file is not in a correct format. Please make sure to use the correct customizer import file.', 'themegrill-demo-importer' ) );
-		}
-
-		if ( ! empty( $demo_data['template'] ) && ! in_array( $data['template'], $demo_data['template'], true ) ) {
-			return new WP_Error( 'themegrill_customizer_import_wrong_theme', __( 'The customizer import file is not suitable for current theme. You can only import customizer settings for the same theme or a child theme.', 'themegrill-demo-importer' ) );
+		if ( ! is_array( $data ) ) {
+			return new WP_Error( 'themegrill_customizer_import_data_error', __( 'The customizer data is not in a correct format.', 'themegrill-demo-importer' ) );
 		}
 
 		// Import Images.
 		if ( apply_filters( 'themegrill_customizer_import_images', true ) ) {
-			$data['mods'] = self::import_customizer_images( $data['mods'] );
+			$data = self::import_customizer_images( $data );
 		}
-
-		// Modify settings array.
-		$data = apply_filters( 'themegrill_customizer_import_settings', $data, $demo_data['pagebuilder_data'][ $pagebuilder ], $demo_id );
 
 		// Import custom options.
 		if ( isset( $data['options'] ) ) {
@@ -76,21 +66,26 @@ class TG_Customizer_Importer {
 			}
 		}
 
-		if ( isset( $data['mods']['colormag_footer_menu'] ) && ! empty( $data['mods']['colormag_footer_menu'] ) ) {
-			$footer_menu_id                       = isset( $term_id_map[ $data['mods']['colormag_footer_menu'] ] ) ? (string) $term_id_map[ $data['mods']['colormag_footer_menu'] ] : $data['mods']['colormag_footer_menu'];
-			$data['mods']['colormag_footer_menu'] = $footer_menu_id;
+		if ( isset( $data['nav_menu_locations'] ) && is_array( $data['nav_menu_locations'] ) ) {
+			foreach ( $data['nav_menu_locations'] as $location => $menu_id ) {
+				if ( isset( $term_id_map[ $menu_id ] ) ) {
+					$data['nav_menu_locations'][ $location ] = $term_id_map[ $menu_id ];
+				}
+			}
+		}
+
+		if ( isset( $data['colormag_footer_menu'] ) && ! empty( $data['colormag_footer_menu'] ) ) {
+			$footer_menu_id               = isset( $term_id_map[ $data['colormag_footer_menu'] ] ) ? (string) $term_id_map[ $data['colormag_footer_menu'] ] : $data['colormag_footer_menu'];
+			$data['colormag_footer_menu'] = $footer_menu_id;
 		}
 
 		// If wp_css is set then import it.
 		if ( function_exists( 'wp_update_custom_css_post' ) && isset( $data['wp_css'] ) && '' !== $data['wp_css'] ) {
 			wp_update_custom_css_post( $data['wp_css'] );
 		}
-
 		// Loop through theme mods and update them.
-		if ( ! empty( $data['mods'] ) ) {
-			foreach ( $data['mods'] as $key => $value ) {
-				set_theme_mod( $key, $value );
-			}
+		foreach ( $data as $key => $value ) {
+			set_theme_mod( $key, $value );
 		}
 	}
 
@@ -103,20 +98,40 @@ class TG_Customizer_Importer {
 	private static function import_customizer_images( $mods ) {
 		foreach ( $mods as $key => $value ) {
 			if ( self::is_image_url( $value ) ) {
-				$data = self::media_handle_sideload( $value );
-				if ( ! is_wp_error( $data ) ) {
-					$mods[ $key ] = $data->url;
-
-					// Handle header image controls.
-					if ( isset( $mods[ $key . '_data' ] ) ) {
-						$mods[ $key . '_data' ] = $data;
-						update_post_meta( $data->attachment_id, '_wp_attachment_is_custom_header', get_stylesheet() );
-					}
-				}
+				$new_url      = self::replace_image_host( $value );
+				$mods[ $key ] = $new_url;
+			} elseif ( is_array( $value ) ) {
+				$mods[ $key ] = self::process_array_images( $value );
 			}
 		}
 
 		return $mods;
+	}
+
+	private static function replace_image_host( $url ) {
+		$parsed_url = wp_parse_url( $url );
+
+		if ( ! $parsed_url || ! isset( $parsed_url['path'] ) ) {
+			return $url;
+		}
+
+		$site_url = wp_parse_url( home_url() );
+		$path     = $parsed_url['path'];
+		$path     = preg_replace( '/\/sites\/\d+/', '', $path );
+		$new_url  = $site_url['scheme'] . '://' . $site_url['host'];
+		$new_url .= $path;
+		return $new_url;
+	}
+
+	private static function process_array_images( $data ) {
+		foreach ( $data as $key => $value ) {
+			if ( is_string( $value ) && self::is_image_url( $value ) ) {
+				$data = self::replace_image_host( $value );
+			} elseif ( is_array( $value ) ) {
+				$data[ $key ] = self::process_array_images( $value );
+			}
+		}
+		return $data;
 	}
 
 	/**
