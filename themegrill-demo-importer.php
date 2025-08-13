@@ -42,28 +42,6 @@ function tgdm() {
 // Global for backwards compatibility.
 $GLOBALS['themegrill-demo-importer'] = tgdm();
 
-function allow_iframe_in_import( $allowedposttags ) {
-	$allowedposttags['iframe'] = array(
-		'src'             => array(),
-		'width'           => array(),
-		'height'          => array(),
-		'frameborder'     => array(),
-		'allowfullscreen' => array(),
-		'allow'           => array(),
-		'loading'         => array(),
-	);
-
-	return $allowedposttags;
-}
-add_filter( 'wp_kses_allowed_html', 'allow_iframe_in_import', 10, 1 );
-
-function allow_iframe_after_import( $postdata, $post, $term_id_map ) { //phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
-	$postdata['post_content'] = wp_kses( $postdata['post_content'], wp_kses_allowed_html( 'post' ) );
-	return $postdata;
-}
-add_filter( 'wp_import_post_data_processed', 'allow_iframe_after_import', 10, 3 );
-
-
 add_filter(
 	'wp_import_post_data_processed',
 	function ( $post_data, $post, $term_id_map ) {
