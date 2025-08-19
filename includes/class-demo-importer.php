@@ -168,7 +168,7 @@ class TG_Demo_Importer {
 			usort(
 				$demos,
 				function ( $a, $b ) {
-					return strtotime( $b->lastUpdated ) - strtotime( $a->lastUpdated );
+					return strtotime( $b->created ) - strtotime( $a->created );
 				}
 			);
 
@@ -188,7 +188,7 @@ class TG_Demo_Importer {
 			$filtered_demos = array_filter(
 				$demos,
 				function ( $demo ) {
-					return in_array( $demo->theme_slug, [ 'zakra','colormag', 'spacious' ], true );
+					return in_array( $demo->theme_slug, [ 'zakra','colormag' ], true );
 				}
 			);
 		} else {
