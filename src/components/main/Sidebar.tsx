@@ -206,7 +206,7 @@ const Sidebar = ({ pagebuilders, categories, handleRefetch }: Props) => {
 						{categories.map((item) => (
 							<Button
 								key={item.slug}
-								className={`cursor-pointer px-6 py-[12px] h-[48px] text-[16px] leading-[26px] font-normal rounded-md border-2 border-solid  ${
+								className={`cursor-pointer px-6 py-[12px] h-[48px] text-[15px] leading-[26px] font-normal rounded-md border-2 border-solid  ${
 									isCategorySelected(item.slug)
 										? 'bg-[#5182EF] border-[#5182EF] text-[#fff] hover:bg-[#5182EF] hover:text-[#fff]'
 										: 'bg-[#FDFDFE] border-[#EEEFF2] text-[#383838] hover:bg-[#fff] hover:text-[#383838]'

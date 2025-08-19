@@ -6,6 +6,7 @@ import { useLocalizedData } from '../../LocalizedDataContext';
 import Pages from '../pages/Pages';
 import Content from './Content';
 import FeatureSidebar from './FeatureSidebar';
+import IframeLoading from './IframeLoading';
 import Sidebar from './Sidebar';
 import StartImport from './StartImport';
 
@@ -36,6 +37,7 @@ const Import = () => {
 	const [error, setError] = useState<string | null>(null);
 	const [empty, setEmpty] = useState<boolean>(false);
 	const [loading, setLoading] = useState(true);
+	const [isIframeLoading, setIsIframeLoading] = useState(true);
 	const [device, setDevice] = useState('desktop');
 	const [pageImport, setPageImport] = useState('all');
 	const [isPagesSelected, setIsPagesSelected] = useState(false);
@@ -161,7 +163,7 @@ const Import = () => {
 
 	if (loading)
 		return (
-			<div className="flex h-screen">
+			<div className="flex h-screen content-container">
 				<div className="w-[350px] h-screen flex flex-col">
 					<div className="p-6  border-0 border-r border-solid border-[#E9E9E9] flex flex-col gap-6 bg-[#FAFBFC] box-border flex-1">
 						<div className="pb-6 border-0 border-b border-solid border-[#E3E3E3]">
@@ -202,7 +204,9 @@ const Import = () => {
 						<div className="w-[74px] h-[24px] bg-[#E7E8E9] rounded-sm animate-pulse ml-auto mr-auto"></div>
 					</div>
 				</div>
-				<div className="flex-1 p-[88px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[40px] overflow-y-auto bg-[#fff]"></div>
+				<div className="flex-1 p-[60px] pb-0 bg-white iframe-wrapper">
+					<IframeLoading />
+				</div>
 			</div>
 		);
 

@@ -282,5 +282,14 @@
 				@apply grid-cols-1;
 			}
 		}
+
+		@container content-container (max-width: 1400px) {
+			.iframe-wrapper .menu-wrapper {
+				@apply gap-4;
+			}
+			.iframe-wrapper .menu-wrapper div {
+				@apply w-[60px] gap-4;
+			}
+		}
 	}
 }

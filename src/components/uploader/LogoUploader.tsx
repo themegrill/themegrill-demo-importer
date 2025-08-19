@@ -106,26 +106,12 @@ const LogoUploader = ({ iframeRef, setSiteLogoId }: Props) => {
 		if (!selectedLogo) return null;
 		return (
 			<>
-				<div className=" mb-[10px] px-[16px] py-[18px] bg-white rounded-md border-2 border-dashed border-[#C4C4C4CC]">
-					<div className="flex items-center gap-[12px]">
-						<div className="flex-shrink-0">
-							<img
-								src={selectedLogo.url}
-								alt={selectedLogo.alt}
-								className="max-w-[120px] max-h-[60px] object-contain border border-[#eee] rounded"
-							/>
-						</div>
-
-						<div className="flex-1 min-w-0">
-							<p className="m-0 text-[12px] text-[#222] font-medium truncate">
-								{selectedLogo.filename || 'Logo'}
-							</p>
-							<p className="m-0 text-[11px] text-[#6B6B6B] mt-[2px]">
-								{selectedLogo.width} × {selectedLogo.height} pixels
-							</p>
-							<p className="m-0 text-[11px] text-[#6B6B6B]">{selectedLogo.mime}</p>
-						</div>
-					</div>
+				<div className=" mb-[10px] h-[50px] p-1 bg-white rounded-md border-2 border-dashed border-[#C4C4C4]/80 max-w-full flex items-center justify-center">
+					<img
+						src={selectedLogo.url}
+						alt={selectedLogo.alt}
+						className="max-w-full max-h-full border border-[#eee] rounded"
+					/>
 				</div>
 				<div className="flex items-center gap-[12px]">
 					<button
@@ -204,7 +190,7 @@ const LogoUploader = ({ iframeRef, setSiteLogoId }: Props) => {
 						return (
 							<button
 								type="button"
-								className="tg-upload-logo w-full p-0 h-[62px] cursor-pointer bg-white rounded-md border-2 border-dashed border-[#C4C4C4CC]"
+								className="tg-upload-logo w-full p-0 h-[62px] cursor-pointer bg-white rounded-md border-2 border-dashed border-[#C4C4c4]/80"
 								onClick={open}
 							>
 								<div className="text-center">

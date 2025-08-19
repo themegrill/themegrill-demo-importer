@@ -34,6 +34,7 @@ export type DemoType = {
 	slug: string;
 	theme_slug: string;
 	previewImage: string;
+	new: boolean;
 };
 
 // export type DataObjectType = Record<string, ThemeDataType>;

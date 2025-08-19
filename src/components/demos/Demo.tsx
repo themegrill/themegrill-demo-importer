@@ -13,15 +13,14 @@ const Demo = ({ demo }: DemoProps) => {
 	const [searchParams] = useSearchParams();
 	const pagebuilder = searchParams.get('pagebuilder') || 'all';
 	const isPremium = demo?.categories?.find((c) => c === 'premium');
-	const isNew = Date.now() - new Date('2025-07-17 03:14:59').getTime() < 7 * 24 * 60 * 60 * 1000;
 
 	return (
 		<Link
 			to={`/import-detail/${demo.theme_slug}/${pagebuilder}/${demo.slug}`}
-			className="text-[#383838] rounded-md no-underline hover:text-[#383838] tg-demo flex flex-col gap-0 flex-shrink-0 self-start"
+			className="text-[#383838] no-underline hover:text-[#383838] tg-demo flex flex-col gap-0 flex-shrink-0 self-start border-2 border-solid border-[#EDEDED] rounded-md hover:border-[#5182EF] hover:shadow-custom-active cursor-pointer "
 		>
-			<div className="border-2 rounded-md border-solid cursor-pointer border-[#EDEDED] hover:border-[#5182EF]">
-				<div className="relative" style={{ aspectRatio: '.84 / 1' }}>
+			<div>
+				<div className="relative h-full" style={{ aspectRatio: '.84 / 1' }}>
 					{demo.previewImage ? (
 						// <img
 						// 	src={require(`../../assets/images/test.jpg`)}
@@ -45,7 +44,7 @@ const Demo = ({ demo }: DemoProps) => {
 					<h4 className="flex items-center gap-2 m-0 text-[#383838] text-[16px]">
 						{demo.title ||
 							demo.slug.replace(/-/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase())}
-						{isNew && (
+						{demo.new && (
 							<span className="bg-[#27AE60] px-2 py-0.5 text-[10px] text-white rounded-[3px]">
 								{__('New', 'themegrill-demo-importer')}
 							</span>

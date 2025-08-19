@@ -30,7 +30,14 @@ const Sidebar = ({
 	onContinue,
 	setIsPagesSelected,
 }: Props) => {
-	const colors = ['#FD6611', '#EA0722', '#524F51', '#8F8F8F', '#D3D3D3'];
+	const colorPalette = [
+		['#FD6611', '#EA0722', '#524F51', '#8F8F8F', '#D3D3D3'],
+		['#2563EB', '#00FF5D', '#524F51', '#8F8F8F', '#D3D3D3'],
+		['#CA04CE', '#5EA396', '#EFDF30', '#8F8F8F', '#D3D3D3'],
+		['#21587B', '#5EA396', '#57CC98', '#80EB9A', '#C6FACC'],
+		['#FF7577', '#E28386', '#BD999D', '#9FC8CB', '#7BF4F3'],
+		['#9481FF', '#9494FF', '#FFA3FF', '#9C84B3', '#FFDFC9'],
+	];
 	const navigate = useNavigate();
 
 	return (
@@ -69,8 +76,11 @@ const Sidebar = ({
 						{__('Color Palette', 'themegrill-demo-importer')}
 					</h3>
 					<div className="grid grid-cols-2 gap-[14px]">
-						{Array.from({ length: 6 }).map((_, outerIndex) => (
-							<div className="border-2 border-solid border-[#EEEFF2] bg-[#FDFDFE] rounded-md p-[6px] flex">
+						{colorPalette.map((colors, index) => (
+							<div
+								className="border-2 border-solid border-[#EEEFF2] bg-[#FDFDFE] rounded-md p-[6px] flex hover:border-[#5182EF]"
+								key={index}
+							>
 								{colors.map((color, index) => (
 									<div
 										key={index}
@@ -95,7 +105,10 @@ const Sidebar = ({
 						</h3>
 						<div className="grid grid-cols-3 gap-[14px]">
 							{Array.from({ length: 9 }).map((_, outerIndex) => (
-								<button className="border-2 border-solid border-[#EEEFF2] bg-[#FDFDFE] px-6 py-[10px] rounded-md cursor-pointer w-[88px]">
+								<button
+									className="border-2 border-solid border-[#EEEFF2] bg-[#FDFDFE] px-6 py-[10px] rounded-md cursor-pointer w-[88px] hover:border-[#5182EF]"
+									key={outerIndex}
+								>
 									<p className="text-[15px] text-[#6B6B6B] font-bold leading-[22px] tracking-[0.15px] m-0 ">
 										Aa
 									</p>
