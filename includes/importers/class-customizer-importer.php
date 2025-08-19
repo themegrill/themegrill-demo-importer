@@ -118,6 +118,7 @@ class TG_Customizer_Importer {
 		$site_url = wp_parse_url( home_url() );
 		$path     = $parsed_url['path'];
 		$path     = preg_replace( '/\/sites\/\d+/', '', $path );
+		$path     = preg_replace( '/^\/[^\/]+/', '', $path );
 		$new_url  = $site_url['scheme'] . '://' . $site_url['host'];
 		$new_url .= $path;
 		return $new_url;
@@ -126,7 +127,7 @@ class TG_Customizer_Importer {
 	private static function process_array_images( $data ) {
 		foreach ( $data as $key => $value ) {
 			if ( is_string( $value ) && self::is_image_url( $value ) ) {
-				$data = self::replace_image_host( $value );
+				$data[ $key ] = self::replace_image_host( $value );
 			} elseif ( is_array( $value ) ) {
 				$data[ $key ] = self::process_array_images( $value );
 			}
