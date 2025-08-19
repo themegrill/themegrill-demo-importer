@@ -106,26 +106,12 @@ const LogoUploader = ({ iframeRef, setSiteLogoId }: Props) => {
 		if (!selectedLogo) return null;
 		return (
 			<>
-				<div className="bg-white rounded mb-[10px] border border-dashed border-[#BABABA] p-[16px]">
-					<div className="flex items-center gap-[12px]">
-						<div className="flex-shrink-0">
-							<img
-								src={selectedLogo.url}
-								alt={selectedLogo.alt}
-								className="max-w-[120px] max-h-[60px] object-contain border border-[#eee] rounded"
-							/>
-						</div>
-
-						<div className="flex-1 min-w-0">
-							<p className="m-0 text-[12px] text-[#222] font-medium truncate">
-								{selectedLogo.filename || 'Logo'}
-							</p>
-							<p className="m-0 text-[11px] text-[#6B6B6B] mt-[2px]">
-								{selectedLogo.width} × {selectedLogo.height} pixels
-							</p>
-							<p className="m-0 text-[11px] text-[#6B6B6B]">{selectedLogo.mime}</p>
-						</div>
-					</div>
+				<div className=" mb-[10px] h-[50px] p-1 bg-white rounded-md border-2 border-dashed border-[#C4C4C4]/80 max-w-full flex items-center justify-center">
+					<img
+						src={selectedLogo.url}
+						alt={selectedLogo.alt}
+						className="max-w-full max-h-full border border-[#eee] rounded"
+					/>
 				</div>
 				<div className="flex items-center gap-[12px]">
 					<button
@@ -190,43 +176,32 @@ const LogoUploader = ({ iframeRef, setSiteLogoId }: Props) => {
 	};
 
 	return (
-		<div className="mb-[24px]">
-			<h4 className="text-[17px] m-0 mb-[20px]">{__('Change Logo', 'themegrill-demo-importer')}</h4>
+		<div>
+			<h3 className="text-[16px] text-[#1F1F1F] mt-0 mb-5">
+				{__('Change Logo', 'themegrill-demo-importer')}
+			</h3>{' '}
 			{selectedLogo ? (
 				renderSelectedLogo()
 			) : (
-				<>
-					<MediaUpload
-						allowedTypes={['image']}
-						onSelect={handleLogoSelect}
-						render={({ open }: { open: () => void }) => {
-							return (
-								<button
-									type="button"
-									className="tg-upload-logo px-[16px] py-[32px] cursor-pointer bg-white rounded mb-[10px] border border-dashed border-[#BABABA]"
-									onClick={open}
-								>
-									<div className="text-center">
-										<h4 className="m-0 mb-[8px] text-[14px] text-[#222]">
-											{__('Upload Logo Here', 'themegrill-demo-importer')}
-										</h4>
-										<p className="m-0 text-[12px] text-[#6B6B6B]">
-											{__('Suggested Dimension: 190x60 pixels', 'themegrill-demo-importer')}
-										</p>
-									</div>
-								</button>
-							);
-						}}
-					/>
-					<p className="text-[#6b6b6b] font-[400] text-[12px] m-0">
-						<i>
-							{__(
-								'Don’t have a logo yet? No problem! You can upload it later.',
-								'themegrill-demo-importer',
-							)}
-						</i>
-					</p>
-				</>
+				<MediaUpload
+					allowedTypes={['image']}
+					onSelect={handleLogoSelect}
+					render={({ open }: { open: () => void }) => {
+						return (
+							<button
+								type="button"
+								className="tg-upload-logo w-full p-0 h-[62px] cursor-pointer bg-white rounded-md border-2 border-dashed border-[#C4C4c4]/80"
+								onClick={open}
+							>
+								<div className="text-center">
+									<p className="m-0 text-[13px] text-[#383838] font-normal">
+										{__('Upload Logo Here', 'themegrill-demo-importer')}
+									</p>
+								</div>
+							</button>
+						);
+					}}
+				/>
 			)}
 		</div>
 	);

@@ -1,8 +1,8 @@
 import React from 'react';
 import { HashRouter, Route, Routes } from 'react-router-dom';
-import Import from './components/import/Import';
 import Home from './Home';
 import { LocalizedDataProvider } from './LocalizedDataContext';
+import Import from './components/import/Import';
 
 const App = () => {
 	return (
@@ -10,7 +10,7 @@ const App = () => {
 			<LocalizedDataProvider>
 				<Routes>
 					<Route path="/" element={<Home />} />
-					<Route path="/import-detail/:slug/:pagebuilder/:demo_theme" element={<Import />} />
+					<Route path="/import-detail/:demo_theme/:pagebuilder/:slug" element={<Import />} />
 				</Routes>
 			</LocalizedDataProvider>
 		</HashRouter>
