@@ -85,14 +85,12 @@ const DialogPro = ({ demo, proUpgrade, proActivate, setOpen }: Props) => {
 			</p>
 			<div className="px-[49px]">
 				{proUpgrade && (
-					<a
-						href={matchedTheme?.pricing_link ?? '#'}
-						target="_blank"
-						rel="noopener noreferrer"
-						className="px-5 py-[15px] h-[51px] text-[15px] leading-[21px] text-[#FAFBFF] font-semibold rounded-md bg-[#2563EB] border-none w-full hover:bg-[#2563EB] cursor-pointer no-underline"
+					<Button
+						className="px-5 py-[15px] h-[51px] text-[15px] leading-[21px] text-[#FAFBFF] font-semibold rounded-md border-none w-full bg-[#2563EB] hover:bg-[#2563EB] cursor-pointer no-underline"
+						onClick={() => window.open(matchedTheme?.pricing_link ?? '#', '_blank')}
 					>
 						{__('Upgrade Now', 'themegrill-demo-importer')}
-					</a>
+					</Button>
 				)}
 				{proActivate &&
 					(isActivating ? (
