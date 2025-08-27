@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: ThemeGrill Demo Importer
+ * Plugin Name: Starter Templates & Sites Pack by ThemeGrill
  * Plugin URI: https://themegrill.com/demo-importer/
  * Description: Import ThemeGrill official themes demo content, widgets and theme settings with just one click.
  * Version: 1.9.9
@@ -17,30 +17,41 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-// Define TGDM_PLUGIN_FILE.
-if ( ! defined( 'TGDM_PLUGIN_FILE' ) ) {
-	define( 'TGDM_PLUGIN_FILE', __FILE__ );
-}
+const TGDM_VERSION     = '1.9.9';
+const TGDM_PLUGIN_FILE = __FILE__;
+define( 'TGDM_ABSPATH', plugin_dir_path( __FILE__ ) );
+define( 'TGDM_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
+$upload_dir = wp_upload_dir( null, false );
+define( 'TGDM_DEMO_DIR', $upload_dir['basedir'] . '/tg-demo-pack/' );
+// const THEMEGRILL_BASE_URL = 'http://themegrill-demos-api.test';
+const THEMEGRILL_BASE_URL = 'https://themegrilldemos.com';
+const ZAKRA_BASE_URL      = 'https://zakrademos.com';
+const TGDM_NAMESPACE      = '/wp-json/themegrill-demos/v1';
 
-// Include the main ThemeGrill Demo Importer class.
-if ( ! class_exists( 'ThemeGrill_Demo_Importer' ) ) {
-	include_once __DIR__ . '/includes/class-themegrill-demo-importer.php';
-}
+require_once __DIR__ . '/vendor/autoload.php';
 
-/**
- * Main instance of ThemeGrill Demo importer.
- *
- * Returns the main instance of TGDM to prevent the need to use globals.
- *
- * @since  1.9.9
- * @return ThemeGrill_Demo_Importer
- */
-function tgdm() {
-	return ThemeGrill_Demo_Importer::instance();
-}
+\ThemeGrill\Demo\Importer\App::instance();
 
-// Global for backwards compatibility.
-$GLOBALS['themegrill-demo-importer'] = tgdm();
+
+// // Include the main ThemeGrill Demo Importer class.
+// if ( ! class_exists( 'ThemeGrill_Demo_Importer' ) ) {
+//  include_once __DIR__ . '/includes/class-themegrill-demo-importer.php';
+// }
+
+// /**
+//  * Main instance of ThemeGrill Demo importer.
+//  *
+//  * Returns the main instance of TGDM to prevent the need to use globals.
+//  *
+//  * @since  1.9.9
+//  * @return ThemeGrill_Demo_Importer
+//  */
+// function tgdm() {
+//  return ThemeGrill_Demo_Importer::instance();
+// }
+
+// // Global for backwards compatibility.
+// $GLOBALS['themegrill-demo-importer'] = tgdm();
 
 add_filter(
 	'wp_import_post_data_processed',

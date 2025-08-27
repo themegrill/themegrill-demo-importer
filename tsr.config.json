@@ -1,0 +1,6 @@
+{
+  "routesDirectory": "./resources/onboarding/routes",
+  "generatedRouteTree": "./resources/onboarding/routeTree.gen.ts",
+  "routeFileIgnorePrefix": "~",
+  "quoteStyle": "single"
+}

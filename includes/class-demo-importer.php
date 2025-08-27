@@ -73,7 +73,7 @@ class TG_Demo_Importer {
 		// add_filter( 'themegrill_customizer_demo_import_settings', array( $this, 'update_customizer_data' ), 10, 2 );
 
 		// Refresh demos.
-		add_action( 'admin_init', array( $this, 'refresh_demo_lists' ) );
+		// add_action( 'admin_init', array( $this, 'refresh_demo_lists' ) );
 
 		// Register API Endpoints
 		add_action( 'rest_api_init', array( $this, 'register_api_endpoints' ) );
@@ -1732,23 +1732,23 @@ class TG_Demo_Importer {
 	/**
 	 * Refreshes the demo lists.
 	 */
-	public function refresh_demo_lists() {
-		// Reset the transient if user has clicked on the `Refresh Demos` button.
-		if ( isset( $_GET['refresh-demo-packages'] ) && isset( $_GET['_refresh_demo_packages_nonce'] ) ) {
-			if ( ! wp_verify_nonce( $_GET['_refresh_demo_packages_nonce'], 'refresh_demo_packages' ) ) {
-				wp_die( __( 'Action failed. Please refresh the page and retry.', 'themegrill-demo-importer' ) );
-			}
+	// public function refresh_demo_lists() {
+	//  // Reset the transient if user has clicked on the `Refresh Demos` button.
+	//  if ( isset( $_GET['refresh-demo-packages'] ) && isset( $_GET['_refresh_demo_packages_nonce'] ) ) {
+	//      if ( ! wp_verify_nonce( $_GET['_refresh_demo_packages_nonce'], 'refresh_demo_packages' ) ) {
+	//          wp_die( __( 'Action failed. Please refresh the page and retry.', 'themegrill-demo-importer' ) );
+	//      }
 
-			$demo_packages = get_transient( 'themegrill_demo_importer_packages' );
+	//      $demo_packages = get_transient( 'themegrill_demo_importer_packages' );
 
-			if ( $demo_packages ) {
-				delete_transient( 'themegrill_demo_importer_packages' );
-			}
+	//      if ( $demo_packages ) {
+	//          delete_transient( 'themegrill_demo_importer_packages' );
+	//      }
 
-			// Redirect to demo import page once the transient is clear, since on first click, none of the demo is shown up in lists.
-			wp_safe_redirect( apply_filters( 'themegrill_demo_importer_redirect_link', admin_url( 'themes.php?page=demo-importer&browse=all' ) ) );
-		}
-	}
+	//      // Redirect to demo import page once the transient is clear, since on first click, none of the demo is shown up in lists.
+	//      wp_safe_redirect( apply_filters( 'themegrill_demo_importer_redirect_link', admin_url( 'themes.php?page=demo-importer&browse=all' ) ) );
+	//  }
+	// }
 
 	/**
 	 * Retrieve a page by its title.
