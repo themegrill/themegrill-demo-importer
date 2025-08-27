@@ -9,6 +9,8 @@ class ImportHooks {
 	use Singleton;
 
 	protected function init() {
+		add_action( 'admin_init', array( $this, 'tg_update_demo_importer_options' ) );
+
 		add_action( 'themegrill_ajax_before_demo_import', array( $this, 'reset_widgets' ), 10 );
 		add_action( 'themegrill_ajax_before_demo_import', array( $this, 'delete_nav_menus' ), 20 );
 		add_action( 'themegrill_ajax_before_demo_import', array( $this, 'remove_theme_mods' ), 30 );
@@ -70,6 +72,26 @@ class ImportHooks {
 			},
 			PHP_INT_MAX
 		);
+	}
+
+	/**
+	 * Update demo importer options.
+	 *
+	 * @since 1.3.4
+	 */
+	public function tg_update_demo_importer_options() {
+		$migrate_options = array(
+			'themegrill_demo_imported_id' => 'themegrill_demo_importer_activated_id',
+		);
+
+		foreach ( $migrate_options as $old_option => $new_option ) {
+			$value = get_option( $old_option );
+
+			if ( $value ) {
+				update_option( $new_option, $value );
+				delete_option( $old_option );
+			}
+		}
 	}
 
 	/**

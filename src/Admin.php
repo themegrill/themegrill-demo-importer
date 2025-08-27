@@ -16,13 +16,6 @@ class Admin {
 	public $demo_packages;
 
 	/**
-	 * The importer class object
-	 *
-	 * @var TG_WXR_Importer
-	 */
-	// public static $importer;
-
-	/**
 	 * Initialize admin functionality
 	 */
 	protected function init() {
@@ -30,16 +23,7 @@ class Admin {
 
 		// Add Demo Importer menu.
 		add_action( 'admin_menu', array( $this, 'admin_menu' ), 9 );
-		add_action( 'admin_head', array( $this, 'add_menu_classes' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
-
-		// Help Tabs.
-		if ( apply_filters( 'themegrill_demo_importer_enable_admin_help_tab', true ) ) {
-			add_action( 'current_screen', array( $this, 'add_help_tabs' ), 50 );
-		}
-
-		// Footer rating text.
-		add_filter( 'admin_footer_text', array( $this, 'admin_footer_text' ), 1 );
 
 		// Disable WooCommerce setup wizard.
 		add_action( 'current_screen', array( $this, 'woocommerce_disable_setup_wizard' ) );
@@ -50,7 +34,6 @@ class Admin {
 	 */
 	public function setup() {
 		$this->demo_packages = static::get_demo_packages();
-		// static::$importer    = new WXRImporter();
 	}
 
 	/**
@@ -72,49 +55,13 @@ class Admin {
 			}
 		);
 		add_action( "admin_print_scripts-$page", array( $this, 'enqueue_demo_importer_assets' ) );
-		add_theme_page( __( 'Demo Importer Status', 'themegrill-demo-importer' ), __( 'Demo Importer Status', 'themegrill-demo-importer' ), 'switch_themes', 'demo-importer-status', array( $this, 'status_menu' ) );
-	}
-
-	/**
-	 * Adds the class to the menu.
-	 */
-	public function add_menu_classes() {
-		global $submenu;
-
-		if ( isset( $submenu['themes.php'] ) ) {
-			$submenu_class = 'demo-importer hide-if-no-js';
-
-			// Add menu classes if user has access.
-			if ( apply_filters( 'themegrill_demo_importer_include_class_in_menu', true ) ) {
-				foreach ( $submenu['themes.php'] as $order => $menu_item ) {
-					if ( 0 === strpos( $menu_item[0], _x( 'Demo Importer', 'Admin menu name', 'themegrill-demo-importer' ) ) ) {
-						$submenu['themes.php'][ $order ][4] = empty( $menu_item[4] ) ? $submenu_class : $menu_item[4] . ' ' . $submenu_class;
-						break;
-					}
-				}
-			}
-		}
 	}
 
 	/**
 	 * Enqueue scripts.
 	 */
 	public function enqueue_scripts() {
-		$screen      = get_current_screen();
-		$screen_id   = $screen ? $screen->id : '';
-		$suffix      = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
-		$assets_path = App::plugin_url() . '/assets/';
-
 		wp_enqueue_media();
-
-		// Demo Importer appearance page.
-		// if ( 'appearance_page_demo-importer' === $screen_id ) {
-		//  wp_enqueue_style( 'tg-demo-importer' );
-		//  wp_enqueue_script( 'tg-demo-importer' );
-
-		//  // For translation of strings within scripts.
-		//  wp_set_script_translations( 'tg-demo-updates', 'themegrill-demo-importer' );
-		// }
 	}
 
 	/**
@@ -155,111 +102,15 @@ class Admin {
 	}
 
 	/**
-	 * Change the admin footer text.
-	 *
-	 * @param  string $footer_text
-	 * @return string
-	 */
-	public function admin_footer_text( $footer_text ) {
-		if ( ! current_user_can( 'manage_options' ) ) {
-			return $footer_text;
-		}
-
-		$current_screen = get_current_screen();
-
-		// Check to make sure we're on a ThemeGrill Demo Importer admin page.
-		if ( isset( $current_screen->id ) && apply_filters( 'themegrill_demo_importer_display_admin_footer_text', in_array( $current_screen->id, array( 'appearance_page_demo-importer' ) ) ) ) {
-			// Change the footer text.
-			if ( ! get_option( 'themegrill_demo_importer_admin_footer_text_rated' ) ) {
-				$footer_text = sprintf(
-				/* translators: 1: ThemeGrill Demo Importer 2: five stars */
-					esc_html__( 'If you like %1$s, please leave us a %2$s rating. A huge thanks in advance!', 'themegrill-demo-importer' ),
-					sprintf( '<strong>%s</strong>', esc_html__( get_template(), 'themegrill-demo-importer' ) ),
-					'<a href="https://wordpress.org/support/theme/' . get_template() . '/reviews?rate=5#new-post" target="_blank" class="themegrill-demo-importer-rating-link" data-rated="' . esc_attr__( 'Thanks :)', 'themegrill-demo-importer' ) . '">&#9733;&#9733;&#9733;&#9733;&#9733;</a>'
-				);
-			} else {
-				$footer_text = esc_html__( 'Thank you for importing with ThemeGrill Demo Importer.', 'themegrill-demo-importer' );
-			}
-		}
-
-		return $footer_text;
-	}
-
-	/**
-	 * Add Contextual help tabs.
-	 */
-	public function add_help_tabs() {
-		$screen = get_current_screen();
-
-		if ( ! $screen || ! in_array( $screen->id, array( 'appearance_page_demo-importer' ) ) ) {
-			return;
-		}
-
-		$screen->add_help_tab(
-			array(
-				'id'      => 'themegrill_demo_importer_support_tab',
-				'title'   => __( 'Help &amp; Support', 'themegrill-demo-importer' ),
-				'content' =>
-					'<h2>' . __( 'Help &amp; Support', 'themegrill-demo-importer' ) . '</h2>' .
-					'<p>' . sprintf(
-					/* translators: %s: Documentation URL */
-						__( 'Should you need help understanding, using, or extending ThemeGrill Demo Importer, <a href="%s">please read our documentation</a>. You will find all kinds of resources including snippets, tutorials and much more.', 'themegrill-demo-importer' ),
-						'https://themegrill.com/docs/themegrill-demo-importer/'
-					) . '</p>' .
-					'<p>' . sprintf(
-					/* translators: 1: WP support URL. 2: TG support URL  */
-						__( 'For further assistance with ThemeGrill Demo Importer core you can use the <a href="%1$s">community forum</a>. If you need help with premium themes sold by ThemeGrill, please <a href="%2$s">use our free support forum</a>.', 'themegrill-demo-importer' ),
-						'https://wordpress.org/support/plugin/themegrill-demo-importer',
-						'https://themegrill.com/support-forum/'
-					) . '</p>' .
-					'<p><a href="https://wordpress.org/support/plugin/themegrill-demo-importer" class="button button-primary">' . __( 'Community forum', 'themegrill-demo-importer' ) . '</a> <a href="https://themegrill.com/support-forum/" class="button">' . __( 'ThemeGrill Support', 'themegrill-demo-importer' ) . '</a></p>',
-			)
-		);
-
-		$screen->add_help_tab(
-			array(
-				'id'      => 'themegrill_demo_importer_bugs_tab',
-				'title'   => __( 'Found a bug?', 'themegrill-demo-importer' ),
-				'content' =>
-					'<h2>' . __( 'Found a bug?', 'themegrill-demo-importer' ) . '</h2>' .
-					'<p>' . sprintf(
-					/* translators: %s: GitHub links */
-						__( 'If you find a bug within ThemeGrill Demo Importer you can create a ticket via <a href="%1$s">Github issues</a>. Ensure you read the <a href="%2$s">contribution guide</a> prior to submitting your report. To help us solve your issue, please be as descriptive as possible.', 'themegrill-demo-importer' ),
-						'https://github.com/themegrill/themegrill-demo-importer/issues?state=open',
-						'https://github.com/themegrill/themegrill-demo-importer/blob/master/.github/CONTRIBUTING.md'
-					) . '</p>' .
-					'<p><a href="https://github.com/themegrill/themegrill-demo-importer/issues?state=open" class="button button-primary">' . __( 'Report a bug', 'themegrill-demo-importer' ) . '</a></p>',
-
-			)
-		);
-
-		$screen->set_help_sidebar(
-			'<p><strong>' . __( 'For more information:', 'themegrill-demo-importer' ) . '</strong></p>' .
-			'<p><a href="https://themegrill.com/demo-importer/" target="_blank">' . __( 'About Demo Importer', 'themegrill-demo-importer' ) . '</a></p>' .
-			'<p><a href="https://wordpress.org/plugins/themegrill-demo-importer/" target="_blank">' . __( 'WordPress.org project', 'themegrill-demo-importer' ) . '</a></p>' .
-			'<p><a href="https://github.com/themegrill/themegrill-demo-importer" target="_blank">' . __( 'Github project', 'themegrill-demo-importer' ) . '</a></p>' .
-			'<p><a href="https://themegrill.com/wordpress-themes/" target="_blank">' . __( 'Official themes', 'themegrill-demo-importer' ) . '</a></p>' .
-			'<p><a href="https://themegrill.com/plugins/" target="_blank">' . __( 'Official plugins', 'themegrill-demo-importer' ) . '</a></p>'
-		);
-	}
-
-	/**
 	 * Disable the WooCommerce Setup Wizard on `ThemeGrill Demo Importer` page only.
 	 */
 	public function woocommerce_disable_setup_wizard() {
 
 		$screen = get_current_screen();
 
-		if ( 'appearance_page_demo-importer' === $screen->id ) {
+		if ( 'appearance_page_demo-importer-v2' === $screen->id ) {
 			add_filter( 'woocommerce_enable_setup_wizard', '__return_false', 1 );
 		}
-	}
-
-	/**
-	 * Demo Importer status page output.
-	 */
-	public function status_menu() {
-		include_once __DIR__ . '/admin/views/html-admin-page-status.php';
 	}
 
 	/**

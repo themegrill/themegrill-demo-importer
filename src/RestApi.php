@@ -15,7 +15,6 @@ class RestApi {
 	protected $namespace = 'tg-demo-importer/v1';
 	private $importController;
 
-
 	/**
 	 * Initialize REST API functionality
 	 */
