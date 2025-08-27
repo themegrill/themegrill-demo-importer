@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: ThemeGrill Demo Importer
+ * Plugin Name: Starter Templates & Sites Pack by ThemeGrill
  * Plugin URI: https://themegrill.com/demo-importer/
  * Description: Import ThemeGrill official themes demo content, widgets and theme settings with just one click.
  * Version: 1.9.9
@@ -17,52 +17,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-// Define TGDM_PLUGIN_FILE.
-if ( ! defined( 'TGDM_PLUGIN_FILE' ) ) {
-	define( 'TGDM_PLUGIN_FILE', __FILE__ );
-}
+const TGDM_VERSION     = '1.9.9';
+const TGDM_PLUGIN_FILE = __FILE__;
+define( 'TGDM_ABSPATH', plugin_dir_path( __FILE__ ) );
+define( 'TGDM_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
+// const THEMEGRILL_BASE_URL = 'http://themegrill-demos-api.test';
+const THEMEGRILL_BASE_URL = 'https://themegrilldemos.com';
+const ZAKRA_BASE_URL      = 'https://zakrademos.com';
+const TGDM_NAMESPACE      = '/wp-json/themegrill-demos/v1';
 
-// Include the main ThemeGrill Demo Importer class.
-if ( ! class_exists( 'ThemeGrill_Demo_Importer' ) ) {
-	include_once __DIR__ . '/includes/class-themegrill-demo-importer.php';
-}
+require_once __DIR__ . '/vendor/autoload.php';
 
-/**
- * Main instance of ThemeGrill Demo importer.
- *
- * Returns the main instance of TGDM to prevent the need to use globals.
- *
- * @since  1.9.9
- * @return ThemeGrill_Demo_Importer
- */
-function tgdm() {
-	return ThemeGrill_Demo_Importer::instance();
-}
-
-// Global for backwards compatibility.
-$GLOBALS['themegrill-demo-importer'] = tgdm();
-
-function allow_iframe_in_import( $allowedposttags ) {
-	$allowedposttags['iframe'] = array(
-		'src'             => array(),
-		'width'           => array(),
-		'height'          => array(),
-		'frameborder'     => array(),
-		'allowfullscreen' => array(),
-		'allow'           => array(),
-		'loading'         => array(),
-	);
-
-	return $allowedposttags;
-}
-add_filter( 'wp_kses_allowed_html', 'allow_iframe_in_import', 10, 1 );
-
-function allow_iframe_after_import( $postdata, $post, $term_id_map ) { //phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
-	$postdata['post_content'] = wp_kses( $postdata['post_content'], wp_kses_allowed_html( 'post' ) );
-	return $postdata;
-}
-add_filter( 'wp_import_post_data_processed', 'allow_iframe_after_import', 10, 3 );
-
+\ThemeGrill\Demo\Importer\App::instance();
 
 add_filter(
 	'wp_import_post_data_processed',
@@ -80,33 +46,65 @@ add_filter(
 
 function update_block_term_ids( array &$blocks, array $term_id_map ) {
 	foreach ( $blocks as &$block ) {
-		if ( isset( $block['blockName'] ) && str_starts_with( $block['blockName'], 'magazine-blocks/' ) ) {
-			if ( isset( $block['attrs'] ) ) {
-				$key1 = array( 'category', 'category2', 'tag', 'tag2' );
+		if ( isset( $block['blockName'] ) ) {
+			if ( str_starts_with( $block['blockName'], 'magazine-blocks/' ) ) {
+				if ( isset( $block['attrs'] ) ) {
+					$key1 = array( 'category', 'category2', 'tag', 'tag2', 'authorName' );
 
-				foreach ( $key1 as $key ) {
-					if ( isset( $block['attrs'][ $key ] ) && isset( $term_id_map[ $block['attrs'][ $key ] ] ) ) {
-						$block['attrs'][ $key ] = (string) $term_id_map[ $block['attrs'][ $key ] ];
+					foreach ( $key1 as $key ) {
+						if ( 'authorName' === $key && isset( $block['attrs'][ $key ] ) ) {
+							$block['attrs'][ $key ] = (string) get_current_user_id();
+							break;
+						}
+						if ( isset( $block['attrs'][ $key ] ) && isset( $term_id_map[ $block['attrs'][ $key ] ] ) ) {
+							$block['attrs'][ $key ] = (string) $term_id_map[ $block['attrs'][ $key ] ];
+						}
+					}
+
+					$key2 = array( 'excludedCategory', 'excludedCategory2' );
+
+					foreach ( $key2 as $key ) {
+						if ( isset( $block['attrs'][ $key ] ) && is_array( $block['attrs'][ $key ] ) ) {
+							$block['attrs'][ $key ] = array_map(
+								function ( $cat_id ) use ( $term_id_map ) {
+									return isset( $term_id_map[ $cat_id ] ) ? (string) $term_id_map[ $cat_id ] : false;
+								},
+								$block['attrs'][ $key ]
+							);
+						}
 					}
 				}
 
-				$key2 = array( 'excludedCategory', 'excludedCategory2' );
-
-				foreach ( $key2 as $key ) {
-					if ( isset( $block['attrs'][ $key ] ) && is_array( $block['attrs'][ $key ] ) ) {
-						$block['attrs'][ $key ] = array_map(
-							function ( $cat_id ) use ( $term_id_map ) {
-								return isset( $term_id_map[ $cat_id ] ) ? (string) $term_id_map[ $cat_id ] : false;
-							},
-							$block['attrs'][ $key ]
-						);
-					}
+				// Recursively update inner blocks
+				if ( ! empty( $block['innerBlocks'] ) ) {
+					update_block_term_ids( $block['innerBlocks'], $term_id_map );
 				}
 			}
+			if ( 'core/group' === $block['blockName'] ) {
+				if ( ! empty( $block['innerBlocks'] ) ) {
+					foreach ( $block['innerBlocks'] as &$inner_block ) {
+						if ( 'core/legacy-widget' === $inner_block['blockName'] ) {
+							if ( isset( $inner_block['attrs']['idBase'] ) && 'nav_menu' === $inner_block['attrs']['idBase'] ) {
+								if ( isset( $inner_block['attrs']['instance']['raw']['nav_menu'] ) ) {
+									$current_menu_id = $inner_block['attrs']['instance']['raw']['nav_menu'];
+									if ( isset( $term_id_map[ $current_menu_id ] ) ) {
+										$new_menu_id = $term_id_map[ $current_menu_id ];
+										$inner_block['attrs']['instance']['raw']['nav_menu'] = $new_menu_id;
 
-			// Recursively update inner blocks
-			if ( ! empty( $block['innerBlocks'] ) ) {
-				update_block_term_ids( $block['innerBlocks'], $term_id_map );
+										// Preserve existing raw data and update nav_menu
+										$new_data             = $inner_block['attrs']['instance']['raw'];
+										$new_data['nav_menu'] = $new_menu_id;
+
+										// Update encoded and hash with complete data
+										$inner_block['attrs']['instance']['encoded'] = base64_encode( serialize( $new_data ) );
+										$inner_block['attrs']['instance']['hash']    = wp_hash( serialize( $new_data ) );
+
+									}
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 	}

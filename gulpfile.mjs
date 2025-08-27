@@ -49,6 +49,7 @@ const FILES = {
 	'license.txt': 'build/themegrill-demo-importer',
 	'package.json': 'build/themegrill-demo-importer',
 	'includes/**/*': 'build/themegrill-demo-importer/includes',
+	'src/**/*': 'build/themegrill-demo-importer/src',
 	'languages/**/*': 'build/themegrill-demo-importer/languages',
 };
 

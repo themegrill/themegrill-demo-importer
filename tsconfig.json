@@ -1,27 +1,25 @@
 {
   "compilerOptions": {
-    "target": "es2015",
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "allowJs": true,
-    "checkJs": false,
-    "skipLibCheck": true,
+    "declaration": true,
+    "declarationMap": true,
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "module": "esnext",
-    "moduleResolution": "node",
+    "incremental": false,
+    "isolatedModules": true,
+    "lib": ["es2022", "DOM", "DOM.Iterable"],
+    "module": "es2020",
+    "moduleDetection": "force",
+    "moduleResolution": "Bundler",
+    "noUncheckedIndexedAccess": true,
     "resolveJsonModule": true,
-    "isolatedModules": false,
-    "noEmit": true,
-    "jsx": "react",
-    "ignoreDeprecations": "5.0",
-    "baseUrl": "src/",
-    "typeRoots": ["./src/types"],
+    "skipLibCheck": true,
+    "strict": true,
+    "target": "ES2022",
+    "baseUrl": "resources/",
+    "jsx": "react-jsx",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./resources/*"]
     }
   },
   "exclude": ["node_modules", "build"],
-  "include": ["./src", "src/components/content/.tsx", "src/@types"]
+  "include": ["./resources"]
 }
