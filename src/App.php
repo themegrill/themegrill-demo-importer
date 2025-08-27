@@ -30,15 +30,11 @@ class App {
 		// Load plugin text domain.
 		add_action( 'init', array( $this, 'load_plugin_textdomain' ) );
 
-		// Register activation hook.
-		register_activation_hook( TGDM_PLUGIN_FILE, array( Activator::class, 'activate' ) );
-
-		// Register deactivation hook.
-		register_deactivation_hook( TGDM_PLUGIN_FILE, array( Deactivator::class, 'deactivate' ) );
-
 		add_filter( 'plugin_action_links_' . TGDM_PLUGIN_BASENAME, array( $this, 'plugin_action_links' ) );
 		add_filter( 'plugin_row_meta', array( $this, 'plugin_row_meta' ), 10, 2 );
 
+		Activator::init();
+		Deactivator::init();
 		Admin::instance();
 		RestApi::instance();
 		ImportHooks::instance();
