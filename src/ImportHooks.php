@@ -23,7 +23,7 @@ class ImportHooks {
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'set_siteorigin_settings' ) );
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'setup_yith_woocommerce_wishlist' ), 10, 2 );
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'regenerate_elementor_styles' ), 10 );
-		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_masteriyo_settings' ), 10, 3 );
+		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_masteriyo_data' ), 10, 3 );
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_magazine_blocks_settings' ), 10, 3 );
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_blockart_blocks_settings' ), 10, 3 );
 
@@ -306,6 +306,11 @@ class ImportHooks {
 						'title'        => 'Instructor Registration',
 						'setting_name' => 'instructor_registration_page_id',
 					),
+					'instructors-list'        => array(
+						'name'         => 'instructors-list',
+						'title'        => 'Instructors list',
+						'setting_name' => 'instructors_list_page_id',
+					),
 				)
 			);
 
@@ -413,20 +418,24 @@ class ImportHooks {
 
 
 	/**
-	 * Update Masteriyo settings.
+	 * Update Masteriyo data.
 	 *
 	 * @param string $id Demo Id.
 	 * @param array  $data Demo data.
 	 * @return void
 	 */
-	public function update_masteriyo_settings( $id, $data ) {
+	public function update_masteriyo_data( $id, $data ) {
 
-		if ( ! function_exists( 'masteriyo_set_setting' ) || empty( $data['masteriyo_settings'] ) ) {
+		if ( empty( $data['masteriyo_data'] ) ) {
 			return;
 		}
-
-		foreach ( $data['masteriyo_settings'] as $key => $value ) {
-			masteriyo_set_setting( $key, $value );
+		if ( function_exists( 'masteriyo_set_setting' ) && ! empty( $data['masteriyo_data']['masteriyo_settings'] ) ) {
+			foreach ( $data['masteriyo_data']['masteriyo_settings'] as $key => $value ) {
+				masteriyo_set_setting( $key, $value );
+			}
+		}
+		if ( ! empty( $data['masteriyo_data']['masteriyo_active_addons'] ) ) {
+			update_option( 'masteriyo_active_addons', $data['masteriyo_data']['masteriyo_active_addons'] );
 		}
 	}
 
