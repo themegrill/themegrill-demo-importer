@@ -32,7 +32,6 @@ type MediaObject = {
 
 const LogoUploader = ({ iframeRef, setSiteLogoId }: Props) => {
 	const [selectedLogo, setSelectedLogo] = useState<LogoData | null>(null);
-	const [hovered, setHovered] = useState(false);
 
 	const handleLogoSelect = (media: MediaObject): void => {
 		// Validate file type
@@ -108,19 +107,17 @@ const LogoUploader = ({ iframeRef, setSiteLogoId }: Props) => {
 		if (!selectedLogo) return null;
 		return (
 			<>
-				<div
-					className="h-[50px] p-1 bg-white rounded-md border-2 border-dashed border-[#C4C4C4]/80 max-w-full flex items-center justify-center relative"
-					onMouseEnter={() => setHovered(true)}
-					onMouseLeave={() => setHovered(false)}
-				>
+				<div className="h-[34px] p-[12px] bg-white rounded-md border-2 border-dashed border-[#D0D0D0] max-w-full flex items-center justify-center relative">
 					<img
 						src={selectedLogo.url}
 						alt={selectedLogo.alt}
 						className="max-w-full max-h-full border border-[#eee] rounded"
 					/>
 					<div
-						className={`absolute bottom-0 left-0 right-0 flex justify-center items-center gap-[12px] bg-white border-0 border-t border-solid border-[#C4C4C4]/80 p-[6px] transition-all duration-300 ease-in-out ${
-							hovered ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'
+						className={`absolute bottom-0 left-0 right-0 flex justify-center items-center gap-[12px] bg-white border-0 border-t border-solid border-[#D0D0D0] p-[6px] transition-all duration-300 ease-in-out ${
+							selectedLogo
+								? 'opacity-100 translate-y-0'
+								: 'opacity-0 translate-y-2 pointer-events-none'
 						}`}
 					>
 						<MediaUpload
@@ -138,7 +135,7 @@ const LogoUploader = ({ iframeRef, setSiteLogoId }: Props) => {
 								</button>
 							)}
 						/>
-						<span className="text-[#C4C4C4]">|</span>
+						<span className="text-[#EEEFF2]">|</span>
 						<button
 							type="button"
 							className="text-[#dc3545] hover:text-[#c82333] text-[12px] no-underline border-0 bg-transparent p-0 cursor-pointer flex items-center gap-1"
@@ -203,7 +200,7 @@ const LogoUploader = ({ iframeRef, setSiteLogoId }: Props) => {
 						return (
 							<button
 								type="button"
-								className="tg-upload-logo w-full p-0 h-[62px] cursor-pointer bg-white rounded-md border-2 border-dashed border-[#C4C4c4]/80"
+								className="tg-upload-logo w-full p-0 h-[62px] cursor-pointer bg-white rounded-md border-2 border-dashed border-[#D0D0D0]"
 								onClick={open}
 							>
 								<div className="text-center">
