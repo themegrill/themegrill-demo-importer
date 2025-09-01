@@ -26,6 +26,30 @@ const THEMEGRILL_BASE_URL = 'https://themegrilldemos.com';
 const ZAKRA_BASE_URL      = 'https://zakrademos.com';
 const TGDM_NAMESPACE      = '/wp-json/themegrill-demos/v1';
 
+if ( version_compare( PHP_VERSION, '8.1.0', '<' ) ) {
+	add_action(
+		'admin_notices',
+		function () {
+			echo '<div class="notice notice-error is-dismissible">';
+			echo '<p><strong>Starter Templates & Sites Pack by ThemeGrill Activation Error:</strong> This plugin requires PHP 8.1.0 or higher. Your current version is ' . PHP_VERSION . '.</p>';
+			echo '<p>Please contact your hosting provider to upgrade PHP.</p>';
+			echo '</div>';
+		}
+	);
+
+	add_action(
+		'admin_init',
+		function () {
+			deactivate_plugins( plugin_basename( __FILE__ ) );
+			if ( isset( $_GET['activate'] ) ) { //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				unset( $_GET['activate'] );
+			}
+		}
+	);
+
+	return;
+}
+
 require_once __DIR__ . '/vendor/autoload.php';
 
 \ThemeGrill\Demo\Importer\App::instance();
