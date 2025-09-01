@@ -75,7 +75,7 @@ const Sidebar = ({
 									className="cursor-pointer"
 								/>
 							</TooltipTrigger>
-							<TooltipContent side="bottom">
+							<TooltipContent side="bottom" sideOffset={-4}>
 								{__('Back to Starter Templates', 'themegrill-demo-importer')}
 							</TooltipContent>
 						</Tooltip>
@@ -85,7 +85,7 @@ const Sidebar = ({
 					</p>
 				</div>
 			</div>
-			<div className="flex flex-col gap-6 box-border px-6 pt-6 pb-10 overflow-y-auto">
+			<div className="flex flex-col gap-6 box-border px-6 pt-6 pb-10 overflow-y-auto tg-scrollbar">
 				<LogoUploader iframeRef={iframeRef} setSiteLogoId={setSiteLogoId} />
 				<div>
 					<h3 className="text-[16px] text-[#1F1F1F] mt-0 mb-5">
@@ -112,7 +112,9 @@ const Sidebar = ({
 													style={{ backgroundColor: color }}
 												/>
 											</TooltipTrigger>
-											<TooltipContent side="bottom">{color}</TooltipContent>
+											<TooltipContent side="bottom" sideOffset={-15}>
+												{color}
+											</TooltipContent>
 										</Tooltip>
 									))}
 								</div>
@@ -140,20 +142,12 @@ const Sidebar = ({
 												</p>
 											</button>
 										</TooltipTrigger>
-										<TooltipContent side="bottom">{t}</TooltipContent>
+										<TooltipContent side="bottom" sideOffset={-15}>
+											{t}
+										</TooltipContent>
 									</Tooltip>
 								))}
 							</TooltipProvider>
-							{/* {Array.from({ length: 9 }).map((_, outerIndex) => (
-								<button
-									className="border-2 border-solid border-[#EEEFF2] bg-[#FDFDFE] px-6 py-[10px] rounded-md cursor-pointer w-[88px] hover:border-[#5182EF]"
-									key={outerIndex}
-								>
-									<p className="text-[15px] text-[#6B6B6B] font-bold leading-[22px] tracking-[0.15px] m-0 ">
-										Aa
-									</p>
-								</button>
-							))} */}
 						</div>
 					</div>
 					<div>

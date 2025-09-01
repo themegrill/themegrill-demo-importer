@@ -15,11 +15,6 @@ type Props = {
 	handleRefetch: () => void;
 };
 
-// type SearchParams = {
-// 	search?: string;
-// 	pagebuilder?: string;
-// };
-
 const Sidebar = ({ builders, categories, handleRefetch }: Props) => {
 	const navigate = Route.useNavigate();
 	const searchParams = Route.useSearch();
@@ -67,42 +62,6 @@ const Sidebar = ({ builders, categories, handleRefetch }: Props) => {
 				};
 			},
 		});
-		// setSearchParams((prev) => {
-		// 	if (selectedCategory === 'all') {
-		// 		prev.delete('category');
-		// 		return prev;
-		// 	}
-		// 	const currentCategories = prev.get('category')?.split(',').filter(Boolean) || [];
-		// 	const isSelected = currentCategories.includes(selectedCategory);
-		// 	let updatedCategories;
-		// 	if (isSelected) {
-		// 		updatedCategories = currentCategories.filter((cat) => cat !== selectedCategory);
-		// 	} else {
-		// 		updatedCategories = [...currentCategories, selectedCategory];
-		// 	}
-
-		// 	// const allAvailableCategories = categories
-		// 	// 	.filter((cat) => cat.slug !== 'all')
-		// 	// 	.map((cat) => cat.slug);
-
-		// 	// // Check if all categories are selected
-		// 	// const allCategoriesSelected = allAvailableCategories.every((cat) =>
-		// 	// 	updatedCategories.includes(cat),
-		// 	// );
-
-		// 	// if (updatedCategories.length === 0 || allCategoriesSelected) {
-		// 	// 	prev.delete('category');
-		// 	// } else {
-		// 	// 	prev.set('category', updatedCategories.join(','));
-		// 	// }
-		// 	if (updatedCategories.length === 0) {
-		// 		prev.delete('category');
-		// 	} else {
-		// 		prev.set('category', updatedCategories.join(','));
-		// 	}
-
-		// 	return prev;
-		// });
 	};
 
 	const isCategorySelected = (slug: string) => {
@@ -171,13 +130,13 @@ const Sidebar = ({ builders, categories, handleRefetch }: Props) => {
 								className="cursor-pointer"
 							/>
 						</TooltipTrigger>
-						<TooltipContent side="bottom">
+						<TooltipContent side="bottom" sideOffset={-4}>
 							{__('Exit Import Process', 'themegrill-demo-importer')}
 						</TooltipContent>
 					</Tooltip>
 				</div>
 			</div>
-			<div className="flex flex-col gap-6 box-border px-6 pt-6 pb-10 overflow-y-auto">
+			<div className="flex flex-col gap-6 box-border px-6 pt-6 pb-10 overflow-y-auto tg-scrollbar">
 				<div>
 					<div className="flex gap-2 items-center mb-5">
 						<h3 className="text-[16px] text-[#1F1F1F] m-0">

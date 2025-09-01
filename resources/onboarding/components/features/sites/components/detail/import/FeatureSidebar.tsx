@@ -46,7 +46,7 @@ const FeatureSidebar = ({ demo, plugins, setPlugins, onOpen, setShowFeatureLayou
 									className="cursor-pointer"
 								/>
 							</TooltipTrigger>
-							<TooltipContent side="bottom">
+							<TooltipContent side="bottom" sideOffset={-4}>
 								{__('Back to Starter Templates', 'themegrill-demo-importer')}
 							</TooltipContent>
 						</Tooltip>
@@ -56,7 +56,7 @@ const FeatureSidebar = ({ demo, plugins, setPlugins, onOpen, setShowFeatureLayou
 					</p>
 				</div>
 			</div>
-			<div className="px-6 pt-6 pb-10 border-0 border-r border-solid border-[#E9E9E9] flex flex-col gap-6 bg-[#FAFBFC] box-border overflow-y-auto flex-1">
+			<div className="px-6 pt-6 pb-10 border-0 border-r border-solid border-[#E9E9E9] flex flex-col gap-6 bg-[#FAFBFC] box-border overflow-y-auto flex-1 tg-scrollbar">
 				{plugins.map((item, index) => (
 					<div
 						className={`bg-[#fff] border-2 border-solid rounded-md p-4 ${item.isSelected ? (item.isMandatory ? 'border-[#5182EF]/65 cursor-not-allowed ' : 'border-[#5182EF] cursor-pointer ') : 'border-[#EDEDED] cursor-pointer '}`}
