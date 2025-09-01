@@ -73,7 +73,7 @@ const FeatureSidebar = ({ demo, plugins, setPlugins, onOpen, setShowFeatureLayou
 								<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width={20} height={20}>
 									<path
 										d="M18.53 10a8.75 8.75 0 1 1-17.5 0 8.75 8.75 0 0 1 17.5 0Z"
-										fill="#D3D3D3"
+										fill="#5182EF"
 										fillOpacity={item.isMandatory ? 0.65 : 1}
 									/>
 									<path
