@@ -70,43 +70,26 @@ const FeatureSidebar = ({ demo, plugins, setPlugins, onOpen, setShowFeatureLayou
 								{item.name}
 							</p>
 							{item.isSelected ? (
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									width="20"
-									height="20"
-									viewBox="0 0 20 20"
-									fill="none"
-								>
-									<circle
-										cx="9.77734"
-										cy="10"
-										r="8.75"
+								<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width={20} height={20}>
+									<path
+										d="M18.53 10a8.75 8.75 0 1 1-17.5 0 8.75 8.75 0 0 1 17.5 0Z"
 										fill="#5182EF"
 										fillOpacity={item.isMandatory ? 0.65 : 1}
 									/>
 									<path
-										d="M14.156 6.25L7.28101 12.7167L4.78101 10.2167"
-										stroke="white"
-										strokeWidth="2.5"
-										strokeLinecap="round"
-										strokeLinejoin="round"
+										fill="#fff"
+										d="M13.164 6.387a1.118 1.118 0 0 1 1.531 1.626l-6.145 5.78a1.117 1.117 0 0 1-1.556-.023L4.76 11.536a1.117 1.117 0 0 1 1.58-1.58l1.468 1.468 5.356-5.037Z"
 									/>
 								</svg>
 							) : (
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									width="20"
-									height="20"
-									viewBox="0 0 20 20"
-									fill="none"
-								>
-									<circle cx="9.77734" cy="10" r="8.75" fill="#D3D3D3" />
+								<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width={20} height={20}>
 									<path
-										d="M14.156 6.25L7.28101 12.7167L4.78101 10.2167"
-										stroke="white"
-										strokeWidth="2.5"
-										strokeLinecap="round"
-										strokeLinejoin="round"
+										d="M18.53 10a8.75 8.75 0 1 1-17.5 0 8.75 8.75 0 0 1 17.5 0Z"
+										fill="#D3D3D3"
+									/>
+									<path
+										fill="#fff"
+										d="M13.164 6.387a1.118 1.118 0 0 1 1.531 1.626l-6.145 5.78a1.117 1.117 0 0 1-1.556-.023L4.76 11.536a1.117 1.117 0 0 1 1.58-1.58l1.468 1.468 5.356-5.037Z"
 									/>
 								</svg>
 							)}
