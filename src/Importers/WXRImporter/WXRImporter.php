@@ -759,7 +759,6 @@ class WXRImporter extends WP_Importer {
 
 		$original_id = isset( $data['post_id'] ) ? (int) $data['post_id'] : 0;
 		$parent_id   = isset( $data['post_parent'] ) ? (int) $data['post_parent'] : 0;
-		$author_id   = isset( $data['post_author'] ) ? (int) $data['post_author'] : 0;
 
 		// Have we already processed this?
 		if ( isset( $this->mapping['post'][ $original_id ] ) ) {
@@ -840,7 +839,8 @@ class WXRImporter extends WP_Importer {
 		$postdata = array(
 			'import_id' => $data['post_id'],
 		);
-		$allowed  = array(
+
+		$allowed = array(
 			'post_author'    => true,
 			'post_date'      => true,
 			'post_date_gmt'  => true,
@@ -2307,7 +2307,7 @@ class WXRImporter extends WP_Importer {
 	/**
 	 * Prefill existing post data.
 	 *
-	 * This preloads all GUIDs into memory, allowing us to avoid hitting the
+	 * This preloads all post names into memory, allowing us to avoid hitting the
 	 * database when we need to check for existence. With larger imports, this
 	 * becomes prohibitively slow to perform SELECT queries on each.
 	 *

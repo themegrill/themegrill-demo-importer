@@ -74,7 +74,7 @@ class WidgetsImporter {
 		foreach ( $data as $sidebar_id => $widgets ) {
 
 			// Skip inactive widgets (should not be in export file).
-			if ( 'wp_inactive_widgets' == $sidebar_id ) {
+			if ( 'wp_inactive_widgets' === $sidebar_id ) {
 				continue;
 			}
 
@@ -121,7 +121,7 @@ class WidgetsImporter {
 				 * If this creates problems for plugins that do actually intend settings in objects then may need to consider other approach: https://wordpress.org/support/topic/problem-with-array-of-arrays.
 				 * It is probably much more likely that arrays are used than objects, however.
 				 */
-				$widget = json_decode( json_encode( $widget ), true );
+				$widget = json_decode( wp_json_encode( $widget ), true );
 				/**
 				 * Filter to modify settings array.
 				 *
@@ -141,7 +141,7 @@ class WidgetsImporter {
 					foreach ( $single_widget_instances as $check_id => $check_widget ) {
 
 						// Is widget in same sidebar and has identical settings?
-						if ( in_array( "$id_base-$check_id", $sidebar_widgets ) && (array) $widget == $check_widget ) {
+						if ( in_array( "$id_base-$check_id", $sidebar_widgets ) && (array) $widget === $check_widget ) {
 							$fail                = true;
 							$widget_message_type = 'warning';
 							$widget_message      = __( 'Widget already exists', 'themegrill-demo-importer' ); // Explain why widget not imported.

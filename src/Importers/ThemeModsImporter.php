@@ -82,12 +82,12 @@ class ThemeModsImporter {
 		}
 
 		// Import custom options.
-		if ( isset( $data['options'] ) ) {
+		// if ( isset( $data['options'] ) ) {
 
-			// Load WordPress Customize Setting Class.
-			if ( ! class_exists( 'WP_Customize_Setting' ) ) {
-				require_once ABSPATH . WPINC . '/class-wp-customize-setting.php';
-			}
+		//  // Load WordPress Customize Setting Class.
+		//  if ( ! class_exists( 'WP_Customize_Setting' ) ) {
+		//      require_once ABSPATH . WPINC . '/class-wp-customize-setting.php';
+		//  }
 
 			// Include Customizer Demo Importer Setting class.
 			// include_once __DIR__ . '/customize/class-oc-customize-demo-importer-setting.php';
@@ -105,7 +105,7 @@ class ThemeModsImporter {
 
 			//  $option->import( $option_value );
 			// }
-		}
+		// }
 
 		if ( isset( $data['nav_menu_locations'] ) && is_array( $data['nav_menu_locations'] ) ) {
 			foreach ( $data['nav_menu_locations'] as $location => $menu_id ) {

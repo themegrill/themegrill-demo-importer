@@ -9,7 +9,6 @@ type ContentProps = {
 };
 
 const Content = ({ demos }: ContentProps) => {
-	const navigate = Route.useNavigate();
 	const searchParams = Route.useSearch();
 	const search = searchParams.search || '';
 	const builder = searchParams.builder || '';
