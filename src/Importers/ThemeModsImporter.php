@@ -22,7 +22,7 @@ class ThemeModsImporter {
 		if ( ! empty( $mapping_data ) ) {
 			$term_id_map = $mapping_data['term_id'] ?? array();
 		}
-		$import = $this->processImport( $demo['themeMods'], $demo['slug'], $demo, $term_id_map );
+		$import = $this->processImport( $demo['themeMods'], $demo['slug'], $demo, $term_id_map, $args );
 		if ( is_wp_error( $import ) ) {
 			$this->logger->error( 'Error importing customizer: ' . $import->get_error_message() );
 			return new WP_Error( 'import_customizer_failed', 'Error importing customizer.', array( 'status' => 500 ) );
@@ -68,7 +68,7 @@ class ThemeModsImporter {
 	 * @param  array  $term_id_map   Processed Terms Map
 	 * @return void|WP_Error
 	 */
-	public static function processImport( $data, $demo_id, $demo_data, $term_id_map ) {
+	public static function processImport( $data, $demo_id, $demo_data, $term_id_map, $args ) {
 		global $wp_customize;
 
 		// Data checks.
@@ -126,7 +126,44 @@ class ThemeModsImporter {
 		}
 		// Loop through theme mods and update them.
 		foreach ( $data as $key => $value ) {
-			set_theme_mod( $key, $value );
+			if ( $demo_data['theme_slug'] . '_color_palette' === $key && ! empty( $args['color_palette'] ) ) {
+				$colors = array();
+				$id     = 'custom-' . time();
+				foreach ( $args['color_palette'] as $index => $color ) {
+					$palette_key            = $demo_data['theme_slug'] . '-color-' . ( $index + 1 );
+					$colors[ $palette_key ] = $color;
+				}
+
+				$new_custom = array(
+					'colors' => $colors,
+					'id'     => $id,
+				);
+
+				$value['custom'][] = $new_custom;
+
+				$new_value = [
+					'id'     => $id,
+					'name'   => 'Importer Color Palette',
+					'colors' => $colors,
+					'custom' => $value['custom'],
+				];
+				set_theme_mod( $key, $new_value );
+			} elseif ( ! empty( $args['typography'] ) ) {
+				$typography_keys = [
+					'body'    => [ 'zakra_body_typography', 'colormag_base_typography', 'elearning_base_typography_body' ],
+					'heading' => [ 'zakra_heading_typography', 'colormag_headings_typography', 'elearning_base_typography_heading' ],
+				];
+
+				if ( in_array( $key, $typography_keys['body'], true ) ) {
+					$value['font-family'] = $args['typography'][0];
+				}
+				if ( in_array( $key, $typography_keys['heading'], true ) ) {
+					$value['font-family'] = $args['typography'][1];
+				}
+				set_theme_mod( $key, $value );
+			} else {
+				set_theme_mod( $key, $value );
+			}
 		}
 	}
 

@@ -5,7 +5,7 @@ import { Demo } from '../../../lib/types';
 export async function getSiteData(args: { theme: string; id: string }) {
 	try {
 		const response = await apiFetch<{ success: boolean; message?: string; data?: Demo }>({
-			path: `tg-demo-importer/v1/data?slug=${args.id}&theme=${args.theme}`,
+			path: `tg-demo-importer/v1/data?id=${args.id}&theme=${args.theme}`,
 			method: 'GET',
 		});
 		return response;

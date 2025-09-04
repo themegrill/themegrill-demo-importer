@@ -14,7 +14,7 @@ class SiteController {
 	}
 
 	public function get_sites( $request ) {
-		$slug  = $request->get_param( 'slug' );
+		$slug  = $request->get_param( 'id' );
 		$theme = $request->get_param( 'theme' );
 
 		try {

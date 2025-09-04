@@ -1,6 +1,5 @@
 import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import React from 'react';
 import { HashRouter, Route, Routes } from 'react-router-dom';
 import Home from './Home';
 import { LocalizedDataProvider } from './LocalizedDataContext';
@@ -14,7 +13,7 @@ const App = () => {
 				<LocalizedDataProvider>
 					<Routes>
 						<Route path="/" element={<Home />} />
-						<Route path="/import-detail/:demo_theme/:pagebuilder/:slug" element={<Import />} />
+						<Route path="/import-detail/:demo_theme/:slug" element={<Import />} />
 					</Routes>
 				</LocalizedDataProvider>
 			</HashRouter>

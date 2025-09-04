@@ -22,6 +22,13 @@ type Props = {
 	setPageImport: (value: string) => void;
 	onContinue?: () => void;
 	setIsPagesSelected: (value: boolean) => void;
+	colorPalette: string[][];
+	typography: string[][];
+	selectedPaletteIndex: number;
+	setSelectedPaletteIndex: (value: number) => void;
+	selectedTypographyIndex: number;
+	setSelectedTypographyIndex: (value: number) => void;
+	isThemeSupported: boolean;
 };
 
 const Sidebar = ({
@@ -34,27 +41,88 @@ const Sidebar = ({
 	setPageImport,
 	onContinue,
 	setIsPagesSelected,
+	colorPalette,
+	typography,
+	selectedPaletteIndex,
+	setSelectedPaletteIndex,
+	selectedTypographyIndex,
+	setSelectedTypographyIndex,
+	isThemeSupported,
 }: Props) => {
-	const colorPalette = [
-		['#FD6611', '#EA0722', '#524F51', '#8F8F8F', '#D3D3D3'],
-		['#2563EB', '#00FF5D', '#524F51', '#8F8F8F', '#D3D3D3'],
-		['#CA04CE', '#5EA396', '#EFDF30', '#8F8F8F', '#D3D3D3'],
-		['#21587B', '#5EA396', '#57CC98', '#80EB9A', '#C6FACC'],
-		['#FF7577', '#E28386', '#BD999D', '#9FC8CB', '#7BF4F3'],
-		['#9481FF', '#9494FF', '#FFA3FF', '#9C84B3', '#FFDFC9'],
-	];
-	const typography = [
-		'Inter',
-		'Lato',
-		'Playfair Display',
-		'IBM Plex Sans Thai Looped',
-		'Raleway',
-		'DM Sans',
-		'Nunito',
-		'Courier New',
-		'Quando',
-	];
 	const router = useRouter();
+
+	const handleColorPalette = (index: number) => {
+		try {
+			if (!iframeRef?.current?.contentWindow) {
+				console.warn('Iframe not available');
+				return;
+			}
+
+			// Send message to iframe
+			iframeRef.current?.contentWindow?.postMessage(
+				{
+					type: 'UPDATE_COLOR_PALETTE',
+					theme: demo.theme_slug,
+					colorPalette: colorPalette[index],
+				},
+				'*',
+			);
+
+			// Listen for confirmation
+			const handleMessage = (event: MessageEvent) => {
+				if (event.data.type === 'COLOR_PALETTE_UPDATED') {
+					// console.log('Color Palette updated successfully:', event.data.success);
+					setSelectedPaletteIndex(index);
+					window.removeEventListener('message', handleMessage);
+				}
+			};
+
+			window.addEventListener('message', handleMessage);
+
+			// Cleanup after timeout
+			setTimeout(() => {
+				window.removeEventListener('message', handleMessage);
+			}, 5000);
+		} catch (error) {
+			console.error('Error sending color update message:', error);
+		}
+	};
+
+	const handleTypography = (index: number) => {
+		try {
+			if (!iframeRef?.current?.contentWindow) {
+				console.warn('Iframe not available');
+				return;
+			}
+
+			// Send message to iframe
+			iframeRef.current?.contentWindow?.postMessage(
+				{
+					type: 'UPDATE_TYPOGRAPHY',
+					typography: typography[index],
+				},
+				'*',
+			);
+
+			// Listen for confirmation
+			const handleMessage = (event: MessageEvent) => {
+				if (event.data.type === 'TYPOGRAPHY_UPDATED') {
+					console.log('Typography updated successfully:', event.data.success);
+					setSelectedTypographyIndex(index);
+					window.removeEventListener('message', handleMessage);
+				}
+			};
+
+			window.addEventListener('message', handleMessage);
+
+			// Cleanup after timeout
+			setTimeout(() => {
+				window.removeEventListener('message', handleMessage);
+			}, 5000);
+		} catch (error) {
+			console.error('Error sending typography update message:', error);
+		}
+	};
 
 	return (
 		<div className="w-[350px] min-w-[350px] flex flex-col bg-[#FAFBFC] border-0 border-r border-solid border-[#E9E9E9] ">
@@ -85,92 +153,84 @@ const Sidebar = ({
 					</p>
 				</div>
 			</div>
-			<div className="flex flex-col gap-6 box-border px-6 pt-6 pb-10 overflow-y-auto tg-scrollbar">
+			<div className="flex flex-col gap-6 box-border px-6 pt-6 pb-10 overflow-y-auto tg-scrollbar flex-1">
 				<LogoUploader iframeRef={iframeRef} setSiteLogoId={setSiteLogoId} />
-				<div>
-					<h3 className="text-[16px] text-[#1F1F1F] mt-0 mb-5">
-						{__('Color Palette', 'themegrill-demo-importer')}
-					</h3>
-					<div className="grid grid-cols-2 gap-[14px]">
-						<TooltipProvider>
-							{colorPalette.map((colors, index) => (
-								<div
-									className="border-2 border-solid border-[#EEEFF2] bg-[#FDFDFE] rounded-md p-[6px] flex hover:border-[#5182EF]"
-									key={index}
-								>
-									{colors.map((color, index) => (
+				{isThemeSupported && (
+					<>
+						<div>
+							<h3 className="text-[16px] text-[#1F1F1F] mt-0 mb-5">
+								{__('Color Palette', 'themegrill-demo-importer')}
+							</h3>
+							<div className="grid grid-cols-2 gap-[14px]">
+								{colorPalette.map((colors, index) => (
+									<div
+										className={`border-2 border-solid  bg-[#FDFDFE] rounded-md p-[6px] flex  cursor-pointer ${index === selectedPaletteIndex ? 'border-[#5182EF]' : 'border-[#EEEFF2] hover:border-[#5182EF]'}`}
+										key={index}
+										onClick={() => handleColorPalette(index)}
+									>
+										{colors.slice(0, 5).map((color, index) => (
+											<div
+												className={`h-[30px] w-[25px] ${
+													index === 0 ? 'rounded-l-md' : index === 4 ? 'rounded-r-md' : ''
+												}`}
+												style={{ backgroundColor: color }}
+												key={color + index}
+											/>
+										))}
+									</div>
+								))}
+							</div>
+						</div>
+						<div>
+							<h3 className="text-[16px] text-[#1F1F1F] mt-0 mb-5 leading-normal">
+								{__('Typography', 'themegrill-demo-importer')}
+							</h3>
+							<div className="grid grid-cols-3 gap-[14px]">
+								<TooltipProvider>
+									{typography.map((t, index) => (
 										<Tooltip key={index}>
 											<TooltipTrigger asChild>
-												<div
-													className={`h-[30px] w-[25px] ${
-														index === 0
-															? 'rounded-l-md'
-															: index === colors.length - 1
-																? 'rounded-r-md'
-																: ''
-													}`}
-													style={{ backgroundColor: color }}
-												/>
+												<button
+													className={`border-2 border-solid bg-[#FDFDFE] px-6 py-[10px] rounded-md cursor-pointer w-[88px] ${index === selectedTypographyIndex ? 'border-[#5182EF]' : 'border-[#EEEFF2] hover:border-[#5182EF]'}`}
+													key={index}
+													onClick={() => handleTypography(index)}
+												>
+													<p className="text-[15px] text-[#6B6B6B] font-bold leading-[22px] tracking-[0.15px] m-0 ">
+														<span style={{ fontFamily: t[0] }}>A</span>
+														<span style={{ fontFamily: t[1] }}>g</span>
+													</p>
+												</button>
 											</TooltipTrigger>
 											<TooltipContent side="bottom" sideOffset={-15}>
-												{color}
+												{t[0]}/{t[1]}
 											</TooltipContent>
 										</Tooltip>
 									))}
-								</div>
-							))}
-						</TooltipProvider>
-					</div>
-				</div>
+								</TooltipProvider>
+							</div>
+						</div>
+					</>
+				)}
 				<div>
-					<div className="mb-5">
-						<h3 className="text-[16px] text-[#1F1F1F] mt-0 mb-5 leading-normal">
-							{__('Typography', 'themegrill-demo-importer')}
-						</h3>
-						<div className="grid grid-cols-3 gap-[14px]">
-							<TooltipProvider>
-								{typography.map((t, index) => (
-									<Tooltip key={index}>
-										<TooltipTrigger asChild>
-											<button
-												className="border-2 border-solid border-[#EEEFF2] bg-[#FDFDFE] px-6 py-[10px] rounded-md cursor-pointer w-[88px] hover:border-[#5182EF]"
-												style={{ fontFamily: t }}
-												key={index}
-											>
-												<p className="text-[15px] text-[#6B6B6B] font-bold leading-[22px] tracking-[0.15px] m-0 ">
-													Ag
-												</p>
-											</button>
-										</TooltipTrigger>
-										<TooltipContent side="bottom" sideOffset={-15}>
-											{t}
-										</TooltipContent>
-									</Tooltip>
-								))}
-							</TooltipProvider>
-						</div>
-					</div>
-					<div>
-						<h3 className="text-[16px] text-[#1F1F1F] mt-0 mb-5">
-							{__('Import', 'themegrill-demo-importer')}
-						</h3>
-						<div className="bg-[#fff] border-2 border-solid border-[#EDEDED] rounded-md flex p-[9px]">
-							<Button
-								className={`font-normal cursor-pointer flex-1 text-[14x] ${pageImport === 'all' ? 'bg-[#E9EFFD] border-2 border-solid border-[#5182EF] text-[#2563EB] hover:bg-[#E9EFFD] hover:border-2 hover:border-solid hover:border-[#5182EF] hover:text-[#2563EB]' : 'bg-transparent border-2 border-solid border-[#fff] text-[#646464] hover:bg-transparent hover:border-2 hover:border-solid hover:border-[#fff] hover:text-[#646464]'}`}
-								onClick={() => setPageImport('all')}
-							>
-								{__('All Pages', 'themegrill-demo-importer')}
-							</Button>
-							<Button
-								className={`font-normal cursor-pointer flex-1 text-[14x] ${pageImport === 'selected' ? 'bg-[#E9EFFD] border-2 border-solid border-[#5182EF] text-[#2563EB] hover:bg-[#E9EFFD] hover:border-2 hover:border-solid hover:border-[#5182EF] hover:text-[#2563EB]' : 'bg-transparent border-2 border-solid border-[#fff] text-[#646464] hover:bg-transparent hover:border-2 hover:border-solid hover:border-[#fff] hover:text-[#646464]'}`}
-								onClick={() => {
-									setPageImport('selected');
-									setIsPagesSelected(true);
-								}}
-							>
-								{__('Select Pages', 'themegrill-demo-importer')}
-							</Button>
-						</div>
+					<h3 className="text-[16px] text-[#1F1F1F] mt-0 mb-5">
+						{__('Import', 'themegrill-demo-importer')}
+					</h3>
+					<div className="bg-[#fff] border-2 border-solid border-[#EDEDED] rounded-md flex p-[9px]">
+						<Button
+							className={`font-normal cursor-pointer flex-1 text-[14x] ${pageImport === 'all' ? 'bg-[#E9EFFD] border-2 border-solid border-[#5182EF] text-[#2563EB] hover:bg-[#E9EFFD] hover:border-2 hover:border-solid hover:border-[#5182EF] hover:text-[#2563EB]' : 'bg-transparent border-2 border-solid border-[#fff] text-[#646464] hover:bg-transparent hover:border-2 hover:border-solid hover:border-[#fff] hover:text-[#646464]'}`}
+							onClick={() => setPageImport('all')}
+						>
+							{__('All Pages', 'themegrill-demo-importer')}
+						</Button>
+						<Button
+							className={`font-normal cursor-pointer flex-1 text-[14x] ${pageImport === 'selected' ? 'bg-[#E9EFFD] border-2 border-solid border-[#5182EF] text-[#2563EB] hover:bg-[#E9EFFD] hover:border-2 hover:border-solid hover:border-[#5182EF] hover:text-[#2563EB]' : 'bg-transparent border-2 border-solid border-[#fff] text-[#646464] hover:bg-transparent hover:border-2 hover:border-solid hover:border-[#fff] hover:text-[#646464]'}`}
+							onClick={() => {
+								setPageImport('selected');
+								setIsPagesSelected(true);
+							}}
+						>
+							{__('Select Pages', 'themegrill-demo-importer')}
+						</Button>
 					</div>
 				</div>
 			</div>

@@ -26,6 +26,8 @@ type Props = {
 	onClose: () => void;
 	setShowSidebar: React.Dispatch<React.SetStateAction<boolean>>;
 	isPagesSelected: boolean;
+	colorPalette: string[] | [];
+	typography: string[] | [];
 };
 
 const StartImport = ({
@@ -39,6 +41,8 @@ const StartImport = ({
 	setOpen,
 	setShowSidebar,
 	isPagesSelected,
+	colorPalette,
+	typography,
 }: Props) => {
 	const { localizedData, setLocalizedData } = useLocalizedData();
 
@@ -114,6 +118,8 @@ const StartImport = ({
 					siteLogoId: siteLogoId,
 					selectedPages: selectedPages,
 					isPagesSelected: isPagesSelected,
+					colorPalette: colorPalette,
+					typography: typography,
 				};
 
 				const data = await queryClient.ensureQueryData(importDataQueryOptions(params));

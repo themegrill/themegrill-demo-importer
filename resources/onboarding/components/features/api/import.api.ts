@@ -9,6 +9,8 @@ export async function importDemo(args: {
 	siteLogoId: number;
 	selectedPages: PageWithSelection[];
 	isPagesSelected: boolean;
+	colorPalette: string[];
+	typography: string[];
 }) {
 	try {
 		const response = await apiFetch<Response>({
@@ -20,8 +22,10 @@ export async function importDemo(args: {
 					plugins: args.selectedPlugins,
 					blogname: '',
 					blogdescription: '',
-					custom_logo: args.siteLogoId,
+					customLogo: args.siteLogoId,
 					pages: args.isPagesSelected ? args.selectedPages : [],
+					colorPalette: args.colorPalette,
+					typography: args.typography,
 				},
 			},
 			parse: false,
@@ -40,6 +44,8 @@ export const importDataQueryOptions = (args: {
 	siteLogoId: number;
 	selectedPages: PageWithSelection[];
 	isPagesSelected: boolean;
+	colorPalette: string[];
+	typography: string[];
 }) =>
 	queryOptions({
 		queryKey: ['importDemo', args],

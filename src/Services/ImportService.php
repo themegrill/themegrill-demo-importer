@@ -60,7 +60,9 @@ class ImportService {
 		$args = array(
 			'blogname'        => $options['blogname'] ?? '',
 			'blogdescription' => $options['blogdescription'] ?? '',
-			'custom_logo'     => $options['custom_logo'] ?? 0,
+			'custom_logo'     => $options['customLogo'] ?? 0,
+			'color_palette'   => $options['colorPalette'],
+			'typography'      => $options['typography'],
 		);
 
 		return $this->customizerImporter->import( $demo_config, $args );
