@@ -1,7 +1,7 @@
 import { useRouter } from '@tanstack/react-router';
 import { __ } from '@wordpress/i18n';
 import { ArrowLeft, Monitor, Smartphone, Tablet } from 'lucide-react';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Demo } from '../../../../../../lib/types';
 import { Button } from '../../../../../ui/Button';
 import {
@@ -57,6 +57,7 @@ const Sidebar = ({
 				console.warn('Iframe not available');
 				return;
 			}
+			setSelectedPaletteIndex(index);
 
 			// Send message to iframe
 			iframeRef.current?.contentWindow?.postMessage(
@@ -72,7 +73,6 @@ const Sidebar = ({
 			const handleMessage = (event: MessageEvent) => {
 				if (event.data.type === 'COLOR_PALETTE_UPDATED') {
 					// console.log('Color Palette updated successfully:', event.data.success);
-					setSelectedPaletteIndex(index);
 					window.removeEventListener('message', handleMessage);
 				}
 			};
@@ -95,6 +95,8 @@ const Sidebar = ({
 				return;
 			}
 
+			setSelectedTypographyIndex(index);
+
 			// Send message to iframe
 			iframeRef.current?.contentWindow?.postMessage(
 				{
@@ -108,7 +110,6 @@ const Sidebar = ({
 			const handleMessage = (event: MessageEvent) => {
 				if (event.data.type === 'TYPOGRAPHY_UPDATED') {
 					console.log('Typography updated successfully:', event.data.success);
-					setSelectedTypographyIndex(index);
 					window.removeEventListener('message', handleMessage);
 				}
 			};
@@ -123,6 +124,36 @@ const Sidebar = ({
 			console.error('Error sending typography update message:', error);
 		}
 	};
+
+	useEffect(() => {
+		if (!iframeRef.current) return;
+
+		const iframe = iframeRef.current;
+		const onLoad = () => {
+			if (selectedPaletteIndex !== null) {
+				iframe.contentWindow?.postMessage(
+					{
+						type: 'UPDATE_COLOR_PALETTE',
+						theme: demo.theme_slug,
+						colorPalette: colorPalette[selectedPaletteIndex],
+					},
+					'*',
+				);
+			}
+			if (selectedTypographyIndex !== null) {
+				iframeRef.current?.contentWindow?.postMessage(
+					{
+						type: 'UPDATE_TYPOGRAPHY',
+						typography: typography[selectedTypographyIndex],
+					},
+					'*',
+				);
+			}
+		};
+
+		iframe.addEventListener('load', onLoad);
+		return () => iframe.removeEventListener('load', onLoad);
+	}, [iframeRef, selectedPaletteIndex, demo.theme_slug, colorPalette]);
 
 	return (
 		<div className="w-[350px] min-w-[350px] flex flex-col bg-[#FAFBFC] border-0 border-r border-solid border-[#E9E9E9] ">
@@ -139,7 +170,17 @@ const Sidebar = ({
 									size={24}
 									color="#909090"
 									strokeWidth={2}
-									onClick={() => router.history.back()}
+									onClick={() =>
+										router.navigate({
+											to: '/',
+											search: {
+												search: undefined,
+												builder: undefined,
+												category: undefined,
+											},
+											replace: true,
+										})
+									}
 									className="cursor-pointer"
 								/>
 							</TooltipTrigger>

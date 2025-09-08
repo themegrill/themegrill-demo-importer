@@ -42,7 +42,17 @@ const FeatureSidebar = ({ demo, plugins, setPlugins, onOpen, setShowFeatureLayou
 									size={24}
 									color="#909090"
 									strokeWidth={2}
-									onClick={() => router.history.back()}
+									onClick={() =>
+										router.navigate({
+											to: '/',
+											search: {
+												search: undefined,
+												builder: undefined,
+												category: undefined,
+											},
+											replace: true,
+										})
+									}
 									className="cursor-pointer"
 								/>
 							</TooltipTrigger>
