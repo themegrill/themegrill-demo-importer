@@ -1,7 +1,7 @@
 import { __ } from '@wordpress/i18n';
 import { MediaUpload } from '@wordpress/media-utils';
 import { PencilLine, Trash2 } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 type Props = {
 	iframeRef: React.RefObject<HTMLIFrameElement>;
@@ -32,6 +32,7 @@ type MediaObject = {
 
 const LogoUploader = ({ iframeRef, setSiteLogoId }: Props) => {
 	const [selectedLogo, setSelectedLogo] = useState<LogoData | null>(null);
+	const [logoBase64, setLogoBase64] = useState<string | null>(null);
 
 	const handleLogoSelect = (media: MediaObject): void => {
 		// Validate file type
@@ -73,7 +74,8 @@ const LogoUploader = ({ iframeRef, setSiteLogoId }: Props) => {
 			const reader = new FileReader();
 			reader.onloadend = () => {
 				const base64data = reader.result as string;
-				// Send message to iframe
+				setLogoBase64(base64data);
+
 				iframeRef.current?.contentWindow?.postMessage(
 					{
 						type: 'UPDATE_LOGO',
@@ -152,6 +154,7 @@ const LogoUploader = ({ iframeRef, setSiteLogoId }: Props) => {
 
 	const handleRemoveLogo = () => {
 		setSelectedLogo(null);
+		setLogoBase64(null);
 		try {
 			if (!iframeRef?.current?.contentWindow) {
 				console.warn('Iframe not available');
@@ -184,6 +187,22 @@ const LogoUploader = ({ iframeRef, setSiteLogoId }: Props) => {
 			console.error('Error sending logo update message:', error);
 		}
 	};
+
+	useEffect(() => {
+		if (!iframeRef.current) return;
+
+		const iframe = iframeRef.current;
+		const onLoad = () => {
+			if (logoBase64) {
+				iframe.contentWindow?.postMessage({ type: 'UPDATE_LOGO', logoData: logoBase64 }, '*');
+			} else {
+				iframe.contentWindow?.postMessage({ type: 'REMOVE_LOGO' }, '*');
+			}
+		};
+
+		iframe.addEventListener('load', onLoad);
+		return () => iframe.removeEventListener('load', onLoad);
+	}, [iframeRef, logoBase64]);
 
 	return (
 		<div>

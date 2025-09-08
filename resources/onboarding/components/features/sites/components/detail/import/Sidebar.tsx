@@ -126,34 +126,41 @@ const Sidebar = ({
 	};
 
 	useEffect(() => {
-		if (!iframeRef.current) return;
+		if (!iframeRef.current || selectedPaletteIndex === null) return;
 
 		const iframe = iframeRef.current;
 		const onLoad = () => {
-			if (selectedPaletteIndex !== null) {
-				iframe.contentWindow?.postMessage(
-					{
-						type: 'UPDATE_COLOR_PALETTE',
-						theme: demo.theme_slug,
-						colorPalette: colorPalette[selectedPaletteIndex],
-					},
-					'*',
-				);
-			}
-			if (selectedTypographyIndex !== null) {
-				iframeRef.current?.contentWindow?.postMessage(
-					{
-						type: 'UPDATE_TYPOGRAPHY',
-						typography: typography[selectedTypographyIndex],
-					},
-					'*',
-				);
-			}
+			iframe.contentWindow?.postMessage(
+				{
+					type: 'UPDATE_COLOR_PALETTE',
+					theme: demo.theme_slug,
+					colorPalette: colorPalette[selectedPaletteIndex],
+				},
+				'*',
+			);
 		};
 
 		iframe.addEventListener('load', onLoad);
 		return () => iframe.removeEventListener('load', onLoad);
 	}, [iframeRef, selectedPaletteIndex, demo.theme_slug, colorPalette]);
+
+	useEffect(() => {
+		if (!iframeRef.current || selectedTypographyIndex === null) return;
+
+		const iframe = iframeRef.current;
+		const onLoad = () => {
+			iframe.contentWindow?.postMessage(
+				{
+					type: 'UPDATE_TYPOGRAPHY',
+					typography: typography[selectedTypographyIndex],
+				},
+				'*',
+			);
+		};
+
+		iframe.addEventListener('load', onLoad);
+		return () => iframe.removeEventListener('load', onLoad);
+	}, [iframeRef, selectedTypographyIndex, typography]);
 
 	return (
 		<div className="w-[350px] min-w-[350px] flex flex-col bg-[#FAFBFC] border-0 border-r border-solid border-[#E9E9E9] ">
