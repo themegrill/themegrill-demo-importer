@@ -126,44 +126,65 @@ class ThemeModsImporter {
 		}
 		// Loop through theme mods and update them.
 		foreach ( $data as $key => $value ) {
-			if ( $demo_data['theme_slug'] . '_color_palette' === $key && ! empty( $args['color_palette'] ) ) {
-				$colors = array();
-				$id     = 'custom-' . time();
-				foreach ( $args['color_palette'] as $index => $color ) {
-					$palette_key            = $demo_data['theme_slug'] . '-color-' . ( $index + 1 );
-					$colors[ $palette_key ] = $color;
-				}
+			set_theme_mod( $key, $value );
+		}
 
-				$new_custom = array(
-					'colors' => $colors,
-					'id'     => $id,
-				);
-
-				$value['custom'][] = $new_custom;
-
-				$new_value = [
-					'id'     => $id,
-					'name'   => 'Importer Color Palette',
-					'colors' => $colors,
-					'custom' => $value['custom'],
-				];
-				set_theme_mod( $key, $new_value );
-			} elseif ( ! empty( $args['typography'] ) ) {
-				$typography_keys = [
-					'body'    => [ 'zakra_body_typography', 'colormag_base_typography', 'elearning_base_typography_body' ],
-					'heading' => [ 'zakra_heading_typography', 'colormag_headings_typography', 'elearning_base_typography_heading' ],
-				];
-
-				if ( in_array( $key, $typography_keys['body'], true ) ) {
-					$value['font-family'] = $args['typography'][0];
-				}
-				if ( in_array( $key, $typography_keys['heading'], true ) ) {
-					$value['font-family'] = $args['typography'][1];
-				}
-				set_theme_mod( $key, $value );
-			} else {
-				set_theme_mod( $key, $value );
+		if ( ! empty( 'color_palette' ) ) {
+			$color_palette_key = $demo_data['theme_slug'] . '_color_palette';
+			$colors            = array();
+			$id                = 'custom-' . time();
+			foreach ( $args['color_palette'] as $index => $color ) {
+				$palette_key            = $demo_data['theme_slug'] . '-color-' . ( $index + 1 );
+				$colors[ $palette_key ] = $color;
 			}
+
+			$new_custom = array(
+				'colors' => $colors,
+				'id'     => $id,
+			);
+
+			$existing_custom   = isset( $data[ $color_palette_key ]['custom'] ) ? $data[ $color_palette_key ]['custom'] : [];
+			$existing_custom[] = $new_custom;
+
+			$new_value = [
+				'id'     => $id,
+				'name'   => 'Importer Color Palette',
+				'colors' => $colors,
+				'custom' => $existing_custom,
+			];
+			set_theme_mod( $color_palette_key, $new_value );
+		}
+
+		if ( ! empty( $args['typography'] ) ) {
+			$typography_keys = [
+				'zakra'     => [
+					'body'    => 'zakra_body_typography',
+					'heading' => 'zakra_heading_typography',
+				],
+				'colormag'  => [
+					'body'    => 'colormag_base_typography',
+					'heading' => 'colormag_headings_typography',
+				],
+				'elearning' => [
+					'body'    => 'elearning_base_typography_body',
+					'heading' => 'elearning_base_typography_heading',
+				],
+			];
+
+			if ( ! isset( $typography_keys[ $demo_data['theme_slug'] ] ) ) {
+				return;
+			}
+
+			$body_typography_key    = $typography_keys[ $demo_data['theme_slug'] ]['body'];
+			$heading_typography_key = $typography_keys[ $demo_data['theme_slug'] ]['heading'];
+
+			$body_typography_value                = isset( $data[ $body_typography_key ] ) ? $data[ $body_typography_key ] : [];
+			$body_typography_value['font-family'] = $args['typography'][0];
+			set_theme_mod( $body_typography_key, $body_typography_value );
+
+			$heading_typography_value                = isset( $data[ $heading_typography_key ] ) ? $data[ $heading_typography_key ] : [];
+			$heading_typography_value['font-family'] = $args['typography'][1];
+			set_theme_mod( $heading_typography_key, $heading_typography_value );
 		}
 	}
 
