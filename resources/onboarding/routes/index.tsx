@@ -6,15 +6,15 @@ export const Route = createFileRoute('/')({
 	validateSearch: (search: Record<string, unknown>) => {
 		return {
 			search: ((search.search as string | undefined) ?? undefined)?.replaceAll(
-				'?page=demo-importer-v2',
+				'?page=tg-starter-templates',
 				'',
 			),
 			builder: ((search.builder as string | undefined) ?? undefined)?.replaceAll(
-				'?page=demo-importer-v2',
+				'?page=tg-starter-templates',
 				'',
 			),
 			category: ((search.category as string | undefined) ?? undefined)?.replaceAll(
-				'?page=demo-importer-v2',
+				'?page=tg-starter-templates',
 				'',
 			),
 		};

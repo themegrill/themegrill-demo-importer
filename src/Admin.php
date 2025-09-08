@@ -46,10 +46,10 @@ class Admin {
 		// }
 
 		$page = add_theme_page(
-			__( 'Demo Importer V2', 'themegrill-demo-importer' ),
-			__( 'Demo Importer V2', 'themegrill-demo-importer' ),
+			__( 'Starter Templates', 'themegrill-demo-importer' ),
+			__( 'Starter Templates', 'themegrill-demo-importer' ),
 			'switch_themes',
-			'demo-importer-v2',
+			'tg-starter-templates',
 			function () {
 				echo '<div id="tg-demo-importer"></div>';
 			}
@@ -108,7 +108,7 @@ class Admin {
 
 		$screen = get_current_screen();
 
-		if ( 'appearance_page_demo-importer-v2' === $screen->id ) {
+		if ( 'appearance_page_tg-starter-templates' === $screen->id ) {
 			add_filter( 'woocommerce_enable_setup_wizard', '__return_false', 1 );
 		}
 	}

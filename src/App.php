@@ -66,7 +66,7 @@ class App {
 	 */
 	public function plugin_action_links( $actions ) {
 		$new_actions = array(
-			'importer' => '<a href="' . admin_url( 'themes.php?page=demo-importer-v2' ) . '" aria-label="' . esc_attr( __( 'View Demo Importer', 'themegrill-demo-importer' ) ) . '">' . __( 'Demo Importer', 'themegrill-demo-importer' ) . '</a>',
+			'importer' => '<a href="' . admin_url( 'themes.php?page=tg-starter-templates' ) . '" aria-label="' . esc_attr( __( 'View Demo Importer', 'themegrill-demo-importer' ) ) . '">' . __( 'Demo Importer', 'themegrill-demo-importer' ) . '</a>',
 		);
 
 		return array_merge( $new_actions, $actions );
