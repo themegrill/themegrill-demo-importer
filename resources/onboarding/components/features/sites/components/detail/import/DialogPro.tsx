@@ -8,6 +8,7 @@ import { Demo } from '../../../../../../lib/types';
 import { useLocalizedData } from '../../../../../../LocalizedDataContext';
 import { Button } from '../../../../../ui/Button';
 import { activateProQueryOptions, localizedDataQueryOptions } from '../../../../api/import.api';
+import { useRouter } from '@tanstack/react-router';
 
 type Props = {
 	demo: Demo;
@@ -17,6 +18,7 @@ type Props = {
 };
 
 const DialogPro = ({ demo, proUpgrade, proActivate, setOpen }: Props) => {
+	const router = useRouter();
 	const { localizedData, setLocalizedData } = useLocalizedData();
 	const [isActivating, setIsActivating] = useState(false);
 	const matchedTheme = themes.find((theme) => theme.slug === demo.theme_slug);
@@ -100,7 +102,20 @@ const DialogPro = ({ demo, proUpgrade, proActivate, setOpen }: Props) => {
 							{__('Activate Now', 'themegrill-demo-importer')}
 						</Button>
 					))}
-				<Button className="mt-4 cursor-pointer text-[14px] text-[#6B6B6B] leading-[19px] border-0 bg-transparent font-normal w-full p-0 h-5 hover:bg-transparent hover:border-0">
+				<Button
+					className="mt-4 cursor-pointer text-[14px] text-[#6B6B6B] leading-[19px] border-0 bg-transparent font-normal w-full p-0 h-5 hover:bg-transparent hover:border-0"
+					onClick={() =>
+						router.navigate({
+							to: '/',
+							search: {
+								search: undefined,
+								builder: undefined,
+								category: undefined,
+							},
+							replace: true,
+						})
+					}
+				>
 					{__('View all Premium Templates', 'themegrill-demo-importer')}
 				</Button>
 			</div>
