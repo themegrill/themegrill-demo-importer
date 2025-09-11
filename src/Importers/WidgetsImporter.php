@@ -15,7 +15,7 @@ class WidgetsImporter {
 
 	public function import( $demo ) {
 		if ( ! $demo['widgets'] ) {
-			return;
+			return true;
 		}
 		$mapping_data = get_option( 'themegrill_demo_importer_mapping', array() );
 		$term_id_map  = array();
@@ -127,7 +127,7 @@ class WidgetsImporter {
 				 *
 				 * Do before identical check because changes may make it identical to end result (such as URL replacements).
 				 */
-				$widget = apply_filters( 'themegrill_widget_import_settings', $widget, $id_base, $instance_id_number, $demo_data, $demo_id );
+				$widget = apply_filters( 'themegrill_widget_import_settings', $widget, $id_base );
 
 				// Does widget with identical settings already exist in same sidebar?
 				if ( ! $fail && isset( $widget_instances[ $id_base ] ) ) {

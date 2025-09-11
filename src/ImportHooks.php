@@ -27,7 +27,7 @@ class ImportHooks {
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_magazine_blocks_settings' ), 10, 3 );
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_blockart_blocks_settings' ), 10, 3 );
 
-		add_filter( 'themegrill_widget_import_settings', array( $this, 'update_widget_data' ), 10, 4 );
+		add_filter( 'themegrill_widget_import_settings', array( $this, 'update_widget_data' ), 10, 2 );
 		// Disable Masteriyo setup wizard.
 		add_filter( 'masteriyo_enable_setup_wizard', '__return_false' );
 
@@ -513,24 +513,36 @@ class ImportHooks {
 		}
 	}
 
-	public function update_widget_data( $widget, $widget_type, $instance_id, $demo_data ) {
+	public function update_widget_data( $widget, $widget_type ) {
 		if ( ! empty( $widget ) ) {
-			if ( 'nav_menu' === $widget_type ) {
-				$mapping_data     = get_option( 'themegrill_demo_importer_mapping', array() );
-				$term_mapped_data = array();
-				if ( ! empty( $mapping_data ) ) {
-					$term_mapped_data = $mapping_data['term_id'] ?? array();
-				}
-				if ( ! empty( $term_mapped_data ) ) {
+			$term_mapped_data = array();
+			$mapping_data     = get_option( 'themegrill_demo_importer_mapping', array() );
+			$term_mapped_data = $mapping_data['term_id'] ?? array();
+			$post_mapped_data = $mapping_data['post'] ?? array();
+
+			if ( ! empty( $term_mapped_data ) ) {
+				if ( 'nav_menu' === $widget_type ) {
 					$menu     = $term_mapped_data[ $widget['nav_menu'] ] ?? '';
 					$nav_menu = wp_get_nav_menu_object( $menu );
 					if ( is_object( $nav_menu ) && $nav_menu->term_id ) {
 						$widget['nav_menu'] = $nav_menu->term_id;
 					}
+				} elseif ( is_array( $widget ) ) {
+					$keys = array( 'category', 'tag', 'author', 'page_id', 'page_id0', 'page_id1', 'page_id2', 'page_id3', 'page_id4', 'page_id5', 'cat_id0', 'cat_id1', 'cat_id2', 'category1', 'category2', 'category3', 'category4' ); // for dropdown categories and pages in widgets
+					foreach ( $keys as $key ) {
+						if ( isset( $widget[ $key ] ) ) {
+							if ( 'author' === $key ) {
+								$widget[ $key ] = get_current_user_id();
+							} elseif ( str_starts_with( $key, 'page_id' ) ) {
+								$widget[ $key ] = $post_mapped_data[ $widget[ $key ] ] ?? $widget[ $key ];
+							} else {
+								$widget[ $key ] = $term_mapped_data[ $widget[ $key ] ] ?? $widget[ $key ];
+							}
+						}
+					}
 				}
 			}
-
-			return $widget;
 		}
+		return $widget;
 	}
 }
