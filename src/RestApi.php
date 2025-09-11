@@ -66,16 +66,6 @@ class RestApi {
 						//  'type'       => 'object',
 						//  'required'   => false,
 						//  'properties' => array(
-						//      'force_install_theme' => array(
-						//          'type'    => 'boolean',
-						//          'default' => true,
-						//      ),
-						//      'blogname'            => array(
-						//          'type' => 'string',
-						//      ),
-						//      'blogdescription'     => array(
-						//          'type' => 'string',
-						//      ),
 						//      'logo'                => array(
 						//          'type' => 'number',
 						//      ),

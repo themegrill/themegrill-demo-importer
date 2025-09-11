@@ -20,8 +20,6 @@ export async function importDemo(args: {
 				demo_config: args.demo,
 				opts: {
 					plugins: args.selectedPlugins,
-					blogname: '',
-					blogdescription: '',
 					customLogo: args.siteLogoId,
 					pages: args.isPagesSelected ? args.selectedPages : [],
 					colorPalette: args.colorPalette,

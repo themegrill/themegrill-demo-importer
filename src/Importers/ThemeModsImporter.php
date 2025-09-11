@@ -15,7 +15,7 @@ class ThemeModsImporter {
 
 	public function import( $demo, $args = array() ) {
 		if ( ! $demo['themeMods'] ) {
-			return;
+			return true;
 		}
 		$mapping_data = get_option( 'themegrill_demo_importer_mapping', array() );
 		$term_id_map  = array();
@@ -28,23 +28,9 @@ class ThemeModsImporter {
 			return new WP_Error( 'import_customizer_failed', 'Error importing customizer.', array( 'status' => 500 ) );
 		}
 
-		if ( ! empty( $args ) ) {
-			if ( $args['blogname'] ) {
-				update_option( 'blogname', $args['blogname'] );
-			}
-
-			if ( $args['blogdescription'] ) {
-				update_option( 'blogdescription', $args['blogdescription'] );
-			}
-
-			if ( $args['custom_logo'] ) {
-				$theme_mods = get_theme_mods();
-				$post_id    = $theme_mods['custom_logo'] ?? null;
-
-				if ( $post_id ) {
-					set_theme_mod( 'custom_logo', $args['custom_logo'] );
-				}
-			}
+		$options = ! empty( $demo['options'] ) ? $demo['options'] : array();
+		foreach ( $options as $key => $value ) {
+			update_option( $key, $value );
 		}
 
 		return new WP_REST_Response(
@@ -129,7 +115,16 @@ class ThemeModsImporter {
 			set_theme_mod( $key, $value );
 		}
 
-		if ( ! empty( 'color_palette' ) ) {
+		if ( ! empty( $args['custom_logo'] ) ) {
+			$theme_mods = get_theme_mods();
+			$post_id    = $theme_mods['custom_logo'] ?? null;
+
+			if ( $post_id ) {
+				set_theme_mod( 'custom_logo', $args['custom_logo'] );
+			}
+		}
+
+		if ( ! empty( $args['color_palette'] ) ) {
 			$color_palette_key = $demo_data['theme_slug'] . '_color_palette';
 			$colors            = array();
 			$id                = 'custom-' . time();

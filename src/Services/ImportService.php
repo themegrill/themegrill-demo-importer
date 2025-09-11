@@ -58,11 +58,9 @@ class ImportService {
 
 	private function importCustomizer( $demo_config, $options ) {
 		$args = array(
-			'blogname'        => $options['blogname'] ?? '',
-			'blogdescription' => $options['blogdescription'] ?? '',
-			'custom_logo'     => $options['customLogo'] ?? 0,
-			'color_palette'   => $options['colorPalette'],
-			'typography'      => $options['typography'],
+			'custom_logo'   => $options['customLogo'] ?? 0,
+			'color_palette' => $options['colorPalette'],
+			'typography'    => $options['typography'],
 		);
 
 		return $this->customizerImporter->import( $demo_config, $args );
