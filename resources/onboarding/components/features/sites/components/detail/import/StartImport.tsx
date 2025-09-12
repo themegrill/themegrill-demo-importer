@@ -130,16 +130,13 @@ const StartImport = ({
 						localizedDataQueryOptions({}),
 					);
 					setLocalizedData(localizedResponse);
+					setImportProgress(100);
+				} else {
+					setImportProgress((prev) => {
+						const next = prev + (IMPORT_ACTIONS[action]?.progressWeight ?? 0);
+						return next;
+					});
 				}
-				setImportProgress((prev) => {
-					let next = 0;
-					if (action !== 'complete') {
-						next = prev + (IMPORT_ACTIONS[action]?.progressWeight ?? 0);
-					} else {
-						next = 100;
-					}
-					return next;
-				});
 			} catch (e) {
 				setImportAction(null);
 				setImportProgress(0);

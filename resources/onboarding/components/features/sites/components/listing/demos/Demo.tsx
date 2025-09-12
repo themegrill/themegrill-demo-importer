@@ -20,7 +20,16 @@ const Demo = ({ demo }: DemoProps) => {
 			<div>
 				<div className="relative h-full" style={{ aspectRatio: '.84 / 1' }}>
 					{demo.previewImage ? (
-						<img src={demo.previewImage} alt="" className="w-full h-full rounded-t-md" />
+						<img
+							src={demo.previewImage}
+							alt=""
+							className={`w-full h-full rounded-t-md ${
+								demo.previewImage.includes('themegrilldemos') ||
+								demo.previewImage.includes('zakrademos')
+									? ''
+									: 'object-contain'
+							}`}
+						/>
 					) : (
 						<img
 							src={require(`../../../../../../assets/images/demo-skeleton.jpg`)}
