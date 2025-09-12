@@ -2,6 +2,7 @@
 
 namespace ThemeGrill\Demo\Importer\Importers;
 
+use ThemeGrill\Demo\Importer\CustomizeDemoImporterSetting;
 use ThemeGrill\Demo\Importer\Logger;
 use WP_Error;
 use WP_REST_Response;
@@ -27,11 +28,6 @@ class ThemeModsImporter {
 		if ( is_wp_error( $import ) ) {
 			$this->logger->error( 'Error importing customizer: ' . $import->get_error_message() );
 			return new WP_Error( 'import_customizer_failed', 'Error importing customizer.', array( 'status' => 500 ) );
-		}
-
-		$options = ! empty( $demo['options'] ) ? $demo['options'] : array();
-		foreach ( $options as $key => $value ) {
-			update_option( $key, $value );
 		}
 		$this->logger->info( 'Theme mods imported.' );
 		return new WP_REST_Response(
@@ -69,30 +65,30 @@ class ThemeModsImporter {
 		}
 
 		// Import custom options.
-		// if ( isset( $data['options'] ) ) {
+		$options = ! empty( $demo_data['wp_options'] ) ? $demo_data['wp_options'] : array();
+		foreach ( $options as $key => $value ) {
+			if ( 'options' === $key ) {
+				if ( ! class_exists( 'WP_Customize_Setting' ) ) {
+					require_once ABSPATH . WPINC . '/class-wp-customize-setting.php';
+				}
+				foreach ( $options['options'] as $option_key => $option_value ) {
+					$option = new CustomizeDemoImporterSetting(
+						$wp_customize,
+						$option_key,
+						array(
+							'default'    => '',
+							'type'       => 'option',
+							'capability' => 'edit_theme_options',
+						)
+					);
 
-		//  // Load WordPress Customize Setting Class.
-		//  if ( ! class_exists( 'WP_Customize_Setting' ) ) {
-		//      require_once ABSPATH . WPINC . '/class-wp-customize-setting.php';
-		//  }
-
-			// Include Customizer Demo Importer Setting class.
-			// include_once __DIR__ . '/customize/class-oc-customize-demo-importer-setting.php';
-
-			// foreach ( $data['options'] as $option_key => $option_value ) {
-			//  $option = new OC_Customize_Demo_Importer_Setting(
-			//      $wp_customize,
-			//      $option_key,
-			//      array(
-			//          'default'    => '',
-			//          'type'       => 'option',
-			//          'capability' => 'edit_theme_options',
-			//      )
-			//  );
-
-			//  $option->import( $option_value );
-			// }
-		// }
+					$option->import( $option_value );
+				}
+			}
+			if ( function_exists( 'wp_update_custom_css_post' ) && 'wp_css' === $key && ! empty( $options['wp_css'] ) ) {
+				wp_update_custom_css_post( $options['wp_css'] );
+			}
+		}
 
 		if ( isset( $data['nav_menu_locations'] ) && is_array( $data['nav_menu_locations'] ) ) {
 			foreach ( $data['nav_menu_locations'] as $location => $menu_id ) {
@@ -107,10 +103,6 @@ class ThemeModsImporter {
 			$data['colormag_footer_menu'] = $footer_menu_id;
 		}
 
-		// If wp_css is set then import it.
-		if ( function_exists( 'wp_update_custom_css_post' ) && isset( $data['wp_css'] ) && '' !== $data['wp_css'] ) {
-			wp_update_custom_css_post( $data['wp_css'] );
-		}
 		// Loop through theme mods and update them.
 		foreach ( $data as $key => $value ) {
 			set_theme_mod( $key, $value );
