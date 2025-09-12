@@ -1249,8 +1249,9 @@ class WXRImporter extends WP_Importer {
 
 				if ( '_elementor_data' === $key ) {
 					$value = json_decode( $value, true );
-					$this->replace_categories_ids( $value, $this->mapping['term_id'] );
+					$this->replace_elementor_categories_ids( $value, $this->mapping['term_id'] );
 				}
+
 				add_post_meta( $post_id, wp_slash( $key ), wp_slash_strings_only( $value ) );
 
 				do_action( 'import_post_meta', $post_id, $key, $value );
@@ -1265,7 +1266,7 @@ class WXRImporter extends WP_Importer {
 		return true;
 	}
 
-	private function replace_categories_ids( &$elements, $category_mapping ) {
+	private function replace_elementor_categories_ids( &$elements, $category_mapping ) {
 		foreach ( $elements as &$element ) {
 			$fields_to_replace = array( 'categories_selected', 'authors_selected', 'tags_selected' );
 
@@ -1292,11 +1293,10 @@ class WXRImporter extends WP_Importer {
 			}
 
 			if ( isset( $element['elements'] ) && ! empty( $element['elements'] ) ) {
-				$this->replace_categories_ids( $element['elements'], $category_mapping );
+				$this->replace_elementor_categories_ids( $element['elements'], $category_mapping );
 			}
 		}
 	}
-
 
 	/**
 	 * Parse a comment node into comment data.

@@ -7,6 +7,7 @@ use ThemeGrill\Demo\Importer\Importers\ContentImporter;
 use ThemeGrill\Demo\Importer\Importers\PluginImporter;
 use ThemeGrill\Demo\Importer\Importers\ThemeModsImporter;
 use ThemeGrill\Demo\Importer\Importers\WidgetsImporter;
+use ThemeGrill\Demo\Importer\Logger;
 use WP_REST_Response;
 
 class ImportService {
@@ -15,12 +16,14 @@ class ImportService {
 	private $widgetImporter;
 	private $customizerImporter;
 	private $pluginImporter;
+	private $logger;
 
 	public function __construct() {
 		$this->contentImporter    = new ContentImporter();
 		$this->widgetImporter     = new WidgetsImporter();
 		$this->customizerImporter = new ThemeModsImporter();
 		$this->pluginImporter     = new PluginImporter();
+		$this->logger             = Logger::getInstance();
 	}
 
 	public function handleImport( $action, $demo_config, $options ) {
@@ -71,12 +74,17 @@ class ImportService {
 	}
 
 	private function completeImport( $demo_config ) {
+		$this->logger->info( 'Finalizing additional settings...' );
+
 		update_option( 'themegrill_demo_importer_activated_id', $demo_config['slug'] );
 
 		do_action( 'themegrill_ajax_demo_imported', $demo_config['slug'], $demo_config );
+
+		delete_option( 'themegrill_demo_importer_mapping' );
 		flush_rewrite_rules();
 		wp_cache_flush();
 
+		$this->logger->info( 'Demo Imported successfully.' );
 		return array(
 			'success' => true,
 			'message' => 'Demo Imported successfully.',

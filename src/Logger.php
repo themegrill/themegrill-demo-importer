@@ -8,14 +8,12 @@ use Psr\Log\InvalidArgumentException;
 
 class Logger implements LoggerInterface {
 
-	private string $logFile;
 	private array $logLevels;
 	private string $dateFormat                = 'Y-m-d H:i:s';
 	private static ?LoggerInterface $instance = null;
+	const LOG_TRANSIENT_KEY                   = 'themegrill_starter_templates_log';
 
 	private function __construct() {
-		$this->logFile = WP_CONTENT_DIR . DIRECTORY_SEPARATOR . 'tdi-debug.log';
-
 		$this->logLevels = [
 			LogLevel::EMERGENCY => 0,
 			LogLevel::ALERT     => 1,
@@ -26,8 +24,6 @@ class Logger implements LoggerInterface {
 			LogLevel::INFO      => 6,
 			LogLevel::DEBUG     => 7,
 		];
-
-		add_action( 'shutdown', [ $this, 'flushLogs' ], 99 );
 	}
 
 	private function __clone() {}
@@ -85,33 +81,41 @@ class Logger implements LoggerInterface {
 		$levelUpper = strtoupper( $level );
 		$logEntry   = "[{$timestamp}] {$levelUpper}: {$interpolatedMessage}" . PHP_EOL;
 
-		$this->writeToFile( $logEntry );
+		$this->write( $logEntry );
 	}
 
 	private function interpolate( string $message, array $context ): string {
 		$replace = [];
+
 		foreach ( $context as $key => $val ) {
-			if ( ! is_array( $val ) && ( ! is_object( $val ) || method_exists( $val, '__toString' ) ) ) {
-				$replace[ '{' . $key . '}' ] = $val;
+			$placeholder = '{' . $key . '}';
+
+			if ( is_scalar( $val ) || ( is_object( $val ) && method_exists( $val, '__toString' ) ) ) {
+				$replace[ $placeholder ] = (string) $val;
 			} elseif ( is_array( $val ) || is_object( $val ) ) {
-				$replace[ '{' . $key . '}' ] = wp_json_encode( $val );
+				$jsonEncoded             = wp_json_encode( $val );
+				$replace[ $placeholder ] = false !== $jsonEncoded ? $jsonEncoded : '[encoding_failed]';
+			} else {
+				$replace[ $placeholder ] = '[unsupported_type]';
 			}
 		}
 
 		return strtr( $message, $replace );
 	}
 
-	private function writeToFile( string $logEntry ): void {
-		@file_put_contents( $this->logFile, $logEntry, FILE_APPEND | LOCK_EX ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents, WordPress.PHP.NoSilencedErrors.Discouraged
+
+	private function write( string $message ): bool {
+		$existingLog = $this->getLog();
+		$newLog      = $existingLog . $message;
+		return set_transient( self::LOG_TRANSIENT_KEY, $newLog, DAY_IN_SECONDS );
 	}
 
-	public function setLogFile( string $logFile ): void {
-		$this->logFile = $logFile;
+	public function getLog(): string {
+		$log = get_transient( self::LOG_TRANSIENT_KEY );
+		return false !== $log ? (string) $log : '';
 	}
 
-	public function getLogFile(): string {
-		return $this->logFile;
+	public function truncateLog(): bool {
+		return delete_transient( self::LOG_TRANSIENT_KEY );
 	}
-
-	public function flushLogs() {}
 }

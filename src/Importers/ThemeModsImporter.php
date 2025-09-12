@@ -22,6 +22,7 @@ class ThemeModsImporter {
 		if ( ! empty( $mapping_data ) ) {
 			$term_id_map = $mapping_data['term_id'] ?? array();
 		}
+		$this->logger->info( 'Importing theme mods...' );
 		$import = $this->processImport( $demo['themeMods'], $demo['slug'], $demo, $term_id_map, $args );
 		if ( is_wp_error( $import ) ) {
 			$this->logger->error( 'Error importing customizer: ' . $import->get_error_message() );
@@ -32,7 +33,7 @@ class ThemeModsImporter {
 		foreach ( $options as $key => $value ) {
 			update_option( $key, $value );
 		}
-
+		$this->logger->info( 'Theme mods imported.' );
 		return new WP_REST_Response(
 			array(
 				'success' => true,

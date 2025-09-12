@@ -2,7 +2,6 @@
 
 namespace ThemeGrill\Demo\Importer\Importers;
 
-use ThemeGrill\Demo\Importer\Importers\WXRImporter\WPImporterLoggerServerSentEvents;
 use ThemeGrill\Demo\Importer\Importers\WXRImporter\WXRImporter;
 use ThemeGrill\Demo\Importer\Logger;
 use WP_Error;
@@ -21,7 +20,14 @@ class ContentImporter {
 		do_action( 'themegrill_ajax_before_demo_import' );
 		if ( $pages ) {
 			foreach ( $pages as $page ) {
-				$this->import_xml( $page['content'] );
+				$page_title = $page['title'];
+				$this->logger->info( "Importing $page_title page..." );
+				$response = $this->import_xml( $page['content'] );
+				if ( is_wp_error( $response ) ) {
+					$this->logger->error( "Error importing $page_title: " . $response->get_error_message() );
+				} else {
+					$this->logger->info( "$page_title imported successfully." );
+				}
 			}
 		} else {
 			$content = $demo['content'];
@@ -29,13 +35,21 @@ class ContentImporter {
 				$this->logger->error( 'No XML content file provided for import.' );
 				return new WP_Error( 'no_content_file', 'No content file.', array( 'status' => 500 ) );
 			}
+			$this->logger->info( 'Importing content...' );
+
 			$response = $this->import_xml( $content );
 			if ( is_wp_error( $response ) ) {
 				$this->logger->error( 'Error importing content: ' . $response->get_error_message() );
 				return $response;
 			}
+
+			$this->logger->info( 'Content imported.' );
+
 		}
+
+		$this->logger->info( 'Importing core options...' );
 		$this->import_core_options( $demo );
+		$this->logger->info( 'Core options imported.' );
 
 		return new WP_REST_Response(
 			array(
@@ -60,9 +74,10 @@ class ContentImporter {
 
 		ob_start();
 		$importer = new WXRImporter();
-		$logger   = new WPImporterLoggerServerSentEvents();
+		$logger   = Logger::getInstance();
 		$importer->set_logger( $logger );
 		$data = $importer->import( $content );
+
 		ob_end_clean();
 
 		update_option( 'themegrill_demo_importer_mapping', $importer->get_mapping_data() );
