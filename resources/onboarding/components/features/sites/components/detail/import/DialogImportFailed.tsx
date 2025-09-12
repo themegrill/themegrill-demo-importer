@@ -1,10 +1,12 @@
+import { useRouter } from '@tanstack/react-router';
 import { __ } from '@wordpress/i18n';
 import { Info } from 'lucide-react';
-import React from 'react';
 import { Button } from '../../../../../ui/Button';
 import { DialogClose } from '../../../../../ui/Dialog';
 
 const DialogImportFailed = ({ handleTryAgain }: { handleTryAgain: () => void }) => {
+	const router = useRouter();
+
 	return (
 		<div className="pt-[50px] pb-[55px] px-[40px] text-center">
 			<div className="flex items-center justify-center gap-3 mb-[6px]">
@@ -38,7 +40,20 @@ const DialogImportFailed = ({ handleTryAgain }: { handleTryAgain: () => void }) 
 				</Button>
 
 				<DialogClose asChild>
-					<Button className="mt-4 cursor-pointer text-[14px] text-[#6B6B6B] leading-[19px] border-0 bg-transparent font-normal w-full p-0 h-5 hover:bg-transparent hover:border-0">
+					<Button
+						className="mt-4 cursor-pointer text-[14px] text-[#6B6B6B] leading-[19px] border-0 bg-transparent font-normal w-full p-0 h-5 hover:bg-transparent hover:border-0"
+						onClick={() =>
+							router.navigate({
+								to: '/',
+								search: {
+									search: undefined,
+									builder: undefined,
+									category: undefined,
+								},
+								replace: true,
+							})
+						}
+					>
 						{__('Cancel', 'themegrill-demo-importer')}
 					</Button>
 				</DialogClose>
