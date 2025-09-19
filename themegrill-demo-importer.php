@@ -3,7 +3,7 @@
  * Plugin Name: Starter Templates & Sites Pack by ThemeGrill
  * Plugin URI: https://themegrill.com/demo-importer/
  * Description: Import ThemeGrill official themes demo content, widgets and theme settings with just one click.
- * Version: 1.9.9
+ * Version: 2.0.0
  * Author: ThemeGrill
  * Author URI: https://themegrill.com
  * License: GPLv3 or later
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-const TGDM_VERSION     = '1.9.9';
+const TGDM_VERSION     = '2.0.0';
 const TGDM_PLUGIN_FILE = __FILE__;
 define( 'TGDM_ABSPATH', plugin_dir_path( __FILE__ ) );
 define( 'TGDM_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
@@ -56,8 +56,8 @@ require_once __DIR__ . '/vendor/autoload.php';
 
 add_filter(
 	'wp_import_post_data_processed',
-	function ( $post_data, $post, $term_id_map ) {
-		if ( isset( $post_data['post_content'] ) && has_blocks( $post_data['post_content'] ) ) {
+	function ( $post_data, $post, $term_id_map = null ) {
+		if ( isset( $post_data['post_content'] ) && has_blocks( $post_data['post_content'] ) && $term_id_map ) {
 			$blocks = parse_blocks( $post_data['post_content'] );
 			update_block_term_ids( $blocks, $term_id_map );
 			$post_data['post_content'] = serialize_blocks( $blocks );

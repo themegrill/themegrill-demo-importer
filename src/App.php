@@ -12,7 +12,7 @@ class App {
 	 *
 	 * @var string
 	 */
-	public $version = '1.9.9';
+	public $version = '2.0.0';
 
 	/**
 	 * Initialize the application
@@ -82,7 +82,7 @@ class App {
 	public function plugin_row_meta( $plugin_meta, $plugin_file ) {
 		if ( TGDM_PLUGIN_BASENAME === $plugin_file ) {
 			$new_plugin_meta = array(
-				'docs'    => '<a href="' . esc_url( apply_filters( 'themegrill_demo_importer_docs_url', 'https://themegrill.com/docs/themegrill-demo-importer/' ) ) . '" title="' . esc_attr( __( 'View Demo Importer Documentation', 'themegrill-demo-importer' ) ) . '">' . __( 'Docs', 'themegrill-demo-importer' ) . '</a>',
+				'docs'    => '<a href="' . esc_url( apply_filters( 'themegrill_demo_importer_docs_url', 'https://docs.themegrill.com/themegrill-demo-importer/' ) ) . '" title="' . esc_attr( __( 'View Demo Importer Documentation', 'themegrill-demo-importer' ) ) . '">' . __( 'Docs', 'themegrill-demo-importer' ) . '</a>',
 				'support' => '<a href="' . esc_url( apply_filters( 'themegrill_demo_importer_support_url', 'https://themegrill.com/support-forum/' ) ) . '" title="' . esc_attr( __( 'Visit Free Customer Support Forum', 'themegrill-demo-importer' ) ) . '">' . __( 'Free Support', 'themegrill-demo-importer' ) . '</a>',
 			);
 
