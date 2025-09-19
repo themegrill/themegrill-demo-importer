@@ -42,36 +42,19 @@ export const Route = createFileRoute('/import/$theme/$id')({
 
 			const isEmpty = !data.data || Object.keys(data.data).length === 0;
 
-			const pluginsList = [
-				{
-					plugin: 'everest-forms/everest-forms.php',
-					name: 'Everest Form',
-					description: 'Let visitors reach you through easy-to-use contact forms.',
-					isSelected: false,
-				},
-				{
-					plugin: 'woocommerce/woocommerce.php',
-					name: 'Woocommerce',
-					description: 'Sell products online and accept secure payments.',
-					isSelected: false,
-				},
-			];
+			const newPlugins: PluginItem[] = Object.entries(data?.data?.plugins || {}).map(
+				([pluginPath, pluginData]) => ({
+					plugin: pluginPath,
+					name: pluginData.name,
+					description: pluginData.description,
+					isSelected: true,
+					isMandatory: true,
+				}),
+			);
 
-			const mergedPlugins = mergePlugins(pluginsList, data?.data?.plugins || {});
-			const sortedPlugins = mergedPlugins.sort((a, b) => {
-				const aMandatory = a.isMandatory || false;
-				const bMandatory = b.isMandatory || false;
-
-				// If both are mandatory or both are not mandatory, maintain original order
-				if (aMandatory === bMandatory) {
-					return 0;
-				}
-				// Put mandatory plugins first
-				return bMandatory ? 1 : -1;
-			});
 			return {
 				demo: data?.data,
-				plugins: sortedPlugins || [],
+				plugins: newPlugins || [],
 				pages: data?.data?.pages || [],
 				isEmpty,
 			};
