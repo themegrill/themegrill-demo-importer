@@ -18,15 +18,21 @@ class ContentImporter {
 
 	public function import( $demo, $pages ) {
 		do_action( 'themegrill_ajax_before_demo_import' );
+		wp_raise_memory_limit( 'memory_limit', '350M' );
+
+		// Increase PHP max execution time. Just in case, even though the AJAX calls are only 25 sec long.
+		if ( strpos( ini_get( 'disable_functions' ), 'set_time_limit' ) === false ) {
+			set_time_limit( 300 );
+		}
 		if ( $pages ) {
 			foreach ( $pages as $page ) {
 				$page_title = $page['title'];
-				$this->logger->info( "Importing $page_title page..." );
+				$this->logger->info( "Importing $page_title page...", [ 'import_content_start_time' => true ] );
 				$response = $this->import_xml( $page['content'] );
 				if ( is_wp_error( $response ) ) {
-					$this->logger->error( "Error importing $page_title: " . $response->get_error_message() );
+					$this->logger->error( "Error importing $page_title: " . $response->get_error_message(), [ 'import_content_end_time' => true ] );
 				} else {
-					$this->logger->info( "$page_title imported successfully." );
+					$this->logger->info( "$page_title imported successfully.", [ 'import_content_end_time' => true ] );
 				}
 			}
 		} else {
@@ -35,21 +41,26 @@ class ContentImporter {
 				$this->logger->error( 'No XML content file provided for import.' );
 				return new WP_Error( 'no_content_file', 'No content file.', array( 'status' => 500 ) );
 			}
-			$this->logger->info( 'Importing content...' );
+			$this->logger->info(
+				'Importing content...',
+				[
+					'import_content_start_time' => true,
+				]
+			);
 
 			$response = $this->import_xml( $content );
 			if ( is_wp_error( $response ) ) {
-				$this->logger->error( 'Error importing content: ' . $response->get_error_message() );
+				$this->logger->error( 'Error importing content: ' . $response->get_error_message(), [ 'import_content_end_time' => true ] );
 				return $response;
 			}
 
-			$this->logger->info( 'Content imported.' );
+			$this->logger->info( 'Content imported.', [ 'import_content_end_time' => true ] );
 
 		}
 
-		$this->logger->info( 'Importing core options...' );
+		$this->logger->info( 'Importing core options...', [ 'start_time' => true ] );
 		$this->import_core_options( $demo );
-		$this->logger->info( 'Core options imported.' );
+		$this->logger->info( 'Core options imported.', [ 'end_time' => true ] );
 
 		return new WP_REST_Response(
 			array(

@@ -22,14 +22,14 @@ class WidgetsImporter {
 		if ( ! empty( $mapping_data ) ) {
 			$term_id_map = $mapping_data['term_id'] ?? array();
 		}
-		$this->logger->info( 'Importing widgets...' );
+		$this->logger->info( 'Importing widgets...', [ 'start_time' => true ] );
 
 		$import = $this->processImport( $demo['widgets'], $demo['slug'], $demo, $term_id_map );
 		if ( is_wp_error( $import ) ) {
-			$this->logger->error( 'Error importing widget: ' . $import->get_error_message() );
+			$this->logger->error( 'Error importing widget: ' . $import->get_error_message(), [ 'end_time' => true ] );
 			return new WP_Error( 'import_widget_failed', 'Error importing widget.', array( 'status' => 500 ) );
 		}
-		$this->logger->info( 'Widgets Imported.' );
+		$this->logger->info( 'Widgets Imported.', [ 'end_time' => true ] );
 
 		return new WP_REST_Response(
 			array(

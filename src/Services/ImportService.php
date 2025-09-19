@@ -74,7 +74,7 @@ class ImportService {
 	}
 
 	private function completeImport( $demo_config ) {
-		$this->logger->info( 'Finalizing additional settings...' );
+		$this->logger->info( 'Finalizing additional settings...', [ 'start_time' => true ] );
 
 		update_option( 'themegrill_demo_importer_activated_id', $demo_config['slug'] );
 
@@ -84,7 +84,7 @@ class ImportService {
 		flush_rewrite_rules();
 		wp_cache_flush();
 
-		$this->logger->info( 'Demo Imported successfully.' );
+		$this->logger->info( 'Demo Imported successfully.', [ 'end_time' => true ] );
 		return array(
 			'success' => true,
 			'message' => 'Demo Imported successfully.',

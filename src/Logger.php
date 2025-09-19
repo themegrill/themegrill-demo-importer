@@ -11,6 +11,9 @@ class Logger implements LoggerInterface {
 	private array $logLevels;
 	private string $dateFormat                = 'Y-m-d H:i:s';
 	private static ?LoggerInterface $instance = null;
+	private $startTime                        = null;
+	private $importContentStartTime           = null;
+	private $fetchStartTime                   = null;
 	const LOG_TRANSIENT_KEY                   = 'themegrill_starter_templates_log';
 
 	private function __construct() {
@@ -73,6 +76,48 @@ class Logger implements LoggerInterface {
 	public function log( $level, $message, array $context = [] ): void {
 		if ( ! isset( $this->logLevels[ $level ] ) ) {
 			throw new InvalidArgumentException( esc_html( "Invalid log level: {$level}" ) );
+		}
+
+		// Handle timing
+		if ( isset( $context['start_time'] ) && true === $context['start_time'] ) {
+			$this->startTime = microtime( true );
+			$message        .= ' [Timing started]';
+		} elseif ( isset( $context['end_time'] ) && true === $context['end_time'] ) {
+			if ( null !== $this->startTime ) {
+				$elapsed         = microtime( true ) - $this->startTime;
+				$message        .= sprintf( ' [Execution time: %.4f sec]', $elapsed );
+				$this->startTime = null;
+			} else {
+				$message .= ' [No timing was started]';
+			}
+		}
+
+		// Handle import content timing separately
+		if ( isset( $context['import_content_start_time'] ) && true === $context['import_content_start_time'] ) {
+			$this->importContentStartTime = microtime( true );
+			$message                     .= ' [Import content timing started]';
+		} elseif ( isset( $context['import_content_end_time'] ) && true === $context['import_content_end_time'] ) {
+			if ( null !== $this->importContentStartTime ) {
+				$importElapsed                = microtime( true ) - $this->importContentStartTime;
+				$message                     .= sprintf( ' [Execution time: %.4f sec]', $importElapsed );
+				$this->importContentStartTime = null;
+			} else {
+				$message .= ' [No import content timing was started]';
+			}
+		}
+
+		// Handle fetch remote file timing separately
+		if ( isset( $context['fetch_start_time'] ) && true === $context['fetch_start_time'] ) {
+			$this->fetchStartTime = microtime( true );
+			$message             .= ' [Fetch timing started]';
+		} elseif ( isset( $context['fetch_end_time'] ) && true === $context['fetch_end_time'] ) {
+			if ( null !== $this->fetchStartTime ) {
+				$fetchElapsed         = microtime( true ) - $this->fetchStartTime;
+				$message             .= sprintf( ' [Execution time: %.4f sec]', $fetchElapsed );
+				$this->fetchStartTime = null;
+			} else {
+				$message .= ' [No fetch timing was started]';
+			}
 		}
 
 		$interpolatedMessage = $this->interpolate( (string) $message, $context );

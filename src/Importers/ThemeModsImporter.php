@@ -23,13 +23,13 @@ class ThemeModsImporter {
 		if ( ! empty( $mapping_data ) ) {
 			$term_id_map = $mapping_data['term_id'] ?? array();
 		}
-		$this->logger->info( 'Importing theme mods...' );
+		$this->logger->info( 'Importing theme mods...', [ 'start_time' => true ] );
 		$import = $this->processImport( $demo['themeMods'], $demo['slug'], $demo, $term_id_map, $args );
 		if ( is_wp_error( $import ) ) {
-			$this->logger->error( 'Error importing customizer: ' . $import->get_error_message() );
+			$this->logger->error( 'Error importing customizer: ' . $import->get_error_message(), [ 'end_time' => true ] );
 			return new WP_Error( 'import_customizer_failed', 'Error importing customizer.', array( 'status' => 500 ) );
 		}
-		$this->logger->info( 'Theme mods imported.' );
+		$this->logger->info( 'Theme mods imported.', [ 'end_time' => true ] );
 		return new WP_REST_Response(
 			array(
 				'success' => true,
@@ -49,6 +49,7 @@ class ThemeModsImporter {
 	 * @param  string $demo_id     The ID of demo being imported.
 	 * @param  array  $demo_data   The data of demo being imported.
 	 * @param  array  $term_id_map   Processed Terms Map
+	 * @param  array  $args   Additional arguments
 	 * @return void|WP_Error
 	 */
 	public static function processImport( $data, $demo_id, $demo_data, $term_id_map, $args ) {
@@ -90,7 +91,7 @@ class ThemeModsImporter {
 			}
 		}
 
-		if ( isset( $data['nav_menu_locations'] ) && is_array( $data['nav_menu_locations'] ) ) {
+		if ( !empty( $data['nav_menu_locations'] ) && is_array( $data['nav_menu_locations'] ) ) {
 			foreach ( $data['nav_menu_locations'] as $location => $menu_id ) {
 				if ( isset( $term_id_map[ $menu_id ] ) ) {
 					$data['nav_menu_locations'][ $location ] = $term_id_map[ $menu_id ];
@@ -98,7 +99,7 @@ class ThemeModsImporter {
 			}
 		}
 
-		if ( isset( $data['colormag_footer_menu'] ) && ! empty( $data['colormag_footer_menu'] ) ) {
+		if ( ! empty( $data['colormag_footer_menu'] ) ) {
 			$footer_menu_id               = isset( $term_id_map[ $data['colormag_footer_menu'] ] ) ? (string) $term_id_map[ $data['colormag_footer_menu'] ] : $data['colormag_footer_menu'];
 			$data['colormag_footer_menu'] = $footer_menu_id;
 		}
@@ -127,8 +128,9 @@ class ThemeModsImporter {
 			}
 
 			$new_custom = array(
-				'colors' => $colors,
 				'id'     => $id,
+				'name'   => 'Starter Colors',
+				'colors' => $colors,
 			);
 
 			$existing_custom   = isset( $data[ $color_palette_key ]['custom'] ) ? $data[ $color_palette_key ]['custom'] : [];
@@ -136,7 +138,7 @@ class ThemeModsImporter {
 
 			$new_value = [
 				'id'     => $id,
-				'name'   => 'Importer Color Palette',
+				'name'   => 'Starter Colors',
 				'colors' => $colors,
 				'custom' => $existing_custom,
 			];

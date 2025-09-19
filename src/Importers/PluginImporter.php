@@ -37,26 +37,26 @@ class PluginImporter {
 		$pg          = explode( '/', $plugin );
 		$plugin_file = WP_PLUGIN_DIR . '/' . $plugin;
 		$results     = array();
-		$this->logger->info( 'Starting installation for plugin: ' . $pg[0] );
+		$this->logger->info( 'Starting installation for plugin: ' . $pg[0], [ 'start_time' => true ] );
 
 		if ( 'companion-elementor/companion-elementor.php' === $plugin ) {
 			$response = apply_filters( 'tgda_install_companion_elementor', 'companion-elementor/companion-elementor.php' );
 			if ( is_array( $response ) ) {
 				if ( isset( $response['success'] ) && $response['success'] ) {
-					$this->logger->info( 'Companion Elementor installed and activated.' );
+					$this->logger->info( 'Companion Elementor installed and activated.', [ 'end_time' => true ] );
 					$results[ $pg[0] ] = array(
 						'status'  => 'success',
 						'message' => __( 'Companion Elementor installed and activated.', 'themegrill-demo-importer' ),
 					);
 				} else {
-					$this->logger->warning( 'Failed to install plugin ' . $pg[0] . ': ' . $response['message'] );
+					$this->logger->warning( 'Failed to install plugin ' . $pg[0] . ': ' . $response['message'], [ 'end_time' => true ] );
 					$results[ $pg[0] ] = array(
 						'status'  => 'error',
 						'message' => $response['message'],
 					);
 				}
 			} else {
-				$this->logger->warning( 'Failed to install Companion Elementor.' );
+				$this->logger->warning( 'Failed to install Companion Elementor.', [ 'end_time' => true ] );
 				$results[ $pg[0] ] = array(
 					'status'  => 'error',
 					'message' => 'Failed to install Companion Elementor.',
@@ -69,7 +69,7 @@ class PluginImporter {
 				$this->logger->info( $plugin_data['Name'] . ' already installed, checking activation status.' );
 
 				if ( is_plugin_active( $plugin ) ) {
-					$this->logger->info( $plugin_data['Name'] . ' already active, skipping activation.' );
+					$this->logger->info( $plugin_data['Name'] . ' already active, skipping activation.', [ 'end_time' => true ] );
 
 					$results[ $pg[0] ] = array(
 						'status'  => 'success',
@@ -82,7 +82,7 @@ class PluginImporter {
 				$result = activate_plugin( $plugin );
 
 				if ( is_wp_error( $result ) ) {
-					$this->logger->warning( 'Failed to activate plugin ' . $plugin . ': ' . $result->get_error_message() );
+					$this->logger->warning( 'Failed to activate plugin ' . $plugin . ': ' . $result->get_error_message(), [ 'end_time' => true ] );
 
 					$results[ $pg[0] ] = array(
 						'status'  => 'error',
@@ -90,7 +90,7 @@ class PluginImporter {
 					);
 				}
 
-				$this->logger->info( $plugin_data['Name'] . ' successfully activated.' );
+				$this->logger->info( $plugin_data['Name'] . ' successfully activated.', [ 'end_time' => true ] );
 
 				$results[ $pg[0] ] = array(
 					'status'  => 'success',
@@ -107,7 +107,7 @@ class PluginImporter {
 				)
 			);
 			if ( is_wp_error( $api ) ) {
-				$this->logger->warning( 'Failed to fetch plugin info from from WordPress.org for ' . $pg[0] . ': ' . $api->get_error_message() );
+				$this->logger->warning( 'Failed to fetch plugin info from from WordPress.org for ' . $pg[0] . ': ' . $api->get_error_message(), [ 'end_time' => true ] );
 
 				$results[ $pg[0] ] = array(
 					'status'  => 'error',
@@ -123,7 +123,7 @@ class PluginImporter {
 			$installed = $upgrader->install( $api->download_link );
 
 			if ( is_wp_error( $installed ) ) {
-				$this->logger->warning( 'Failed to install plugin ' . $pg[0] . ': ' . $installed->get_error_message() );
+				$this->logger->warning( 'Failed to install plugin ' . $pg[0] . ': ' . $installed->get_error_message(), [ 'end_time' => true ] );
 
 				$results[ $pg[0] ] = array(
 					'status'  => 'error',
@@ -141,7 +141,7 @@ class PluginImporter {
 				$result = activate_plugin( $install_status['file'] );
 
 				if ( is_wp_error( $result ) ) {
-					$this->logger->warning( 'Failed to activate plugin after install ' . $pg[0] . ': ' . $result->get_error_message() );
+					$this->logger->warning( 'Failed to activate plugin after install ' . $pg[0] . ': ' . $result->get_error_message(), [ 'end_time' => true ] );
 
 					$results[ $pg[0] ] = array(
 						'status'  => 'error',
@@ -152,7 +152,7 @@ class PluginImporter {
 				}
 			}
 
-			$this->logger->info( $api->name . ' installed and activated.' );
+			$this->logger->info( $api->name . ' installed and activated.', [ 'end_time' => true ] );
 
 			$results[ $pg[0] ] = array(
 				'status'  => 'success',
