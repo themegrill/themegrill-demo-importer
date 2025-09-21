@@ -1,9 +1,8 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { localizedDataQueryOptions } from './components/features/api/import.api';
 import Content from './components/features/sites/components/listing/main/Content';
 import Sidebar from './components/features/sites/components/listing/main/Sidebar';
 import { queryClient } from './lib/query-client';
-import { DemoType, PagebuilderCategory } from './lib/types';
 import { useLocalizedData } from './LocalizedDataContext';
 
 declare const require: any;
@@ -11,32 +10,22 @@ declare const require: any;
 const Home = () => {
 	const { localizedData, setLocalizedData } = useLocalizedData();
 
-	const [demos, setDemos] = useState<DemoType[]>([]);
-	const [builders, setBuilders] = useState<PagebuilderCategory[]>([]);
-	const [categories, setCategories] = useState<PagebuilderCategory[]>([]);
-	const [error, setError] = useState('');
-	const [theme, setTheme] = useState('all');
+	const demos = useMemo(() => localizedData?.data?.demos || [], [localizedData]);
+	const builders = useMemo(() => localizedData?.data?.builders || [], [localizedData]);
+	const categories = useMemo(() => localizedData?.data?.categories || [], [localizedData]);
+	const theme = localizedData?.theme || 'all';
 
 	const loading = useMemo(() => {
-		return !localizedData || demos.length === 0 || builders.length === 0 || categories.length === 0;
-	}, [localizedData, demos, builders, categories]);
-
-	useEffect(() => {
-		if (localizedData?.data) {
-			setDemos(localizedData.data.demos || []);
-			setBuilders(localizedData.data.builders || []);
-			setCategories(localizedData.data.categories || []);
-			setTheme(localizedData.theme);
-		}
+		return !localizedData?.data;
 	}, [localizedData]);
 
-	useEffect(() => {
-		if (localizedData && !loading && demos.length === 0) {
-			setError(localizedData.error_msg || 'No data available');
-		} else if (demos.length > 0) {
-			setError(''); // Clear error when data loads successfully
+	const error = useMemo(() => {
+		if (localizedData?.error_msg) return localizedData.error_msg;
+		if (localizedData?.data && !demos.length && !builders.length && !categories.length) {
+			return 'No data available';
 		}
-	}, [localizedData, loading, demos.length]);
+		return '';
+	}, [localizedData, demos.length, builders.length, categories.length]);
 
 	const handleRefetch = async () => {
 		const response = await queryClient.ensureQueryData(
@@ -70,6 +59,7 @@ const Home = () => {
 			</div>
 		);
 	}
+
 	return (
 		<>
 			{loading ? (
@@ -120,7 +110,12 @@ const Home = () => {
 				</div>
 			) : (
 				<div className="flex h-screen content-container">
-					<Sidebar builders={builders} categories={categories} handleRefetch={handleRefetch} theme={theme} />
+					<Sidebar
+						builders={builders}
+						categories={categories}
+						handleRefetch={handleRefetch}
+						theme={theme}
+					/>
 					<Content demos={demos} />
 				</div>
 			)}

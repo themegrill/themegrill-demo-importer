@@ -51,7 +51,7 @@ const FeatureSidebar = ({ demo, plugins, setPlugins, onOpen, setShowFeatureLayou
 										</TooltipTrigger>
 										<TooltipContent side="bottom" sideOffset={-4}>
 											{__(
-												'This plugin is required and cannot be deselected',
+												'This plugin is required for the template to function properly and cannot be unchecked.',
 												'themegrill-demo-importer',
 											)}
 										</TooltipContent>

@@ -34,8 +34,8 @@ const Content = ({ demo, iframeRef, device }: Props) => {
 					<iframe
 						src={demo?.url}
 						title={`${
-							demo.title ||
-							demo.slug.replace(/-/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase())
+							demo?.title ||
+							demo?.slug.replace(/-/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase())
 						} Preview`}
 						className={`ml-auto mr-auto h-full ${deviceClass}`}
 						onLoad={() => setIsIframeLoading(false)}

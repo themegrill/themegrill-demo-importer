@@ -25,7 +25,7 @@ const ImportSkeleton = () => {
 					<div>
 						<div className="w-[139px] h-[18px] bg-[#E7E8E9] rounded-sm animate-pulse mb-5"></div>
 						<div className="grid grid-cols-2 gap-[14px] ">
-							{Array.from({ length: 6 }).map((_, outerIndex) => (
+							{Array.from({ length: 4 }).map((_, outerIndex) => (
 								<div
 									className="h-[46px] w-[144px] bg-[#E7E8E9] rounded-md animate-pulse "
 									key={outerIndex}
@@ -36,12 +36,12 @@ const ImportSkeleton = () => {
 					<div>
 						<div className="w-[139px] h-[18px] bg-[#E7E8E9] rounded-sm animate-pulse mb-5"></div>
 						<div className="grid grid-cols-3 gap-[14px] ">
-							{Array.from({ length: 9 }).map((_, outerIndex) => (
+							{Array.from({ length: 6 }).map((_, outerIndex) => (
 								<div className="h-[46px] w-[92px] bg-[#E7E8E9] rounded-md animate-pulse "></div>
 							))}
 						</div>
-						<div className="w-[139px] h-[18px] bg-[#E7E8E9] rounded-sm animate-pulse mt-5 mb-4"></div>
-						<div className="w-[302px] h-[48px] bg-[#E7E8E9] rounded-md animate-pulse"></div>
+						{/* <div className="w-[139px] h-[18px] bg-[#E7E8E9] rounded-sm animate-pulse mt-5 mb-4"></div>
+						<div className="w-[302px] h-[48px] bg-[#E7E8E9] rounded-md animate-pulse"></div> */}
 					</div>
 				</div>
 				<div className="border-0 border-t border-r border-solid border-[#E9E9E9] bg-white p-[24px] pb-[12px]">

@@ -54,12 +54,6 @@ export type PageWithSelection = PageType & {
 	isSelected: boolean;
 };
 
-export type CoreOptions = {
-	blogname: string;
-	page_on_front: string;
-	page_for_posts: string;
-};
-
 export type CustomizerDataUpdate = {
 	nav_menu_locations: {
 		primary: string;
@@ -80,7 +74,7 @@ export type Demo = {
 	url: string;
 	premium: boolean;
 	theme_slug: string;
-	plugins: Record<string, { name: string; description: string }>;
+	plugins: Record<string, { name: string; description: string; mandatory: boolean }>;
 	pages: PageType[];
 };
 

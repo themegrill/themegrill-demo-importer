@@ -20,7 +20,6 @@ class ContentImporter {
 		do_action( 'themegrill_ajax_before_demo_import' );
 		wp_raise_memory_limit( 'memory_limit', '350M' );
 
-		// Increase PHP max execution time. Just in case, even though the AJAX calls are only 25 sec long.
 		if ( strpos( ini_get( 'disable_functions' ), 'set_time_limit' ) === false ) {
 			set_time_limit( 300 );
 		}

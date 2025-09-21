@@ -76,8 +76,8 @@ const StartImport = ({
 	const [isImportFailed, setIsImportFailed] = useState(false);
 
 	const checkThemeExists = (demo: Demo) => {
-		const proTheme = demo.theme_slug + '-pro';
-		if (demo.theme_slug === 'zakra') {
+		const proTheme = demo?.theme_slug + '-pro';
+		if (demo?.theme_slug === 'zakra') {
 			if (localizedData.zakra_pro_installed) {
 				return true;
 			}
@@ -169,12 +169,12 @@ const StartImport = ({
 			return <DialogImportFailed handleTryAgain={handleTryAgain} />;
 		}
 
-		if (demo.premium) {
+		if (demo?.premium) {
 			if (checkThemeExists(demo)) {
 				if (
-					!(demo.theme_slug === 'zakra'
+					!(demo?.theme_slug === 'zakra'
 						? localizedData.zakra_pro_activated
-						: demo.theme_slug + '-pro' === localizedData.current_theme)
+						: demo?.theme_slug + '-pro' === localizedData.current_theme)
 				) {
 					return <DialogPro demo={demo} proUpgrade={false} proActivate={true} setOpen={setOpen} />;
 				}
@@ -183,9 +183,9 @@ const StartImport = ({
 			}
 		}
 		if (!importAction) {
-			return <DialogConfirm demo={demo} onConfirm={handleInstallation} />;
+			return <DialogConfirm onConfirm={handleInstallation} />;
 		}
-		if (importAction !== 'complete') {
+		if (importProgress !== 100) {
 			return (
 				<DialogImporting
 					importProgress={importProgress}

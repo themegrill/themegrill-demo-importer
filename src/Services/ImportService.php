@@ -83,7 +83,7 @@ class ImportService {
 		flush_rewrite_rules();
 		wp_cache_flush();
 
-		$this->logger->info( 'Demo Imported successfully.', [ 'end_time' => true ] );
+		$this->logger->info( 'Demo (' . $demo_config['slug'] . ') imported successfully.', [ 'end_time' => true ] );
 		return array(
 			'success' => true,
 			'message' => 'Demo Imported successfully.',

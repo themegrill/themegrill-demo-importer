@@ -1,15 +1,12 @@
 import { __ } from '@wordpress/i18n';
-import React from 'react';
-import { Demo } from '../../../../../../lib/types';
 import { Button } from '../../../../../ui/Button';
 import { DialogClose } from '../../../../../ui/Dialog';
 
 type Props = {
-	demo: Demo;
 	onConfirm: () => void;
 };
 
-const DialogConfirm = ({ demo, onConfirm }: Props) => {
+const DialogConfirm = ({ onConfirm }: Props) => {
 	return (
 		<div className="pt-[50px] pb-[55px] px-[40px] text-center">
 			<h2 className="text-[26px] leading-[44px] text-[#131313] mt-0 mb-[6px]">

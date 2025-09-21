@@ -1,3 +1,4 @@
+import { useRouter } from '@tanstack/react-router';
 import { __ } from '@wordpress/i18n';
 import Lottie from 'lottie-react';
 import React, { useState } from 'react';
@@ -8,7 +9,6 @@ import { Demo } from '../../../../../../lib/types';
 import { useLocalizedData } from '../../../../../../LocalizedDataContext';
 import { Button } from '../../../../../ui/Button';
 import { activateProQueryOptions, localizedDataQueryOptions } from '../../../../api/import.api';
-import { useRouter } from '@tanstack/react-router';
 
 type Props = {
 	demo: Demo;
@@ -21,7 +21,7 @@ const DialogPro = ({ demo, proUpgrade, proActivate, setOpen }: Props) => {
 	const router = useRouter();
 	const { localizedData, setLocalizedData } = useLocalizedData();
 	const [isActivating, setIsActivating] = useState(false);
-	const matchedTheme = themes.find((theme) => theme.slug === demo.theme_slug);
+	const matchedTheme = themes.find((theme) => theme.slug === demo?.theme_slug);
 
 	const activatePro = async (slug: string) => {
 		setIsActivating(true);
@@ -97,7 +97,7 @@ const DialogPro = ({ demo, proUpgrade, proActivate, setOpen }: Props) => {
 					) : (
 						<Button
 							className="px-5 py-[15px] h-[51px] text-[15px] leading-[21px] text-[#FAFBFF] font-semibold rounded-md bg-[#2563EB] no-underline border-none w-full hover:bg-[#2563EB] hover:text-[#FAFBFF] cursor-pointer"
-							onClick={() => activatePro(demo.theme_slug)}
+							onClick={() => activatePro(demo?.theme_slug)}
 						>
 							{__('Activate Now', 'themegrill-demo-importer')}
 						</Button>

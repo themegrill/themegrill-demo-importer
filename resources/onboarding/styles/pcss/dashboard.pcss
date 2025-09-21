@@ -73,99 +73,99 @@
 	#wpfooter {
 		@apply hidden;
 	}
+}
+
+#tg-demo-importer {
+	.tg-demo-pro {
+		@apply absolute bg-[#F95D5D] py-[5px] px-2 rounded-[4px] top-[12px] right-[12px];
+	}
+}
+
+.tg-full-overlay-active {
+	overflow: hidden;
+
+	.notice {
+		display: none;
+	}
+
+	#wpbody {
+		position: fixed;
+		top: 0;
+		left: 0;
+		z-index: 50000;
+		width: 100%;
+		height: 100vh;
+		margin-left: 0;
+	}
+
+	#wpadminbar {
+		position: fixed;
+		z-index: -9999;
+	}
 
 	#tg-demo-importer {
-		.tg-demo-pro {
-			@apply absolute bg-[#F95D5D] py-[5px] px-2 rounded-[4px] top-[12px] right-[12px];
+		position: absolute;
+		top: 0;
+		width: 100%;
+	}
+
+	.tg-full-overlay {
+		display: flex;
+	}
+
+	/* -------Scrollbar---------- */
+	.tg-scrollbar {
+		scrollbar-width: thin;
+		scrollbar-color: #d0d0d0 transparent;
+
+		&::-webkit-scrollbar {
+			width: 6px;
+		}
+
+		&::-webkit-scrollbar-track {
+			background: transparent;
+		}
+
+		&::-webkit-scrollbar-thumb {
+			background: #d0d0d0;
+			border-radius: 32px;
+			min-height: 40px;
+		}
+
+		&::-webkit-scrollbar-thumb:hover {
+			background: #bbb;
+			border-radius: 32px;
 		}
 	}
 
-	&.tg-full-overlay-active {
-		overflow: hidden;
+	.content-container {
+		container-type: inline-size;
+		container-name: content-container;
+	}
 
-		.notice {
-			display: none;
+	@container content-container (max-width: 1600px) {
+		.content-wrapper {
+			padding: 54px;
+			gap: 32px;
 		}
-
-		#wpbody {
-			position: fixed;
-			top: 0;
-			left: 0;
-			z-index: 50000;
-			width: 100%;
-			height: 100vh;
-			margin-left: 0;
+	}
+	@container content-container (max-width: 1200px) {
+		.content-wrapper {
+			@apply grid-cols-2;
 		}
-
-		#wpadminbar {
-			position: fixed;
-			z-index: -9999;
+	}
+	@container content-container (max-width: 992px) {
+		.content-wrapper {
+			@apply grid-cols-1;
 		}
+	}
 
-		#tg-demo-importer {
-			position: absolute;
-			top: 0;
-			width: 100%;
+	@container content-container (max-width: 1400px) {
+		.iframe-wrapper .menu-wrapper {
+			@apply gap-4;
 		}
-
-		.tg-full-overlay {
-			display: flex;
-		}
-
-		/* -------Scrollbar---------- */
-		.tg-scrollbar {
-			scrollbar-width: thin;
-			scrollbar-color: #d0d0d0 transparent;
-
-			&::-webkit-scrollbar {
-				width: 6px;
-			}
-
-			&::-webkit-scrollbar-track {
-				background: transparent;
-			}
-
-			&::-webkit-scrollbar-thumb {
-				background: #d0d0d0;
-				border-radius: 32px;
-				min-height: 40px;
-			}
-
-			&::-webkit-scrollbar-thumb:hover {
-				background: #bbb;
-				border-radius: 32px;
-			}
-		}
-
-		.content-container {
-			container-type: inline-size;
-			container-name: content-container;
-		}
-
-		@container content-container (max-width: 1600px) {
-			.content-wrapper {
-				padding: 54px;
-				gap: 32px;
-			}
-		}
-		@container content-container (max-width: 1200px) {
-			.content-wrapper {
-				@apply grid-cols-2;
-			}
-		}
-		@container content-container (max-width: 992px) {
-			.content-wrapper {
-				@apply grid-cols-1;
-			}
-		}
-
-		@container content-container (max-width: 1400px) {
-			.iframe-wrapper .menu-wrapper {
-				@apply gap-4;
-			}
-			.iframe-wrapper .menu-wrapper div {
-				@apply w-[60px] gap-4;
-			}
+		.iframe-wrapper .menu-wrapper div {
+			@apply w-[60px] gap-4;
 		}
 	}
 }

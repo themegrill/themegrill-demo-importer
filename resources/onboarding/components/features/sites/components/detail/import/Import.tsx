@@ -116,9 +116,9 @@ const Import = () => {
 			'font-family'
 		];
 
-	const actualBodyTypography = bodyTypography === 'Inherit' ? 'System' : bodyTypography;
+	const actualBodyTypography = bodyTypography === 'inherit' ? 'System' : bodyTypography;
 	const actualHeadingTypography =
-		headingTypography === 'Inherit' ? actualBodyTypography : headingTypography;
+		headingTypography === 'inherit' ? actualBodyTypography : headingTypography;
 
 	const defaultTypography: string[] =
 		actualBodyTypography && actualHeadingTypography
@@ -134,15 +134,15 @@ const Import = () => {
 		['Outfit', 'DM Sans'],
 	];
 
-	const supportedThemes = ['zakra', 'colormag', 'elearning'];
+	const supportedThemes = ['colormag', 'elearning'];
 	const isThemeSupported = supportedThemes.includes(theme || '');
 
 	const [selectedPaletteIndex, setSelectedPaletteIndex] = useState<number>(0);
 	const [selectedTypographyIndex, setSelectedTypographyIndex] = useState<number>(0);
 
 	const [siteLogoId, setSiteLogoId] = useState<number>(0);
-	const [demo, setDemo] = useState(data.demo || ({} as Demo));
-	const [pages, setPages] = useState<PageType[]>(data.pages || []);
+	const [demo, setDemo] = useState(data?.demo || ({} as Demo));
+	const [pages, setPages] = useState<PageType[]>(data?.pages || []);
 	const [allPages, setAllPages] = useState<PageWithSelection[]>(() => {
 		return pages.map((p, index) => {
 			return {
@@ -155,7 +155,7 @@ const Import = () => {
 			};
 		});
 	});
-	const [plugins, setPlugins] = useState<PluginItem[]>(data.plugins || []);
+	const [plugins, setPlugins] = useState<PluginItem[]>(data?.plugins || []);
 	const [device, setDevice] = useState('desktop');
 	const [pageImport, setPageImport] = useState('all');
 	const [isPagesSelected, setIsPagesSelected] = useState(false);
@@ -194,7 +194,7 @@ const Import = () => {
 		return themeExists;
 	};
 
-	if (data.isEmpty) {
+	if (data?.isEmpty) {
 		return (
 			<div className="flex items-center justify-center h-screen">
 				<div className="text-center">
@@ -225,12 +225,12 @@ const Import = () => {
 					setSelectedTypographyIndex={setSelectedTypographyIndex}
 					onContinue={() => {
 						setPageImport('all');
-						if (demo.premium) {
+						if (demo?.premium) {
 							if (checkThemeExists(demo)) {
 								if (
-									!(demo.theme_slug === 'zakra'
+									!(demo?.theme_slug === 'zakra'
 										? localizedData.zakra_pro_activated
-										: demo.theme_slug + '-pro' === localizedData.current_theme)
+										: demo?.theme_slug + '-pro' === localizedData.current_theme)
 								) {
 									setOpen(true);
 								} else {
