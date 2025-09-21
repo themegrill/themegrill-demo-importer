@@ -66,7 +66,7 @@ class App {
 	 */
 	public function plugin_action_links( $actions ) {
 		$new_actions = array(
-			'importer' => '<a href="' . admin_url( 'themes.php?page=tg-starter-templates' ) . '" aria-label="' . esc_attr( __( 'View Demo Importer', 'themegrill-demo-importer' ) ) . '">' . __( 'Demo Importer', 'themegrill-demo-importer' ) . '</a>',
+			'importer' => '<a href="' . admin_url( 'themes.php?page=tg-starter-templates' ) . '" aria-label="' . esc_attr( __( 'View Starter Templates', 'themegrill-demo-importer' ) ) . '">' . __( 'Starter Templates', 'themegrill-demo-importer' ) . '</a>',
 		);
 
 		return array_merge( $new_actions, $actions );
@@ -82,7 +82,7 @@ class App {
 	public function plugin_row_meta( $plugin_meta, $plugin_file ) {
 		if ( TGDM_PLUGIN_BASENAME === $plugin_file ) {
 			$new_plugin_meta = array(
-				'docs'    => '<a href="' . esc_url( apply_filters( 'themegrill_demo_importer_docs_url', 'https://docs.themegrill.com/themegrill-demo-importer/' ) ) . '" title="' . esc_attr( __( 'View Demo Importer Documentation', 'themegrill-demo-importer' ) ) . '">' . __( 'Docs', 'themegrill-demo-importer' ) . '</a>',
+				'docs'    => '<a href="' . esc_url( apply_filters( 'themegrill_demo_importer_docs_url', 'https://docs.themegrill.com/themegrill-demo-importer/' ) ) . '" title="' . esc_attr( __( 'View Starter Templates Documentation', 'themegrill-demo-importer' ) ) . '">' . __( 'Docs', 'themegrill-demo-importer' ) . '</a>',
 				'support' => '<a href="' . esc_url( apply_filters( 'themegrill_demo_importer_support_url', 'https://themegrill.com/support-forum/' ) ) . '" title="' . esc_attr( __( 'Visit Free Customer Support Forum', 'themegrill-demo-importer' ) ) . '">' . __( 'Free Support', 'themegrill-demo-importer' ) . '</a>',
 			);
 
