@@ -54,7 +54,6 @@ class ImportService {
 	}
 
 	private function importContent( $demo_config, $options ) {
-		$this->cleanup(); // Delete previous data
 		$pages = $options['pages'] ?? array();
 		return $this->contentImporter->import( $demo_config, $pages );
 	}
