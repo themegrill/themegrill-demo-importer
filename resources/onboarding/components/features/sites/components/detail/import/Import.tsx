@@ -18,75 +18,79 @@ const Import = () => {
 
 	const defaultColorPalette: string[] = data?.demo?.themeMods?.[`${theme}_color_palette`]?.colors
 		? Object.values(data.demo.themeMods?.[`${theme}_color_palette`]?.colors)
-		: [
-				'#eaf3fb',
-				'#bfdcf3',
-				'#94c4eb',
-				'#6aace2',
-				'#257bc1',
-				'#1d6096',
-				'#15446b',
-				'#0c2941',
-				'#040e16',
-			];
-	const colorPalette = [
-		defaultColorPalette,
+		: [];
+
+	const predefinedPalettes = [
 		[
-			'#E74C3C',
-			'#9B59B6',
-			'#3498DB',
-			'#1ABC9C',
-			'#F39C12',
-			'#2ECC71',
-			'#E67E22',
-			'#34495E',
-			'#95A5A6',
+			'#269bd1',
+			'#1e7ba6',
+			'#FFFFFF',
+			'#F9FEFD',
+			'#27272A',
+			'#16181A',
+			'#51585f',
+			'#FFFFFF',
+			'#e4e4e7',
 		],
 		[
-			'#FF1744',
-			'#E91E63',
-			'#9C27B0',
-			'#673AB7',
-			'#3F51B5',
-			'#2196F3',
-			'#00BCD4',
-			'#009688',
+			'#F44336',
+			'#D12729',
+			'#FFFFFF',
+			'#FEF6F4',
+			'#0F000A',
+			'#252020',
+			'#7E7777',
+			'#FFFFFF',
+			'#C1BDBD',
+		],
+		[
 			'#4CAF50',
-		],
-		[
-			'#8BC34A',
-			'#CDDC39',
-			'#FFEB3B',
-			'#FFC107',
-			'#FF9800',
-			'#FF5722',
-			'#795548',
-			'#607D8B',
-			'#9E9E9E',
-		],
-		[
-			'#FF4081',
-			'#FF80AB',
-			'#F8BBD9',
-			'#E1BEE7',
-			'#D1C4E9',
-			'#C5CAE9',
-			'#BBDEFB',
-			'#B3E5FC',
-			'#B2EBF2',
-		],
-		[
-			'#212121',
-			'#424242',
-			'#616161',
-			'#757575',
-			'#9E9E9E',
+			'#379643',
+			'#FFFFFF',
+			'#FAFEF6',
+			'#000504',
+			'#141614',
+			'#858585',
+			'#FFFFFF',
 			'#BDBDBD',
-			'#E0E0E0',
-			'#EEEEEE',
-			'#F5F5F5',
+		],
+		[
+			'#FFA726',
+			'#DB851B',
+			'#FFFFFF',
+			'#FFFDF6',
+			'#0B0A0A',
+			'#121110',
+			'#828282',
+			'#FFFFFF',
+			'#B7B5B3',
 		],
 	];
+
+	// Helper function to compare two arrays of strings
+	const arraysEqual = (arr1: string[], arr2: string[]) => {
+		if (arr1.length !== arr2.length) return false;
+		return arr1.every((val, index) => val === arr2[index]);
+	};
+
+	// Find if defaultColorPalette exists in predefinedPalettes
+	const existingIndex = predefinedPalettes.findIndex((palette) =>
+		arraysEqual(defaultColorPalette, palette),
+	);
+
+	let colorPalette: string[][];
+
+	if (existingIndex !== -1) {
+		// If defaultColorPalette exists, move it to index 0
+		const foundPalette = predefinedPalettes[existingIndex]!; // Non-null assertion since we know it exists
+		colorPalette = [
+			foundPalette,
+			...predefinedPalettes.filter((_, index) => index !== existingIndex),
+		];
+	} else {
+		// If defaultColorPalette doesn't exist, add it at index 0
+		colorPalette = [defaultColorPalette, ...predefinedPalettes];
+	}
 
 	const typographyKeys = {
 		zakra: {
@@ -111,19 +115,23 @@ const Import = () => {
 		data?.demo?.themeMods?.[typographyKeys[theme as keyof typeof typographyKeys]?.heading]?.[
 			'font-family'
 		];
+
+	const actualBodyTypography = bodyTypography === 'Inherit' ? 'System' : bodyTypography;
+	const actualHeadingTypography =
+		headingTypography === 'Inherit' ? actualBodyTypography : headingTypography;
+
 	const defaultTypography: string[] =
-		bodyTypography && headingTypography ? [bodyTypography, headingTypography] : ['Inter', 'Inter'];
+		actualBodyTypography && actualHeadingTypography
+			? [actualHeadingTypography, actualBodyTypography]
+			: ['Inter', 'Inter'];
 
 	const typography = [
 		defaultTypography,
-		['Dancing Script', 'Story Script'],
-		['Playfair Display', 'Lato'],
-		['IBM Plex Sans Thai Looped', 'Lato'],
-		['Raleway', 'Lato'],
-		['DM Sans', 'Lato'],
-		['Nunito', 'Lato'],
-		['Courier New', 'Lato'],
-		['Quando', 'Lato'],
+		['Rubik', 'Lato'],
+		['PT Serif', 'Roboto'],
+		['IBM Plex Serif', 'Inter'],
+		['Bitter', 'Public Sans'],
+		['Outfit', 'DM Sans'],
 	];
 
 	const supportedThemes = ['zakra', 'colormag', 'elearning'];

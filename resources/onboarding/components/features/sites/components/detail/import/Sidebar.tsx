@@ -1,6 +1,5 @@
-import { useRouter } from '@tanstack/react-router';
 import { __ } from '@wordpress/i18n';
-import { ArrowLeft, Monitor, Smartphone, Tablet } from 'lucide-react';
+import { Monitor, Smartphone, Tablet } from 'lucide-react';
 import React, { useEffect } from 'react';
 import { Demo } from '../../../../../../lib/types';
 import { Button } from '../../../../../ui/Button';
@@ -11,6 +10,7 @@ import {
 	TooltipTrigger,
 } from '../../../../../ui/Tooltip';
 import LogoUploader from '../uploader/LogoUploader';
+import SidebarHeader from './SidebarHeader';
 
 type Props = {
 	demo: Demo;
@@ -49,8 +49,6 @@ const Sidebar = ({
 	setSelectedTypographyIndex,
 	isThemeSupported,
 }: Props) => {
-	const router = useRouter();
-
 	const handleColorPalette = (index: number) => {
 		try {
 			if (!iframeRef?.current?.contentWindow) {
@@ -126,7 +124,7 @@ const Sidebar = ({
 	};
 
 	useEffect(() => {
-		if (!iframeRef.current || selectedPaletteIndex === null) return;
+		if (!iframeRef.current || selectedPaletteIndex === null || isThemeSupported === false) return;
 
 		const iframe = iframeRef.current;
 		const onLoad = () => {
@@ -142,10 +140,11 @@ const Sidebar = ({
 
 		iframe.addEventListener('load', onLoad);
 		return () => iframe.removeEventListener('load', onLoad);
-	}, [iframeRef, selectedPaletteIndex, demo.theme_slug, colorPalette]);
+	}, [iframeRef, selectedPaletteIndex, demo.theme_slug, colorPalette, isThemeSupported]);
 
 	useEffect(() => {
-		if (!iframeRef.current || selectedTypographyIndex === null) return;
+		if (!iframeRef.current || selectedTypographyIndex === null || isThemeSupported === false)
+			return;
 
 		const iframe = iframeRef.current;
 		const onLoad = () => {
@@ -160,75 +159,50 @@ const Sidebar = ({
 
 		iframe.addEventListener('load', onLoad);
 		return () => iframe.removeEventListener('load', onLoad);
-	}, [iframeRef, selectedTypographyIndex, typography]);
+	}, [iframeRef, selectedTypographyIndex, typography, isThemeSupported]);
 
 	return (
 		<div className="w-[350px] min-w-[350px] flex flex-col bg-[#FAFBFC] border-0 border-r border-solid border-[#E9E9E9] ">
-			<div className="px-6 pt-6">
-				<div className="pb-6 border-0 border-b border-solid border-[#E3E3E3]">
-					<div className="flex justify-between items-center">
-						<h3 className="text-[20px] leading-7 m-0">
-							{demo.title ||
-								demo.slug.replace(/-/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase())}
-						</h3>
-						<Tooltip>
-							<TooltipTrigger asChild>
-								<ArrowLeft
-									size={24}
-									color="#909090"
-									strokeWidth={2}
-									onClick={() =>
-										router.navigate({
-											to: '/',
-											search: {
-												search: undefined,
-												builder: undefined,
-												category: undefined,
-											},
-											replace: true,
-										})
-									}
-									className="cursor-pointer"
-								/>
-							</TooltipTrigger>
-							<TooltipContent side="bottom" sideOffset={-4}>
-								{__('Back to Starter Templates', 'themegrill-demo-importer')}
-							</TooltipContent>
-						</Tooltip>
-					</div>
-					<p className="text-[14px] text-[#6B6B6B] leading-[21px] m-0 mt-[6px] ">
-						{__('Add your branding: logo, colors & fonts.', 'themegrill-demo-importer')}
-					</p>
-				</div>
-			</div>
+			<SidebarHeader
+				title={
+					demo.title || demo.slug.replace(/-/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase())
+				}
+				subtitle="Add your branding: logo, colors & fonts"
+			/>
 			<div className="flex flex-col gap-6 box-border px-6 pt-6 pb-10 overflow-y-auto tg-scrollbar flex-1">
 				<LogoUploader iframeRef={iframeRef} setSiteLogoId={setSiteLogoId} />
 				{isThemeSupported && (
 					<>
-						<div>
-							<h3 className="text-[16px] text-[#1F1F1F] mt-0 mb-5">
-								{__('Color Palette', 'themegrill-demo-importer')}
-							</h3>
-							<div className="grid grid-cols-2 gap-[14px]">
-								{colorPalette.map((colors, index) => (
-									<div
-										className={`border-2 border-solid  bg-[#FDFDFE] rounded-md p-[6px] flex  cursor-pointer ${index === selectedPaletteIndex ? 'border-[#5182EF]' : 'border-[#EEEFF2] hover:border-[#5182EF]'}`}
-										key={index}
-										onClick={() => handleColorPalette(index)}
-									>
-										{colors.slice(0, 5).map((color, index) => (
-											<div
-												className={`h-[30px] w-[25px] ${
-													index === 0 ? 'rounded-l-md' : index === 4 ? 'rounded-r-md' : ''
-												}`}
-												style={{ backgroundColor: color }}
-												key={color + index}
-											/>
-										))}
-									</div>
-								))}
+						{Array.isArray(colorPalette?.[0]) && colorPalette[0].length > 0 && (
+							<div>
+								<h3 className="text-[16px] text-[#1F1F1F] mt-0 mb-5">
+									{__('Color Palette', 'themegrill-demo-importer')}
+								</h3>
+								<div className="grid grid-cols-2 gap-[14px]">
+									{colorPalette.map((colors, index) => (
+										<div
+											className={`border-2 border-solid  bg-[#FDFDFE] rounded-md p-[6px] cursor-pointer ${index === selectedPaletteIndex ? 'border-[#5182EF]' : 'border-[#EEEFF2] hover:border-[#5182EF]'}`}
+											key={index}
+											onClick={() => handleColorPalette(index)}
+										>
+											<div className="border border-solid border-[#EEEFF2] flex rounded-md">
+												{colors
+													.filter((_, index) => [0, 1, 5, 6, 7].includes(index))
+													.map((color, index) => (
+														<div
+															className={`h-[30px] w-[25px] ${
+																index === 0 ? 'rounded-l-md' : index === 4 ? 'rounded-r-md' : ''
+															}`}
+															style={{ backgroundColor: color }}
+															key={color + index}
+														/>
+													))}
+											</div>
+										</div>
+									))}
+								</div>
 							</div>
-						</div>
+						)}
 						<div>
 							<h3 className="text-[16px] text-[#1F1F1F] mt-0 mb-5 leading-normal">
 								{__('Typography', 'themegrill-demo-importer')}
@@ -259,7 +233,7 @@ const Sidebar = ({
 						</div>
 					</>
 				)}
-				<div>
+				{/* <div>
 					<h3 className="text-[16px] text-[#1F1F1F] mt-0 mb-5">
 						{__('Import', 'themegrill-demo-importer')}
 					</h3>
@@ -280,7 +254,7 @@ const Sidebar = ({
 							{__('Select Pages', 'themegrill-demo-importer')}
 						</Button>
 					</div>
-				</div>
+				</div> */}
 			</div>
 			<div className="border-0 border-t border-r border-solid border-[#E9E9E9] bg-white p-[24px] pb-[12px]">
 				<Button
