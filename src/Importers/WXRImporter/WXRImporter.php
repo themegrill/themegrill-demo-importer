@@ -90,22 +90,20 @@ class WXRImporter extends WP_Importer {
 			'user'    => array(),
 		);
 
-		$this->mapping              = $empty_types;
-		$this->mapping['user_slug'] = array();
-		$this->mapping['term_id']   = array();
-		$this->requires_remapping   = $empty_types;
-		$this->exists               = $empty_types;
+		$this->mapping            = $empty_types;
+		$this->mapping['term_id'] = array();
+		$this->requires_remapping = $empty_types;
+		$this->exists             = $empty_types;
 
 		$this->options = wp_parse_args(
 			$options,
 			array(
-				'prefill_existing_posts'    => true,
-				'prefill_existing_comments' => true,
-				'prefill_existing_terms'    => true,
-				'update_attachment_guids'   => false,
-				'fetch_attachments'         => true,
-				'aggressive_url_search'     => false,
-				'default_author'            => get_current_user_id(),
+				'prefill_existing_posts'  => true,
+				'prefill_existing_terms'  => true,
+				'update_attachment_guids' => false,
+				'fetch_attachments'       => true,
+				'aggressive_url_search'   => false,
+				'default_author'          => get_current_user_id(),
 			)
 		);
 	}
@@ -136,188 +134,6 @@ class WXRImporter extends WP_Importer {
 		return $reader;
 	}
 
-	/**
-	 * The main controller for the actual import stage.
-	 *
-	 * @param string $file Path to the WXR file for importing
-	 */
-	public function get_preliminary_information( $file ) {
-		// Let's run the actual importer now, woot
-		$reader = $this->get_reader( $file );
-		if ( is_wp_error( $reader ) ) {
-			return $reader;
-		}
-
-		// Set the version to compatibility mode first
-		$this->version = '1.0';
-
-		// Start parsing!
-		$data = new WXRImportInfo();
-		while ( $reader->read() ) {
-			// Only deal with element opens
-			if ( $reader->nodeType !== XMLReader::ELEMENT ) {
-				continue;
-			}
-
-			switch ( $reader->name ) {
-				case 'wp:wxr_version':
-					// Upgrade to the correct version
-					$this->version = $reader->readString();
-
-					if ( version_compare( $this->version, self::MAX_WXR_VERSION, '>' ) ) {
-						$this->logger->warning(
-							sprintf(
-								__( 'This WXR file (version %1$s) is newer than the importer (version %2$s) and may not be supported. Please consider updating.', 'themegrill-demo-importer' ),
-								$this->version,
-								self::MAX_WXR_VERSION
-							)
-						);
-					}
-
-					// Handled everything in this node, move on to the next
-					$reader->next();
-					break;
-
-				case 'generator':
-					$data->generator = $reader->readString();
-					$reader->next();
-					break;
-
-				case 'title':
-					$data->title = $reader->readString();
-					$reader->next();
-					break;
-
-				case 'wp:base_site_url':
-					$data->siteurl = $reader->readString();
-					$reader->next();
-					break;
-
-				case 'wp:base_blog_url':
-					$data->home = $reader->readString();
-					$reader->next();
-					break;
-
-				case 'wp:author':
-					$node = $reader->expand();
-
-					$parsed = $this->parse_author_node( $node );
-					if ( is_wp_error( $parsed ) ) {
-						$this->log_error( $parsed );
-
-						// Skip the rest of this post
-						$reader->next();
-						break;
-					}
-
-					$data->users[] = $parsed;
-
-					// Handled everything in this node, move on to the next
-					$reader->next();
-					break;
-
-				case 'item':
-					$node   = $reader->expand();
-					$parsed = $this->parse_post_node( $node );
-					if ( is_wp_error( $parsed ) ) {
-						$this->log_error( $parsed );
-
-						// Skip the rest of this post
-						$reader->next();
-						break;
-					}
-
-					if ( $parsed['data']['post_type'] === 'attachment' ) {
-						++$data->media_count;
-					} else {
-						++$data->post_count;
-					}
-					$data->comment_count += count( $parsed['comments'] );
-
-					// Handled everything in this node, move on to the next
-					$reader->next();
-					break;
-
-				case 'wp:category':
-				case 'wp:tag':
-				case 'wp:term':
-					++$data->term_count;
-
-					// Handled everything in this node, move on to the next
-					$reader->next();
-					break;
-			}
-		}
-
-		$data->version = $this->version;
-
-		return $data;
-	}
-
-	/**
-	 * The main controller for the actual import stage.
-	 *
-	 * @param string $file Path to the WXR file for importing
-	 */
-	public function parse_authors( $file ) {
-		// Let's run the actual importer now, woot
-		$reader = $this->get_reader( $file );
-		if ( is_wp_error( $reader ) ) {
-			return $reader;
-		}
-
-		// Set the version to compatibility mode first
-		$this->version = '1.0';
-
-		// Start parsing!
-		$authors = array();
-		while ( $reader->read() ) {
-			// Only deal with element opens
-			if ( $reader->nodeType !== XMLReader::ELEMENT ) {
-				continue;
-			}
-
-			switch ( $reader->name ) {
-				case 'wp:wxr_version':
-					// Upgrade to the correct version
-					$this->version = $reader->readString();
-
-					if ( version_compare( $this->version, self::MAX_WXR_VERSION, '>' ) ) {
-						$this->logger->warning(
-							sprintf(
-								__( 'This WXR file (version %1$s) is newer than the importer (version %2$s) and may not be supported. Please consider updating.', 'themegrill-demo-importer' ),
-								$this->version,
-								self::MAX_WXR_VERSION
-							)
-						);
-					}
-
-					// Handled everything in this node, move on to the next
-					$reader->next();
-					break;
-
-				case 'wp:author':
-					$node = $reader->expand();
-
-					$parsed = $this->parse_author_node( $node );
-					if ( is_wp_error( $parsed ) ) {
-						$this->log_error( $parsed );
-
-						// Skip the rest of this post
-						$reader->next();
-						break;
-					}
-
-					$authors[] = $parsed;
-
-					// Handled everything in this node, move on to the next
-					$reader->next();
-					break;
-			}
-		}
-
-		return $authors;
-	}
 
 	/**
 	 * The main controller for the actual import stage.
@@ -403,27 +219,6 @@ class WXRImporter extends WP_Importer {
 					$reader->next();
 					break;
 
-				case 'wp:author':
-					$node = $reader->expand();
-
-					$parsed = $this->parse_author_node( $node );
-					if ( is_wp_error( $parsed ) ) {
-						$this->log_error( $parsed );
-
-						// Skip the rest of this post
-						$reader->next();
-						break;
-					}
-
-					$status = $this->process_author( $parsed['data'], $parsed['meta'] );
-					if ( is_wp_error( $status ) ) {
-						$this->log_error( $status );
-					}
-
-					// Handled everything in this node, move on to the next
-					$reader->next();
-					break;
-
 				case 'wp:category':
 					$node = $reader->expand();
 
@@ -488,12 +283,28 @@ class WXRImporter extends WP_Importer {
 
 		// Now that we've done the main processing, do any required
 		// post-processing and remapping.
+		$this->logger->info(
+			'Post-processing started',
+			[ 'start_time' => true ]
+		);
 		$this->post_process();
+		$this->logger->info(
+			'Post-processing ended',
+			[ 'end_time' => true ]
+		);
 
 		if ( $this->options['aggressive_url_search'] ) {
 			$this->replace_attachment_urls_in_content();
 		}
+		$this->logger->info(
+			'Remapping featured images',
+			[ 'start_time' => true ]
+		);
 		$this->remap_featured_images();
+		$this->logger->info(
+			'Remapped featured images',
+			[ 'end_time' => true ]
+		);
 		$this->import_end();
 	}
 
@@ -532,9 +343,6 @@ class WXRImporter extends WP_Importer {
 		if ( $this->options['prefill_existing_posts'] ) {
 			$this->prefill_existing_posts();
 		}
-		if ( $this->options['prefill_existing_comments'] ) {
-			$this->prefill_existing_comments();
-		}
 		if ( $this->options['prefill_existing_terms'] ) {
 			$this->prefill_existing_terms();
 		}
@@ -570,41 +378,6 @@ class WXRImporter extends WP_Importer {
 		 * your cache or re-enable processing, do so here.
 		 */
 		do_action( 'import_end' );
-	}
-
-	/**
-	 * Set the user mapping.
-	 *
-	 * @param array $mapping List of map arrays (containing `old_slug`, `old_id`, `new_id`)
-	 */
-	public function set_user_mapping( $mapping ) {
-		foreach ( $mapping as $map ) {
-			if ( empty( $map['old_slug'] ) || empty( $map['old_id'] ) || empty( $map['new_id'] ) ) {
-				$this->logger->warning( __( 'Invalid author mapping', 'themegrill-demo-importer' ) );
-				$this->logger->debug( var_export( $map, true ) );
-				continue;
-			}
-
-			$old_slug = $map['old_slug'];
-			$old_id   = $map['old_id'];
-			$new_id   = $map['new_id'];
-
-			$this->mapping['user'][ $old_id ]        = $new_id;
-			$this->mapping['user_slug'][ $old_slug ] = $new_id;
-		}
-	}
-
-	/**
-	 * Set the user slug overrides.
-	 *
-	 * Allows overriding the slug in the import with a custom/renamed version.
-	 *
-	 * @param string[] $overrides Map of old slug to new slug.
-	 */
-	public function set_user_slug_overrides( $overrides ) {
-		foreach ( $overrides as $original => $renamed ) {
-			$this->user_slug_override[ $original ] = $renamed;
-		}
 	}
 
 	/**
@@ -715,13 +488,6 @@ class WXRImporter extends WP_Importer {
 					}
 					break;
 
-				case 'wp:comment':
-					$comment_item = $this->parse_comment_node( $child );
-					if ( ! empty( $comment_item ) ) {
-						$comments[] = $comment_item;
-					}
-					break;
-
 				case 'category':
 					$term_item = $this->parse_category_node( $child );
 					if ( ! empty( $term_item ) ) {
@@ -751,7 +517,6 @@ class WXRImporter extends WP_Importer {
 		 * @param array $comments Comments on the post.
 		 * @param array $terms Terms on the post.
 		 */
-
 		$data = apply_filters( 'wxr_importer.pre_process.post', $data, $meta, $comments, $terms );
 		if ( empty( $data ) ) {
 			return false;
@@ -765,6 +530,8 @@ class WXRImporter extends WP_Importer {
 			return;
 		}
 
+		$this->logger->info( 'Importing post: ' . $data['post_title'], [ 'start_time' => true ] );
+
 		$post_type_object = get_post_type_object( $data['post_type'] );
 
 		// Is this type even valid?
@@ -775,7 +542,8 @@ class WXRImporter extends WP_Importer {
 					__( 'Failed to import "%1$s": Invalid post type %2$s', 'themegrill-demo-importer' ),
 					$data['post_title'],
 					$data['post_type']
-				)
+				),
+				[ 'end_time' => true ]
 			);
 			return false;
 		}
@@ -785,12 +553,13 @@ class WXRImporter extends WP_Importer {
 
 			if ( $post_exists ) {
 
-				$this->logger->info(
+				$this->logger->warning(
 					sprintf(
 						__( '%1$s "%2$s" already exists.', 'themegrill-demo-importer' ),
 						$post_type_object->labels->singular_name,
 						$data['post_title']
-					)
+					),
+					[ 'end_time' => true ]
 				);
 
 				/**
@@ -799,9 +568,6 @@ class WXRImporter extends WP_Importer {
 				 * @param array $data Raw data imported for the post.
 				 */
 				do_action( 'wxr_importer.process_already_imported.post', $data );
-
-				// Even though this post already exists, new comments might need importing
-				$this->process_comments( $comments, $original_id, $data, $post_exists );
 
 				return false;
 			}
@@ -876,7 +642,8 @@ class WXRImporter extends WP_Importer {
 					sprintf(
 						__( 'Skipping attachment "%s", fetching attachments disabled' ),
 						$data['post_title']
-					)
+					),
+					[ 'end_time' => true ]
 				);
 				/**
 				 * Post processing skipped.
@@ -901,7 +668,8 @@ class WXRImporter extends WP_Importer {
 					__( 'Failed to import "%1$s" (%2$s)', 'themegrill-demo-importer' ),
 					$data['post_title'],
 					$post_type_object->labels->singular_name
-				)
+				),
+				[ 'end_time' => true ]
 			);
 			$this->logger->debug( $post_id->get_error_message() );
 
@@ -1003,7 +771,6 @@ class WXRImporter extends WP_Importer {
 			}
 		}
 
-		$this->process_comments( $comments, $post_id, $data );
 		$this->process_post_meta( $meta, $post_id, $data );
 
 		if ( 'nav_menu_item' === $data['post_type'] ) {
@@ -1020,6 +787,15 @@ class WXRImporter extends WP_Importer {
 		 * @param array $terms Raw term data, already processed.
 		 */
 		do_action( 'wxr_importer.processed.post', $post_id, $data, $meta, $comments, $terms );
+
+		$this->logger->info(
+			sprintf(
+				__( 'Complete import "%1$s" (%2$s)', 'themegrill-demo-importer' ),
+				$data['post_title'],
+				$post_type_object->labels->singular_name
+			),
+			[ 'end_time' => true ]
+		);
 	}
 
 	/**
@@ -1111,15 +887,44 @@ class WXRImporter extends WP_Importer {
 			$remote_url = rtrim( $this->base_url, '/' ) . $remote_url;
 		}
 
+		$this->logger->info(
+			sprintf(
+				__( 'Fetching remote file for "%s"', 'themegrill-demo-importer' ),
+				$post['post_title']
+			),
+			[ 'fetch_start_time' => true ]
+		);
 		$upload = $this->fetch_remote_file( $remote_url, $post );
 		if ( is_wp_error( $upload ) ) {
+			$this->logger->warning(
+				sprintf(
+					__( 'Failed to fetch remote file for "%s"', 'themegrill-demo-importer' ),
+					$post['post_title']
+				),
+				[ 'fetch_end_time' => true ]
+			);
 			return $upload;
 		}
 
 		$info = wp_check_filetype( $upload['file'] );
 		if ( ! $info ) {
+			$this->logger->warning(
+				sprintf(
+					__( 'Invalid file type for "%s"', 'themegrill-demo-importer' ),
+					$post['post_title']
+				),
+				[ 'fetch_end_time' => true ]
+			);
 			return new WP_Error( 'attachment_processing_error', __( 'Invalid file type', 'themegrill-demo-importer' ) );
 		}
+
+		$this->logger->info(
+			sprintf(
+				__( 'Fetched remote file for "%s"', 'themegrill-demo-importer' ),
+				$post['post_title']
+			),
+			[ 'fetch_end_time' => true ]
+		);
 
 		$post['post_mime_type'] = $info['type'];
 
@@ -1298,220 +1103,7 @@ class WXRImporter extends WP_Importer {
 		}
 	}
 
-	/**
-	 * Parse a comment node into comment data.
-	 *
-	 * @param DOMElement $node Parent node of comment data (typically `wp:comment`).
-	 * @return array Comment data array.
-	 */
-	protected function parse_comment_node( $node ) {
-		$data = array(
-			'commentmeta' => array(),
-		);
 
-		foreach ( $node->childNodes as $child ) {
-			// We only care about child elements
-			if ( $child->nodeType !== XML_ELEMENT_NODE ) {
-				continue;
-			}
-
-			switch ( $child->tagName ) {
-				case 'wp:comment_id':
-					$data['comment_id'] = $child->textContent;
-					break;
-				case 'wp:comment_author':
-					$data['comment_author'] = $child->textContent;
-					break;
-
-				case 'wp:comment_author_email':
-					$data['comment_author_email'] = $child->textContent;
-					break;
-
-				case 'wp:comment_author_IP':
-					$data['comment_author_IP'] = $child->textContent;
-					break;
-
-				case 'wp:comment_author_url':
-					$data['comment_author_url'] = $child->textContent;
-					break;
-
-				case 'wp:comment_user_id':
-					$data['comment_user_id'] = $child->textContent;
-					break;
-
-				case 'wp:comment_date':
-					$data['comment_date'] = $child->textContent;
-					break;
-
-				case 'wp:comment_date_gmt':
-					$data['comment_date_gmt'] = $child->textContent;
-					break;
-
-				case 'wp:comment_content':
-					$data['comment_content'] = $child->textContent;
-					break;
-
-				case 'wp:comment_approved':
-					$data['comment_approved'] = $child->textContent;
-					break;
-
-				case 'wp:comment_type':
-					$data['comment_type'] = $child->textContent;
-					break;
-
-				case 'wp:comment_parent':
-					$data['comment_parent'] = $child->textContent;
-					break;
-
-				case 'wp:commentmeta':
-					$meta_item = $this->parse_meta_node( $child );
-					if ( ! empty( $meta_item ) ) {
-						$data['commentmeta'][] = $meta_item;
-					}
-					break;
-			}
-		}
-
-		return $data;
-	}
-
-	/**
-	 * Process and import comment data.
-	 *
-	 * @param array $comments List of comment data arrays.
-	 * @param int $post_id Post to associate with.
-	 * @param array $post Post data.
-	 * @return int|WP_Error Number of comments imported on success, error otherwise.
-	 */
-	protected function process_comments( $comments, $post_id, $post, $post_exists = false ) {
-
-		$comments = apply_filters( 'wp_import_post_comments', $comments, $post_id, $post );
-		if ( empty( $comments ) ) {
-			return 0;
-		}
-
-		$num_comments = 0;
-
-		// Sort by ID to avoid excessive remapping later
-		usort( $comments, array( $this, 'sort_comments_by_id' ) );
-
-		foreach ( $comments as $key => $comment ) {
-			/**
-			 * Pre-process comment data
-			 *
-			 * @param array $comment Comment data. (Return empty to skip.)
-			 * @param int $post_id Post the comment is attached to.
-			 */
-			$comment = apply_filters( 'wxr_importer.pre_process.comment', $comment, $post_id );
-			if ( empty( $comment ) ) {
-				return false;
-			}
-
-			$original_id = isset( $comment['comment_id'] ) ? (int) $comment['comment_id'] : 0;
-			$parent_id   = isset( $comment['comment_parent'] ) ? (int) $comment['comment_parent'] : 0;
-			$author_id   = isset( $comment['comment_user_id'] ) ? (int) $comment['comment_user_id'] : 0;
-
-			// if this is a new post we can skip the comment_exists() check
-			// TODO: Check comment_exists for performance
-			if ( $post_exists ) {
-				$existing = $this->comment_exists( $comment );
-				if ( $existing ) {
-
-					/**
-					 * Comment processing already imported.
-					 *
-					 * @param array $comment Raw data imported for the comment.
-					 */
-					do_action( 'wxr_importer.process_already_imported.comment', $comment );
-
-					$this->mapping['comment'][ $original_id ] = $existing;
-					continue;
-				}
-			}
-
-			// Remove meta from the main array
-			$meta = isset( $comment['commentmeta'] ) ? $comment['commentmeta'] : array();
-			unset( $comment['commentmeta'] );
-
-			// Map the parent comment, or mark it as one we need to fix
-			$requires_remapping = false;
-			if ( $parent_id ) {
-				if ( isset( $this->mapping['comment'][ $parent_id ] ) ) {
-					$comment['comment_parent'] = $this->mapping['comment'][ $parent_id ];
-				} else {
-					// Prepare for remapping later
-					$meta[]             = array(
-						'key'   => '_wxr_import_parent',
-						'value' => $parent_id,
-					);
-					$requires_remapping = true;
-
-					// Wipe the parent for now
-					$comment['comment_parent'] = 0;
-				}
-			}
-
-			// Map the author, or mark it as one we need to fix
-			if ( $author_id ) {
-				if ( isset( $this->mapping['user'][ $author_id ] ) ) {
-					$comment['user_id'] = $this->mapping['user'][ $author_id ];
-				} else {
-					// Prepare for remapping later
-					$meta[]             = array(
-						'key'   => '_wxr_import_user',
-						'value' => $author_id,
-					);
-					$requires_remapping = true;
-
-					// Wipe the user for now
-					$comment['user_id'] = 0;
-				}
-			}
-
-			// Run standard core filters
-			$comment['comment_post_ID'] = $post_id;
-			$comment                    = wp_filter_comment( $comment );
-
-			// wp_insert_comment expects slashed data
-			$comment_id = wp_insert_comment( wp_slash( $comment ) );
-
-			$this->mapping['comment'][ $original_id ] = $comment_id;
-			if ( $requires_remapping ) {
-				$this->requires_remapping['comment'][ $comment_id ] = true;
-			}
-			$this->mark_comment_exists( $comment, $comment_id );
-
-			/**
-			 * Comment has been imported.
-			 *
-			 * @param int $comment_id New comment ID
-			 * @param array $comment Comment inserted (`comment_id` item refers to the original ID)
-			 * @param int $post_id Post parent of the comment
-			 * @param array $post Post data
-			 */
-			do_action( 'wp_import_insert_comment', $comment_id, $comment, $post_id, $post );
-
-			// Process the meta items
-			foreach ( $meta as $meta_item ) {
-				$value = maybe_unserialize( $meta_item['value'] );
-				add_comment_meta( $comment_id, wp_slash( $meta_item['key'] ), wp_slash( $value ) );
-			}
-
-			/**
-			 * Post processing completed.
-			 *
-			 * @param int $post_id New post ID.
-			 * @param array $comment Raw data imported for the comment.
-			 * @param array $meta Raw meta data, already processed by {@see process_post_meta}.
-			 * @param array $post_id Parent post ID.
-			 */
-			do_action( 'wxr_importer.processed.comment', $comment_id, $comment, $meta, $post_id );
-
-			++$num_comments;
-		}
-
-		return $num_comments;
-	}
 
 	protected function parse_category_node( $node ) {
 		$data = array(
@@ -1541,179 +1133,6 @@ class WXRImporter extends WP_Importer {
 		return $data;
 	}
 
-	/**
-	 * Callback for `usort` to sort comments by ID
-	 *
-	 * @param array $a Comment data for the first comment
-	 * @param array $b Comment data for the second comment
-	 * @return int
-	 */
-	public static function sort_comments_by_id( $a, $b ) {
-		if ( empty( $a['comment_id'] ) ) {
-			return 1;
-		}
-
-		if ( empty( $b['comment_id'] ) ) {
-			return -1;
-		}
-
-		return $a['comment_id'] - $b['comment_id'];
-	}
-
-	protected function parse_author_node( $node ) {
-		$data = array();
-		$meta = array();
-		foreach ( $node->childNodes as $child ) {
-			// We only care about child elements
-			if ( $child->nodeType !== XML_ELEMENT_NODE ) {
-				continue;
-			}
-
-			switch ( $child->tagName ) {
-				case 'wp:author_login':
-					$data['user_login'] = $child->textContent;
-					break;
-
-				case 'wp:author_id':
-					$data['ID'] = $child->textContent;
-					break;
-
-				case 'wp:author_email':
-					$data['user_email'] = $child->textContent;
-					break;
-
-				case 'wp:author_display_name':
-					$data['display_name'] = $child->textContent;
-					break;
-
-				case 'wp:author_first_name':
-					$data['first_name'] = $child->textContent;
-					break;
-
-				case 'wp:author_last_name':
-					$data['last_name'] = $child->textContent;
-					break;
-			}
-		}
-
-		return compact( 'data', 'meta' );
-	}
-
-	protected function process_author( $data, $meta ) {
-		/**
-		 * Pre-process user data.
-		 *
-		 * @param array $data User data. (Return empty to skip.)
-		 * @param array $meta Meta data.
-		 */
-		$data = apply_filters( 'wxr_importer.pre_process.user', $data, $meta );
-		if ( empty( $data ) ) {
-			return false;
-		}
-
-		// Have we already handled this user?
-		$original_id   = isset( $data['ID'] ) ? $data['ID'] : 0;
-		$original_slug = $data['user_login'];
-
-		if ( isset( $this->mapping['user'][ $original_id ] ) ) {
-			$existing = $this->mapping['user'][ $original_id ];
-
-			// Note the slug mapping if we need to too
-			if ( ! isset( $this->mapping['user_slug'][ $original_slug ] ) ) {
-				$this->mapping['user_slug'][ $original_slug ] = $existing;
-			}
-
-			return false;
-		}
-
-		if ( isset( $this->mapping['user_slug'][ $original_slug ] ) ) {
-			$existing = $this->mapping['user_slug'][ $original_slug ];
-
-			// Ensure we note the mapping too
-			$this->mapping['user'][ $original_id ] = $existing;
-
-			return false;
-		}
-
-		// Allow overriding the user's slug
-		$login = $original_slug;
-		if ( isset( $this->user_slug_override[ $login ] ) ) {
-			$login = $this->user_slug_override[ $login ];
-		}
-
-		$userdata = array(
-			'user_login' => sanitize_user( $login, true ),
-			'user_pass'  => wp_generate_password(),
-		);
-
-		$allowed = array(
-			'user_email'   => true,
-			'display_name' => true,
-			'first_name'   => true,
-			'last_name'    => true,
-		);
-		foreach ( $data as $key => $value ) {
-			if ( ! isset( $allowed[ $key ] ) ) {
-				continue;
-			}
-
-			$userdata[ $key ] = $data[ $key ];
-		}
-
-		$user_id = wp_insert_user( wp_slash( $userdata ) );
-
-		if ( is_wp_error( $user_id ) ) {
-			$this->logger->error(
-				sprintf(
-					__( 'Failed to import user "%s"', 'themegrill-demo-importer' ),
-					$userdata['user_login']
-				)
-			);
-			$this->logger->debug( $user_id->get_error_message() );
-
-			/**
-			 * User processing failed.
-			 *
-			 * @param WP_Error $user_id Error object.
-			 * @param array $userdata Raw data imported for the user.
-			 */
-			do_action( 'wxr_importer.process_failed.user', $user_id, $userdata );
-			return false;
-		}
-
-		$imported_users   = get_option( 'themegrill_demo_importer_imported_users', array() );
-		$imported_users[] = $user_id;
-		$imported_users   = array_unique( $imported_users );
-		update_option( 'themegrill_demo_importer_imported_users', $imported_users );
-
-		if ( $original_id ) {
-			$this->mapping['user'][ $original_id ] = $user_id;
-		}
-		$this->mapping['user_slug'][ $original_slug ] = $user_id;
-
-		$this->logger->info(
-			sprintf(
-				__( 'Imported user "%s"', 'themegrill-demo-importer' ),
-				$userdata['user_login']
-			)
-		);
-		$this->logger->debug(
-			sprintf(
-				__( 'User %1$d remapped to %2$d', 'themegrill-demo-importer' ),
-				$original_id,
-				$user_id
-			)
-		);
-
-		// TODO: Implement meta handling once WXR includes it
-		/**
-		 * User processing completed.
-		 *
-		 * @param int $user_id New user ID.
-		 * @param array $userdata Raw data imported for the user.
-		 */
-		do_action( 'wxr_importer.processed.user', $user_id, $userdata );
-	}
 
 	protected function parse_term_node( $node, $type = 'term' ) {
 		$data = array();
@@ -1817,6 +1236,15 @@ class WXRImporter extends WP_Importer {
 			return false;
 		}
 
+		$this->logger->info(
+			sprintf(
+				__( 'Importing "%1$s" (%2$s)', 'themegrill-demo-importer' ),
+				$data['name'],
+				$data['taxonomy']
+			),
+			[ 'start_time' => true ]
+		);
+
 		$termdata = array();
 		$allowed  = array(
 			'slug'        => true,
@@ -1855,7 +1283,8 @@ class WXRImporter extends WP_Importer {
 					__( 'Failed to import %1$s %2$s', 'themegrill-demo-importer' ),
 					$data['taxonomy'],
 					$data['name']
-				)
+				),
+				[ 'end_time' => true ]
 			);
 			$this->logger->debug( $result->get_error_message() );
 			do_action( 'wp_import_insert_term_failed', $result, $data );
@@ -1906,6 +1335,15 @@ class WXRImporter extends WP_Importer {
 		 * @param array $data Raw data imported for the term.
 		 */
 		do_action( 'wxr_importer.processed.term', $term_id, $data );
+
+		$this->logger->info(
+			sprintf(
+				__( 'Complete import "%1$s" (%2$s)', 'themegrill-demo-importer' ),
+				$data['name'],
+				$data['taxonomy']
+			),
+			[ 'end_time' => true ]
+		);
 	}
 
 		/**
@@ -1978,6 +1416,7 @@ class WXRImporter extends WP_Importer {
 					'User-Agent' => 'ThemeGrill/1.0',
 				),
 				'sslverify' => false,
+				'timeout'   => 30,
 			)
 		);
 
@@ -2031,9 +1470,6 @@ class WXRImporter extends WP_Importer {
 		if ( ! empty( $this->requires_remapping['post'] ) ) {
 			$this->post_process_posts( $this->requires_remapping['post'] );
 		}
-		if ( ! empty( $this->requires_remapping['comment'] ) ) {
-			$this->post_process_comments( $this->requires_remapping['comment'] );
-		}
 	}
 
 	protected function post_process_posts( $todo ) {
@@ -2074,25 +1510,7 @@ class WXRImporter extends WP_Importer {
 
 			$author_slug = get_post_meta( $post_id, '_wxr_import_user_slug', true );
 			if ( ! empty( $author_slug ) ) {
-				// Have we imported the user now?
-				if ( isset( $this->mapping['user_slug'][ $author_slug ] ) ) {
-					$data['post_author'] = $this->mapping['user_slug'][ $author_slug ];
-				} else {
-					$this->logger->warning(
-						sprintf(
-							__( 'Could not find the author for "%1$s" (post #%2$d)', 'themegrill-demo-importer' ),
-							get_the_title( $post_id ),
-							$post_id
-						)
-					);
-					$this->logger->debug(
-						sprintf(
-							__( 'Post %1$d was imported with author "%2$s", but could not be found', 'themegrill-demo-importer' ),
-							$post_id,
-							$author_slug
-						)
-					);
-				}
+				$data['post_author'] = (int) get_current_user_id();
 			}
 
 			$has_attachments = get_post_meta( $post_id, '_wxr_import_has_attachment_refs', true );
@@ -2193,77 +1611,6 @@ class WXRImporter extends WP_Importer {
 		delete_post_meta( $post_id, '_wxr_import_menu_item' );
 	}
 
-	protected function post_process_comments( $todo ) {
-		foreach ( $todo as $comment_id => $_ ) {
-			$data = array();
-
-			$parent_id = get_comment_meta( $comment_id, '_wxr_import_parent', true );
-			if ( ! empty( $parent_id ) ) {
-				// Have we imported the parent now?
-				if ( isset( $this->mapping['comment'][ $parent_id ] ) ) {
-					$data['comment_parent'] = $this->mapping['comment'][ $parent_id ];
-				} else {
-					$this->logger->warning(
-						sprintf(
-							__( 'Could not find the comment parent for comment #%d', 'themegrill-demo-importer' ),
-							$comment_id
-						)
-					);
-					$this->logger->debug(
-						sprintf(
-							__( 'Comment %1$d was imported with parent %2$d, but could not be found', 'themegrill-demo-importer' ),
-							$comment_id,
-							$parent_id
-						)
-					);
-				}
-			}
-
-			$author_id = get_comment_meta( $comment_id, '_wxr_import_user', true );
-			if ( ! empty( $author_id ) ) {
-				// Have we imported the user now?
-				if ( isset( $this->mapping['user'][ $author_id ] ) ) {
-					$data['user_id'] = $this->mapping['user'][ $author_id ];
-				} else {
-					$this->logger->warning(
-						sprintf(
-							__( 'Could not find the author for comment #%d', 'themegrill-demo-importer' ),
-							$comment_id
-						)
-					);
-					$this->logger->debug(
-						sprintf(
-							__( 'Comment %1$d was imported with author %2$d, but could not be found', 'themegrill-demo-importer' ),
-							$comment_id,
-							$author_id
-						)
-					);
-				}
-			}
-
-			// Do we have updates to make?
-			if ( empty( $data ) ) {
-				continue;
-			}
-
-			// Run the update
-			$data['comment_ID'] = $comment_ID;
-			$result             = wp_update_comment( wp_slash( $data ) );
-			if ( empty( $result ) ) {
-				$this->logger->warning(
-					sprintf(
-						__( 'Could not update comment #%d with mapped data', 'themegrill-demo-importer' ),
-						$comment_id
-					)
-				);
-				continue;
-			}
-
-			// Clear out our temporary meta keys
-			delete_comment_meta( $comment_id, '_wxr_import_parent' );
-			delete_comment_meta( $comment_id, '_wxr_import_user' );
-		}
-	}
 
 	/**
 	 * Use stored mapping information to update old attachment URLs
@@ -2399,57 +1746,6 @@ class WXRImporter extends WP_Importer {
 		$this->exists['post'][ $exists_key ] = $post_id;
 	}
 
-	/**
-	 * Prefill existing comment data.
-	 *
-	 * @see self::prefill_existing_posts() for justification of why this exists.
-	 */
-	protected function prefill_existing_comments() {
-		global $wpdb;
-		$posts = $wpdb->get_results( "SELECT comment_ID, comment_author, comment_date FROM {$wpdb->comments}" );
-
-		foreach ( $posts as $item ) {
-			$exists_key                             = sha1( $item->comment_author . ':' . $item->comment_date );
-			$this->exists['comment'][ $exists_key ] = $item->comment_ID;
-		}
-	}
-
-	/**
-	 * Does the comment exist?
-	 *
-	 * @param array $data Comment data to check against.
-	 * @return int|bool Existing comment ID if it exists, false otherwise.
-	 */
-	protected function comment_exists( $data ) {
-		$exists_key = sha1( $data['comment_author'] . ':' . $data['comment_date'] );
-
-		// Constant-time lookup if we prefilled
-		if ( $this->options['prefill_existing_comments'] ) {
-			return isset( $this->exists['comment'][ $exists_key ] ) ? $this->exists['comment'][ $exists_key ] : false;
-		}
-
-		// No prefilling, but might have already handled it
-		if ( isset( $this->exists['comment'][ $exists_key ] ) ) {
-			return $this->exists['comment'][ $exists_key ];
-		}
-
-		// Still nothing, try comment_exists, and cache it
-		$exists                                 = comment_exists( $data['comment_author'], $data['comment_date'] );
-		$this->exists['comment'][ $exists_key ] = $exists;
-
-		return $exists;
-	}
-
-	/**
-	 * Mark the comment as existing.
-	 *
-	 * @param array $data Comment data to mark as existing.
-	 * @param int $comment_id Comment ID.
-	 */
-	protected function mark_comment_exists( $data, $comment_id ) {
-		$exists_key                             = sha1( $data['comment_author'] . ':' . $data['comment_date'] );
-		$this->exists['comment'][ $exists_key ] = $comment_id;
-	}
 
 	/**
 	 * Prefill existing term data.
@@ -2487,7 +1783,7 @@ class WXRImporter extends WP_Importer {
 			return $this->exists['term'][ $exists_key ];
 		}
 
-		// Still nothing, try comment_exists, and cache it
+		// Still nothing, try term_exists, and cache it
 		$exists = term_exists( $data['slug'], $data['taxonomy'] );
 		if ( is_array( $exists ) ) {
 			$exists = $exists['term_id'];
