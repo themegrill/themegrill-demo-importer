@@ -120,7 +120,7 @@ class WXRImporter extends WP_Importer {
 	 */
 	protected function get_reader( $file ) {
 		if ( ! class_exists( 'XMLReader' ) ) {
-			$this->logger->critical( __( 'The XMLReader class is missing! Please install the XMLReader PHP extension on your server', 'wordpress-importer' ) );
+			$this->logger->critical( 'The XMLReader class is missing! Please install the XMLReader PHP extension on your server' );
 			return new WP_Error( 'wxr_importer.cannot_parse', __( 'The XMLReader class is missing! Please install the XMLReader PHP extension on your server', 'wordpress-importer' ) );
 		}
 
@@ -186,7 +186,7 @@ class WXRImporter extends WP_Importer {
 					if ( version_compare( $this->version, self::MAX_WXR_VERSION, '>' ) ) {
 						$this->logger->warning(
 							sprintf(
-								__( 'This WXR file (version %1$s) is newer than the importer (version %2$s) and may not be supported. Please consider updating.', 'themegrill-demo-importer' ),
+								'This WXR file (version %1$s) is newer than the importer (version %2$s) and may not be supported. Please consider updating.',
 								$this->version,
 								self::MAX_WXR_VERSION
 							)
@@ -539,7 +539,7 @@ class WXRImporter extends WP_Importer {
 
 			$this->logger->warning(
 				sprintf(
-					__( 'Failed to import "%1$s": Invalid post type %2$s', 'themegrill-demo-importer' ),
+					'Failed to import "%1$s": Invalid post type %2$s',
 					$data['post_title'],
 					$data['post_type']
 				),
@@ -555,7 +555,7 @@ class WXRImporter extends WP_Importer {
 
 				$this->logger->warning(
 					sprintf(
-						__( '%1$s "%2$s" already exists.', 'themegrill-demo-importer' ),
+						'%1$s "%2$s" already exists.',
 						$post_type_object->labels->singular_name,
 						$data['post_title']
 					),
@@ -640,7 +640,7 @@ class WXRImporter extends WP_Importer {
 			if ( ! $this->options['fetch_attachments'] ) {
 				$this->logger->notice(
 					sprintf(
-						__( 'Skipping attachment "%s", fetching attachments disabled' ),
+						'Skipping attachment "%s", fetching attachments disabled',
 						$data['post_title']
 					),
 					[ 'end_time' => true ]
@@ -665,7 +665,7 @@ class WXRImporter extends WP_Importer {
 
 			$this->logger->error(
 				sprintf(
-					__( 'Failed to import "%1$s" (%2$s)', 'themegrill-demo-importer' ),
+					'Failed to import "%1$s" (%2$s)',
 					$data['post_title'],
 					$post_type_object->labels->singular_name
 				),
@@ -708,14 +708,14 @@ class WXRImporter extends WP_Importer {
 
 		$this->logger->info(
 			sprintf(
-				__( 'Imported "%1$s" (%2$s)', 'themegrill-demo-importer' ),
+				'Imported "%1$s" (%2$s)',
 				$data['post_title'],
 				$post_type_object->labels->singular_name
 			)
 		);
 		$this->logger->debug(
 			sprintf(
-				__( 'Post %1$d remapped to %2$d', 'themegrill-demo-importer' ),
+				'Post %1$d remapped to %2$d',
 				$original_id,
 				$post_id
 			)
@@ -744,7 +744,7 @@ class WXRImporter extends WP_Importer {
 						} else {
 							$this->logger->warning(
 								sprintf(
-									esc_html__( 'Failed to import term: %1$s - %2$s', 'wordpress-importer' ),
+									esc_html( 'Failed to import term: %1$s - %2$s' ),
 									esc_html( $taxonomy ),
 									esc_html( $term['name'] )
 								)
@@ -790,7 +790,7 @@ class WXRImporter extends WP_Importer {
 
 		$this->logger->info(
 			sprintf(
-				__( 'Complete import "%1$s" (%2$s)', 'themegrill-demo-importer' ),
+				'Complete import "%1$s" (%2$s)',
 				$data['post_title'],
 				$post_type_object->labels->singular_name
 			),
@@ -889,7 +889,7 @@ class WXRImporter extends WP_Importer {
 
 		$this->logger->info(
 			sprintf(
-				__( 'Fetching remote file for "%s"', 'themegrill-demo-importer' ),
+				'Fetching remote file for "%s"',
 				$post['post_title']
 			),
 			[ 'fetch_start_time' => true ]
@@ -898,7 +898,7 @@ class WXRImporter extends WP_Importer {
 		if ( is_wp_error( $upload ) ) {
 			$this->logger->warning(
 				sprintf(
-					__( 'Failed to fetch remote file for "%s"', 'themegrill-demo-importer' ),
+					'Failed to fetch remote file for "%s"',
 					$post['post_title']
 				),
 				[ 'fetch_end_time' => true ]
@@ -910,7 +910,7 @@ class WXRImporter extends WP_Importer {
 		if ( ! $info ) {
 			$this->logger->warning(
 				sprintf(
-					__( 'Invalid file type for "%s"', 'themegrill-demo-importer' ),
+					'Invalid file type for "%s"',
 					$post['post_title']
 				),
 				[ 'fetch_end_time' => true ]
@@ -920,7 +920,7 @@ class WXRImporter extends WP_Importer {
 
 		$this->logger->info(
 			sprintf(
-				__( 'Fetched remote file for "%s"', 'themegrill-demo-importer' ),
+				'Fetched remote file for "%s"',
 				$post['post_title']
 			),
 			[ 'fetch_end_time' => true ]
@@ -1238,7 +1238,7 @@ class WXRImporter extends WP_Importer {
 
 		$this->logger->info(
 			sprintf(
-				__( 'Importing "%1$s" (%2$s)', 'themegrill-demo-importer' ),
+				'Importing "%1$s" (%2$s)',
 				$data['name'],
 				$data['taxonomy']
 			),
@@ -1280,7 +1280,7 @@ class WXRImporter extends WP_Importer {
 		if ( is_wp_error( $result ) ) {
 			$this->logger->warning(
 				sprintf(
-					__( 'Failed to import %1$s %2$s', 'themegrill-demo-importer' ),
+					'Failed to import %1$s %2$s',
 					$data['taxonomy'],
 					$data['name']
 				),
@@ -1312,14 +1312,14 @@ class WXRImporter extends WP_Importer {
 
 		$this->logger->info(
 			sprintf(
-				__( 'Imported "%1$s" (%2$s)', 'themegrill-demo-importer' ),
+				'Imported "%1$s" (%2$s)',
 				$data['name'],
 				$data['taxonomy']
 			)
 		);
 		$this->logger->debug(
 			sprintf(
-				__( 'Term %1$d remapped to %2$d', 'themegrill-demo-importer' ),
+				'Term %1$d remapped to %2$d',
 				$original_id,
 				$term_id
 			)
@@ -1338,7 +1338,7 @@ class WXRImporter extends WP_Importer {
 
 		$this->logger->info(
 			sprintf(
-				__( 'Complete import "%1$s" (%2$s)', 'themegrill-demo-importer' ),
+				'Complete import "%1$s" (%2$s)',
 				$data['name'],
 				$data['taxonomy']
 			),
@@ -1478,7 +1478,7 @@ class WXRImporter extends WP_Importer {
 				sprintf(
 				// Note: title intentionally not used to skip extra processing
 				// for when debug logging is off
-					__( 'Running post-processing for post %d', 'themegrill-demo-importer' ),
+					'Running post-processing for post %d',
 					$post_id
 				)
 			);
@@ -1493,14 +1493,14 @@ class WXRImporter extends WP_Importer {
 				} else {
 					$this->logger->warning(
 						sprintf(
-							__( 'Could not find the post parent for "%1$s" (post #%2$d)', 'themegrill-demo-importer' ),
+							'Could not find the post parent for "%1$s" (post #%2$d)',
 							get_the_title( $post_id ),
 							$post_id
 						)
 					);
 					$this->logger->debug(
 						sprintf(
-							__( 'Post %1$d was imported with parent %2$d, but could not be found', 'themegrill-demo-importer' ),
+							'Post %1$d was imported with parent %2$d, but could not be found',
 							$post_id,
 							$parent_id
 						)
@@ -1533,7 +1533,7 @@ class WXRImporter extends WP_Importer {
 			if ( empty( $data ) ) {
 				$this->logger->debug(
 					sprintf(
-						__( 'Post %d was marked for post-processing, but none was required.', 'themegrill-demo-importer' ),
+						'Post %d was marked for post-processing, but none was required.',
 						$post_id
 					)
 				);
@@ -1546,7 +1546,7 @@ class WXRImporter extends WP_Importer {
 			if ( is_wp_error( $result ) ) {
 				$this->logger->warning(
 					sprintf(
-						__( 'Could not update "%1$s" (post #%2$d) with mapped data', 'themegrill-demo-importer' ),
+						'Could not update "%1$s" (post #%2$d) with mapped data',
 						get_the_title( $post_id ),
 						$post_id
 					)
@@ -1593,14 +1593,14 @@ class WXRImporter extends WP_Importer {
 		} else {
 			$this->logger->warning(
 				sprintf(
-					__( 'Could not find the menu object for "%1$s" (post #%2$d)', 'themegrill-demo-importer' ),
+					'Could not find the menu object for "%1$s" (post #%2$d)',
 					get_the_title( $post_id ),
 					$post_id
 				)
 			);
 			$this->logger->debug(
 				sprintf(
-					__( 'Post %1$d was imported with object "%2$d" of type "%3$s", but could not be found', 'themegrill-demo-importer' ),
+					'Post %1$d was imported with object "%2$d" of type "%3$s", but could not be found',
 					$post_id,
 					$menu_object_id,
 					$menu_item_type
