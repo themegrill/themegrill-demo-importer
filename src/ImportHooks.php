@@ -340,7 +340,7 @@ class ImportHooks {
 							}
 						}
 					} else {
-						$page_id = $page_ids[0]->ID;
+						$page_id = ! empty( $page_ids ) ? $page_ids[0]->ID : 0;
 					}
 
 					// Delete posts.
