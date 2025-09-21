@@ -106,21 +106,21 @@ class ContentImporter {
 		$page_for_posts = $demo['page_for_posts'] ?? '';
 		if ( $show_on_front ) {
 			if ( in_array( $show_on_front, array( 'posts', 'page' ), true ) ) {
-							update_option( 'show_on_front', $show_on_front );
+				update_option( 'show_on_front', $show_on_front );
 			}
 		}
-		if ( $page_on_front ) {
-			$page = $this->get_page_by_title( $page_on_front );
 
-			if ( is_object( $page ) && $page->ID ) {
-				update_option( 'page_on_front', $page->ID );
+		$mapping_data = get_option( 'themegrill_demo_importer_mapping', array() );
+		if ( $page_on_front ) {
+			$page_on_front_remapped_id = ! empty( $mapping_data['post'][ $page_on_front ] ) ? $mapping_data['post'][ $page_on_front ] : $page_on_front;
+			if ( get_post_status( $page_on_front_remapped_id ) === 'publish' ) {
+				update_option( 'page_on_front', $page_on_front_remapped_id );
 			}
 		}
 		if ( $page_for_posts ) {
-			$page = $this->get_page_by_title( $page_for_posts );
-
-			if ( is_object( $page ) && $page->ID ) {
-				update_option( 'page_for_posts', $page->ID );
+			$page_for_posts_remapped_id = ! empty( $mapping_data['post'][ $page_for_posts ] ) ? $mapping_data['post'][ $page_for_posts ] : $page_for_posts;
+			if ( get_post_status( $page_for_posts_remapped_id ) === 'publish' ) {
+				update_option( 'page_for_posts', $page_for_posts_remapped_id );
 				update_option( 'show_on_front', 'page' );
 			}
 		}
