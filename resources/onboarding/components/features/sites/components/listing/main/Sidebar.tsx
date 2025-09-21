@@ -14,9 +14,10 @@ type Props = {
 	builders: PagebuilderCategory[];
 	categories: PagebuilderCategory[];
 	handleRefetch: () => void;
+	theme: string;
 };
 
-const Sidebar = ({ builders, categories, handleRefetch }: Props) => {
+const Sidebar = ({ builders, categories, handleRefetch, theme}: Props) => {
 	const navigate = Route.useNavigate();
 	const searchParams = Route.useSearch();
 	const search = searchParams.search || '';
@@ -78,6 +79,14 @@ const Sidebar = ({ builders, categories, handleRefetch }: Props) => {
 		}
 	};
 
+	const checkLogoExists = (key: string): string => {
+		try {
+			return require(`../../../../../../assets/images/logos/${key}.png`);
+		} catch {
+			return '';
+		}
+	};
+
 	useEffect(() => {
 		if (!builder && builders.length > 0) {
 			navigate({
@@ -94,7 +103,14 @@ const Sidebar = ({ builders, categories, handleRefetch }: Props) => {
 		<div className="w-[350px] min-w-[350px] flex flex-col bg-[#FAFBFC] border-0 border-r border-solid border-[#E9E9E9] ">
 			<div className="px-6 pt-6">
 				<div className="flex justify-between items-center border-0 border-b border-solid border-[#E3E3E3] pb-6">
+					{theme === 'all' ?
 					<img src={logo} alt="Starter Templates and Sites Pack By ThemeGrill" width={50} />
+					:
+						checkLogoExists(theme) !== '' ? (
+							<img src={require(`../../../../../../assets/images/logos/${theme}.png`)} alt="Starter Templates and Sites Pack By ThemeGrill" width={50} />
+						) :
+						<img src={logo} alt="Starter Templates and Sites Pack By ThemeGrill" width={50} />
+					}
 					<Tooltip>
 						<TooltipTrigger asChild>
 							<X

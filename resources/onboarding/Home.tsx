@@ -15,6 +15,7 @@ const Home = () => {
 	const [builders, setBuilders] = useState<PagebuilderCategory[]>([]);
 	const [categories, setCategories] = useState<PagebuilderCategory[]>([]);
 	const [error, setError] = useState('');
+	const [theme, setTheme] = useState('all');
 
 	const loading = useMemo(() => {
 		return !localizedData || demos.length === 0 || builders.length === 0 || categories.length === 0;
@@ -25,6 +26,7 @@ const Home = () => {
 			setDemos(localizedData.data.demos || []);
 			setBuilders(localizedData.data.builders || []);
 			setCategories(localizedData.data.categories || []);
+			setTheme(localizedData.theme);
 		}
 	}, [localizedData]);
 
@@ -118,7 +120,7 @@ const Home = () => {
 				</div>
 			) : (
 				<div className="flex h-screen content-container">
-					<Sidebar builders={builders} categories={categories} handleRefetch={handleRefetch} />
+					<Sidebar builders={builders} categories={categories} handleRefetch={handleRefetch} theme={theme} />
 					<Content demos={demos} />
 				</div>
 			)}
