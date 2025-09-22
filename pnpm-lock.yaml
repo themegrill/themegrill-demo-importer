@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@mierak/react-virtualized-grid':
+        specifier: 0.0.5-ALPHA
+        version: 0.0.5-ALPHA(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-checkbox':
         specifier: ^1.3.2
         version: 1.3.3(@types/react-dom@18.3.7(@types/react@18.3.24))(@types/react@18.3.24)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -41,12 +44,18 @@ importers:
       '@tanstack/react-router':
         specifier: ^1.45.11
         version: 1.131.27(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@tanstack/react-virtual':
+        specifier: ^3.13.12
+        version: 3.13.12(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@tanstack/router-devtools':
         specifier: ^1.45.11
         version: 1.131.27(@tanstack/react-router@1.131.27(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@tanstack/router-core@1.131.27)(csstype@3.1.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(solid-js@1.9.9)(tiny-invariant@1.3.3)
       '@tanstack/router-plugin':
         specifier: ^1.45.8
         version: 1.131.27(@tanstack/react-router@1.131.27(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(webpack@5.101.3)
+      '@virtual-grid/react':
+        specifier: ^2.0.3
+        version: 2.0.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       class-variance-authority:
         specifier: ^0.7.0
         version: 0.7.1
@@ -1553,8 +1562,17 @@ packages:
   '@jridgewell/trace-mapping@0.3.30':
     resolution: {integrity: sha512-GQ7Nw5G2lTu/BtHTKfXhKHok2WGetd4XYcVKGx00SjAk8GMwgJM3zr6zORiPGuOE+/vkc90KtTosSSvaCjKb2Q==}
 
+  '@juggle/resize-observer@3.4.0':
+    resolution: {integrity: sha512-dfLbk+PwWvFzSxwk3n5ySL0hfBog779o8h68wK/7/APo/7cgyWp5jcXockbxdk5kFRkbeXWm4Fbi9FrdN381sA==}
+
   '@leichtgewicht/ip-codec@2.0.5':
     resolution: {integrity: sha512-Vo+PSpZG2/fmgmiNzYK9qWRh8h/CHrwD0mo1h1DzL4yzHNSfWYujGTYsWGreD000gcgmZ7K4Ys6Tx9TxtsKdDw==}
+
+  '@mierak/react-virtualized-grid@0.0.5-ALPHA':
+    resolution: {integrity: sha512-K7TVmRooNKsfN/69dUPJzkKRFE9e9ZUrQclxxHn0Tok5EcDIhz95CK5YcNbWdNjlprf0WGFGJ9o6cZFZ7nK/6g==}
+    peerDependencies:
+      react: '>=16.8.0'
+      react-dom: '>=16.8.0'
 
   '@nicolo-ribaudo/eslint-scope-5-internals@5.1.1-v1':
     resolution: {integrity: sha512-54/JRvkLIzzDWshCWfuhadfrfZVPiElY8Fcgmg1HroEly/EDSszzhBAsarCux+D/kOslTRquNzuyGSmUSTTHGg==}
@@ -2486,6 +2504,12 @@ packages:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
       react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
+  '@tanstack/react-virtual@3.13.12':
+    resolution: {integrity: sha512-Gd13QdxPSukP8ZrkbgS2RwoZseTTbQPLnQEn7HY/rqtM+8Zt95f7xKC7N0EsKs7aoz0WzZ+fditZux+F8EzYxA==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+
   '@tanstack/router-cli@1.131.27':
     resolution: {integrity: sha512-/oSibgLtIiDup1hHr8MNIQItzl8jkPRZu97WGJsiP7jbKy0IqdT3g2tNnFMD1L+HA0/hyPHkLg+qrK4sQu2sXw==}
     engines: {node: '>=12'}
@@ -2550,6 +2574,9 @@ packages:
 
   '@tanstack/store@0.7.4':
     resolution: {integrity: sha512-F1XqZQici1Aq6WigEfcxJSml92nW+85Om8ElBMokPNg5glCYVOmPkZGIQeieYFxcPiKTfwo0MTOQpUyJtwncrg==}
+
+  '@tanstack/virtual-core@3.13.12':
+    resolution: {integrity: sha512-1YBOJfRHV4sXUmWsFSf5rQor4Ss82G8dQWLRbnk3GA4jeP8hQt1hxXh0tmflpC0dz3VgEv/1+qwPyLeWkQuPFA==}
 
   '@tanstack/virtual-file-routes@1.131.2':
     resolution: {integrity: sha512-VEEOxc4mvyu67O+Bl0APtYjwcNRcL9it9B4HKbNgcBTIOEalhk+ufBl4kiqc8WP1sx1+NAaiS+3CcJBhrqaSRg==}
@@ -2877,6 +2904,17 @@ packages:
     resolution: {integrity: sha512-Yy19y6O2GJq8f7CHf7L0nxL8bf4PZCPaVOCgJrusOeFHY1LvHgYXnmnXg6N5iwAnbgbZCDjo60SiM6IPJi9C5g==}
     peerDependencies:
       react: '>= 16.8.0'
+
+  '@virtual-grid/core@2.0.1':
+    resolution: {integrity: sha512-ZqhtuVGMVM89W/8PFljGqaWV0f8Jce+x68y4hWXpgCHlhSwpGrAKE5awgG1qHDsbTcM0kv1cL88KOFWknbnyWQ==}
+
+  '@virtual-grid/react@2.0.3':
+    resolution: {integrity: sha512-vIEW2dLbkc7UVvQy5xkA3q7mPiEWq5S0726m+2NOdXoYTbu/XkZEGwRq3W1o0SnGySBH9A/KIykKw5/0B1tHsg==}
+    peerDependencies:
+      react: ^17.0.2 || ^18.0.0
+
+  '@virtual-grid/shared@2.0.1':
+    resolution: {integrity: sha512-E0krspmtVOGRg/qAgDKUjhTRV7VXmFp7Q05ljT87Llffh8g5JoXVsAUPV7JiRKnrSRFShpiVdCy9eq0VvVeifA==}
 
   '@webassemblyjs/ast@1.14.1':
     resolution: {integrity: sha512-nuBEDgQfm1ccRp/8bCQrx1frohyufl4JlbMMZ4P1wpeOfDhF6FQkxZJ1b/e+PLwr6X1Nhw6OLme5usuBWYBvuQ==}
@@ -4314,6 +4352,10 @@ packages:
   depd@2.0.0:
     resolution: {integrity: sha512-g7nH6P6dyDioJogAAGprGpCtVImJhpPk/roCzdb3fIh61/s/nPsfR6onyMwkCAR/OlC3yBC0lESvUoQEAssIrw==}
     engines: {node: '>= 0.8'}
+
+  dequal@2.0.3:
+    resolution: {integrity: sha512-0je+qPKHEMohvfRTCEo3CrPG6cAzAYgmzKyxRiYSSDkS6eGJdyVJm7WaYA5ECaAD9wLB2T4EEeymA5aFVcYXCA==}
+    engines: {node: '>=6'}
 
   destroy@1.2.0:
     resolution: {integrity: sha512-2sJGJTaXIIaR1w4iJSNoN0hnMY7Gpc/n8D4qSCJw8QqFWXf7cuAgnEHxBpweaVcPevC2l3KpjYCx3NypQQgaJg==}
@@ -7542,6 +7584,15 @@ packages:
     peerDependencies:
       react: ^18.3.1
 
+  react-intersection-observer@9.16.0:
+    resolution: {integrity: sha512-w9nJSEp+DrW9KmQmeWHQyfaP6b03v+TdXynaoA964Wxt7mdR3An11z4NNCQgL4gKSK7y1ver2Fq+JKH6CWEzUA==}
+    peerDependencies:
+      react: ^17.0.0 || ^18.0.0 || ^19.0.0
+      react-dom: ^17.0.0 || ^18.0.0 || ^19.0.0
+    peerDependenciesMeta:
+      react-dom:
+        optional: true
+
   react-is@16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
 
@@ -8712,6 +8763,11 @@ packages:
       '@types/react':
         optional: true
 
+  use-deep-compare@1.3.0:
+    resolution: {integrity: sha512-94iG+dEdEP/Sl3WWde+w9StIunlV8Dgj+vkt5wTwMoFQLaijiEZSXXy8KtcStpmEDtIptRJiNeD4ACTtVvnIKA==}
+    peerDependencies:
+      react: '>=16.8.0'
+
   use-lilius@2.0.5:
     resolution: {integrity: sha512-IbPjJe4T6B0zQV6ahftVtHvCAxi6RAuDpEcO8TmnHh4nBtx7JbGdpbgXWOUj/9YjrzEbdT/lW7JWcBVbX3MbrA==}
     peerDependencies:
@@ -8722,6 +8778,12 @@ packages:
     resolution: {integrity: sha512-g66/K7ZQGYrI6dy8GLpVcMsBp4s17xNkYJVSMvTEevGy3nDxHOfE6z8BVE22+5G5x7t3+bhzrlTDB7ObrEE0cQ==}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
+
+  use-resize-observer@9.1.0:
+    resolution: {integrity: sha512-R25VqO9Wb3asSD4eqtcxk8sJalvIOYBqS8MNZlpDSQ4l4xMQxC/J7Id9HoTqPq8FwULIn0PVW+OAqF2dyYbjow==}
+    peerDependencies:
+      react: 16.8.0 - 18
+      react-dom: 16.8.0 - 18
 
   use-sidecar@1.1.3:
     resolution: {integrity: sha512-Fedw0aZvkhynoPYlA5WXrMCAMm+nSWdZt6lzJQ7Ok8S6Q+VsHmHpRWndVRJ8Be0ZbkfPc5LRYH+5XrzXcEeLRQ==}
@@ -11385,7 +11447,14 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
+  '@juggle/resize-observer@3.4.0': {}
+
   '@leichtgewicht/ip-codec@2.0.5': {}
+
+  '@mierak/react-virtualized-grid@0.0.5-ALPHA(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
 
   '@nicolo-ribaudo/eslint-scope-5-internals@5.1.1-v1':
     dependencies:
@@ -12394,6 +12463,12 @@ snapshots:
       react-dom: 18.3.1(react@18.3.1)
       use-sync-external-store: 1.5.0(react@18.3.1)
 
+  '@tanstack/react-virtual@3.13.12(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@tanstack/virtual-core': 3.13.12
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+
   '@tanstack/router-cli@1.131.27':
     dependencies:
       '@tanstack/router-generator': 1.131.27
@@ -12484,6 +12559,8 @@ snapshots:
       - supports-color
 
   '@tanstack/store@0.7.4': {}
+
+  '@tanstack/virtual-core@3.13.12': {}
 
   '@tanstack/virtual-file-routes@1.131.2': {}
 
@@ -12921,6 +12998,22 @@ snapshots:
     dependencies:
       '@use-gesture/core': 10.3.1
       react: 18.3.1
+
+  '@virtual-grid/core@2.0.1': {}
+
+  '@virtual-grid/react@2.0.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@tanstack/react-virtual': 3.13.12(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@virtual-grid/core': 2.0.1
+      '@virtual-grid/shared': 2.0.1
+      react: 18.3.1
+      react-intersection-observer: 9.16.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      use-deep-compare: 1.3.0(react@18.3.1)
+      use-resize-observer: 9.1.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+    transitivePeerDependencies:
+      - react-dom
+
+  '@virtual-grid/shared@2.0.1': {}
 
   '@webassemblyjs/ast@1.14.1':
     dependencies:
@@ -14831,6 +14924,8 @@ snapshots:
   depd@1.1.2: {}
 
   depd@2.0.0: {}
+
+  dequal@2.0.3: {}
 
   destroy@1.2.0: {}
 
@@ -18671,6 +18766,12 @@ snapshots:
       react: 18.3.1
       scheduler: 0.23.2
 
+  react-intersection-observer@9.16.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+    dependencies:
+      react: 18.3.1
+    optionalDependencies:
+      react-dom: 18.3.1(react@18.3.1)
+
   react-is@16.13.1: {}
 
   react-is@17.0.2: {}
@@ -20026,6 +20127,11 @@ snapshots:
     optionalDependencies:
       '@types/react': 18.3.24
 
+  use-deep-compare@1.3.0(react@18.3.1):
+    dependencies:
+      dequal: 2.0.3
+      react: 18.3.1
+
   use-lilius@2.0.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       date-fns: 3.6.0
@@ -20035,6 +20141,12 @@ snapshots:
   use-memo-one@1.1.3(react@18.3.1):
     dependencies:
       react: 18.3.1
+
+  use-resize-observer@9.1.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+    dependencies:
+      '@juggle/resize-observer': 3.4.0
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
 
   use-sidecar@1.1.3(@types/react@18.3.24)(react@18.3.1):
     dependencies:

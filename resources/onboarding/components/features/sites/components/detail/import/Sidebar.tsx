@@ -70,7 +70,7 @@ const Sidebar = ({
 			// Listen for confirmation
 			const handleMessage = (event: MessageEvent) => {
 				if (event.data.type === 'COLOR_PALETTE_UPDATED') {
-					// console.log('Color Palette updated successfully:', event.data.success);
+					console.info('Color Palette updated successfully:', event.data.success);
 					window.removeEventListener('message', handleMessage);
 				}
 			};
@@ -107,7 +107,7 @@ const Sidebar = ({
 			// Listen for confirmation
 			const handleMessage = (event: MessageEvent) => {
 				if (event.data.type === 'TYPOGRAPHY_UPDATED') {
-					console.log('Typography updated successfully:', event.data.success);
+					console.info('Typography updated successfully:', event.data.success);
 					window.removeEventListener('message', handleMessage);
 				}
 			};

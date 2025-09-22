@@ -123,7 +123,6 @@ const StartImport = ({
 				};
 
 				const data = await queryClient.ensureQueryData(importDataQueryOptions(params));
-				console.log(data);
 				results[action] = data;
 				if (action === 'complete') {
 					const localizedResponse = await queryClient.ensureQueryData(
