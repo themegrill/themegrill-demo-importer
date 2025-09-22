@@ -3,10 +3,13 @@ import { __ } from '@wordpress/i18n';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { DemoType } from '../../../../../../lib/types';
 import { Route } from '../../../../../../routes';
+import { Button } from '../../../../../ui/Button';
 import Demo from '../demos/Demo';
 
 type ContentProps = {
 	demos: DemoType[];
+	handleRefetch: () => void;
+	isRefetching: boolean;
 };
 
 export enum MediaQuerySizes {
@@ -50,7 +53,7 @@ const getResponsiveCardSize = (width: number) => {
 	};
 };
 
-const Content = ({ demos }: ContentProps) => {
+const Content = ({ demos, handleRefetch, isRefetching }: ContentProps) => {
 	const searchParams = Route.useSearch();
 	const search = searchParams.search || '';
 	const builder = searchParams.builder || '';
@@ -172,44 +175,52 @@ const Content = ({ demos }: ContentProps) => {
 					</div>
 				</div>
 			) : (
-				<div
-					ref={ref}
-					className="flex-1 p-14 sm:p-14 2xl:p-[88px] overflow-y-auto bg-[#fff] content-wrapper"
-				>
-					{containerSize.width > 0 && (
-						<div
-							style={{
-								position: 'relative',
-								height: `${rowVirtualizer.getTotalSize()}px`,
-								width: `${columnVirtualizer.getTotalSize()}px`,
-							}}
-						>
-							{rowVirtualizer.getVirtualItems().map((virtualRow) => (
-								<React.Fragment key={virtualRow.key}>
-									{columnVirtualizer.getVirtualItems().map((virtualColumn) => {
-										const item = grid.getVirtualItem({
-											row: virtualRow,
-											column: virtualColumn,
-										});
+				<>
+					<Button
+						className={`tg-refresh-btn absolute right-[108px] top-7 cursor-pointer bg-transparent border-1 border-solid h-10 border-[#5182ef] text-[#5182ef] text-[15px] hover:bg-[#5182ef] hover:text-white ${isRefetching ? 'pointer-events-none opacity-50' : ''}`}
+						onClick={handleRefetch}
+					>
+						{isRefetching ? 'Syncing...' : 'Sync'}
+					</Button>
+					<div
+						ref={ref}
+						className="flex-1 p-14 sm:p-14 2xl:p-[88px] overflow-y-auto bg-[#fff] content-wrapper"
+					>
+						{containerSize.width > 0 && (
+							<div
+								style={{
+									position: 'relative',
+									height: `${rowVirtualizer.getTotalSize()}px`,
+									width: `${columnVirtualizer.getTotalSize()}px`,
+								}}
+							>
+								{rowVirtualizer.getVirtualItems().map((virtualRow) => (
+									<React.Fragment key={virtualRow.key}>
+										{columnVirtualizer.getVirtualItems().map((virtualColumn) => {
+											const item = grid.getVirtualItem({
+												row: virtualRow,
+												column: virtualColumn,
+											});
 
-										if (!item) return null;
+											if (!item) return null;
 
-										const demoIndex = virtualRow.index * columns + virtualColumn.index;
-										const demo = newDemos[demoIndex];
+											const demoIndex = virtualRow.index * columns + virtualColumn.index;
+											const demo = newDemos[demoIndex];
 
-										if (!demo) return null;
+											if (!demo) return null;
 
-										return (
-											<div key={virtualColumn.key} style={item.style}>
-												<Demo demo={demo} />
-											</div>
-										);
-									})}
-								</React.Fragment>
-							))}
-						</div>
-					)}
-				</div>
+											return (
+												<div key={virtualColumn.key} style={item.style}>
+													<Demo demo={demo} />
+												</div>
+											);
+										})}
+									</React.Fragment>
+								))}
+							</div>
+						)}
+					</div>
+				</>
 			)}
 		</>
 	);

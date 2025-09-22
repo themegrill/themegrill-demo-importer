@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { localizedDataQueryOptions } from './components/features/api/import.api';
 import Content from './components/features/sites/components/listing/main/Content';
 import Sidebar from './components/features/sites/components/listing/main/Sidebar';
@@ -14,6 +14,7 @@ const Home = () => {
 	const builders = useMemo(() => localizedData?.data?.builders || [], [localizedData]);
 	const categories = useMemo(() => localizedData?.data?.categories || [], [localizedData]);
 	const theme = localizedData?.theme || 'all';
+	const [isRefetching, setIsRefetching] = useState(false);
 
 	const loading = useMemo(() => {
 		return !localizedData?.data;
@@ -28,10 +29,13 @@ const Home = () => {
 	}, [localizedData, demos.length, builders.length, categories.length]);
 
 	const handleRefetch = async () => {
+		queryClient.clear();
+		setIsRefetching(true);
 		const response = await queryClient.ensureQueryData(
 			localizedDataQueryOptions({ refetch: true }),
 		);
 		setLocalizedData(response);
+		setIsRefetching(false);
 	};
 
 	useEffect(() => {
@@ -111,7 +115,7 @@ const Home = () => {
 			) : (
 				<div className="flex h-screen content-container">
 					<Sidebar builders={builders} categories={categories} theme={theme} />
-					<Content demos={demos} />
+					<Content demos={demos} handleRefetch={handleRefetch} isRefetching={isRefetching} />
 				</div>
 			)}
 		</>
