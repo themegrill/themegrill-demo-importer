@@ -22,7 +22,7 @@ class Admin {
 		add_action( 'init', array( $this, 'setup' ), 5 );
 
 		// Add Demo Importer menu.
-		add_action( 'admin_menu', array( $this, 'admin_menu' ), 9 );
+		add_action( 'admin_menu', array( $this, 'admin_menu' ), 12 );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 
 		// Disable WooCommerce setup wizard.
@@ -40,20 +40,44 @@ class Admin {
 	 * Add menu item.
 	 */
 	public function admin_menu() {
+		global $menu;
+		$menu_exists = false;
+		$parent_slug = '';
 
-		// if ( apply_filters( 'themegrill_demo_importer_show_main_menu', true ) ) {
-		//  add_theme_page( __( 'Demo Importer', 'themegrill-demo-importer' ), __( 'Demo Importer', 'themegrill-demo-importer' ), 'switch_themes', 'demo-importer', array( $this, 'demo_importer' ) );
-		// }
-
-		$page = add_theme_page(
-			__( 'Starter Templates', 'themegrill-demo-importer' ),
-			__( 'Starter Templates', 'themegrill-demo-importer' ),
-			'switch_themes',
-			'tg-starter-templates',
-			function () {
-				echo '<div id="tg-demo-importer"></div>';
+		if ( isset( $menu ) && is_array( $menu ) ) {
+			foreach ( $menu as $menu_item ) {
+				if ( isset( $menu_item[2] ) && in_array( $menu_item[2], array( 'zakra', 'colormag' ), true ) ) {
+					$menu_exists = true;
+					$parent_slug = $menu_item[2];
+					remove_submenu_page( $parent_slug, $parent_slug . '-starter-templates' );
+					remove_submenu_page( $parent_slug, 'demo-importer-status' );
+					break;
+				}
 			}
-		);
+		}
+
+		if ( $menu_exists ) {
+			$page = add_submenu_page(
+				$parent_slug,
+				__( 'Starter Templates', 'themegrill-demo-importer' ),
+				__( 'Starter Templates', 'themegrill-demo-importer' ),
+				'switch_themes',
+				'tg-starter-templates',
+				function () {
+					echo '<div id="tg-demo-importer"></div>';
+				}
+			);
+		} else {
+			$page = add_theme_page(
+				__( 'Starter Templates', 'themegrill-demo-importer' ),
+				__( 'Starter Templates', 'themegrill-demo-importer' ),
+				'switch_themes',
+				'tg-starter-templates',
+				function () {
+					echo '<div id="tg-demo-importer"></div>';
+				}
+			);
+		}
 		add_action( "admin_print_scripts-$page", array( $this, 'enqueue_demo_importer_assets' ) );
 	}
 

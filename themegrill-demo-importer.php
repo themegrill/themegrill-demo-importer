@@ -151,3 +151,15 @@ add_action(
 	},
 	10
 );
+
+add_action(
+	'admin_menu',
+	function () {
+		if ( isset( $_GET['page'] ) && in_array( sanitize_key( wp_unslash( $_GET['page'] ) ), array( 'colormag-starter-templates', 'zakra-starter-templates', 'demo-importer' ), true ) ) { //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$redirect_url = admin_url( 'admin.php?page=tg-starter-templates' );
+			wp_safe_redirect( $redirect_url );
+			exit;
+		}
+	},
+	PHP_INT_MIN
+);
