@@ -33,7 +33,7 @@ Bugs can be reported either in our support forum or preferably on the [GitHub re
 Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/themegrill-demo-importer/) :)
 
 == Changelog ==
-= 2.0.0 - 21-11-2024 =
+= 2.0.0 - 22-09-2025 =
 * Enhance - Complete design revamp of importer interface with modern amd intuitive layout.
 * Feature - New import progress tracking with real-time status updates and completion indicators.
 * Feature - Enhanced import flow with step-by-step guidance and visual feedback.
