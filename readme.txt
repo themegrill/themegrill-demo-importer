@@ -38,6 +38,21 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 * Feature - New import progress tracking with real-time status updates and completion indicators.
 * Feature - Enhanced import flow with step-by-step guidance and visual feedback.
 
+= 1.9.14 - 01-08-2025 =
+* Fix   - PHP 8.0+ compatibility issue with deprecated libxml_disable_entity_loader() function
+
+= 1.9.13 - 30-06-2025 =
+* Fix   - Spacious widget import issue
+
+= 1.9.12 - 13-05-2025 =
+* Fix   - Colormag Footer builder menu 1 component import issue
+
+= 1.9.11 - 13-05-2025 =
+* Tweak   - Update WordPress tested upto version to 6.8.
+
+= 1.9.10 - 13-05-2025 =
+* Fix - Compatibility with magazine blocks.
+
 = 1.9.9 - 21-11-2024 =
 * Fix - Footer widget menu import issue.
 
