@@ -25,10 +25,10 @@ const ImportSkeleton = () => {
 					<div>
 						<div className="w-[139px] h-[18px] bg-[#E7E8E9] rounded-sm animate-pulse mb-5"></div>
 						<div className="grid grid-cols-2 gap-[14px] ">
-							{Array.from({ length: 4 }).map((_, outerIndex) => (
+							{Array.from({ length: 4 }).map((_, index) => (
 								<div
 									className="h-[46px] w-[144px] bg-[#E7E8E9] rounded-md animate-pulse "
-									key={outerIndex}
+									key={index}
 								></div>
 							))}
 						</div>
@@ -36,8 +36,11 @@ const ImportSkeleton = () => {
 					<div>
 						<div className="w-[139px] h-[18px] bg-[#E7E8E9] rounded-sm animate-pulse mb-5"></div>
 						<div className="grid grid-cols-3 gap-[14px] ">
-							{Array.from({ length: 6 }).map((_, outerIndex) => (
-								<div className="h-[46px] w-[92px] bg-[#E7E8E9] rounded-md animate-pulse "></div>
+							{Array.from({ length: 6 }).map((_, index) => (
+								<div
+									className="h-[46px] w-[92px] bg-[#E7E8E9] rounded-md animate-pulse "
+									key={index}
+								></div>
 							))}
 						</div>
 						{/* <div className="w-[139px] h-[18px] bg-[#E7E8E9] rounded-sm animate-pulse mt-5 mb-4"></div>

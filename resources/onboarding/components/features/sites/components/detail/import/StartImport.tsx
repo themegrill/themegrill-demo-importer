@@ -153,6 +153,7 @@ const StartImport = ({
 		setImportProgressImportDetail(step.importDetail);
 		setImportProgress(0);
 		setIsImportFailed(false);
+		queryClient.clear();
 		handleCleanup();
 	};
 
