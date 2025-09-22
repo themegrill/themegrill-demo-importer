@@ -126,7 +126,7 @@ class Admin {
 	}
 
 	/**
-	 * Disable the WooCommerce Setup Wizard on `ThemeGrill Demo Importer` page only.
+	 * Disable the WooCommerce Setup Wizard on `Starter Templates & Sites Pack by ThemeGrill` page only.
 	 */
 	public function woocommerce_disable_setup_wizard() {
 
@@ -247,7 +247,7 @@ class Admin {
 				}
 			);
 
-			set_transient( 'themegrill_demo_importer_demos', $demos );
+			set_transient( 'themegrill_demo_importer_demos', $demos, WEEK_IN_SECONDS );
 
 		}
 		$data = static::get_filtered_data( $demos, $template );

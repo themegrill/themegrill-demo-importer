@@ -110,12 +110,7 @@ const Home = () => {
 				</div>
 			) : (
 				<div className="flex h-screen content-container">
-					<Sidebar
-						builders={builders}
-						categories={categories}
-						handleRefetch={handleRefetch}
-						theme={theme}
-					/>
+					<Sidebar builders={builders} categories={categories} theme={theme} />
 					<Content demos={demos} />
 				</div>
 			)}

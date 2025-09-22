@@ -13,11 +13,10 @@ declare const require: any;
 type Props = {
 	builders: PagebuilderCategory[];
 	categories: PagebuilderCategory[];
-	handleRefetch: () => void;
 	theme: string;
 };
 
-const Sidebar = ({ builders, categories, handleRefetch, theme }: Props) => {
+const Sidebar = ({ builders, categories, theme }: Props) => {
 	const navigate = Route.useNavigate();
 	const searchParams = Route.useSearch();
 	const search = searchParams.search || '';

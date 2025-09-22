@@ -80,7 +80,7 @@ const FeatureSidebar = ({ demo, plugins, setPlugins, onOpen, setShowFeatureLayou
 					className="mt-4 cursor-pointer text-[14px] text-[#6B6B6B] leading-[19px] border-0 bg-transparent font-normal w-full p-0 h-5 hover:bg-transparent hover:border-0"
 					onClick={() => setShowFeatureLayout(false)}
 				>
-					{__('Cancel', 'themegrill-demo-importer')}
+					{__('Back', 'themegrill-demo-importer')}
 				</Button>
 			</div>
 		</div>
