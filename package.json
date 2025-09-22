@@ -66,6 +66,7 @@
     "@tanstack/react-router": "^1.45.11",
     "@tanstack/router-devtools": "^1.45.11",
     "@tanstack/router-plugin": "^1.45.8",
+    "@virtual-grid/react": "^2.0.3",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "lottie-react": "^2.4.0",
