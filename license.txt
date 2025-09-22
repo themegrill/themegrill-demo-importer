@@ -1,4 +1,4 @@
-ThemeGrill Demo Importer - Importer for WordPress
+Starter Templates & Sites Pack by ThemeGrill
 
 Copyright 2019 by the contributors
 
@@ -18,11 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 This program incorporates work covered by the following copyright and
 permission notices:
 
-  ThemeGrill Demo Importer - Importer for WordPress
+  Starter Templates & Sites Pack by ThemeGrill
 
-  ThemeGrill Demo Importer is Copyright (c) 2016 ThemeGrill
+  Starter Templates & Sites Pack by ThemeGrill is Copyright (c) 2016 ThemeGrill
 
-  ThemeGrill Demo Importer is released under the GPL
+  Starter Templates & Sites Pack by ThemeGrill is released under the GPL
 
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 

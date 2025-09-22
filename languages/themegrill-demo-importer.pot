@@ -2,7 +2,7 @@
 # This file is distributed under the GPLv3 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: ThemeGrill Demo Importer 1.8.0\n"
+"Project-Id-Version: Starter Templates & Sites Pack by ThemeGrill 1.8.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/themegrill-demo-importer\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,7 +18,7 @@ msgstr ""
 #. translators: %s: official ThemeGrill themes URL
 #: includes/class-demo-importer.php:243
 #: includes/class-themegrill-demo-importer.php:292
-msgid "ThemeGrill Demo Importer"
+msgid "Starter Templates & Sites Pack by ThemeGrill"
 msgstr ""
 
 #. Plugin URI of the plugin
@@ -450,7 +450,7 @@ msgid "Script Debug Mode Enabled:"
 msgstr ""
 
 #: includes/admin/views/html-admin-page-system-status-report.php:175
-msgid "ThemeGrill Demo Importer Version:"
+msgid "Starter Templates & Sites Pack by ThemeGrill Version:"
 msgstr ""
 
 #: includes/admin/views/html-admin-page-system-status-report.php:186
@@ -591,7 +591,7 @@ msgstr ""
 msgid "Confirm!"
 msgstr ""
 
-#. translators: 1: ThemeGrill Demo Importer 2: five stars
+#. translators: 1: Starter Templates & Sites Pack by ThemeGrill 2: five stars
 #: includes/class-demo-importer.php:242
 msgid "If you like %1$s please leave us a %2$s rating. A huge thanks in advance!"
 msgstr ""
@@ -601,7 +601,7 @@ msgid "Thanks :)"
 msgstr ""
 
 #: includes/class-demo-importer.php:247
-msgid "Thank you for importing with ThemeGrill Demo Importer."
+msgid "Thank you for importing with Starter Templates & Sites Pack by ThemeGrill."
 msgstr ""
 
 #: includes/class-demo-importer.php:267
@@ -611,12 +611,12 @@ msgstr ""
 
 #. translators: %s: Documentation URL
 #: includes/class-demo-importer.php:272
-msgid "Should you need help understanding, using, or extending ThemeGrill Demo Importer, <a href=\"%s\">please read our documentation</a>. You will find all kinds of resources including snippets, tutorials and much more."
+msgid "Should you need help understanding, using, or extending Starter Templates & Sites Pack by ThemeGrill, <a href=\"%s\">please read our documentation</a>. You will find all kinds of resources including snippets, tutorials and much more."
 msgstr ""
 
 #. translators: 1: WP support URL. 2: TG support URL
 #: includes/class-demo-importer.php:277
-msgid "For further assistance with ThemeGrill Demo Importer core you can use the <a href=\"%1$s\">community forum</a>. If you need help with premium themes sold by ThemeGrill, please <a href=\"%2$s\">use our free support forum</a>."
+msgid "For further assistance with Starter Templates & Sites Pack by ThemeGrill core you can use the <a href=\"%1$s\">community forum</a>. If you need help with premium themes sold by ThemeGrill, please <a href=\"%2$s\">use our free support forum</a>."
 msgstr ""
 
 #: includes/class-demo-importer.php:281
@@ -634,7 +634,7 @@ msgstr ""
 
 #. translators: %s: GitHub links
 #: includes/class-demo-importer.php:293
-msgid "If you find a bug within ThemeGrill Demo Importer you can create a ticket via <a href=\"%1$s\">Github issues</a>. Ensure you read the <a href=\"%2$s\">contribution guide</a> prior to submitting your report. To help us solve your issue, please be as descriptive as possible."
+msgid "If you find a bug within Starter Templates & Sites Pack by ThemeGrill you can create a ticket via <a href=\"%1$s\">Github issues</a>. Ensure you read the <a href=\"%2$s\">contribution guide</a> prior to submitting your report. To help us solve your issue, please be as descriptive as possible."
 msgstr ""
 
 #: includes/class-demo-importer.php:297
