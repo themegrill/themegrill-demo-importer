@@ -91,7 +91,7 @@ class ThemeModsImporter {
 			}
 		}
 
-		if ( !empty( $data['nav_menu_locations'] ) && is_array( $data['nav_menu_locations'] ) ) {
+		if ( ! empty( $data['nav_menu_locations'] ) && is_array( $data['nav_menu_locations'] ) ) {
 			foreach ( $data['nav_menu_locations'] as $location => $menu_id ) {
 				if ( isset( $term_id_map[ $menu_id ] ) ) {
 					$data['nav_menu_locations'][ $location ] = $term_id_map[ $menu_id ];
@@ -104,18 +104,14 @@ class ThemeModsImporter {
 			$data['colormag_footer_menu'] = $footer_menu_id;
 		}
 
+		$mods = [];
 		// Loop through theme mods and update them.
 		foreach ( $data as $key => $value ) {
-			set_theme_mod( $key, $value );
+			$mods[ $key ] = $value;
 		}
 
 		if ( ! empty( $args['custom_logo'] ) ) {
-			$theme_mods = get_theme_mods();
-			$post_id    = $theme_mods['custom_logo'] ?? null;
-
-			if ( $post_id ) {
-				set_theme_mod( 'custom_logo', $args['custom_logo'] );
-			}
+				$mods['custom_logo'] = $args['custom_logo'];
 		}
 
 		if ( ! empty( $args['color_palette'] ) ) {
@@ -136,13 +132,13 @@ class ThemeModsImporter {
 			$existing_custom   = isset( $data[ $color_palette_key ]['custom'] ) ? $data[ $color_palette_key ]['custom'] : [];
 			$existing_custom[] = $new_custom;
 
-			$new_value = [
+			$new_value                  = [
 				'id'     => $id,
 				'name'   => 'Starter Colors',
 				'colors' => $colors,
 				'custom' => $existing_custom,
 			];
-			set_theme_mod( $color_palette_key, $new_value );
+			$mods[ $color_palette_key ] = $new_value;
 		}
 
 		if ( ! empty( $args['typography'] ) ) {
@@ -169,13 +165,16 @@ class ThemeModsImporter {
 			$heading_typography_key = $typography_keys[ $demo_data['theme_slug'] ]['heading'];
 
 			$body_typography_value                = isset( $data[ $body_typography_key ] ) ? $data[ $body_typography_key ] : [];
-			$body_typography_value['font-family'] = $args['typography'][0];
-			set_theme_mod( $body_typography_key, $body_typography_value );
+			$body_typography_value['font-family'] = 'System' === $args['typography'][1] ? 'inherit' : $args['typography'][1];
+			$mods[ $body_typography_key ]         = $body_typography_value;
 
 			$heading_typography_value                = isset( $data[ $heading_typography_key ] ) ? $data[ $heading_typography_key ] : [];
-			$heading_typography_value['font-family'] = $args['typography'][1];
-			set_theme_mod( $heading_typography_key, $heading_typography_value );
+			$heading_typography_value['font-family'] = 'System' === $args['typography'][0] ? 'inherit' : $args['typography'][0];
+			$mods[ $heading_typography_key ]         = $heading_typography_value;
+
 		}
+
+		update_option( 'themegrill_starter_template_theme_mods', $mods );
 	}
 
 	/**

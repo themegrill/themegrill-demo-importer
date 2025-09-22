@@ -15,6 +15,7 @@ class ImportHooks {
 		add_action( 'themegrill_ajax_before_demo_import', array( $this, 'delete_nav_menus' ), 20 );
 		add_action( 'themegrill_ajax_before_demo_import', array( $this, 'remove_theme_mods' ), 30 );
 
+		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_customizer_data' ), 9 );
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_nav_menu_items' ) );
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'set_elementor_load_fa4_shim' ) );
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'set_elementor_active_kit' ) );
@@ -74,6 +75,13 @@ class ImportHooks {
 		);
 	}
 
+	public function update_customizer_data() {
+		$theme_mods = get_option( 'themegrill_starter_template_theme_mods' );
+		foreach ( $theme_mods as $key => $value ) {
+			set_theme_mod( $key, $value );
+		}
+		delete_option( 'themegrill_starter_template_theme_mods' );
+	}
 	/**
 	 * Update demo importer options.
 	 *
