@@ -5,32 +5,6 @@ import ImportSkeleton from '../components/features/sites/components/detail/impor
 import { queryClient } from '../lib/query-client';
 import { PluginItem } from '../lib/types';
 
-const mergePlugins = (
-	pluginsList: PluginItem[],
-	plugins: Record<string, { name: string; description: string }>,
-): PluginItem[] => {
-	const uniquePlugins = new Map();
-
-	// Add existing pluginsList items to the map
-	pluginsList.forEach((item) => {
-		uniquePlugins.set(item.plugin, { ...item, isMandatory: false });
-	});
-
-	// Add/Override with plugins from the API object with isSelected and isMandatory true
-	Object.entries(plugins).forEach(([pluginPath, pluginData]) => {
-		uniquePlugins.set(pluginPath, {
-			plugin: pluginPath,
-			name: pluginData.name,
-			description: pluginData.description,
-			isSelected: true,
-			isMandatory: true,
-		});
-	});
-
-	// Convert Map values back to array
-	return Array.from(uniquePlugins.values());
-};
-
 export const Route = createFileRoute('/import/$theme/$id')({
 	component: RouteComponent,
 	loader: async ({ params }) => {
@@ -48,13 +22,18 @@ export const Route = createFileRoute('/import/$theme/$id')({
 					name: pluginData.name,
 					description: pluginData.description,
 					isSelected: true,
-					isMandatory: true,
+					isMandatory: pluginData.mandatory,
 				}),
 			);
 
+			const sortedPlugins = newPlugins.sort((a, b) => {
+				if (a.isMandatory === b.isMandatory) return 0;
+				return a.isMandatory ? -1 : 1;
+			});
+
 			return {
 				demo: data?.data,
-				plugins: newPlugins || [],
+				plugins: sortedPlugins || [],
 				pages: data?.data?.pages || [],
 				isEmpty,
 			};
@@ -68,8 +47,8 @@ export const Route = createFileRoute('/import/$theme/$id')({
 		return (
 			<div className="flex items-center justify-center h-screen">
 				<div className="text-center">
-					<h2>Unable to Load Demo</h2>
-					<p>{error.message}</p>
+					<h2>Something went wrong.</h2>
+					{/* <p>{error.message}</p> */}
 					<button onClick={() => window.location.reload()}>Try Again</button>
 				</div>
 			</div>
