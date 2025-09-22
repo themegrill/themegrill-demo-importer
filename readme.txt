@@ -35,8 +35,8 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 == Changelog ==
 = 2.0.0 - 22-09-2025 =
 * Enhance - Complete design revamp of importer interface with modern amd intuitive layout.
-* Feature - New import progress tracking with real-time status updates and completion indicators.
-* Feature - Enhanced import flow with step-by-step guidance and visual feedback.
+* Enhance - Enhanced import flow with step-by-step guidance and visual feedback.
+* Feature - New import progress tracking with import updates and completion indicators.
 
 = 1.9.14 - 01-08-2025 =
 * Fix   - PHP 8.0+ compatibility issue with deprecated libxml_disable_entity_loader() function
