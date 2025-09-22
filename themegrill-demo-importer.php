@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Starter Templates & Sites Pack by ThemeGrill
  * Plugin URI: https://themegrill.com/demo-importer/
- * Description: Import ThemeGrill official themes demo content, widgets and theme settings with just one click.
+ * Description: Premium starter sites and website templates by ThemeGrill. Import demo content, widgets, and theme settings with one click.
  * Version: 2.0.0
  * Author: ThemeGrill
  * Author URI: https://themegrill.com

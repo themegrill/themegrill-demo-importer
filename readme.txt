@@ -8,7 +8,7 @@ Stable tag: 1.9.9
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-Import ThemeGrill official themes demo content, widgets and theme settings with just one click.
+Premium starter sites and website templates by ThemeGrill. Import demo content, widgets, and theme settings with one click.
 
 == Description ==
 
