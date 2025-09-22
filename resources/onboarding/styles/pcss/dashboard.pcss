@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter&family=Lato&family=Dancing+Script&family=Story+Script&family=Playfair+Display&family=IBM+Plex+Sans+Thai+Looped&family=Raleway&family=DM+Sans&family=Nunito&family=Quando&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter&family=Lato&family=Manrope&family=Montserrat&family=Roboto&family=Poppins&family=Merriweather&family=DM+Serif+Display&family=Nunito&family=DM+Sans&display=swap');
 
 @layer {
 	:root {
@@ -146,12 +146,19 @@
 	@container content-container (max-width: 1600px) {
 		.content-wrapper {
 			padding: 54px;
+			padding-top: 70px;
 			gap: 32px;
+		}
+		.tg-refresh-btn {
+			@apply absolute right-[68px] top-5;
 		}
 	}
 	@container content-container (max-width: 1200px) {
 		.content-wrapper {
 			@apply grid-cols-2;
+		}
+		.tg-refresh-btn {
+			@apply absolute right-[72px] top-2;
 		}
 	}
 	@container content-container (max-width: 992px) {

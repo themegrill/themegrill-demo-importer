@@ -127,14 +127,14 @@ const Import = () => {
 
 	const typography = [
 		defaultTypography,
-		['Rubik', 'Lato'],
-		['PT Serif', 'Roboto'],
-		['IBM Plex Serif', 'Inter'],
-		['Bitter', 'Public Sans'],
-		['Outfit', 'DM Sans'],
+		['Manrope', 'Inter'],
+		['Montserrat', 'Lato'],
+		['Poppins', 'Roboto'],
+		['Merriweather', 'Nunito'],
+		['DM Serif Display', 'DM Sans'],
 	];
 
-	const supportedThemes = ['colormag', 'elearning'];
+	const supportedThemes = ['elearning'];
 	const isThemeSupported = supportedThemes.includes(theme || '');
 
 	const [selectedPaletteIndex, setSelectedPaletteIndex] = useState<number>(0);

@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
+import { __ } from '@wordpress/i18n';
 import { siteDataQueryOptions } from '../components/features/api/site.api';
 import Import from '../components/features/sites/components/detail/import/Import';
 import ImportSkeleton from '../components/features/sites/components/detail/import/ImportSkeleton';
@@ -47,9 +48,11 @@ export const Route = createFileRoute('/import/$theme/$id')({
 		return (
 			<div className="flex items-center justify-center h-screen">
 				<div className="text-center">
-					<h2>Something went wrong.</h2>
+					<h2>{__('Something went wrong.', 'themegrill-demo-importer')}</h2>
 					{/* <p>{error.message}</p> */}
-					<button onClick={() => window.location.reload()}>Try Again</button>
+					<button onClick={() => window.location.reload()}>
+						{__('Try Again', 'themegrill-demo-importer')}
+					</button>
 				</div>
 			</div>
 		);

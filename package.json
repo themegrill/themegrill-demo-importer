@@ -18,7 +18,8 @@
     "prettier:fix": "prettier --write \"**/*.+(ts|tsx)\"",
     "release": "gulp release",
     "watch:routes": "tsr watch",
-    "build:routes": "tsr generate"
+    "build:routes": "tsr generate",
+    "makepot": "wp i18n make-pot ./ languages/themegrill-demo-importer.pot --exclude=node_modules,vendor"
   },
   "keywords": [],
   "author": "",
