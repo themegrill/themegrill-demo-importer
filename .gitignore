@@ -10,6 +10,7 @@ project.properties
 *.sublime-project
 *.sublime-workspace
 .sublimelinterrc
+dist
 
 # Grunt
 /node_modules/
@@ -29,3 +30,9 @@ Thumbs.db
 
 # Dist
 themegrill-demo-importer.zip
+
+build
+
+.tanstack
+
+release

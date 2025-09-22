@@ -1,9 +1,9 @@
 <?php
 /**
- * Plugin Name: ThemeGrill Demo Importer
+ * Plugin Name: Starter Templates & Sites Pack by ThemeGrill
  * Plugin URI: https://themegrill.com/demo-importer/
- * Description: Import ThemeGrill official themes demo content, widgets and theme settings with just one click.
- * Version: 1.9.14
+ * Description: Premium starter sites and website templates by ThemeGrill. Import demo content, widgets, and theme settings with one click.
+ * Version: 2.0.0
  * Author: ThemeGrill
  * Author URI: https://themegrill.com
  * License: GPLv3 or later
@@ -17,35 +17,47 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-// Define TGDM_PLUGIN_FILE.
-if ( ! defined( 'TGDM_PLUGIN_FILE' ) ) {
-	define( 'TGDM_PLUGIN_FILE', __FILE__ );
+const TGDM_VERSION     = '2.0.0';
+const TGDM_PLUGIN_FILE = __FILE__;
+define( 'TGDM_ABSPATH', plugin_dir_path( __FILE__ ) );
+define( 'TGDM_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
+// const THEMEGRILL_BASE_URL = 'http://themegrill-demos-api.test';
+const THEMEGRILL_BASE_URL = 'https://themegrilldemos.com';
+const ZAKRA_BASE_URL      = 'https://zakrademos.com';
+const TGDM_NAMESPACE      = '/wp-json/themegrill-demos/v1';
+
+if ( version_compare( PHP_VERSION, '8.1.0', '<' ) ) {
+	add_action(
+		'admin_notices',
+		function () {
+			echo '<div class="notice notice-error is-dismissible">';
+			echo '<p><strong>Starter Templates & Sites Pack by ThemeGrill Activation Error:</strong> This plugin requires PHP 8.1.0 or higher. Your current version is ' . PHP_VERSION . '.</p>';
+			echo '<p>Please contact your hosting provider to upgrade PHP.</p>';
+			echo '</div>';
+		}
+	);
+
+	add_action(
+		'admin_init',
+		function () {
+			deactivate_plugins( plugin_basename( __FILE__ ) );
+			if ( isset( $_GET['activate'] ) ) { //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				unset( $_GET['activate'] );
+			}
+		}
+	);
+
+	return;
 }
 
-// Include the main ThemeGrill Demo Importer class.
-if ( ! class_exists( 'ThemeGrill_Demo_Importer' ) ) {
-	include_once __DIR__ . '/includes/class-themegrill-demo-importer.php';
-}
+require_once __DIR__ . '/vendor/autoload.php';
 
-/**
- * Main instance of ThemeGrill Demo importer.
- *
- * Returns the main instance of TGDM to prevent the need to use globals.
- *
- * @since  1.3.4
- * @return ThemeGrill_Demo_Importer
- */
-function tgdm() {
-	return ThemeGrill_Demo_Importer::instance();
-}
-
-// Global for backwards compatibility.
-$GLOBALS['themegrill-demo-importer'] = tgdm();
+\ThemeGrill\Demo\Importer\App::instance();
 
 add_filter(
 	'wp_import_post_data_processed',
-	function ( $post_data, $post, $term_id_map ) {
-		if ( isset( $post_data['post_content'] ) && has_blocks( $post_data['post_content'] ) ) {
+	function ( $post_data, $post, $term_id_map = null ) {
+		if ( isset( $post_data['post_content'] ) && has_blocks( $post_data['post_content'] ) && $term_id_map ) {
 			$blocks = parse_blocks( $post_data['post_content'] );
 			update_block_term_ids( $blocks, $term_id_map );
 			$post_data['post_content'] = serialize_blocks( $blocks );
@@ -58,42 +70,73 @@ add_filter(
 
 function update_block_term_ids( array &$blocks, array $term_id_map ) {
 	foreach ( $blocks as &$block ) {
-		if ( isset( $block['blockName'] ) && str_starts_with( $block['blockName'], 'magazine-blocks/' ) ) {
-			if ( isset( $block['attrs'] ) ) {
-				$key1 = array( 'category', 'category2', 'tag', 'tag2' );
+		if ( isset( $block['blockName'] ) ) {
+			if ( str_starts_with( $block['blockName'], 'magazine-blocks/' ) ) {
+				if ( isset( $block['attrs'] ) ) {
+					$key1 = array( 'category', 'category2', 'tag', 'tag2', 'authorName' );
 
-				foreach ( $key1 as $key ) {
-					if ( isset( $block['attrs'][ $key ] ) && isset( $term_id_map[ $block['attrs'][ $key ] ] ) ) {
-						$block['attrs'][ $key ] = (string) $term_id_map[ $block['attrs'][ $key ] ];
+					foreach ( $key1 as $key ) {
+						if ( 'authorName' === $key && isset( $block['attrs'][ $key ] ) ) {
+							$block['attrs'][ $key ] = (string) get_current_user_id();
+							break;
+						}
+						if ( isset( $block['attrs'][ $key ] ) && isset( $term_id_map[ $block['attrs'][ $key ] ] ) ) {
+							$block['attrs'][ $key ] = (string) $term_id_map[ $block['attrs'][ $key ] ];
+						}
+					}
+
+					$key2 = array( 'excludedCategory', 'excludedCategory2' );
+
+					foreach ( $key2 as $key ) {
+						if ( isset( $block['attrs'][ $key ] ) && is_array( $block['attrs'][ $key ] ) ) {
+							$block['attrs'][ $key ] = array_map(
+								function ( $cat_id ) use ( $term_id_map ) {
+									return isset( $term_id_map[ $cat_id ] ) ? (string) $term_id_map[ $cat_id ] : false;
+								},
+								$block['attrs'][ $key ]
+							);
+						}
 					}
 				}
 
-				$key2 = array( 'excludedCategory', 'excludedCategory2' );
-
-				foreach ( $key2 as $key ) {
-					if ( isset( $block['attrs'][ $key ] ) && is_array( $block['attrs'][ $key ] ) ) {
-						$block['attrs'][ $key ] = array_map(
-							function ( $cat_id ) use ( $term_id_map ) {
-								return isset( $term_id_map[ $cat_id ] ) ? (string) $term_id_map[ $cat_id ] : false;
-							},
-							$block['attrs'][ $key ]
-						);
-					}
+				// Recursively update inner blocks
+				if ( ! empty( $block['innerBlocks'] ) ) {
+					update_block_term_ids( $block['innerBlocks'], $term_id_map );
 				}
 			}
+			if ( 'core/group' === $block['blockName'] ) {
+				if ( ! empty( $block['innerBlocks'] ) ) {
+					foreach ( $block['innerBlocks'] as &$inner_block ) {
+						if ( 'core/legacy-widget' === $inner_block['blockName'] ) {
+							if ( isset( $inner_block['attrs']['idBase'] ) && 'nav_menu' === $inner_block['attrs']['idBase'] ) {
+								if ( isset( $inner_block['attrs']['instance']['raw']['nav_menu'] ) ) {
+									$current_menu_id = $inner_block['attrs']['instance']['raw']['nav_menu'];
+									if ( isset( $term_id_map[ $current_menu_id ] ) ) {
+										$new_menu_id = $term_id_map[ $current_menu_id ];
+										$inner_block['attrs']['instance']['raw']['nav_menu'] = $new_menu_id;
 
-			// Recursively update inner blocks
-			if ( ! empty( $block['innerBlocks'] ) ) {
-				update_block_term_ids( $block['innerBlocks'], $term_id_map );
+										// Preserve existing raw data and update nav_menu
+										$new_data             = $inner_block['attrs']['instance']['raw'];
+										$new_data['nav_menu'] = $new_menu_id;
+
+										// Update encoded and hash with complete data
+										$inner_block['attrs']['instance']['encoded'] = base64_encode( serialize( $new_data ) );
+										$inner_block['attrs']['instance']['hash']    = wp_hash( serialize( $new_data ) );
+
+									}
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 	}
 }
 
-
 add_action(
 	'themegrill_widget_importer_after_widgets_import',
-	function ( $term_id_map, $post_id_map ) {
+	function ( $term_id_map ) {
 		$widget_blocks = get_option( 'widget_block', array() );
 		if ( ! empty( $widget_blocks ) ) {
 			foreach ( $widget_blocks as $index => $widget ) {
@@ -105,54 +148,18 @@ add_action(
 			}
 			update_option( 'widget_block', $widget_blocks );
 		}
+	},
+	10
+);
 
-		$widget_spacious_service_widget = get_option( 'widget_spacious_service_widget', array() );
-		if ( ! empty( $widget_spacious_service_widget ) ) {
-			foreach ( $widget_spacious_service_widget as $index => $widget ) {
-				if ( ! empty( $widget ) && is_array( $widget ) ) {
-					$keys = array( 'page_id0', 'page_id1', 'page_id2', 'page_id3', 'page_id4', 'page_id5' );
-					foreach ( $widget as $key => $value ) {
-						if ( in_array( $key, $keys, true ) && isset( $post_id_map[ $value ] ) ) {
-							$widget[ $key ] = (string) $post_id_map[ $value ];
-						}
-					}
-					$widget_spacious_service_widget[ $index ] = $widget;
-				}
-			}
-			update_option( 'widget_spacious_service_widget', $widget_spacious_service_widget );
-		}
-
-		$widget_spacious_recent_work_widget = get_option( 'widget_spacious_recent_work_widget', array() );
-		if ( ! empty( $widget_spacious_recent_work_widget ) ) {
-			foreach ( $widget_spacious_recent_work_widget as $index => $widget ) {
-				if ( ! empty( $widget ) && is_array( $widget ) ) {
-					$keys = array( 'page_id0', 'page_id1', 'page_id2' );
-					foreach ( $widget as $key => $value ) {
-						if ( in_array( $key, $keys, true ) && isset( $post_id_map[ $value ] ) ) {
-							$widget[ $key ] = (string) $post_id_map[ $value ];
-						}
-					}
-					$widget_spacious_recent_work_widget[ $index ] = $widget;
-				}
-			}
-			update_option( 'widget_spacious_recent_work_widget', $widget_spacious_recent_work_widget );
-		}
-
-		$widget_spacious_featured_single_page_widget = get_option( 'widget_spacious_featured_single_page_widget', array() );
-		if ( ! empty( $widget_spacious_featured_single_page_widget ) ) {
-			foreach ( $widget_spacious_featured_single_page_widget as $index => $widget ) {
-				if ( ! empty( $widget ) && is_array( $widget ) ) {
-					foreach ( $widget as $key => $value ) {
-						if ( 'page_id' === $key && isset( $post_id_map[ $value ] ) ) {
-							$widget[ $key ] = (string) $post_id_map[ $value ];
-						}
-					}
-					$widget_spacious_featured_single_page_widget[ $index ] = $widget;
-				}
-			}
-			update_option( 'widget_spacious_featured_single_page_widget', $widget_spacious_featured_single_page_widget );
+add_action(
+	'admin_menu',
+	function () {
+		if ( isset( $_GET['page'] ) && in_array( sanitize_key( wp_unslash( $_GET['page'] ) ), array( 'colormag-starter-templates', 'zakra-starter-templates', 'demo-importer' ), true ) ) { //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$redirect_url = admin_url( 'admin.php?page=tg-starter-templates' );
+			wp_safe_redirect( $redirect_url );
+			exit;
 		}
 	},
-	10,
-	2
+	PHP_INT_MIN
 );

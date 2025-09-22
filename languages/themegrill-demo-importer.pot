@@ -1,1159 +1,335 @@
-# Copyright (C) 2022 ThemeGrill
+# Copyright (C) 2025 ThemeGrill
 # This file is distributed under the GPLv3 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: ThemeGrill Demo Importer 1.8.0\n"
+"Project-Id-Version: Starter Templates & Sites Pack by ThemeGrill 2.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/themegrill-demo-importer\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2022-07-01T04:39:36+00:00\n"
+"POT-Creation-Date: 2025-09-22T10:13:20+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"X-Generator: WP-CLI 2.5.0\n"
+"X-Generator: WP-CLI 2.11.0\n"
 "X-Domain: themegrill-demo-importer\n"
 
 #. Plugin Name of the plugin
-#. translators: %s: official ThemeGrill themes URL
-#: includes/class-demo-importer.php:243
-#: includes/class-themegrill-demo-importer.php:292
-msgid "ThemeGrill Demo Importer"
+#: themegrill-demo-importer.php
+msgid "Starter Templates & Sites Pack by ThemeGrill"
 msgstr ""
 
 #. Plugin URI of the plugin
+#: themegrill-demo-importer.php
 msgid "https://themegrill.com/demo-importer/"
 msgstr ""
 
 #. Description of the plugin
-msgid "Import ThemeGrill official themes demo content, widgets and theme settings with just one click."
+#: themegrill-demo-importer.php
+msgid "Premium starter sites and website templates by ThemeGrill. Import demo content, widgets, and theme settings with one click."
 msgstr ""
 
 #. Author of the plugin
-#: includes/class-demo-importer.php:600
+#: themegrill-demo-importer.php
 msgid "ThemeGrill"
 msgstr ""
 
 #. Author URI of the plugin
+#: themegrill-demo-importer.php
 msgid "https://themegrill.com"
 msgstr ""
 
-#: includes/admin/class-demo-importer-status.php:41
-msgid "All Fine"
+#: src/Admin.php:62
+#: src/Admin.php:63
+#: src/Admin.php:72
+#: src/Admin.php:73
+#: src/App.php:69
+msgid "Starter Templates"
 msgstr ""
 
-#: includes/admin/class-demo-importer-status.php:43
-msgid "There are some write permission errors on your site."
+#: src/App.php:69
+msgid "View Starter Templates"
 msgstr ""
 
-#: includes/admin/class-demo-importer-status.php:60
-msgid "There is a connection issue of your site to our demo pack services."
+#: src/App.php:85
+msgid "View Starter Templates Documentation"
 msgstr ""
 
-#: includes/admin/class-demo-importer-status.php:62
-msgid "Connected"
-msgstr ""
-
-#: includes/admin/class-demo-pack-upgrader.php:35
-msgid "Install package not available."
-msgstr ""
-
-#. translators: %s: package URL
-#: includes/admin/class-demo-pack-upgrader.php:37
-msgid "Downloading install package from <span class=\"code\">%s</span>&#8230;"
-msgstr ""
-
-#: includes/admin/class-demo-pack-upgrader.php:38
-msgid "Unpacking the package&#8230;"
-msgstr ""
-
-#: includes/admin/class-demo-pack-upgrader.php:39
-msgid "Removing the old version of the demo&#8230;"
-msgstr ""
-
-#: includes/admin/class-demo-pack-upgrader.php:40
-msgid "Could not remove the old demo."
-msgstr ""
-
-#: includes/admin/class-demo-pack-upgrader.php:41
-msgid "Installing the demo&#8230;"
-msgstr ""
-
-#: includes/admin/class-demo-pack-upgrader.php:42
-msgid "The demo contains no files."
-msgstr ""
-
-#: includes/admin/class-demo-pack-upgrader.php:43
-msgid "Demo install failed."
-msgstr ""
-
-#: includes/admin/class-demo-pack-upgrader.php:44
-msgid "Demo installed successfully."
-msgstr ""
-
-#: includes/admin/class-demo-pack-upgrader.php:121
-msgid "No valid demos were found."
-msgstr ""
-
-#: includes/admin/class-plugin-deactivate-notice.php:50
-msgid "It seems you've imported the theme demo successfully. Now, the purpose of this plugin is fulfilled and it has no more use. So, if you're satisfied with this import, you can safely deactivate it by clicking the button."
-msgstr ""
-
-#: includes/admin/class-plugin-deactivate-notice.php:62
-msgid "Deactivate"
-msgstr ""
-
-#: includes/admin/class-plugin-deactivate-notice.php:78
-#: includes/class-demo-importer.php:1336
-msgid "Action failed. Please refresh the page and retry."
-msgstr ""
-
-#: includes/admin/views/html-admin-page-demo-import-faqs.php:11
-#: includes/admin/views/html-admin-page-status.php:14
-msgid "FAQ's"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-demo-import-faqs.php:28
-msgid "Error fetching the FAQ's"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-demo-import-faqs.php:36
-msgid "An error has occurred, which probably means our server is down. Try again later."
-msgstr ""
-
-#: includes/admin/views/html-admin-page-demo-import-faqs.php:62
-msgid "View More FAQ's"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-importer.php:12
-#: includes/class-demo-importer.php:120
-#: includes/class-themegrill-demo-importer.php:259
-msgid "Demo Importer"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-importer.php:16
-msgid "If you do not see the new demos on the list, please click this button to fetch all the available demos."
-msgstr ""
-
-#: includes/admin/views/html-admin-page-importer.php:18
-msgid "Refresh Demos"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-importer.php:22
-msgid "Upcoming Demos"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-importer.php:28
-msgid "The Demo Importer screen requires JavaScript."
-msgstr ""
-
-#: includes/admin/views/html-admin-page-importer.php:31
-msgid "Filter demos list"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-importer.php:54
-msgid "Without Page Builder"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-importer.php:63
-msgid "Themes list"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-importer.php:67
-#: includes/class-demo-importer.php:208
-msgid "No demos found. Try a different search."
-msgstr ""
-
-#: includes/admin/views/html-admin-page-importer.php:81
-#: includes/admin/views/html-admin-page-importer.php:169
-msgid "Premium"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-importer.php:85
-#: includes/admin/views/html-admin-page-importer.php:173
-msgid "Pro Plus"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-importer.php:89
-#: includes/admin/views/html-admin-page-importer.php:177
-msgid "Pro"
-msgstr ""
-
-#. translators: %s: Demo author name
-#. translators: %s: Demo author name
-#. translators: 1. Plugin author name.
-#. translators: 1. Plugin author name.
-#: includes/admin/views/html-admin-page-importer.php:95
-#: includes/admin/views/html-admin-page-importer.php:184
-#: includes/admin/views/html-admin-page-system-status-report.php:287
-#: includes/admin/views/html-admin-page-system-status-report.php:334
-msgid "By %s"
-msgstr ""
-
-#. translators: %s: Demo name
-#: includes/admin/views/html-admin-page-importer.php:104
-msgid "<span>Imported:</span> %s"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-importer.php:113
-#: includes/admin/views/html-admin-page-importer.php:158
-#: includes/admin/views/html-admin-page-importer.php:268
-#: assets/js/admin/demo-updates.js:114
-msgid "Live Preview"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-importer.php:116
-#: includes/admin/views/html-admin-page-importer.php:118
-#: includes/admin/views/html-admin-page-importer.php:147
-#: includes/admin/views/html-admin-page-importer.php:149
-#: includes/admin/views/html-admin-page-importer.php:257
-#: includes/admin/views/html-admin-page-importer.php:259
-msgid "Buy Now"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-importer.php:120
-#: includes/admin/views/html-admin-page-importer.php:151
-#: includes/admin/views/html-admin-page-importer.php:261
-msgid "Upgrade Theme Plan"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-importer.php:122
-#: includes/admin/views/html-admin-page-importer.php:155
-#: includes/admin/views/html-admin-page-importer.php:265
-msgid "Update"
-msgstr ""
-
-#. translators: %s: Demo name
-#: includes/admin/views/html-admin-page-importer.php:126
-msgctxt "demo"
-msgid "Import %s"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-importer.php:128
-msgid "Import"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-importer.php:130
-#: includes/admin/views/html-admin-page-importer.php:294
-msgid "Preview"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-importer.php:136
-msgctxt "demo"
-msgid "Imported"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-importer.php:143
-msgid "Close"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-importer.php:144
-msgctxt "Button label for a demo"
-msgid "Previous"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-importer.php:145
-msgctxt "Button label for a demo"
-msgid "Next"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-importer.php:153
-#: includes/admin/views/html-admin-page-importer.php:160
-#: includes/admin/views/html-admin-page-importer.php:263
-#: includes/admin/views/html-admin-page-importer.php:270
-msgid "Import Demo"
-msgstr ""
-
-#. translators: %s: Theme Name
-#. translators: %s: Theme Name
-#: includes/admin/views/html-admin-page-importer.php:195
-#: includes/admin/views/html-admin-page-importer.php:204
-msgid "%s theme is not active."
-msgstr ""
-
-#. translators: %s: Demo version
-#: includes/admin/views/html-admin-page-importer.php:211
-msgid "Version: %s"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-importer.php:218
-msgid "Plugins Information"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-importer.php:223
-msgid "Required Plugins"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-importer.php:246
-msgid "No plugins are required for this demo."
-msgstr ""
-
-#: includes/admin/views/html-admin-page-importer.php:274
-#: includes/class-demo-importer.php:209
-msgid "Collapse Sidebar"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-importer.php:276
-msgid "Collapse"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-importer.php:281
-msgid "Enter desktop preview mode"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-importer.php:284
-msgid "Enter tablet preview mode"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-importer.php:287
-msgid "Enter mobile preview mode"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-status.php:13
-#: includes/admin/views/html-admin-page-system-status-report.php:16
-msgid "System Status"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-system-status-report.php:21
-msgid "System Info"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-system-status-report.php:28
-msgid "Operating System:"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-system-status-report.php:33
-msgid "Server:"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-system-status-report.php:38
-msgid "MySQL Version:"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-system-status-report.php:43
-msgid "PHP Version:"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-system-status-report.php:48
-msgid "PHP Max Execution Time:"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-system-status-report.php:53
-msgid "PHP Max Upload Size:"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-system-status-report.php:58
-msgid "PHP Post Max Size:"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-system-status-report.php:63
-msgid "PHP Max Input Vars:"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-system-status-report.php:68
-msgid "PHP Memory Limit:"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-system-status-report.php:73
-msgid "cURL Installed:"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-system-status-report.php:74
-#: includes/admin/views/html-admin-page-system-status-report.php:86
-#: includes/admin/views/html-admin-page-system-status-report.php:136
-#: includes/admin/views/html-admin-page-system-status-report.php:166
-#: includes/admin/views/html-admin-page-system-status-report.php:171
-#: includes/admin/views/html-admin-page-system-status-report.php:214
-msgid "Yes"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-system-status-report.php:74
-#: includes/admin/views/html-admin-page-system-status-report.php:86
-#: includes/admin/views/html-admin-page-system-status-report.php:136
-#: includes/admin/views/html-admin-page-system-status-report.php:166
-#: includes/admin/views/html-admin-page-system-status-report.php:171
-#: includes/admin/views/html-admin-page-system-status-report.php:214
-msgid "No"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-system-status-report.php:79
-msgid "cURL version:"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-system-status-report.php:85
-msgid "GD Installed:"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-system-status-report.php:91
-msgid "GD version:"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-system-status-report.php:97
-msgid "Write Permission:"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-system-status-report.php:102
-msgid "Demo Pack Server Connection:"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-system-status-report.php:113
-msgid "WordPress Info"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-system-status-report.php:120
-#: includes/admin/views/html-admin-page-system-status-report.php:198
-msgid "Version:"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-system-status-report.php:125
-msgid "Site URL:"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-system-status-report.php:130
-msgid "Home URL:"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-system-status-report.php:135
-msgid "Multisite:"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-system-status-report.php:140
-msgid "Max Upload Size:"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-system-status-report.php:145
-msgid "Memory Limit:"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-system-status-report.php:150
-msgid "Max Memory Limit:"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-system-status-report.php:155
-msgid "Permalink Structure:"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-system-status-report.php:156
-msgid "Plain"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-system-status-report.php:160
-msgid "Language:"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-system-status-report.php:165
-msgid "Debug Mode Enabled:"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-system-status-report.php:170
-msgid "Script Debug Mode Enabled:"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-system-status-report.php:175
-msgid "ThemeGrill Demo Importer Version:"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-system-status-report.php:186
-msgid "Theme Info"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-system-status-report.php:193
-msgid "Name:"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-system-status-report.php:203
-msgid "Author:"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-system-status-report.php:208
-msgid "Author URL:"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-system-status-report.php:213
-msgid "Child Theme:"
-msgstr ""
-
-#. translators: 1. Opening anchor tag for ThemeGrill Child Tutorial, 2. Closing the anchor tag
-#: includes/admin/views/html-admin-page-system-status-report.php:220
-msgid "If you want to modify the features of the theme then, we recommend you to use %1$s child theme. %2$s"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-system-status-report.php:230
-msgid "Parent Theme Name:"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-system-status-report.php:235
-msgid "Parent Theme Version:"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-system-status-report.php:240
-msgid "Parent Theme Author:"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-system-status-report.php:245
-msgid "Parent Theme Author URL:"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-system-status-report.php:257
-msgid "Active Plugins"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-system-status-report.php:304
-msgid "Inactive Plugins"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-system-status-report.php:348
-msgid "Copy &amp; Paste"
-msgstr ""
-
-#: includes/admin/views/html-admin-page-system-status-report.php:351
-msgid "While creating support request, please provide us the details generated below within the support request. It might help us to tackle on the issue more conviniently."
-msgstr ""
-
-#: includes/admin/views/html-admin-page-system-status-report.php:358
-msgid "Copy System Status"
-msgstr ""
-
-#: includes/class-demo-importer.php:121
-msgid "Demo Importer Status"
-msgstr ""
-
-#: includes/class-demo-importer.php:136
-msgctxt "Admin menu name"
-msgid "Demo Importer"
-msgstr ""
-
-#. translators: Before import warning texts
-#: includes/class-demo-importer.php:190
-msgid "Importing demo data will ensure that your site will look similar as theme demo. It makes you easy to modify the content instead of creating them from scratch. Also, consider before importing the demo: %1$s %2$s %3$s %4$s %5$s %6$s"
-msgstr ""
-
-#: includes/class-demo-importer.php:191
-msgid "Importing the demo on the site if you have already added the content is highly discouraged."
-msgstr ""
-
-#: includes/class-demo-importer.php:192
-msgid "You need to import demo on fresh WordPress install to exactly replicate the theme demo."
-msgstr ""
-
-#: includes/class-demo-importer.php:193
-msgid "It will install the required plugins as well as activate them for installing the required theme demo within your site."
-msgstr ""
-
-#: includes/class-demo-importer.php:194
-msgid "Copyright images will get replaced with other placeholder images."
-msgstr ""
-
-#: includes/class-demo-importer.php:195
-msgid "None of the posts, pages, attachments or any other data already existing in your site will be deleted or modified."
-msgstr ""
-
-#: includes/class-demo-importer.php:196
-msgid "It will take some time to import the theme demo."
-msgstr ""
-
-#: includes/class-demo-importer.php:200
-msgid "Search Demos"
-msgstr ""
-
-#: includes/class-demo-importer.php:201
-msgid "Search demos..."
-msgstr ""
-
-#. translators: %s: support forums URL
-#: includes/class-demo-importer.php:203
-msgid "An unexpected error occurred. Something may be wrong with ThemeGrill demo server&#8217;s configuration. If you continue to have problems, please try the <a href=\"%s\">support forums</a>."
-msgstr ""
-
-#: includes/class-demo-importer.php:204
-msgid "Try Again"
-msgstr ""
-
-#: includes/class-demo-importer.php:205
-msgid "Please suggest us!"
-msgstr ""
-
-#. translators: %d: Number of demos.
-#: includes/class-demo-importer.php:207
-msgid "Number of Demos found: %d"
-msgstr ""
-
-#: includes/class-demo-importer.php:210
-msgid "Expand Sidebar"
-msgstr ""
-
-#. translators: accessibility text
-#: includes/class-demo-importer.php:212
-msgid "Select one or more Demo features to filter by"
-msgstr ""
-
-#: includes/class-demo-importer.php:213
-msgid "Confirm!"
-msgstr ""
-
-#. translators: 1: ThemeGrill Demo Importer 2: five stars
-#: includes/class-demo-importer.php:242
-msgid "If you like %1$s please leave us a %2$s rating. A huge thanks in advance!"
-msgstr ""
-
-#: includes/class-demo-importer.php:244
-msgid "Thanks :)"
-msgstr ""
-
-#: includes/class-demo-importer.php:247
-msgid "Thank you for importing with ThemeGrill Demo Importer."
-msgstr ""
-
-#: includes/class-demo-importer.php:267
-#: includes/class-demo-importer.php:269
-msgid "Help &amp; Support"
-msgstr ""
-
-#. translators: %s: Documentation URL
-#: includes/class-demo-importer.php:272
-msgid "Should you need help understanding, using, or extending ThemeGrill Demo Importer, <a href=\"%s\">please read our documentation</a>. You will find all kinds of resources including snippets, tutorials and much more."
-msgstr ""
-
-#. translators: 1: WP support URL. 2: TG support URL
-#: includes/class-demo-importer.php:277
-msgid "For further assistance with ThemeGrill Demo Importer core you can use the <a href=\"%1$s\">community forum</a>. If you need help with premium themes sold by ThemeGrill, please <a href=\"%2$s\">use our free support forum</a>."
-msgstr ""
-
-#: includes/class-demo-importer.php:281
-msgid "Community forum"
-msgstr ""
-
-#: includes/class-demo-importer.php:281
-msgid "ThemeGrill Support"
-msgstr ""
-
-#: includes/class-demo-importer.php:288
-#: includes/class-demo-importer.php:290
-msgid "Found a bug?"
-msgstr ""
-
-#. translators: %s: GitHub links
-#: includes/class-demo-importer.php:293
-msgid "If you find a bug within ThemeGrill Demo Importer you can create a ticket via <a href=\"%1$s\">Github issues</a>. Ensure you read the <a href=\"%2$s\">contribution guide</a> prior to submitting your report. To help us solve your issue, please be as descriptive as possible."
-msgstr ""
-
-#: includes/class-demo-importer.php:297
-msgid "Report a bug"
-msgstr ""
-
-#: includes/class-demo-importer.php:303
-msgid "For more information:"
-msgstr ""
-
-#: includes/class-demo-importer.php:304
-msgid "About Demo Importer"
-msgstr ""
-
-#: includes/class-demo-importer.php:305
-msgid "WordPress.org project"
-msgstr ""
-
-#: includes/class-demo-importer.php:306
-msgid "Github project"
-msgstr ""
-
-#: includes/class-demo-importer.php:307
-msgid "Official themes"
-msgstr ""
-
-#: includes/class-demo-importer.php:308
-msgid "Official plugins"
-msgstr ""
-
-#: includes/class-demo-importer.php:495
-#: includes/class-demo-importer.php:566
-msgid "This demo requires %1$s version of %2$s theme to get imported"
-msgstr ""
-
-#: includes/class-demo-importer.php:501
-#: includes/class-demo-importer.php:529
-msgid "This demo requires %1$s version of %2$s theme and %3$s version of %4$s as well as %5$s version of %6$s plugins to get imported"
-msgstr ""
-
-#: includes/class-demo-importer.php:505
-#: includes/class-demo-importer.php:515
-#: includes/class-demo-importer.php:521
-#: includes/class-demo-importer.php:533
-#: includes/class-demo-importer.php:558
-msgid "Zakra Pro"
-msgstr ""
-
-#: includes/class-demo-importer.php:507
-#: includes/class-demo-importer.php:535
-#: includes/class-demo-importer.php:543
-#: includes/class-demo-importer.php:549
-#: includes/class-demo-importer.php:560
-#: includes/class-demo-importer.php:579
-#: includes/class-demo-importer.php:585
-msgid "Companion Elementor"
-msgstr ""
-
-#: includes/class-demo-importer.php:511
-#: includes/class-demo-importer.php:539
-#: includes/class-demo-importer.php:575
-msgid "This demo requires %1$s version of %2$s theme and %3$s version of %4$s plugin to get imported"
-msgstr ""
-
-#: includes/class-demo-importer.php:519
-#: includes/class-demo-importer.php:547
-#: includes/class-demo-importer.php:583
-msgid "This demo requires %1$s version of %2$s plugin to get imported"
-msgstr ""
-
-#: includes/class-demo-importer.php:556
-msgid "This demo requires %1$s version of %2$s as well as %3$s version of %4$s plugins to get imported"
-msgstr ""
-
-#: includes/class-demo-importer.php:595
-msgid "%s Pro"
-msgstr ""
-
-#: includes/class-demo-importer.php:660
-msgid "No demo specified."
-msgstr ""
-
-#: includes/class-demo-importer.php:676
-msgid "Sorry, you are not allowed to import content."
-msgstr ""
-
-#: includes/class-demo-importer.php:708
-#: includes/functions-demo-importer.php:117
-msgid "Unable to connect to the filesystem. Please confirm your credentials."
-msgstr ""
-
-#: includes/class-demo-importer.php:791
-msgid "The XML file dummy content is missing."
-msgstr ""
-
-#: includes/class-demo-importer.php:887
-msgid "The DAT file customizer data is missing."
-msgstr ""
-
-#: includes/class-demo-importer.php:912
-msgid "The WIE file widget content is missing."
-msgstr ""
-
-#: includes/class-themegrill-demo-importer.php:50
-#: includes/class-themegrill-demo-importer.php:59
-msgid "Cheatin&#8217; huh?"
-msgstr ""
-
-#: includes/class-themegrill-demo-importer.php:259
-msgid "View Demo Importer"
-msgstr ""
-
-#: includes/class-themegrill-demo-importer.php:275
-msgid "View Demo Importer Documentation"
-msgstr ""
-
-#: includes/class-themegrill-demo-importer.php:275
+#: src/App.php:85
 msgid "Docs"
 msgstr ""
 
-#: includes/class-themegrill-demo-importer.php:276
+#: src/App.php:86
 msgid "Visit Free Customer Support Forum"
 msgstr ""
 
-#: includes/class-themegrill-demo-importer.php:276
+#: src/App.php:86
 msgid "Free Support"
 msgstr ""
 
-#. translators: %s: official ThemeGrill themes URL
-#: includes/class-themegrill-demo-importer.php:292
-msgid "This plugin requires %s to be activated to work."
+#: src/Controllers/ImportController.php:28
+msgid "Invalid action provided"
 msgstr ""
 
-#. translators: %s: official ThemeGrill themes URL
-#: includes/class-themegrill-demo-importer.php:292
-msgid "Official ThemeGrill Theme"
+#: src/Controllers/ImportController.php:39
+msgid "Invalid demo config provided"
 msgstr ""
 
-#: includes/functions-demo-importer.php:37
-msgid "No plugin specified."
+#: src/Controllers/ImportController.php:67
+msgid "Invalid slug provided"
 msgstr ""
 
-#: includes/functions-demo-importer.php:51
-msgid "Sorry, you are not allowed to install plugins on this site."
+#: src/Controllers/ImportController.php:81
+msgid "Pro activated successfully."
 msgstr ""
 
-#. translators: %s: Number of plugins
-#: includes/functions-demo-importer.php:541
-msgid "%s plugin successfully installed."
+#: src/Importers/PluginImporter.php:49
+msgid "Companion Elementor installed and activated."
 msgstr ""
 
-#. translators: %s: Number of plugins
-#: includes/functions-demo-importer.php:548
-msgid "%s plugins successfully installed."
+#. translators: %s Plugin name
+#: src/Importers/PluginImporter.php:160
+msgid "%s installed and activated."
 msgstr ""
 
-#. translators: %s: Number of failed installs
-#: includes/functions-demo-importer.php:558
-msgid "%s install failed."
+#: src/Importers/ThemeModsImporter.php:60
+msgid "The customizer data is not in a correct format."
 msgstr ""
 
-#. translators: %s: Number of failed installs
-#: includes/functions-demo-importer.php:563
-msgid "%s installs failed."
+#: src/Importers/WidgetsImporter.php:58
+msgid "Invalid data."
 msgstr ""
 
-#: includes/functions-demo-importer.php:566
-msgid "Show more details"
-msgstr ""
-
-#: includes/importers/class-customizer-importer.php:36
-msgid "The customizer import file is not in a correct format. Please make sure to use the correct customizer import file."
-msgstr ""
-
-#: includes/importers/class-customizer-importer.php:40
-msgid "The customizer import file is not suitable for current theme. You can only import customizer settings for the same theme or a child theme."
-msgstr ""
-
-#: includes/importers/class-widget-importer.php:34
-msgid "Widget import data could not be read. Please try a different file."
-msgstr ""
-
-#: includes/importers/class-widget-importer.php:71
+#: src/Importers/WidgetsImporter.php:95
 msgid "Sidebar does not exist in theme (moving widget to Inactive)"
 msgstr ""
 
-#: includes/importers/class-widget-importer.php:93
+#: src/Importers/WidgetsImporter.php:117
 msgid "Site does not support widget"
 msgstr ""
 
-#: includes/importers/class-widget-importer.php:128
+#: src/Importers/WidgetsImporter.php:151
 msgid "Widget already exists"
 msgstr ""
 
-#: includes/importers/class-widget-importer.php:187
+#: src/Importers/WidgetsImporter.php:210
 msgid "Imported"
 msgstr ""
 
-#: includes/importers/class-widget-importer.php:190
+#: src/Importers/WidgetsImporter.php:213
 msgid "Imported to Inactive"
 msgstr ""
 
-#: includes/importers/class-widget-importer.php:196
+#: src/Importers/WidgetsImporter.php:219
 msgid "No Title"
 msgstr ""
 
-#: includes/importers/wordpress-importer/class-wxr-importer.php:132
-#: includes/importers/wordpress-importer/class-wxr-importer.php:141
-#: includes/importers/wordpress-importer/class-wxr-importer.php:192
-#: includes/importers/wordpress-importer/class-wxr-importer.php:196
-#: includes/importers/wordpress-importer/class-wxr-importer.php:205
-msgid "Sorry, there has been an error."
+#: src/Importers/WXRImporter/WXRImporter.php:131
+msgid "Could not open the file for parsing"
 msgstr ""
 
-#: includes/importers/wordpress-importer/class-wxr-importer.php:133
-msgid "The file does not exist, please try again."
-msgstr ""
-
-#: includes/importers/wordpress-importer/class-wxr-importer.php:176
-msgid "All done."
-msgstr ""
-
-#: includes/importers/wordpress-importer/class-wxr-importer.php:176
-msgid "Have fun!"
-msgstr ""
-
-#: includes/importers/wordpress-importer/class-wxr-importer.php:177
-msgid "Remember to update the passwords and roles of imported users."
-msgstr ""
-
-#: includes/importers/wordpress-importer/class-wxr-importer.php:197
-msgid "The export file could not be found at <code>%s</code>. It is likely that this was caused by a permissions problem."
-msgstr ""
-
-#: includes/importers/wordpress-importer/class-wxr-importer.php:213
-msgid "This WXR file (version %s) may not be supported by this version of the importer. Please consider updating."
-msgstr ""
-
-#: includes/importers/wordpress-importer/class-wxr-importer.php:238
-msgid "Failed to import author %s. Their posts will be attributed to the current user."
-msgstr ""
-
-#: includes/importers/wordpress-importer/class-wxr-importer.php:264
-msgid "Assign Authors"
-msgstr ""
-
-#: includes/importers/wordpress-importer/class-wxr-importer.php:265
-msgid "To make it simpler for you to edit and save the imported content, you may want to reassign the author of the imported item to an existing user of this site, such as your primary administrator account."
-msgstr ""
-
-#: includes/importers/wordpress-importer/class-wxr-importer.php:267
-msgid "If a new user is created by WordPress, a new password will be randomly generated and the new user&#8217;s role will be set as %s. Manually changing the new user&#8217;s details will be necessary."
-msgstr ""
-
-#: includes/importers/wordpress-importer/class-wxr-importer.php:277
-msgid "Import Attachments"
-msgstr ""
-
-#: includes/importers/wordpress-importer/class-wxr-importer.php:280
-msgid "Download and import file attachments"
-msgstr ""
-
-#: includes/importers/wordpress-importer/class-wxr-importer.php:284
-msgid "Submit"
-msgstr ""
-
-#: includes/importers/wordpress-importer/class-wxr-importer.php:297
-msgid "Import author:"
-msgstr ""
-
-#: includes/importers/wordpress-importer/class-wxr-importer.php:309
-msgid "or create new user with login name:"
-msgstr ""
-
-#: includes/importers/wordpress-importer/class-wxr-importer.php:312
-msgid "as a new user:"
-msgstr ""
-
-#: includes/importers/wordpress-importer/class-wxr-importer.php:322
-msgid "assign posts to an existing user:"
-msgstr ""
-
-#: includes/importers/wordpress-importer/class-wxr-importer.php:324
-msgid "or assign posts to an existing user:"
-msgstr ""
-
-#: includes/importers/wordpress-importer/class-wxr-importer.php:332
-msgid "- Select -"
-msgstr ""
-
-#: includes/importers/wordpress-importer/class-wxr-importer.php:386
-msgid "Failed to create new user for %s. Their posts will be attributed to the current user."
-msgstr ""
-
-#: includes/importers/wordpress-importer/class-wxr-importer.php:438
-msgid "Failed to import category %s"
-msgstr ""
-
-#: includes/importers/wordpress-importer/class-wxr-importer.php:483
-msgid "Failed to import post tag %s"
-msgstr ""
-
-#: includes/importers/wordpress-importer/class-wxr-importer.php:538
-#: includes/importers/wordpress-importer/class-wxr-importer.php:764
-msgid "Failed to import %s %s"
-msgstr ""
-
-#: includes/importers/wordpress-importer/class-wxr-importer.php:631
-msgid "Failed to import &#8220;%s&#8221;: Invalid post type %s"
-msgstr ""
-
-#: includes/importers/wordpress-importer/class-wxr-importer.php:668
-msgid "%s &#8220;%s&#8221; already exists."
-msgstr ""
-
-#: includes/importers/wordpress-importer/class-wxr-importer.php:730
-msgid "Failed to import %s &#8220;%s&#8221;"
-msgstr ""
-
-#: includes/importers/wordpress-importer/class-wxr-importer.php:904
-msgid "Menu item skipped due to missing menu slug"
-msgstr ""
-
-#: includes/importers/wordpress-importer/class-wxr-importer.php:911
-msgid "Menu item skipped due to invalid menu slug: %s"
-msgstr ""
-
-#: includes/importers/wordpress-importer/class-wxr-importer.php:974
-msgid "Fetching attachments is not enabled"
-msgstr ""
-
-#: includes/importers/wordpress-importer/class-wxr-importer.php:987
+#: src/Importers/WXRImporter/WXRImporter.php:918
 msgid "Invalid file type"
 msgstr ""
 
-#: includes/importers/wordpress-importer/class-wxr-importer.php:1026
-msgid "Could not create temporary file."
+#: src/Importers/WXRImporter/WXRImporter.php:1437
+msgid "Remote server returned %1$d %2$s for %3$s"
 msgstr ""
 
-#. translators: 1: The WordPress error message. 2: The WordPress error code.
-#: includes/importers/wordpress-importer/class-wxr-importer.php:1045
-msgid "Request failed due to an error: %1$s (%2$s)"
+#: src/Importers/WXRImporter/WXRImporter.php:1450
+msgid "Remote file is incorrect size"
 msgstr ""
 
-#. translators: 1: The HTTP error message. 2: The HTTP error code.
-#: includes/importers/wordpress-importer/class-wxr-importer.php:1061
-msgid "Remote server returned the following unexpected result: %1$s (%2$s)"
-msgstr ""
-
-#: includes/importers/wordpress-importer/class-wxr-importer.php:1073
-msgid "Remote server did not respond"
-msgstr ""
-
-#: includes/importers/wordpress-importer/class-wxr-importer.php:1080
+#: src/Importers/WXRImporter/WXRImporter.php:1455
 msgid "Zero size file downloaded"
 msgstr ""
 
-#: includes/importers/wordpress-importer/class-wxr-importer.php:1085
-msgid "Downloaded file has incorrect size"
-msgstr ""
-
-#: includes/importers/wordpress-importer/class-wxr-importer.php:1091
+#: src/Importers/WXRImporter/WXRImporter.php:1461
 msgid "Remote file is too large, limit is %s"
 msgstr ""
 
-#: includes/importers/wordpress-importer/class-wxr-importer.php:1123
-msgid "Sorry, this file type is not permitted for security reasons."
+#: src/Services/ImportService.php:134
+msgid "Cleaned up successfully."
 msgstr ""
 
-#: includes/importers/wordpress-importer/class-wxr-importer.php:1138
-msgid "The uploaded file could not be moved"
+#: src/Traits/Singleton.php:34
+#: src/Traits/Singleton.php:41
+msgid "Cheatin&#8217; huh?"
 msgstr ""
 
-#: includes/importers/wordpress-importer/class-wxr-importer.php:1250
-msgid "Import WordPress"
+#: dist/dashboard.11cd7c6d91229b2ef483.hot-update.js:162
+#: dist/dashboard.c859266cb0c967623443.hot-update.js:161
+#: dist/dashboard.js:54124
+msgid "Color Palette"
 msgstr ""
 
-#: includes/importers/wordpress-importer/class-wxr-importer.php:1257
-msgid "A new version of this importer is available. Please update to version %s to ensure compatibility with newer export files."
+#: dist/dashboard.11cd7c6d91229b2ef483.hot-update.js:182
+#: dist/dashboard.c859266cb0c967623443.hot-update.js:181
+#: dist/dashboard.js:54144
+msgid "Typography"
 msgstr ""
 
-#: includes/importers/wordpress-importer/class-wxr-importer.php:1272
-msgid "Howdy! Upload your WordPress eXtended RSS (WXR) file and we&#8217;ll import the posts, pages, comments, custom fields, categories, and tags into this site."
+#: dist/dashboard.11cd7c6d91229b2ef483.hot-update.js:222
+#: dist/dashboard.c859266cb0c967623443.hot-update.js:221
+#: dist/dashboard.js:54184
+msgid "Continue"
 msgstr ""
 
-#: includes/importers/wordpress-importer/class-wxr-importer.php:1273
-msgid "Choose a WXR (.xml) file to upload, then click Upload file and import."
-msgstr ""
-
-#: includes/importers/wordpress-importer/class-wxr-parser-regex.php:96
-#: includes/importers/wordpress-importer/class-wxr-parser-simplexml.php:41
-#: includes/importers/wordpress-importer/class-wxr-parser-simplexml.php:46
-#: includes/importers/wordpress-importer/class-wxr-parser-xml.php:48
-msgid "This does not appear to be a WXR file, missing/invalid WXR version number"
-msgstr ""
-
-#: includes/importers/wordpress-importer/class-wxr-parser-simplexml.php:29
-#: includes/importers/wordpress-importer/class-wxr-parser-simplexml.php:37
-#: includes/importers/wordpress-importer/class-wxr-parser.php:42
-msgid "There was an error when reading this WXR file"
-msgstr ""
-
-#: includes/importers/wordpress-importer/class-wxr-parser.php:43
-msgid "Details are shown above. The importer will now try again with a different parser..."
-msgstr ""
-
-#: assets/js/admin/demo-updates.js:40
-#: assets/js/admin/demo-updates.js:45
-msgid "Importing..."
-msgstr ""
-
-#. translators: %s: Demo name.
-#: assets/js/admin/demo-updates.js:50
-msgctxt "demo"
-msgid "Importing %s..."
-msgstr ""
-
-#: assets/js/admin/demo-updates.js:54
-msgid "Importing... please wait."
-msgstr ""
-
-#. translators: %s: Demo name.
-#: assets/js/admin/demo-updates.js:85
-msgctxt "demo"
-msgid "%s imported!"
-msgstr ""
-
-#: assets/js/admin/demo-updates.js:89
-msgid "Imported!"
-msgstr ""
-
-#: assets/js/admin/demo-updates.js:91
-msgid "Import completed successfully."
-msgstr ""
-
-#. translators: %s: Demo name.
-#: assets/js/admin/demo-updates.js:110
-msgctxt "demo"
-msgid "Live Preview %s"
-msgstr ""
-
-#. translators: %s: Demo import error message.
-#: assets/js/admin/demo-updates.js:132
-#: assets/js/admin/demo-updates.js:347
-msgid "Import failed: %s"
-msgstr ""
-
-#. translators: %s: Demo name.
-#: assets/js/admin/demo-updates.js:162
-msgctxt "demo"
-msgid "%s import failed"
-msgstr ""
-
-#: assets/js/admin/demo-updates.js:166
-#: assets/js/admin/demo-updates.js:372
-msgid "Import Failed!"
-msgstr ""
-
-#. translators: %s: Plugin name.
-#: assets/js/admin/demo-updates.js:196
-#: assets/js/admin/demo-updates.js:205
-#: assets/js/admin/demo-updates.js:214
-msgctxt "plugin"
-msgid "Installing %s..."
-msgstr ""
-
-#: assets/js/admin/demo-updates.js:209
-#: assets/js/admin/demo-updates.js:220
-#: assets/js/admin/demo-updates.js:227
-msgid "Installing..."
-msgstr ""
-
-#: assets/js/admin/demo-updates.js:229
-msgid "Installing... please wait."
-msgstr ""
-
-#. translators: %s: Plugin name.
-#: assets/js/admin/demo-updates.js:256
-msgctxt "plugin"
-msgid "%s installed!"
-msgstr ""
-
-#: assets/js/admin/demo-updates.js:260
-msgctxt "plugin"
-msgid "Installed!"
-msgstr ""
-
-#: assets/js/admin/demo-updates.js:262
-msgid "Installation completed successfully."
-msgstr ""
-
-#. translators: %s: Bulk plugin installation error message.
-#: assets/js/admin/demo-updates.js:292
-#: assets/js/admin/demo-updates.js:351
-msgid "Installation failed: %s"
-msgstr ""
-
-#. translators: %s: Plugin name.
-#: assets/js/admin/demo-updates.js:303
-msgctxt "plugin"
-msgid "%s installation failed"
-msgstr ""
-
-#: assets/js/admin/demo-updates.js:307
-msgid "Installation Failed!"
-msgstr ""
-
-#: assets/js/admin/demo-updates.js:327
+#: dist/dashboard.16be1212b3f566da16a4.hot-update.js:76
+#: dist/dashboard.45f349303263ed48d1fc.hot-update.js:76
+#: dist/dashboard.2369509db165ac1280a2.hot-update.js:73
+#: dist/dashboard.js:57029
 msgid "Something went wrong."
 msgstr ""
 
-#: assets/js/admin/demo-updates.js:336
-msgid "An error has occurred. Please reload the page and try again."
+#: dist/dashboard.45f349303263ed48d1fc.hot-update.js:79
+#: dist/dashboard.js:52830
+#: dist/dashboard.js:57032
+msgid "Try Again"
 msgstr ""
 
-#: assets/js/admin/demo-updates.js:340
-msgid "Connection lost or the server is busy. Please try again later."
+#: dist/dashboard.js:52712
+msgid "Ready to Import?"
 msgstr ""
 
-#: assets/js/admin/demo-updates.js:342
-msgid "Try this solution!"
+#: dist/dashboard.js:52715
+msgid "Importing this template adds content to your site and overwrites current theme settings."
+msgstr ""
+
+#: dist/dashboard.js:52721
+#: dist/dashboard.js:53405
+msgid "Start Import"
+msgstr ""
+
+#: dist/dashboard.js:52726
+#: dist/dashboard.js:52844
+msgid "Cancel"
+msgstr ""
+
+#: dist/dashboard.js:52811
+msgid "Import Failed"
+msgstr ""
+
+#: dist/dashboard.js:52818
+msgid "Unable to import the template. If the problem continues, refer to our "
+msgstr ""
+
+#: dist/dashboard.js:52823
+msgid "documentation"
+msgstr ""
+
+#: dist/dashboard.js:52824
+msgid "."
+msgstr ""
+
+#: dist/dashboard.js:52943
+msgid "Congratulations!"
+msgstr ""
+
+#: dist/dashboard.js:52946
+msgid "Import complete! Your site is now live with your selected template."
+msgstr ""
+
+#: dist/dashboard.js:52954
+msgid "View Your Site"
+msgstr ""
+
+#: dist/dashboard.js:52962
+msgid "Back to Dashboard"
+msgstr ""
+
+#: dist/dashboard.js:53058
+msgid "Importing your site"
+msgstr ""
+
+#: dist/dashboard.js:53066
+msgid "It might take a couple of minutes. Please do not close or refresh this page."
+msgstr ""
+
+#: dist/dashboard.js:53205
+msgid "Upgrade to Pro"
+msgstr ""
+
+#: dist/dashboard.js:53233
+msgid "This is a premium template. Please upgrade to premium plans to access premium starter templates."
+msgstr ""
+
+#: dist/dashboard.js:53242
+msgid "Upgrade Now"
+msgstr ""
+
+#: dist/dashboard.js:53250
+msgid "Activating..."
+msgstr ""
+
+#: dist/dashboard.js:53254
+msgid "Activate Now"
+msgstr ""
+
+#: dist/dashboard.js:53266
+msgid "View all Premium Templates"
+msgstr ""
+
+#: dist/dashboard.js:53387
+msgid "This plugin is required for the template to function properly and cannot be unchecked."
+msgstr ""
+
+#: dist/dashboard.js:53409
+msgid "Back"
+msgstr ""
+
+#: dist/dashboard.js:54310
+msgid "Back to Starter Templates"
+msgstr ""
+
+#: dist/dashboard.js:54976
+msgid "Change"
+msgstr ""
+
+#: dist/dashboard.js:54987
+msgid "Remove"
+msgstr ""
+
+#: dist/dashboard.js:55045
+msgid "Change Logo"
+msgstr ""
+
+#: dist/dashboard.js:55060
+msgid "Upload Logo Here"
+msgstr ""
+
+#: dist/dashboard.js:55158
+msgid "Premium"
+msgstr ""
+
+#: dist/dashboard.js:55167
+msgid "New"
+msgstr ""
+
+#: dist/dashboard.js:55397
+msgid "Sorry, no result found"
+msgstr ""
+
+#: dist/dashboard.js:55400
+msgid "Please try another search"
+msgstr ""
+
+#: dist/dashboard.js:55626
+msgid "Exit Import Process"
+msgstr ""
+
+#: dist/dashboard.js:55637
+msgid "Select a Template you like"
+msgstr ""
+
+#: dist/dashboard.js:55646
+msgid "Search ..."
+msgstr ""
+
+#: dist/dashboard.js:55666
+msgid "Choose Builder"
+msgstr ""
+
+#: dist/dashboard.js:55682
+msgid "Categories"
 msgstr ""
