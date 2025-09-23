@@ -205,7 +205,7 @@ class Admin {
 	 *
 	 * @return array of objects
 	 */
-	public static function get_demo_packages( $force = true ) {
+	public static function get_demo_packages( $force = false ) {
 		$template   = static::get_theme();
 		$demos      = [];
 		$need_fetch = false;

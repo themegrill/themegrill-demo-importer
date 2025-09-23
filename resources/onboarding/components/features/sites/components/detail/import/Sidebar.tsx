@@ -186,8 +186,9 @@ const Sidebar = ({
 											onClick={() => handleColorPalette(index)}
 										>
 											<div className="border border-solid border-[#EEEFF2] flex rounded-md">
-												{colors
-													.filter((_, index) => [0, 1, 5, 6, 7].includes(index))
+												{[0, 1, 5, 6, 2]
+													.map((originalIndex) => colors?.[originalIndex])
+													.filter((color) => color !== undefined)
 													.map((color, index) => (
 														<div
 															className={`h-[30px] w-[25px] ${
