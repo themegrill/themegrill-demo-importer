@@ -13,13 +13,13 @@ class Admin {
 	 *
 	 * @var array
 	 */
-	public $demo_packages;
+	// public $demo_packages;
+	public static $starter_templates_link = '';
 
 	/**
 	 * Initialize admin functionality
 	 */
 	protected function init() {
-		add_action( 'init', array( $this, 'setup' ), 5 );
 
 		// Add Demo Importer menu.
 		add_action( 'admin_menu', array( $this, 'admin_menu' ), 12 );
@@ -27,13 +27,6 @@ class Admin {
 
 		// Disable WooCommerce setup wizard.
 		add_action( 'current_screen', array( $this, 'woocommerce_disable_setup_wizard' ) );
-	}
-
-	/**
-	 * Demo importer setup.
-	 */
-	public function setup() {
-		$this->demo_packages = static::get_demo_packages();
 	}
 
 	/**
@@ -57,7 +50,7 @@ class Admin {
 		}
 
 		if ( $menu_exists ) {
-			$page = add_submenu_page(
+			$page                         = add_submenu_page(
 				$parent_slug,
 				__( 'Starter Templates', 'themegrill-demo-importer' ),
 				__( 'Starter Templates', 'themegrill-demo-importer' ),
@@ -67,8 +60,9 @@ class Admin {
 					echo '<div id="tg-demo-importer"></div>';
 				}
 			);
+			self::$starter_templates_link = 'admin.php?page=tg-starter-templates';
 		} else {
-			$page = add_theme_page(
+			$page                         = add_theme_page(
 				__( 'Starter Templates', 'themegrill-demo-importer' ),
 				__( 'Starter Templates', 'themegrill-demo-importer' ),
 				'switch_themes',
@@ -77,6 +71,7 @@ class Admin {
 					echo '<div id="tg-demo-importer"></div>';
 				}
 			);
+			self::$starter_templates_link = 'themes.php?page=tg-starter-templates';
 		}
 		add_action( "admin_print_scripts-$page", array( $this, 'enqueue_demo_importer_assets' ) );
 	}
@@ -110,11 +105,12 @@ class Admin {
 		};
 		wp_enqueue_script( 'tdi-dashboard', $asset_url( 'dashboard.js' ), $asset( 'dashboard' )['dependencies'], $asset( 'dashboard' )['version'], true );
 		$localized_data = static::get_localized_data();
-		if ( array_key_exists( 'message', $this->demo_packages ) ) {
+		$demos          = static::get_demo_packages();
+		if ( array_key_exists( 'message', $demos ) ) {
 			$localized_data['data']      = array();
-			$localized_data['error_msg'] = $this->demo_packages['message'];
+			$localized_data['error_msg'] = $demos['message'];
 		} else {
-			$localized_data['data'] = $this->demo_packages;
+			$localized_data['data'] = $demos;
 		}
 
 		wp_localize_script(
@@ -221,21 +217,21 @@ class Admin {
 			$zakra_demos      = array();
 			$themegrill_demos = array();
 
-			$zakra_url   = ZAKRA_BASE_URL . TGDM_NAMESPACE;
-			$zakra_demos = static::fetch_demo_data( $zakra_url );
-			if ( is_array( $zakra_demos ) && isset( $zakra_demos['message'] ) ) {
-				return array(
-					'success' => false,
-					'message' => 'Failed to fetch Zakra demos: ' . ( $zakra_demos['message'] ?? 'Unknown error' ),
-				);
-			}
-
 			$themegrill_url   = THEMEGRILL_BASE_URL . TGDM_NAMESPACE;
 			$themegrill_demos = static::fetch_demo_data( $themegrill_url );
 			if ( is_array( $themegrill_demos ) && isset( $themegrill_demos['message'] ) ) {
 				return array(
 					'success' => false,
 					'message' => 'Failed to fetch ThemeGrill demos: ' . ( $themegrill_demos['message'] ?? 'Unknown error' ),
+				);
+			}
+
+			$zakra_url   = ZAKRA_BASE_URL . TGDM_NAMESPACE;
+			$zakra_demos = static::fetch_demo_data( $zakra_url );
+			if ( is_array( $zakra_demos ) && isset( $zakra_demos['message'] ) ) {
+				return array(
+					'success' => false,
+					'message' => 'Failed to fetch Zakra demos: ' . ( $zakra_demos['message'] ?? 'Unknown error' ),
 				);
 			}
 
@@ -398,7 +394,8 @@ class Admin {
 					'User-Agent'   => 'ThemeGrill/1.0',
 					'Content-Type' => 'application/json',
 				),
-				'sslverify' => false,
+				'sslverify' => true,
+				'timeout'   => 30,
 			)
 		);
 
