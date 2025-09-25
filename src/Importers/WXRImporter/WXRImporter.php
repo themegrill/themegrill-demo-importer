@@ -1053,7 +1053,11 @@ class WXRImporter extends WP_Importer {
 				}
 
 				if ( '_elementor_data' === $key ) {
-					$value = json_decode( $value, true );
+					if ( is_string( $value ) ) {
+						$value = json_decode( $value, true );
+					} else {
+						$value = $value;
+					}
 					$this->replace_elementor_categories_ids( $value, $this->mapping['term_id'] );
 				}
 
@@ -1415,7 +1419,7 @@ class WXRImporter extends WP_Importer {
 				'headers'   => array(
 					'User-Agent' => 'ThemeGrill/1.0',
 				),
-				'sslverify' => false,
+				'sslverify' => true,
 				'timeout'   => 30,
 			)
 		);
