@@ -127,6 +127,7 @@ class ImportService {
 
 		delete_option( 'themegrill_demo_importer_imported_posts' );
 		delete_option( 'themegrill_demo_importer_imported_terms' );
+		delete_option( 'themegrill_demo_importer_posts_with_evf' );
 
 		return new WP_REST_Response(
 			array(

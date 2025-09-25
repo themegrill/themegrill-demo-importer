@@ -27,6 +27,7 @@ class ImportHooks {
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_masteriyo_data' ), 10, 2 );
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_magazine_blocks_settings' ), 10, 2 );
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_blockart_blocks_settings' ), 10, 2 );
+		add_action( 'themegrill_ajax_demo_imported', array( $this, 'process_evf_posts' ) );
 
 		add_filter( 'themegrill_widget_import_settings', array( $this, 'update_widget_data' ), 10, 2 );
 		// Disable Masteriyo setup wizard.
@@ -552,5 +553,63 @@ class ImportHooks {
 			}
 		}
 		return $widget;
+	}
+
+	public function process_evf_posts() {
+		$posts_with_evf = get_option( 'themegrill_demo_importer_posts_with_evf', array() );
+
+		if ( empty( $posts_with_evf ) ) {
+			return;
+		}
+
+		foreach ( $posts_with_evf as $post_id ) {
+			$post = get_post( $post_id );
+
+			if ( ! $post || ! has_blocks( $post->post_content ) || ! has_block( 'everest-forms/form-selector', $post->post_content ) ) {
+				continue;
+			}
+
+			$blocks = parse_blocks( $post->post_content );
+
+			if ( empty( $blocks ) ) {
+				continue;
+			}
+
+			$mapping_data     = get_option( 'themegrill_demo_importer_mapping', array() );
+			$post_mapped_data = $mapping_data['post'] ?? array();
+
+			$this->update_evf_form_ids( $blocks, $post_mapped_data );
+
+			// Convert blocks back to post content.
+			$post_content = serialize_blocks( $blocks );
+
+			// Update the post content.
+			wp_update_post(
+				array(
+					'ID'           => $post_id,
+					'post_content' => $post_content,
+				)
+			);
+		}
+
+		delete_option( 'themegrill_demo_importer_posts_with_evf' );
+	}
+
+	public function update_evf_form_ids( array &$blocks, array $post_id_map ) {
+		foreach ( $blocks as &$block ) {
+			if ( isset( $block['blockName'] ) ) {
+				if ( 'everest-forms/form-selector' === $block['blockName'] ) {
+					if ( isset( $block['attrs']['formId'] ) ) {
+						$current_form_id = $block['attrs']['formId'];
+						if ( isset( $post_id_map[ $current_form_id ] ) ) {
+							$block['attrs']['formId'] = (string) $post_id_map[ $current_form_id ];
+						}
+					}
+				}
+				if ( ! empty( $block['innerBlocks'] ) ) {
+					$this->update_evf_form_ids( $block['innerBlocks'], $post_id_map );
+				}
+			}
+		}
 	}
 }

@@ -658,6 +658,11 @@ class WXRImporter extends WP_Importer {
 			$post_id    = $this->process_attachment( $postdata, $meta, $remote_url );
 		} else {
 			$post_id = wp_insert_post( $postdata, true );
+			if ( $postdata['post_content'] && has_blocks( $postdata['post_content'] ) && has_block( 'everest-forms/form-selector', $postdata['post_content'] ) ) {
+				$posts_with_evf   = get_option( 'themegrill_demo_importer_posts_with_evf', array() );
+				$posts_with_evf[] = $post_id;
+				update_option( 'themegrill_demo_importer_posts_with_evf', $posts_with_evf );
+			}
 			do_action( 'wp_import_insert_post', $post_id, $original_id, $postdata, $data );
 		}
 
