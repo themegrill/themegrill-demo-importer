@@ -24,9 +24,9 @@ class ImportHooks {
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'set_siteorigin_settings' ) );
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'setup_yith_woocommerce_wishlist' ), 10, 2 );
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'regenerate_elementor_styles' ), 10 );
-		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_masteriyo_data' ), 10, 3 );
-		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_magazine_blocks_settings' ), 10, 3 );
-		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_blockart_blocks_settings' ), 10, 3 );
+		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_masteriyo_data' ), 10, 2 );
+		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_magazine_blocks_settings' ), 10, 2 );
+		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_blockart_blocks_settings' ), 10, 2 );
 
 		add_filter( 'themegrill_widget_import_settings', array( $this, 'update_widget_data' ), 10, 2 );
 		// Disable Masteriyo setup wizard.
@@ -76,7 +76,7 @@ class ImportHooks {
 	}
 
 	public function update_customizer_data() {
-		$theme_mods = get_option( 'themegrill_starter_template_theme_mods' );
+		$theme_mods = get_option( 'themegrill_starter_template_theme_mods', array() );
 		foreach ( $theme_mods as $key => $value ) {
 			set_theme_mod( $key, $value );
 		}
