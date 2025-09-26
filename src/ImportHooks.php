@@ -91,6 +91,7 @@ class ImportHooks {
 		add_action(
 			'themegrill_widget_importer_after_widgets_import',
 			function ( $term_id_map ) {
+				remove_all_actions( 'themegrill_widget_importer_after_widgets_import' );
 				$widget_blocks = get_option( 'widget_block', array() );
 				if ( ! empty( $widget_blocks ) ) {
 					foreach ( $widget_blocks as $index => $widget ) {
@@ -103,7 +104,7 @@ class ImportHooks {
 					update_option( 'widget_block', $widget_blocks );
 				}
 			},
-			10
+			9
 		);
 	}
 
