@@ -631,7 +631,9 @@ class WXRImporter extends WP_Importer {
 			$postdata[ $key ] = $data[ $key ];
 		}
 
-		$postdata = apply_filters( 'wp_import_post_data_processed', $postdata, $data, $this->mapping['term_id'] );
+		$postdata = apply_filters( 'wp_import_post_data_processed', $postdata, $data );
+
+		$postdata = apply_filters( 'themegrill_import_post_data_processed', $postdata, $this->mapping['term_id'] );
 
 		$postdata = wp_slash( $postdata );
 
@@ -658,6 +660,11 @@ class WXRImporter extends WP_Importer {
 			$post_id    = $this->process_attachment( $postdata, $meta, $remote_url );
 		} else {
 			$post_id = wp_insert_post( $postdata, true );
+			if ( $postdata['post_content'] && has_blocks( $postdata['post_content'] ) && has_block( 'everest-forms/form-selector', $postdata['post_content'] ) ) {
+				$posts_with_evf   = get_option( 'themegrill_demo_importer_posts_with_evf', array() );
+				$posts_with_evf[] = $post_id;
+				update_option( 'themegrill_demo_importer_posts_with_evf', $posts_with_evf );
+			}
 			do_action( 'wp_import_insert_post', $post_id, $original_id, $postdata, $data );
 		}
 
@@ -1053,7 +1060,11 @@ class WXRImporter extends WP_Importer {
 				}
 
 				if ( '_elementor_data' === $key ) {
-					$value = json_decode( $value, true );
+					if ( is_string( $value ) ) {
+						$value = json_decode( $value, true );
+					} else {
+						$value = $value;
+					}
 					$this->replace_elementor_categories_ids( $value, $this->mapping['term_id'] );
 				}
 
@@ -1415,7 +1426,7 @@ class WXRImporter extends WP_Importer {
 				'headers'   => array(
 					'User-Agent' => 'ThemeGrill/1.0',
 				),
-				'sslverify' => false,
+				'sslverify' => true,
 				'timeout'   => 30,
 			)
 		);

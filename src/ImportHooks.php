@@ -24,9 +24,10 @@ class ImportHooks {
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'set_siteorigin_settings' ) );
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'setup_yith_woocommerce_wishlist' ), 10, 2 );
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'regenerate_elementor_styles' ), 10 );
-		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_masteriyo_data' ), 10, 3 );
-		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_magazine_blocks_settings' ), 10, 3 );
-		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_blockart_blocks_settings' ), 10, 3 );
+		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_masteriyo_data' ), 10, 2 );
+		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_magazine_blocks_settings' ), 10, 2 );
+		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_blockart_blocks_settings' ), 10, 2 );
+		add_action( 'themegrill_ajax_demo_imported', array( $this, 'process_evf_posts' ) );
 
 		add_filter( 'themegrill_widget_import_settings', array( $this, 'update_widget_data' ), 10, 2 );
 		// Disable Masteriyo setup wizard.
@@ -73,10 +74,41 @@ class ImportHooks {
 			},
 			PHP_INT_MAX
 		);
+
+		add_filter(
+			'themegrill_import_post_data_processed',
+			function ( $post_data, $term_id_map = null ) {
+				if ( isset( $post_data['post_content'] ) && has_blocks( $post_data['post_content'] ) && $term_id_map ) {
+					$blocks = parse_blocks( $post_data['post_content'] );
+					$this->themegrill_update_block_term_ids( $blocks, $term_id_map );
+					$post_data['post_content'] = serialize_blocks( $blocks );
+				}
+				return $post_data;
+			},
+			10,
+			2
+		);
+		add_action(
+			'themegrill_widget_importer_after_widgets_import',
+			function ( $term_id_map ) {
+				$widget_blocks = get_option( 'widget_block', array() );
+				if ( ! empty( $widget_blocks ) ) {
+					foreach ( $widget_blocks as $index => $widget ) {
+						if ( isset( $widget['content'] ) ) {
+							$blocks = parse_blocks( $widget['content'] );
+							$this->themegrill_update_block_term_ids( $blocks, $term_id_map );
+							$widget_blocks[ $index ]['content'] = serialize_blocks( $blocks );
+						}
+					}
+					update_option( 'widget_block', $widget_blocks );
+				}
+			},
+			10
+		);
 	}
 
 	public function update_customizer_data() {
-		$theme_mods = get_option( 'themegrill_starter_template_theme_mods' );
+		$theme_mods = get_option( 'themegrill_starter_template_theme_mods', array() );
 		foreach ( $theme_mods as $key => $value ) {
 			set_theme_mod( $key, $value );
 		}
@@ -552,5 +584,129 @@ class ImportHooks {
 			}
 		}
 		return $widget;
+	}
+
+	public function process_evf_posts() {
+		$posts_with_evf = get_option( 'themegrill_demo_importer_posts_with_evf', array() );
+
+		if ( empty( $posts_with_evf ) ) {
+			return;
+		}
+
+		foreach ( $posts_with_evf as $post_id ) {
+			$post = get_post( $post_id );
+
+			if ( ! $post || ! has_blocks( $post->post_content ) || ! has_block( 'everest-forms/form-selector', $post->post_content ) ) {
+				continue;
+			}
+
+			$blocks = parse_blocks( $post->post_content );
+
+			if ( empty( $blocks ) ) {
+				continue;
+			}
+
+			$mapping_data     = get_option( 'themegrill_demo_importer_mapping', array() );
+			$post_mapped_data = $mapping_data['post'] ?? array();
+
+			$this->update_evf_form_ids( $blocks, $post_mapped_data );
+
+			// Convert blocks back to post content.
+			$post_content = serialize_blocks( $blocks );
+
+			// Update the post content.
+			wp_update_post(
+				array(
+					'ID'           => $post_id,
+					'post_content' => $post_content,
+				)
+			);
+		}
+
+		delete_option( 'themegrill_demo_importer_posts_with_evf' );
+	}
+
+	public function update_evf_form_ids( array &$blocks, array $post_id_map ) {
+		foreach ( $blocks as &$block ) {
+			if ( isset( $block['blockName'] ) ) {
+				if ( 'everest-forms/form-selector' === $block['blockName'] ) {
+					if ( isset( $block['attrs']['formId'] ) ) {
+						$current_form_id = $block['attrs']['formId'];
+						if ( isset( $post_id_map[ $current_form_id ] ) ) {
+							$block['attrs']['formId'] = (string) $post_id_map[ $current_form_id ];
+						}
+					}
+				}
+				if ( ! empty( $block['innerBlocks'] ) ) {
+					$this->update_evf_form_ids( $block['innerBlocks'], $post_id_map );
+				}
+			}
+		}
+	}
+
+	public function themegrill_update_block_term_ids( array &$blocks, array $term_id_map ) {
+		foreach ( $blocks as &$block ) {
+			if ( isset( $block['blockName'] ) ) {
+				if ( str_starts_with( $block['blockName'], 'magazine-blocks/' ) ) {
+					if ( isset( $block['attrs'] ) ) {
+						$key1 = array( 'category', 'category2', 'tag', 'tag2', 'authorName' );
+
+						foreach ( $key1 as $key ) {
+							if ( 'authorName' === $key && isset( $block['attrs'][ $key ] ) ) {
+								$block['attrs'][ $key ] = (string) get_current_user_id();
+								break;
+							}
+							if ( isset( $block['attrs'][ $key ] ) && isset( $term_id_map[ $block['attrs'][ $key ] ] ) ) {
+								$block['attrs'][ $key ] = (string) $term_id_map[ $block['attrs'][ $key ] ];
+							}
+						}
+
+						$key2 = array( 'excludedCategory', 'excludedCategory2' );
+
+						foreach ( $key2 as $key ) {
+							if ( isset( $block['attrs'][ $key ] ) && is_array( $block['attrs'][ $key ] ) ) {
+								$block['attrs'][ $key ] = array_map(
+									function ( $cat_id ) use ( $term_id_map ) {
+										return isset( $term_id_map[ $cat_id ] ) ? (string) $term_id_map[ $cat_id ] : false;
+									},
+									$block['attrs'][ $key ]
+								);
+							}
+						}
+					}
+
+					// Recursively update inner blocks
+					if ( ! empty( $block['innerBlocks'] ) ) {
+						$this->themegrill_update_block_term_ids( $block['innerBlocks'], $term_id_map );
+					}
+				}
+				if ( 'core/group' === $block['blockName'] ) {
+					if ( ! empty( $block['innerBlocks'] ) ) {
+						foreach ( $block['innerBlocks'] as &$inner_block ) {
+							if ( 'core/legacy-widget' === $inner_block['blockName'] ) {
+								if ( isset( $inner_block['attrs']['idBase'] ) && 'nav_menu' === $inner_block['attrs']['idBase'] ) {
+									if ( isset( $inner_block['attrs']['instance']['raw']['nav_menu'] ) ) {
+										$current_menu_id = $inner_block['attrs']['instance']['raw']['nav_menu'];
+										if ( isset( $term_id_map[ $current_menu_id ] ) ) {
+											$new_menu_id = $term_id_map[ $current_menu_id ];
+											$inner_block['attrs']['instance']['raw']['nav_menu'] = $new_menu_id;
+
+											// Preserve existing raw data and update nav_menu
+											$new_data             = $inner_block['attrs']['instance']['raw'];
+											$new_data['nav_menu'] = $new_menu_id;
+
+											// Update encoded and hash with complete data
+											$inner_block['attrs']['instance']['encoded'] = base64_encode( serialize( $new_data ) );
+											$inner_block['attrs']['instance']['hash']    = wp_hash( serialize( $new_data ) );
+
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 }

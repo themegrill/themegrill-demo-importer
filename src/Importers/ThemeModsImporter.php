@@ -113,7 +113,6 @@ class ThemeModsImporter {
 		if ( ! empty( $args['custom_logo'] ) ) {
 				$mods['custom_logo'] = $args['custom_logo'];
 		}
-
 		if ( ! empty( $args['color_palette'] ) ) {
 			$color_palette_key = $demo_data['theme_slug'] . '_color_palette';
 			$colors            = array();
@@ -133,10 +132,11 @@ class ThemeModsImporter {
 			$existing_custom[] = $new_custom;
 
 			$new_value                  = [
-				'id'     => $id,
-				'name'   => 'Starter Colors',
-				'colors' => $colors,
-				'custom' => $existing_custom,
+				'id'         => $id,
+				'name'       => 'Starter Colors',
+				'colors'     => $colors,
+				'custom'     => $existing_custom,
+				'updated_at' => time(),
 			];
 			$mods[ $color_palette_key ] = $new_value;
 		}

@@ -17,7 +17,8 @@ class SiteService {
 					'User-Agent'   => 'ThemeGrill/1.0',
 					'Content-Type' => 'application/json',
 				],
-				'sslverify' => false,
+				'sslverify' => true,
+				'timeout'   => 30,
 			]
 		);
 
