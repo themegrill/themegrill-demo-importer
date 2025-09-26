@@ -631,7 +631,9 @@ class WXRImporter extends WP_Importer {
 			$postdata[ $key ] = $data[ $key ];
 		}
 
-		$postdata = apply_filters( 'wp_import_post_data_processed', $postdata, $data, $this->mapping['term_id'] );
+		$postdata = apply_filters( 'wp_import_post_data_processed', $postdata, $data );
+
+		$postdata = apply_filters( 'themegrill_import_post_data_processed', $postdata, $this->mapping['term_id'] );
 
 		$postdata = wp_slash( $postdata );
 
