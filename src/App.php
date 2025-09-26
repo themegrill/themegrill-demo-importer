@@ -12,7 +12,7 @@ class App {
 	 *
 	 * @var string
 	 */
-	public $version = '2.0.0.4';
+	public $version = '2.0.0.5';
 
 	/**
 	 * Initialize the application

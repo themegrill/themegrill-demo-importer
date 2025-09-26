@@ -4,7 +4,7 @@ Tags: themegrill, theme demos, demo, importer, one click import
 Requires at least: 5.7
 Tested up to: 6.8
 Requires PHP: 8.1.0
-Stable tag: 2.0.0.4
+Stable tag: 2.0.0.5
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -33,6 +33,9 @@ Bugs can be reported either in our support forum or preferably on the [GitHub re
 Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/themegrill-demo-importer/) :)
 
 == Changelog ==
+= 2.0.0.5 - 26-09-2025 =
+* Tweak   - Minor fix.
+
 = 2.0.0.4 - 26-09-2025 =
 * Fix   - Issue with customized color palette import.
 * Fix   - Issue with Everest form block import.
