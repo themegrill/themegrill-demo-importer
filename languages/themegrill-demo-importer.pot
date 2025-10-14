@@ -9,9 +9,9 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-09-22T10:13:20+00:00\n"
+"POT-Creation-Date: 2025-10-14T06:48:58+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"X-Generator: WP-CLI 2.11.0\n"
+"X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: themegrill-demo-importer\n"
 
 #. Plugin Name of the plugin
@@ -26,7 +26,7 @@ msgstr ""
 
 #. Description of the plugin
 #: themegrill-demo-importer.php
-msgid "Premium starter sites and website templates by ThemeGrill. Import demo content, widgets, and theme settings with one click."
+msgid "Import ThemeGrill official themes demo content, widgets and theme settings with just one click."
 msgstr ""
 
 #. Author of the plugin
@@ -39,297 +39,238 @@ msgstr ""
 msgid "https://themegrill.com"
 msgstr ""
 
-#: src/Admin.php:62
-#: src/Admin.php:63
-#: src/Admin.php:72
-#: src/Admin.php:73
-#: src/App.php:69
+#: src/Admin.php:42
+#: src/Admin.php:43
 msgid "Starter Templates"
 msgstr ""
 
-#: src/App.php:69
-msgid "View Starter Templates"
+#: src/Controllers/V1/ImportController.php:234
+msgid "Invalid content type specified"
 msgstr ""
 
-#: src/App.php:85
-msgid "View Starter Templates Documentation"
+#: src/Controllers/V1/ImportController.php:257
+msgid "Sorry, you are not allowed to import."
 msgstr ""
 
-#: src/App.php:85
-msgid "Docs"
+#: src/Controllers/V1/ImportController.php:275
+msgid "Sorry, you are not allowed to view logs."
 msgstr ""
 
-#: src/App.php:86
-msgid "Visit Free Customer Support Forum"
+#: src/Controllers/V1/ImportController.php:281
+msgid "Sorry, you are not allowed to delete logs."
 msgstr ""
 
-#: src/App.php:86
-msgid "Free Support"
+#: src/Controllers/V1/ImportController.php:416
+msgid "Failed to create upload directory for content file."
 msgstr ""
 
-#: src/Controllers/ImportController.php:28
-msgid "Invalid action provided"
+#. translators: %s: file path
+#: src/Controllers/V1/ImportController.php:428
+#, php-format
+msgid "Failed to save content file to %s"
 msgstr ""
 
-#: src/Controllers/ImportController.php:39
-msgid "Invalid demo config provided"
+#: src/Controllers/V1/ImportController.php:484
+msgid "Failed to download content file. Please check the URL and try again."
 msgstr ""
 
-#: src/Controllers/ImportController.php:67
-msgid "Invalid slug provided"
+#: src/Controllers/V1/SitesController.php:50
+msgid "Unique identifier for the site."
 msgstr ""
 
-#: src/Controllers/ImportController.php:81
-msgid "Pro activated successfully."
+#: src/Controllers/V1/SitesController.php:55
+msgid "Source of the site data."
 msgstr ""
 
-#: src/Importers/PluginImporter.php:49
-msgid "Companion Elementor installed and activated."
+#: src/Controllers/V1/SitesController.php:241
+msgid "Sorry, you are not allowed to access this resource."
 msgstr ""
 
-#. translators: %s Plugin name
-#: src/Importers/PluginImporter.php:160
-msgid "%s installed and activated."
+#: src/Controllers/V1/SitesController.php:257
+msgid "Force refresh data from remote source, bypassing cache."
 msgstr ""
 
-#: src/Importers/ThemeModsImporter.php:60
-msgid "The customizer data is not in a correct format."
+#: dist/starter-templates.js:1
+msgid "Gutenberg"
 msgstr ""
 
-#: src/Importers/WidgetsImporter.php:58
-msgid "Invalid data."
+#: dist/starter-templates.js:1
+msgid "Elementor"
 msgstr ""
 
-#: src/Importers/WidgetsImporter.php:95
-msgid "Sidebar does not exist in theme (moving widget to Inactive)"
+#: dist/starter-templates.js:1
+msgid "Brizy"
 msgstr ""
 
-#: src/Importers/WidgetsImporter.php:117
-msgid "Site does not support widget"
+#: dist/starter-templates.js:1
+msgid "Exit import process"
 msgstr ""
 
-#: src/Importers/WidgetsImporter.php:151
-msgid "Widget already exists"
+#: dist/starter-templates.js:1
+msgid "Select a Template you Like"
 msgstr ""
 
-#: src/Importers/WidgetsImporter.php:210
-msgid "Imported"
+#: dist/starter-templates.js:1
+msgid "Search..."
 msgstr ""
 
-#: src/Importers/WidgetsImporter.php:213
-msgid "Imported to Inactive"
-msgstr ""
-
-#: src/Importers/WidgetsImporter.php:219
-msgid "No Title"
-msgstr ""
-
-#: src/Importers/WXRImporter/WXRImporter.php:131
-msgid "Could not open the file for parsing"
-msgstr ""
-
-#: src/Importers/WXRImporter/WXRImporter.php:918
-msgid "Invalid file type"
-msgstr ""
-
-#: src/Importers/WXRImporter/WXRImporter.php:1437
-msgid "Remote server returned %1$d %2$s for %3$s"
-msgstr ""
-
-#: src/Importers/WXRImporter/WXRImporter.php:1450
-msgid "Remote file is incorrect size"
-msgstr ""
-
-#: src/Importers/WXRImporter/WXRImporter.php:1455
-msgid "Zero size file downloaded"
-msgstr ""
-
-#: src/Importers/WXRImporter/WXRImporter.php:1461
-msgid "Remote file is too large, limit is %s"
-msgstr ""
-
-#: src/Services/ImportService.php:134
-msgid "Cleaned up successfully."
-msgstr ""
-
-#: src/Traits/Singleton.php:34
-#: src/Traits/Singleton.php:41
-msgid "Cheatin&#8217; huh?"
-msgstr ""
-
-#: dist/dashboard.11cd7c6d91229b2ef483.hot-update.js:162
-#: dist/dashboard.c859266cb0c967623443.hot-update.js:161
-#: dist/dashboard.js:54124
-msgid "Color Palette"
-msgstr ""
-
-#: dist/dashboard.11cd7c6d91229b2ef483.hot-update.js:182
-#: dist/dashboard.c859266cb0c967623443.hot-update.js:181
-#: dist/dashboard.js:54144
-msgid "Typography"
-msgstr ""
-
-#: dist/dashboard.11cd7c6d91229b2ef483.hot-update.js:222
-#: dist/dashboard.c859266cb0c967623443.hot-update.js:221
-#: dist/dashboard.js:54184
-msgid "Continue"
-msgstr ""
-
-#: dist/dashboard.16be1212b3f566da16a4.hot-update.js:76
-#: dist/dashboard.45f349303263ed48d1fc.hot-update.js:76
-#: dist/dashboard.2369509db165ac1280a2.hot-update.js:73
-#: dist/dashboard.js:57029
-msgid "Something went wrong."
-msgstr ""
-
-#: dist/dashboard.45f349303263ed48d1fc.hot-update.js:79
-#: dist/dashboard.js:52830
-#: dist/dashboard.js:57032
-msgid "Try Again"
-msgstr ""
-
-#: dist/dashboard.js:52712
-msgid "Ready to Import?"
-msgstr ""
-
-#: dist/dashboard.js:52715
-msgid "Importing this template adds content to your site and overwrites current theme settings."
-msgstr ""
-
-#: dist/dashboard.js:52721
-#: dist/dashboard.js:53405
-msgid "Start Import"
-msgstr ""
-
-#: dist/dashboard.js:52726
-#: dist/dashboard.js:52844
-msgid "Cancel"
-msgstr ""
-
-#: dist/dashboard.js:52811
-msgid "Import Failed"
-msgstr ""
-
-#: dist/dashboard.js:52818
-msgid "Unable to import the template. If the problem continues, refer to our "
-msgstr ""
-
-#: dist/dashboard.js:52823
-msgid "documentation"
-msgstr ""
-
-#: dist/dashboard.js:52824
-msgid "."
-msgstr ""
-
-#: dist/dashboard.js:52943
-msgid "Congratulations!"
-msgstr ""
-
-#: dist/dashboard.js:52946
-msgid "Import complete! Your site is now live with your selected template."
-msgstr ""
-
-#: dist/dashboard.js:52954
-msgid "View Your Site"
-msgstr ""
-
-#: dist/dashboard.js:52962
-msgid "Back to Dashboard"
-msgstr ""
-
-#: dist/dashboard.js:53058
-msgid "Importing your site"
-msgstr ""
-
-#: dist/dashboard.js:53066
-msgid "It might take a couple of minutes. Please do not close or refresh this page."
-msgstr ""
-
-#: dist/dashboard.js:53205
-msgid "Upgrade to Pro"
-msgstr ""
-
-#: dist/dashboard.js:53233
-msgid "This is a premium template. Please upgrade to premium plans to access premium starter templates."
-msgstr ""
-
-#: dist/dashboard.js:53242
-msgid "Upgrade Now"
-msgstr ""
-
-#: dist/dashboard.js:53250
-msgid "Activating..."
-msgstr ""
-
-#: dist/dashboard.js:53254
-msgid "Activate Now"
-msgstr ""
-
-#: dist/dashboard.js:53266
-msgid "View all Premium Templates"
-msgstr ""
-
-#: dist/dashboard.js:53387
-msgid "This plugin is required for the template to function properly and cannot be unchecked."
-msgstr ""
-
-#: dist/dashboard.js:53409
-msgid "Back"
-msgstr ""
-
-#: dist/dashboard.js:54310
-msgid "Back to Starter Templates"
-msgstr ""
-
-#: dist/dashboard.js:54976
-msgid "Change"
-msgstr ""
-
-#: dist/dashboard.js:54987
-msgid "Remove"
-msgstr ""
-
-#: dist/dashboard.js:55045
-msgid "Change Logo"
-msgstr ""
-
-#: dist/dashboard.js:55060
-msgid "Upload Logo Here"
-msgstr ""
-
-#: dist/dashboard.js:55158
-msgid "Premium"
-msgstr ""
-
-#: dist/dashboard.js:55167
-msgid "New"
-msgstr ""
-
-#: dist/dashboard.js:55397
-msgid "Sorry, no result found"
-msgstr ""
-
-#: dist/dashboard.js:55400
-msgid "Please try another search"
-msgstr ""
-
-#: dist/dashboard.js:55626
-msgid "Exit Import Process"
-msgstr ""
-
-#: dist/dashboard.js:55637
-msgid "Select a Template you like"
-msgstr ""
-
-#: dist/dashboard.js:55646
-msgid "Search ..."
-msgstr ""
-
-#: dist/dashboard.js:55666
+#: dist/starter-templates.js:1
 msgid "Choose Builder"
 msgstr ""
 
-#: dist/dashboard.js:55682
-msgid "Categories"
+#: dist/starter-templates.js:1
+msgid "Category"
+msgstr ""
+
+#: dist/starter-templates.js:1
+msgid "Premium"
+msgstr ""
+
+#: dist/starter-templates.js:1
+msgid "Installing Plugins"
+msgstr ""
+
+#: dist/starter-templates.js:1
+msgid "Importing Content"
+msgstr ""
+
+#: dist/starter-templates.js:1
+msgid "Applying Theme Customizations"
+msgstr ""
+
+#: dist/starter-templates.js:1
+msgid "Configuring Widgets"
+msgstr ""
+
+#: dist/starter-templates.js:1
+msgid "Cleaning Up"
+msgstr ""
+
+#: dist/starter-templates.js:1
+msgid "Finalizing Import"
+msgstr ""
+
+#: dist/starter-templates.js:1
+#, js-format
+msgid "Processing: %s..."
+msgstr ""
+
+#: dist/starter-templates.js:1
+msgid "Import Failed"
+msgstr ""
+
+#: dist/starter-templates.js:1
+msgid "Importing your site"
+msgstr ""
+
+#: dist/starter-templates.js:1
+msgid "Unable to import the template. If the problem continues, refer to our "
+msgstr ""
+
+#: dist/starter-templates.js:1
+msgid "documentation"
+msgstr ""
+
+#: dist/starter-templates.js:1
+msgid "It might take a couple of minutes. Please do not close or refresh this page."
+msgstr ""
+
+#: dist/starter-templates.js:1
+msgid "Try Again"
+msgstr ""
+
+#: dist/starter-templates.js:1
+msgid "Cancel"
+msgstr ""
+
+#: dist/starter-templates.js:1
+msgid "Upgrade to Pro"
+msgstr ""
+
+#: dist/starter-templates.js:1
+msgid "This is premium template. Please upgrade to premium plans to access premium starter templates"
+msgstr ""
+
+#: dist/starter-templates.js:1
+msgid "Upgrade Now"
+msgstr ""
+
+#: dist/starter-templates.js:1
+msgid "View all Premium Templates"
+msgstr ""
+
+#: dist/starter-templates.js:1
+msgid "Ready to Import?"
+msgstr ""
+
+#: dist/starter-templates.js:1
+msgid "Importing this template adds content to your site and overwrites current theme settings."
+msgstr ""
+
+#: dist/starter-templates.js:1
+msgid "Start Import"
+msgstr ""
+
+#: dist/starter-templates.js:1
+msgid "Congratulations!"
+msgstr ""
+
+#: dist/starter-templates.js:1
+msgid "Import complete! your site is now live with your selected template."
+msgstr ""
+
+#: dist/starter-templates.js:1
+msgid "View Your Site"
+msgstr ""
+
+#: dist/starter-templates.js:1
+msgid "Back to Dashboard"
+msgstr ""
+
+#: dist/starter-templates.js:1
+msgid "Close"
+msgstr ""
+
+#: dist/starter-templates.js:1
+msgid "Change"
+msgstr ""
+
+#: dist/starter-templates.js:1
+msgid "Remove"
+msgstr ""
+
+#: dist/starter-templates.js:1
+msgid "Upload Logo Here"
+msgstr ""
+
+#: dist/starter-templates.js:1
+msgid "Features"
+msgstr ""
+
+#: dist/starter-templates.js:1
+msgid "Add your branding: logo, colors & fonts"
+msgstr ""
+
+#: dist/starter-templates.js:1
+msgid "Select features that you need for your site"
+msgstr ""
+
+#: dist/starter-templates.js:1
+msgid "Back to starter templates"
+msgstr ""
+
+#: dist/starter-templates.js:1
+msgid "Continue"
+msgstr ""
+
+#: dist/starter-templates.js:1
+msgid "Desktop preview"
+msgstr ""
+
+#: dist/starter-templates.js:1
+msgid "Tablet preview"
+msgstr ""
+
+#: dist/starter-templates.js:1
+msgid "Mobile preview"
 msgstr ""

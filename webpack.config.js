@@ -1,26 +1,18 @@
 const defaults = require('@wordpress/scripts/config/webpack.config');
 const { resolve } = require('path');
 const ForkTsCheckerPlugin = require('fork-ts-checker-webpack-plugin');
-const { TanStackRouterWebpack } = require('@tanstack/router-plugin/webpack');
+const { tanstackRouter } = require('@tanstack/router-plugin/webpack');
 
 module.exports = {
 	...defaults,
 	output: {
+		...defaults.output,
 		filename: '[name].js',
 		path: resolve(process.cwd(), 'dist'),
 	},
 	entry: {
-		dashboard: resolve(process.cwd(), 'resources/onboarding', 'index.tsx'),
+		'starter-templates': resolve(process.cwd(), 'resources/starter-templates', 'index.tsx'),
 	},
-	plugins: [
-		...defaults.plugins,
-		TanStackRouterWebpack({
-			routesDirectory: resolve(process.cwd(), 'resources/onboarding/routes'),
-			generatedRouteTreeFile: resolve(process.cwd(), 'resources/onboarding/routeTree.gen.ts'),
-			routeFileExtensions: ['.ts', '.tsx'],
-		}),
-		new ForkTsCheckerPlugin(),
-	],
 	resolve: {
 		...defaults.resolve,
 		alias: {
@@ -28,6 +20,19 @@ module.exports = {
 			'@/*': resolve(process.cwd(), 'resources/*'),
 		},
 	},
+	plugins: [
+		...defaults.plugins,
+		new ForkTsCheckerPlugin(),
+		tanstackRouter({
+			target: 'react',
+			routesDirectory: resolve(process.cwd(), 'resources/starter-templates/routes'),
+			generatedRouteTreeFile: resolve(
+				process.cwd(),
+				'resources/starter-templates/routeTree.gen.ts',
+			),
+			routeFileExtensions: ['.ts', '.tsx'],
+		}),
+	].filter(Boolean),
 	devServer:
 		process.env.NODE_ENV === 'production'
 			? undefined

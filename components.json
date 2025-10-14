@@ -4,18 +4,17 @@
   "rsc": false,
   "tsx": true,
   "tailwind": {
-    "config": "",
-    "css": "src/assets/css/dashboard.pcss",
+    "config": "tailwind.config.js",
+    "css": "resources/starter-templates/styles/dashboard.pcss",
     "baseColor": "neutral",
-    "cssVariables": true,
-    "prefix": ""
+    "cssVariables": true
   },
   "aliases": {
-    "components": "@/components",
-    "utils": "@/lib/utils",
-    "ui": "@/components/ui",
-    "lib": "@/lib",
-    "hooks": "@/hooks"
+    "components": "@/starter-templates/components",
+    "utils": "@/starter-templates/lib/utils",
+    "ui": "@/starter-templates/components/ui",
+    "lib": "@/starter-templates/lib",
+    "hooks": "@/starter-templates/hooks"
   },
   "iconLibrary": "lucide"
 }

@@ -1,0 +1,296 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@layer base {
+	:root {
+		--background: 221 100% 100%;
+		--foreground: 221 5% 10%;
+		--card: 221 50% 100%;
+		--card-foreground: 221 5% 15%;
+		--popover: 221 100% 100%;
+		--popover-foreground: 221 100% 10%;
+		--primary: 221 83% 53%;
+		--primary-foreground: 0 0% 100%;
+		--secondary: 221 30% 90%;
+		--secondary-foreground: 0 0% 0%;
+		--muted: 223 84% 95%;
+		--muted-foreground: 223 5% 40%;
+		--accent: 223 84% 95%;
+		--accent-foreground: 221 5% 15%;
+		--destructive: 0 100% 50%;
+		--destructive-foreground: 221 5% 100%;
+		--border: 210 11% 93%;
+		--input: 210 11% 93%;
+		--ring: 221 83.2% 53.3%;
+		--radius: 0.5rem;
+		--chart-1: 221.2 83.2% 53.3%;
+		--chart-2: 212 95% 68%;
+		--chart-3: 216 92% 60%;
+		--chart-4: 210 98% 78%;
+		--chart-5: 212 97% 87%;
+		--react-international-phone-border-radius: calc(var(--radius) - 2px);
+		--react-international-phone-border-color: hsl(var(--input));
+		--react-international-phone-height: 2.5rem;
+		--sidebar-background: 0 0% 98%;
+		--sidebar-foreground: 240 5.3% 26.1%;
+		--sidebar-primary: 240 5.9% 10%;
+		--sidebar-primary-foreground: 0 0% 98%;
+		--sidebar-accent: 240 4.8% 95.9%;
+		--sidebar-accent-foreground: 240 5.9% 10%;
+		--sidebar-border: 220 13% 91%;
+		--sidebar-ring: 217.2 91.2% 59.8%;
+	}
+	.dark {
+		--sidebar-background: 240 5.9% 10%;
+		--sidebar-foreground: 240 4.8% 95.9%;
+		--sidebar-primary: 224.3 76.3% 48%;
+		--sidebar-primary-foreground: 0 0% 100%;
+		--sidebar-accent: 240 3.7% 15.9%;
+		--sidebar-accent-foreground: 240 4.8% 95.9%;
+		--sidebar-border: 240 3.7% 15.9%;
+		--sidebar-ring: 217.2 91.2% 59.8%;
+	}
+}
+
+@layer base {
+	@font-face {
+		font-display: swap;
+		font-family: "Segoe UI";
+		font-style: normal;
+		font-weight: 300;
+		src: url("../assets/fonts/segoeui/segoeuilight.woff2") format("woff2");
+	}
+	@font-face {
+		font-display: swap;
+		font-family: "Segoe UI";
+		font-style: normal;
+		font-weight: 400;
+		src: url("../assets/fonts/segoeui/segoeui.woff2") format("woff2");
+	}
+	@font-face {
+		font-display: swap;
+		font-family: "Segoe UI";
+		font-style: normal;
+		font-weight: 600;
+		src: url("../assets/fonts/segoeui/segoeuisemibold.woff2")
+			format("woff2");
+	}
+	* {
+		@apply border-border;
+	}
+	body {
+		@apply bg-background text-foreground;
+	}
+}
+
+body,
+#ThemeGrill-Demo-Importer-App {
+	@apply min-h-svh w-full bg-white;
+}
+
+#ThemeGrill-Demo-Importer-App {
+	@apply flex flex-1 flex-col;
+}
+
+@layer base {
+	.loader {
+		width: 16px;
+		aspect-ratio: 1;
+		border-radius: 50%;
+		border: 2px solid #2564eb;
+		animation:
+			l20-1 0.8s infinite linear alternate,
+			l20-2 1.6s infinite linear;
+	}
+	@keyframes l20-1 {
+		0% {
+			clip-path: polygon(
+				50% 50%,
+				0 0,
+				50% 0%,
+				50% 0%,
+				50% 0%,
+				50% 0%,
+				50% 0%
+			);
+		}
+		12.5% {
+			clip-path: polygon(
+				50% 50%,
+				0 0,
+				50% 0%,
+				100% 0%,
+				100% 0%,
+				100% 0%,
+				100% 0%
+			);
+		}
+		25% {
+			clip-path: polygon(
+				50% 50%,
+				0 0,
+				50% 0%,
+				100% 0%,
+				100% 100%,
+				100% 100%,
+				100% 100%
+			);
+		}
+		50% {
+			clip-path: polygon(
+				50% 50%,
+				0 0,
+				50% 0%,
+				100% 0%,
+				100% 100%,
+				50% 100%,
+				0% 100%
+			);
+		}
+		62.5% {
+			clip-path: polygon(
+				50% 50%,
+				100% 0,
+				100% 0%,
+				100% 0%,
+				100% 100%,
+				50% 100%,
+				0% 100%
+			);
+		}
+		75% {
+			clip-path: polygon(
+				50% 50%,
+				100% 100%,
+				100% 100%,
+				100% 100%,
+				100% 100%,
+				50% 100%,
+				0% 100%
+			);
+		}
+		100% {
+			clip-path: polygon(
+				50% 50%,
+				50% 100%,
+				50% 100%,
+				50% 100%,
+				50% 100%,
+				50% 100%,
+				0% 100%
+			);
+		}
+	}
+	@keyframes l20-2 {
+		0% {
+			transform: scaleY(1) rotate(0deg);
+		}
+		49.99% {
+			transform: scaleY(1) rotate(135deg);
+		}
+		50% {
+			transform: scaleY(-1) rotate(0deg);
+		}
+		100% {
+			transform: scaleY(-1) rotate(-135deg);
+		}
+	}
+}
+
+#ThemeGrill-Starter-Templates-App {
+	@apply min-h-svh w-full bg-white;
+}
+
+#ThemeGrill-Starter-Templates-App-Loader {
+	@apply min-h-svh grid place-items-center w-full;
+
+	div {
+		@apply text-primary;
+	}
+
+	svg {
+		@apply animate-spin;
+	}
+}
+
+body[data-wait="true"] {
+	* {
+		cursor: wait !important;
+	}
+}
+
+.screen-reader-text {
+	@apply sr-only;
+}
+
+.media-router .media-menu-item:focus {
+	@apply shadow-[0_0_0_2px_hsl(var(--primary))];
+}
+
+.media-router .media-menu-item:hover,
+.media-router .media-menu-item:active {
+	@apply text-primary;
+}
+
+.wp-core-ui .button,
+.wp-core-ui .button-secondary {
+	@apply text-primary border-primary bg-white;
+}
+
+.wp-core-ui .button.hover,
+.wp-core-ui .button:hover,
+.wp-core-ui .button-secondary:hover {
+	@apply bg-white text-primary border-primary;
+}
+
+.wp-core-ui .attachment.details,
+.wp-core-ui .selected.attachment {
+	@apply shadow-[inset_0_0_0_3px_hsl(var(--background)),inset_0_0_0_7px_hsl(var(--primary))];
+}
+
+.wp-core-ui .attachment.details .check,
+.wp-core-ui .attachment.selected .check:focus,
+.wp-core-ui .media-frame.mode-grid .attachment.selected .check {
+	@apply bg-primary shadow-[0_0_0_1px_hsl(var(--background)),0_0_0_2px_hsl(var(--primary))];
+}
+
+.media-frame input[type="text"]:focus,
+.media-frame input[type="password"]:focus,
+.media-frame input[type="number"]:focus,
+.media-frame input[type="search"]:focus,
+.media-frame input[type="email"]:focus,
+.media-frame input[type="url"]:focus,
+.media-frame textarea:focus,
+.media-frame select:focus {
+	@apply border-primary shadow-[0_0_0_1px_hsl(var(--primary))];
+}
+
+.media-frame a {
+	@apply text-primary;
+}
+
+.wp-core-ui .button.focus,
+.wp-core-ui .button:focus,
+.wp-core-ui .button-secondary:focus {
+	@apply bg-white border-primary text-primary shadow-[0_0_0_1px_hsl(var(--primary))];
+}
+
+.media-progress-bar div {
+	@apply bg-primary;
+}
+
+.wp-core-ui .attachment:focus,
+.wp-core-ui .selected.attachment:focus,
+.wp-core-ui .attachment.details:focus {
+	@apply shadow-[inset_0_0_2px_3px_hsl(var(--background)),inset_0_0_0_7px_hsl(var(--primary))];
+}
+
+.media-modal-close:hover,
+.media-modal-close:active,
+.media-modal-close:focus {
+	@apply text-primary;
+}
+
+.media-modal-close:focus {
+	@apply border-primary shadow-[0_0_0_3px_hsl(var(--primary))];
+}

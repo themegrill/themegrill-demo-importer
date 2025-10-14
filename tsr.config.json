@@ -1,6 +1,6 @@
 {
-  "routesDirectory": "./resources/onboarding/routes",
-  "generatedRouteTree": "./resources/onboarding/routeTree.gen.ts",
+  "routesDirectory": "./resources/starter-templates/routes",
+  "generatedRouteTree": "./resources/starter-templates/routeTree.gen.ts",
   "routeFileIgnorePrefix": "~",
   "quoteStyle": "single"
 }

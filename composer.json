@@ -1,47 +1,21 @@
 {
-  "name": "themegrill/themegrill-demo-importer",
-  "description": "Import your demo content, widgets and theme settings with one click for ThemeGrill official themes.",
-  "homepage": "https://themegrill.com/plugins/demo-importer/",
-  "type": "wordpress-plugin",
-  "license": "GPL-2.0+",
-  "prefer-stable": true,
-  "minimum-stability": "dev",
+  "name": "themegrill/starter-templates",
+  "version": "1.0.0",
   "require": {
     "php": ">=8.1",
-    "composer/installers": "^1.0 || ^2.0",
-    "psr/log": "^3.0"
+    "laravie/parser": "^2.4",
+    "psr/log": "^3.0",
+    "sabre/xml": "^4.0"
   },
   "require-dev": {
     "wp-cli/i18n-command": "^2.2.5"
   },
+  "scripts": {
+    "makepot": "\"vendor/bin/wp\" i18n make-pot . ./languages/themegrill-demo-importer.pot --include=dist,src"
+  },
   "autoload": {
     "psr-4": {
-      "ThemeGrill\\Demo\\Importer\\": "src/"
-    }
-  },
-  "scripts": {
-    "phpcs": [
-      "phpcs -s -p"
-    ],
-    "phpcs-pre-commit": [
-      "phpcs -s -p -n"
-    ],
-    "phpcbf": [
-      "phpcbf -p"
-    ],
-    "make-pot": [
-      "\"vendor/bin/wp\" i18n make-pot . languages/themegrill-demo-importer.pot --exclude=\"vendor,node_modules,.github,.wordpress.org\" --slug=themegrill-demo-importer"
-    ]
-  },
-  "extra": {
-    "scripts-description": {
-      "phpcs": "Analyze code against the WordPress coding standard with PHP_CodeSniffer",
-      "phpcbf": "Fix coding standards warnings/errors automattically with PHP Code Beautifier"
-    }
-  },
-  "config": {
-    "allow-plugins": {
-      "composer/installers": true
+      "ThemeGrill\\StarterTemplates\\": "src/"
     }
   }
 }

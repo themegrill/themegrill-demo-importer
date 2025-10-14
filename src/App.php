@@ -1,104 +1,187 @@
 <?php
+/**
+ * Main application class for ThemeGrill Starter Templates.
+ *
+ * @package ThemeGrill\StarterTemplates
+ * @since   2.0.0
+ */
 
-namespace ThemeGrill\Demo\Importer;
+namespace ThemeGrill\StarterTemplates;
 
-use ThemeGrill\Demo\Importer\Traits\Singleton;
+use Psr\Log\LoggerInterface;
+use ThemeGrill\StarterTemplates\Controllers\V1\{ImportController, SitesController};
+use ThemeGrill\StarterTemplates\Services\{ActivationService, DeactivationService};
+use ThemeGrill\StarterTemplates\Traits\Hooks;
 
 class App {
-	use Singleton;
+
+	use Hooks;
+
+	private static ?\ThemeGrill\StarterTemplates\App $instance = null;
+
+	private bool $booted = false;
+
+	private LoggerInterface $logger;
 
 	/**
-	 * Plugin version.
+	 * Get the singleton instance of the App class.
 	 *
-	 * @var string
+	 * @since 2.0.0
+	 * @return \ThemeGrill\StarterTemplates\App The singleton instance.
 	 */
-	public $version = '2.0.0.5';
-
-	/**
-	 * Initialize the application
-	 */
-	protected function init() {
-		$this->init_hooks();
-
-		do_action( 'themegrill_demo_importer_loaded' );
-	}
-
-	/**
-	 * Hook into actions and filters.
-	 */
-	private function init_hooks() {
-		// Load plugin text domain.
-		add_action( 'init', array( $this, 'load_plugin_textdomain' ) );
-
-		add_filter( 'plugin_action_links_' . TGDM_PLUGIN_BASENAME, array( $this, 'plugin_action_links' ) );
-		add_filter( 'plugin_row_meta', array( $this, 'plugin_row_meta' ), 10, 2 );
-
-		Activator::init();
-		Deactivator::init();
-		Admin::instance();
-		RestApi::instance();
-		ImportHooks::instance();
-	}
-
-	/**
-	 * Load Localisation files.
-	 *
-	 * Note: the first-loaded translation file overrides any following ones if the same translation is present.
-	 *
-	 * Locales found in:
-	 *      - WP_LANG_DIR/themegrill-demo-importer/themegrill-demo-importer-LOCALE.mo
-	 *      - WP_LANG_DIR/plugins/themegrill-demo-importer-LOCALE.mo
-	 */
-	public function load_plugin_textdomain() {
-		$locale = is_admin() && function_exists( 'get_user_locale' ) ? get_user_locale() : get_locale();
-		$locale = apply_filters( 'plugin_locale', $locale, 'themegrill-demo-importer' );
-
-		unload_textdomain( 'themegrill-demo-importer' );
-		load_textdomain( 'themegrill-demo-importer', WP_LANG_DIR . '/themegrill-demo-importer/themegrill-demo-importer-' . $locale . '.mo' );
-		load_plugin_textdomain( 'themegrill-demo-importer', false, plugin_basename( dirname( TGDM_PLUGIN_FILE ) ) . '/languages' );
-	}
-
-	/**
-	 * Display action links in the Plugins list table.
-	 *
-	 * @param  array $actions Plugin Action links.
-	 * @return array
-	 */
-	public function plugin_action_links( $actions ) {
-		$url         = admin_url( Admin::$starter_templates_link );
-		$new_actions = array(
-			'importer' => '<a href="' . esc_url( $url ) . '" aria-label="' . esc_attr( __( 'View Starter Templates', 'themegrill-demo-importer' ) ) . '">' . __( 'Starter Templates', 'themegrill-demo-importer' ) . '</a>',
-		);
-
-		return array_merge( $new_actions, $actions );
-	}
-
-	/**
-	 * Display row meta in the Plugins list table.
-	 *
-	 * @param  array  $plugin_meta Plugin Row Meta.
-	 * @param  string $plugin_file Plugin Row Meta.
-	 * @return array
-	 */
-	public function plugin_row_meta( $plugin_meta, $plugin_file ) {
-		if ( TGDM_PLUGIN_BASENAME === $plugin_file ) {
-			$new_plugin_meta = array(
-				'docs'    => '<a href="' . esc_url( apply_filters( 'themegrill_demo_importer_docs_url', 'https://docs.themegrill.com/themegrill-demo-importer/' ) ) . '" title="' . esc_attr( __( 'View Starter Templates Documentation', 'themegrill-demo-importer' ) ) . '">' . __( 'Docs', 'themegrill-demo-importer' ) . '</a>',
-				'support' => '<a href="' . esc_url( apply_filters( 'themegrill_demo_importer_support_url', 'https://themegrill.com/support-forum/' ) ) . '" title="' . esc_attr( __( 'Visit Free Customer Support Forum', 'themegrill-demo-importer' ) ) . '">' . __( 'Free Support', 'themegrill-demo-importer' ) . '</a>',
-			);
-
-			return array_merge( $plugin_meta, $new_plugin_meta );
+	public static function getInstance() {
+		if ( null === self::$instance ) {
+			self::$instance = new self();
 		}
 
-		return (array) $plugin_meta;
+		return self::$instance;
 	}
 
 	/**
-	 * Get the plugin url.
+	 * Boot the application by initializing components and registering hooks.
 	 *
-	 * @return string
+	 * @since 2.0.0
+	 * @return void
 	 */
-	public static function plugin_url() {
-		return untrailingslashit( plugins_url( '/', TGDM_PLUGIN_FILE ) );
+	public function boot() {
+		if ( $this->booted ) {
+			return;
+		}
+
+		$this->doAction( 'themegrill:starter-templates:app-boot', $this );
+
+		$this->logger = Logger::getInstance();
+
+		new Admin();
+
+		$this->registerHooks();
+		$this->booted = true;
+
+		$this->doAction( 'themegrill:starter-templates:app-booted', $this );
+	}
+
+	/**
+	 * Register WordPress hooks and actions for the application.
+	 *
+	 * @since 2.0.0
+	 * @return void
+	 */
+	public function registerHooks() {
+		$this->doAction( 'themegrill:starter-templates:register-hooks', $this );
+
+		$this->addAction( 'init', [ $this, 'onInit' ], 0 );
+		$this->addAction( 'rest_api_init', [ $this, 'onRestApiInit' ] );
+		register_activation_hook( THEMEGRILL_STARTER_TEMPLATES_PLUGIN_FILE, [ ActivationService::class, 'activate' ] );
+		register_deactivation_hook( THEMEGRILL_STARTER_TEMPLATES_PLUGIN_FILE, [ DeactivationService::class, 'deactivate' ] );
+
+		$this->doAction( 'themegrill:starter-templates:hooks-registered', $this );
+	}
+
+	/**
+	 * Handle the WordPress 'init' action.
+	 *
+	 * @since 2.0.0
+	 * @return void
+	 */
+	public function onInit() {
+		$this->doAction( 'themegrill:starter-templates:app-init', $this );
+
+		$this->loadTextDomain();
+		$this->registerScriptsStyles();
+
+		$this->doAction( 'themegrill:starter-templates:app-initialized', $this );
+	}
+
+	/**
+	 * Handle the WordPress 'rest_api_init' action.
+	 *
+	 * @since 2.0.0
+	 * @return void
+	 */
+	public function onRestApiInit() {
+		$controllers = $this->applyFilters( 'themegrill:starter-templates:rest-controllers', $this->getControllers() );
+
+		foreach ( $controllers as $controller ) {
+			( new $controller( $this->logger ) )->register_routes();
+		}
+
+		$this->doAction( 'themegrill:starter-templates:rest-api-ready', $controllers );
+	}
+
+	/**
+	 * Load the plugin text domain for translations.
+	 *
+	 * @since 2.0.0
+	 * @return void
+	 */
+	private function loadTextDomain() {
+		$this->doAction( 'themegrill:starter-templates:load-textdomain' );
+
+		load_plugin_textdomain( 'themegrill-demo-importer', false, THEMEGRILL_STARTER_TEMPLATES_PLUGIN_DIR . '/languages' );
+
+		$this->doAction( 'themegrill:starter-templates:textdomain-loaded' );
+	}
+
+	/**
+	 * Get the list of REST API controllers.
+	 *
+	 * @since 2.0.0
+	 * @return array Array of controller class names.
+	 */
+	private function getControllers(): array {
+		return [
+			SitesController::class,
+			ImportController::class,
+		];
+	}
+
+	/**
+	 * Register JavaScript and CSS files for the plugin.
+	 *
+	 * @since 2.0.0
+	 * @return void
+	 */
+	private function registerScriptsStyles() {
+		$this->doAction( 'themegrill:starter-templates:register-scripts-styles' );
+
+		$assetFile = THEMEGRILL_STARTER_TEMPLATES_PLUGIN_DIR . '/dist/starter-templates.asset.php';
+		$asset     = file_exists( $assetFile ) ? require $assetFile : [
+			'dependencies' => [],
+			'version'      => time(),
+		];
+		$isDev     = defined( 'THEMEGRILL_STARTER_TEMPLATES_DEVELOPMENT' ) && THEMEGRILL_STARTER_TEMPLATES_DEVELOPMENT;
+		$rtl       = ! $isDev && is_rtl() ? '-rtl' : '';
+
+		$baseUri = $isDev ? 'http://localhost:8887' : THEMEGRILL_STARTER_TEMPLATES_PLUGIN_DIR_URL . '/dist';
+
+		$asset   = $this->applyFilters( 'themegrill:starter-templates:asset-config', $asset );
+		$baseUri = $this->applyFilters( 'themegrill:starter-templates:assets-base-uri', $baseUri );
+
+		if ( $isDev ) {
+			wp_register_script(
+				'themegrill-starter-templates-runtime',
+				'http://localhost:8887/runtime.js',
+				[],
+				md5( time() . wp_rand( 0, 1000 ) ),
+				true
+			);
+		}
+
+		wp_register_script(
+			'themegrill-starter-templates',
+			$baseUri . '/starter-templates.js',
+			$isDev ? array_merge( $asset['dependencies'], [ 'themegrill-starter-templates-runtime' ] ) : $asset['dependencies'],
+			$asset['version'],
+			true
+		);
+
+		wp_register_style(
+			'themegrill-starter-templates',
+			$baseUri . "/starter-templates$rtl.css",
+			[],
+			$asset['version']
+		);
+
+		$this->doAction( 'themegrill:starter-templates:scripts-styles-registered', $asset, $baseUri );
 	}
 }
