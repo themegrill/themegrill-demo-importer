@@ -391,8 +391,8 @@ class Admin {
 			$api_url,
 			array(
 				'headers'   => array(
-					'User-Agent'   => 'ThemeGrill/1.0',
-					'Content-Type' => 'application/json',
+					'User-Agent' => 'ThemeGrill/1.0',
+					'Accept'     => 'application/json',
 				),
 				'sslverify' => true,
 				'timeout'   => 30,
