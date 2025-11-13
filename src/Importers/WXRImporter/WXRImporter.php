@@ -62,6 +62,8 @@ class WXRImporter extends WP_Importer {
 	protected $url_remap       = array();
 	protected $featured_images = array();
 
+	protected $temp_file = null;
+
 	/**
 	 * Logger instance.
 	 *
@@ -124,16 +126,55 @@ class WXRImporter extends WP_Importer {
 			return new WP_Error( 'wxr_importer.cannot_parse', __( 'The XMLReader class is missing! Please install the XMLReader PHP extension on your server', 'wordpress-importer' ) );
 		}
 
+		if ( filter_var( $file, FILTER_VALIDATE_URL ) ) {
+			$this->logger->debug( 'Downloading XML file from URL: ' . $file );
+
+			$response = wp_remote_get(
+				$file,
+				array(
+					'headers'   => array(
+						'User-Agent' => 'ThemeGrill Starter Template/1.0',
+					),
+					'sslverify' => true,
+					'timeout'   => 30,
+				)
+			);
+
+			if ( is_wp_error( $response ) ) {
+				$this->logger->error( 'Error downloading the remote file: ' . $response->get_error_message() );
+				return new WP_Error( 'wxr_importer.download_failed', __( 'Could not download the XML file from the provided URL', 'themegrill-demo-importer' ) );
+			}
+
+			$content = wp_remote_retrieve_body( $response );
+
+			if ( empty( $content ) ) {
+				$this->logger->error( 'Downloaded file is empty' );
+				return new WP_Error( 'wxr_importer.empty_file', __( 'The downloaded XML file is empty', 'themegrill-demo-importer' ) );
+			}
+
+			$wp_upload_dir = wp_upload_dir( null, false );
+			$file_path     = $wp_upload_dir['basedir'] . '/themegrill-demo.xml';
+			require_once ABSPATH . '/wp-admin/includes/file.php';
+			global $wp_filesystem;
+			WP_Filesystem();
+			$wp_filesystem->put_contents( $file_path, $content );
+			$file            = $file_path;
+			$this->temp_file = $file_path;
+		}
+
 		$reader = new XMLReader();
 		$status = $reader->open( $file );
 
 		if ( ! $status ) {
+			if ( isset( $this->temp_file ) && file_exists( $this->temp_file ) ) {
+				wp_delete_file( $this->temp_file );
+				$this->temp_file = null;
+			}
 			return new WP_Error( 'wxr_importer.cannot_parse', __( 'Could not open the file for parsing', 'themegrill-demo-importer' ) );
 		}
 
 		return $reader;
 	}
-
 
 	/**
 	 * The main controller for the actual import stage.
@@ -370,6 +411,12 @@ class WXRImporter extends WP_Importer {
 
 		wp_defer_term_counting( false );
 		wp_defer_comment_counting( false );
+
+		// Clean up temporary content file if it exists
+		if ( isset( $this->temp_file ) && file_exists( $this->temp_file ) ) {
+			wp_delete_file( $this->temp_file );
+			$this->temp_file = null;
+		}
 
 		/**
 		 * Complete the import.
@@ -1424,7 +1471,7 @@ class WXRImporter extends WP_Importer {
 				'stream'    => true,
 				'filename'  => $upload['file'],
 				'headers'   => array(
-					'User-Agent' => 'ThemeGrill/1.0',
+					'User-Agent' => 'ThemeGrill Starter Template/1.0',
 				),
 				'sslverify' => true,
 				'timeout'   => 30,
