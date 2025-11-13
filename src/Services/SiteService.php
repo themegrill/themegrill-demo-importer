@@ -14,8 +14,8 @@ class SiteService {
 			$api_url,
 			[
 				'headers'   => [
-					'User-Agent'   => 'ThemeGrill Starter Template/1.0',
-					'Content-Type' => 'application/json',
+					'User-Agent' => 'ThemeGrill Starter Template/1.0',
+					'Accept'     => 'application/json',
 				],
 				'sslverify' => true,
 				'timeout'   => 30,

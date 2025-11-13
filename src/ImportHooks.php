@@ -27,6 +27,7 @@ class ImportHooks {
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_masteriyo_data' ), 10, 2 );
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_magazine_blocks_settings' ), 10, 2 );
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_blockart_blocks_settings' ), 10, 2 );
+		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_elementor_settings' ), 10, 2 );
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'process_evf_posts' ) );
 
 		add_filter( 'themegrill_widget_import_settings', array( $this, 'update_widget_data' ), 10, 2 );
@@ -708,6 +709,18 @@ class ImportHooks {
 					}
 				}
 			}
+		}
+	}
+
+	public function update_elementor_settings( $id, $data ) {
+		$settings = $data['elementor_settings'] ?? array();
+
+		if ( empty( $settings ) ) {
+			return;
+		}
+
+		foreach ( $settings as $key => $value ) {
+			update_option( $key, $value );
 		}
 	}
 }
