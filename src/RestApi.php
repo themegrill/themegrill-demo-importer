@@ -108,7 +108,9 @@ class RestApi {
 				array(
 					'methods'             => 'GET',
 					'callback'            => [ $this->importController, 'get_localized_data' ],
-					'permission_callback' => '__return_true',
+					'permission_callback' => function () {
+						return current_user_can( 'install_themes' );
+					},
 				),
 			)
 		);
