@@ -1,4 +1,61 @@
 == Changelog ==
+= 2.0.0.7 - 30-03-2026 =
+* Fix - REST API permission-related vulnerability.
+
+= 2.0.0.6 - 13-11-2025 =
+* Fix - Elementor color and typography settings not applying correctly.
+* Fix - Site content file opening issue during import.
+* Fix - Minor bug fixes.
+
+= 2.0.0.5 - 26-09-2025 =
+* Tweak   - Minor fix.
+
+= 2.0.0.4 - 26-09-2025 =
+* Fix   - Issue with customized color palette import.
+* Fix   - Issue with Everest form block import.
+* Fix 	- Minor bug fixes.
+
+= 2.0.0.3 - 23-09-2025 =
+* Tweak   - Minor fixes.
+
+= 2.0.0.2 - 23-09-2025 =
+* Tweak   - Update WordPress tested upto version to 6.8.
+
+= 2.0.0.1 - 23-09-2025 =
+* Tweak - Minor fixes
+
+= 2.0.0 - 23-09-2025 =
+* Enhance - Complete design revamp of importer interface with modern amd intuitive layout.
+* Enhance - Enhanced import flow with step-by-step guidance and visual feedback.
+* Feature - New import progress tracking with import updates and completion indicators.
+
+= 1.9.14 - 01-08-2025 =
+* Fix   - PHP 8.0+ compatibility issue with deprecated libxml_disable_entity_loader() function
+
+= 1.9.13 - 30-06-2025 =
+* Fix   - Spacious widget import issue
+
+= 1.9.12 - 13-05-2025 =
+* Fix   - Colormag Footer builder menu 1 component import issue
+
+= 1.9.11 - 13-05-2025 =
+* Tweak   - Update WordPress tested upto version to 6.8.
+
+= 1.9.10 - 13-05-2025 =
+* Fix - Compatibility with magazine blocks.
+
+= 1.9.9 - 21-11-2024 =
+* Fix - Footer widget menu import issue.
+
+= 1.9.8 - 16-10-2024 =
+* Tweak - Update readme file.
+
+= 1.9.7 - 29-05-2024 =
+* Tweak - Remove compulsory companion elementor in Zakra premium demo.
+
+= 1.9.6 - 16-05-2024 =
+* Fix - Elementor kit import issue.
+
 = 1.9.5 - 19-03-2024 =
 * Tweak - Minor fixes.
 
@@ -50,13 +107,13 @@
 * Update – Stable tag.
 
 = 1.8.8 - 07-11-2022 =
-* Support – Support for Gizmo. 
+* Support – Support for Gizmo.
 
 = 1.8.7 - 10-10-2022 =
-* Update – Stable tag. 
+* Update – Stable tag.
 
 = 1.8.6 - 10-10-2022 =
-* Remove  - Support for eStory Pro. 
+* Remove  - Support for eStory Pro.
 
 = 1.8.5 - 19-09-2022 =
 * Fix - Compatibility with Masteriyo Pro.
@@ -76,7 +133,7 @@
 
 = 1.8.0 - 08-03-2022 =
 * Support - Skincare theme.
-* Remove  - Support for Luza theme. 
+* Remove  - Support for Luza theme.
 
 = 1.7.9 - 16-02-2022 =
 * Tweak - Update static demo content url.
