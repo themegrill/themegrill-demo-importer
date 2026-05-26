@@ -11,6 +11,7 @@
  * License: GPLv3 or later
  * Text Domain: themegrill-demo-importer
  * Domain Path: /languages/
+ * WordPress Available: yes
  *
  * @package ThemeGrill_Demo_Importer
  */
