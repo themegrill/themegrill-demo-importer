@@ -16,6 +16,7 @@ class Stats {
 		add_filter( 'themegrill-sdk/survey/themegrill-demo-importer', array( $this, 'configure_formbricks' ), 10, 2 );
 		add_filter( 'themegrill_demo_importer_logger_data', array( $this, 'logger_data' ) );
 		add_filter( 'pre_http_request', array( $this, 'debug_log_payload' ), 10, 3 );
+		add_action( 'admin_init', array( $this, 'bridge_notification_hooks' ), 20 );
 	}
 
 	/**
@@ -133,6 +134,22 @@ class Stats {
 	 *
 	 * @return int
 	 */
+	/**
+	 * Bridge SDK notification hook case mismatch.
+	 * Logger registers on 'themegrill_sdk_registered_notifications' (lowercase),
+	 * but Notification module reads 'themeGrill_sdk_registered_notifications' (capital G).
+	 * Runs at admin_init priority 20 — after Logger adds its filter at priority 10.
+	 */
+	public function bridge_notification_hooks() {
+		add_filter(
+			'themeGrill_sdk_registered_notifications',
+			function ( $notifications ) {
+				return apply_filters( 'themegrill_sdk_registered_notifications', $notifications );
+			},
+			20
+		);
+	}
+
 	/**
 	 * Log the SDK tracking payload to WP error log when WP_DEBUG is true.
 	 *
