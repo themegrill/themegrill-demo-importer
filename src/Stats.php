@@ -15,6 +15,7 @@ class Stats {
 		add_action( 'admin_enqueue_scripts', array( $this, 'declare_internal_page' ) );
 		add_filter( 'themegrill-sdk/survey/themegrill-demo-importer', array( $this, 'configure_formbricks' ), 10, 2 );
 		add_filter( 'themegrill_demo_importer_logger_data', array( $this, 'logger_data' ) );
+		add_filter( 'pre_http_request', array( $this, 'debug_log_payload' ), 10, 3 );
 	}
 
 	/**
@@ -132,6 +133,22 @@ class Stats {
 	 *
 	 * @return int
 	 */
+	/**
+	 * Log the SDK tracking payload to WP error log when WP_DEBUG is true.
+	 *
+	 * @param bool|array $preempt Whether to preempt the request.
+	 * @param array      $args    Request arguments.
+	 * @param string     $url     Request URL.
+	 * @return bool|array
+	 */
+	public function debug_log_payload( $preempt, $args, $url ) {
+		if ( defined( 'WP_DEBUG' ) && WP_DEBUG && str_contains( $url, 'api.themegrill.com/tracking/log' ) ) {
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			error_log( 'TGSDK Logger payload: ' . print_r( json_decode( $args['body'], true ), true ) );
+		}
+		return $preempt;
+	}
+
 	private function get_install_days() {
 		$install_time = get_option( 'themegrill_demo_importer_install', time() );
 		return (int) floor( ( time() - (int) $install_time ) / DAY_IN_SECONDS );
