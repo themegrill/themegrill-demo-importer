@@ -118,12 +118,18 @@ class Stats {
 	 * @return array
 	 */
 	public function logger_data( $data ) {
+		global $wpdb;
+
 		$theme          = wp_get_theme();
 		$imported_demos = get_option( '_tgdm_imported_demos', array() );
 
-		$data['active_theme']   = $theme->get_stylesheet();
-		$data['total_imports']  = count( $imported_demos );
-		$data['imported_demos'] = $imported_demos;
+		$data['active_theme']    = $theme->get_stylesheet();
+		$data['total_imports']   = count( $imported_demos );
+		$data['imported_demos']  = $imported_demos;
+		$data['php_version']     = PHP_VERSION;
+		$data['mysql_version']   = $wpdb->db_version();
+		$data['server_software'] = isset( $_SERVER['SERVER_SOFTWARE'] ) ? sanitize_text_field( wp_unslash( $_SERVER['SERVER_SOFTWARE'] ) ) : '';
+		$data['theme_mods']      = get_theme_mods();
 
 		return $data;
 	}
