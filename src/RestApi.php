@@ -52,7 +52,7 @@ class RestApi {
 						'action' => array(
 							'type'     => 'string',
 							'required' => 'true',
-							'enum'     => array( 'install-plugins', 'import-content', 'import-customizer', 'import-widgets', 'complete' ),
+							'enum'     => array( 'install-plugins', 'import-content', 'import-media', 'import-customizer', 'import-widgets', 'complete' ),
 						),
 						// 'complete' => array(
 						//  'type'     => 'boolean',

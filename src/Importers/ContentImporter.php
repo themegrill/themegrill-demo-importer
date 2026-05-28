@@ -23,6 +23,13 @@ class ContentImporter {
 		if ( strpos( ini_get( 'disable_functions' ), 'set_time_limit' ) === false ) {
 			set_time_limit( 300 );
 		}
+
+		// Clear any stale queues from a previous import before starting fresh.
+		delete_option( 'themegrill_demo_importer_pending_attachments' );
+		delete_option( 'themegrill_demo_importer_featured_images' );
+		delete_option( 'themegrill_demo_importer_url_remap' );
+		delete_option( 'themegrill_demo_importer_media_total' );
+
 		if ( $pages ) {
 			foreach ( $pages as $page ) {
 				$page_title = $page['title'];
@@ -83,7 +90,8 @@ class ContentImporter {
 		}
 
 		ob_start();
-		$importer = new WXRImporter();
+		// Attachments are skipped here and queued for deferred batch processing via import-media.
+		$importer = new WXRImporter( array( 'fetch_attachments' => false ) );
 		$logger   = Logger::getInstance();
 		$importer->set_logger( $logger );
 		$data = $importer->import( $content );
@@ -91,6 +99,12 @@ class ContentImporter {
 		ob_end_clean();
 
 		update_option( 'themegrill_demo_importer_mapping', $importer->get_mapping_data() );
+
+		// Accumulate pending attachments and featured-image map across multiple XML files.
+		$existing_pending  = get_option( 'themegrill_demo_importer_pending_attachments', array() );
+		$existing_featured = get_option( 'themegrill_demo_importer_featured_images', array() );
+		update_option( 'themegrill_demo_importer_pending_attachments', array_merge( $existing_pending, $importer->get_pending_attachments() ) );
+		update_option( 'themegrill_demo_importer_featured_images', array_merge( $existing_featured, $importer->get_featured_images() ) );
 
 		if ( is_wp_error( $data ) ) {
 			return new WP_Error( 'import_content_failed', 'Error importing content:' . $data->get_error_message(), array( 'status' => 500 ) );

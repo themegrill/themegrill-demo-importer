@@ -4,6 +4,7 @@ namespace ThemeGrill\Demo\Importer\Services;
 
 use Exception;
 use ThemeGrill\Demo\Importer\Importers\ContentImporter;
+use ThemeGrill\Demo\Importer\Importers\MediaImporter;
 use ThemeGrill\Demo\Importer\Importers\PluginImporter;
 use ThemeGrill\Demo\Importer\Importers\ThemeModsImporter;
 use ThemeGrill\Demo\Importer\Importers\WidgetsImporter;
@@ -34,6 +35,9 @@ class ImportService {
 			case 'import-content':
 				return $this->importContent( $demo_config, $options );
 
+			case 'import-media':
+				return $this->importMedia();
+
 			case 'import-customizer':
 				return $this->importCustomizer( $demo_config, $options );
 
@@ -51,6 +55,12 @@ class ImportService {
 	private function installPlugins( $options ) {
 		$plugins = $options['plugins'] ?? array();
 		return $this->pluginImporter->installPlugins( $plugins );
+	}
+
+	private function importMedia() {
+		$importer = new MediaImporter();
+		$result   = $importer->import_batch();
+		return new WP_REST_Response( $result, 200 );
 	}
 
 	private function importContent( $demo_config, $options ) {

@@ -64,6 +64,9 @@ class WXRImporter extends WP_Importer {
 
 	protected $temp_file = null;
 
+	// Attachments collected when fetch_attachments is false, for deferred batch processing.
+	protected $pending_attachments = array();
+
 	/**
 	 * Logger instance.
 	 *
@@ -689,17 +692,25 @@ class WXRImporter extends WP_Importer {
 			if ( ! $this->options['fetch_attachments'] ) {
 				$this->logger->notice(
 					sprintf(
-						'Skipping attachment "%s", fetching attachments disabled',
+						'Skipping attachment "%s", queued for deferred import',
 						$data['post_title']
 					),
 					[ 'end_time' => true ]
 				);
-				/**
-				 * Post processing skipped.
-				 *
-				 * @param array $data Raw data imported for the post.
-				 * @param array $meta Raw meta data, already processed by {@see process_post_meta}.
-				 */
+
+				$remote_url = ! empty( $data['attachment_url'] ) ? $data['attachment_url'] : $data['guid'];
+
+				// Rewrite origin domain to proxy so deferred downloads also route through the proxy.
+				$remote_url = str_replace( 'https://themegrilldemos.com', THEMEGRILL_BASE_URL, $remote_url );
+				$remote_url = str_replace( 'https://zakrademos.com', ZAKRA_BASE_URL, $remote_url );
+
+				$this->pending_attachments[] = array(
+					'original_id' => $original_id,
+					'postdata'    => $postdata,
+					'meta'        => $meta,
+					'remote_url'  => $remote_url,
+				);
+
 				do_action( 'wxr_importer.process_skipped.post', $data, $meta );
 				return false;
 			}
@@ -1870,5 +1881,13 @@ class WXRImporter extends WP_Importer {
 
 	public function get_mapping_data() {
 		return $this->mapping;
+	}
+
+	public function get_pending_attachments(): array {
+		return $this->pending_attachments;
+	}
+
+	public function get_featured_images(): array {
+		return $this->featured_images;
 	}
 }
