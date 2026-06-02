@@ -8,6 +8,7 @@ import {
 	cleanupQueryOptions,
 	importDataQueryOptions,
 	localizedDataQueryOptions,
+	saveTrackingConsent,
 } from '../../../../api/import.api';
 import DialogConfirm from './DialogConfirm';
 import DialogImported from './DialogImported';
@@ -87,7 +88,8 @@ const StartImport = ({
 		return themeExists;
 	};
 
-	const handleInstallation = async () => {
+	const handleInstallation = async (allowContribution: boolean = false) => {
+		await saveTrackingConsent({ allowContribution });
 		setShowSidebar(false);
 		const selectedPlugins = plugins
 			.filter((plugin) => plugin.isSelected === true)
@@ -153,15 +155,15 @@ const StartImport = ({
 		setImportProgress(0);
 		setIsImportFailed(false);
 		queryClient.clear();
-		handleCleanup();
+		handleCleanup(false);
 	};
 
-	const handleCleanup = async () => {
+	const handleCleanup = async (allowContribution: boolean = false) => {
 		const response = await queryClient.ensureQueryData(cleanupQueryOptions());
 		if (response.success) {
 			setImportProgress(0);
 		}
-		handleInstallation();
+		handleInstallation(allowContribution);
 	};
 
 	const renderDialog = () => {

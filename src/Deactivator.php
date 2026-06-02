@@ -2,6 +2,8 @@
 
 namespace ThemeGrill\Demo\Importer;
 
+use ThemeGrill\Demo\Importer\Services\TrackingService;
+
 class Deactivator {
 
 	public static function init() {
@@ -12,5 +14,6 @@ class Deactivator {
 	 * Deactivate TG Demo Importer.
 	 */
 	public static function deactivate() {
+		( new TrackingService() )->unschedule();
 	}
 }

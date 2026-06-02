@@ -2,6 +2,7 @@
 
 namespace ThemeGrill\Demo\Importer;
 
+use ThemeGrill\Demo\Importer\Services\TrackingService;
 use ThemeGrill\Demo\Importer\Traits\Singleton;
 
 class App {
@@ -29,6 +30,9 @@ class App {
 	private function init_hooks() {
 		// Load plugin text domain.
 		add_action( 'init', array( $this, 'load_plugin_textdomain' ) );
+
+		// Weekly usage tracking cron callback.
+		add_action( TrackingService::WEEKLY_CRON_HOOK, array( new TrackingService(), 'fire_weekly_tracking' ) );
 
 		add_filter( 'plugin_action_links_' . TGDM_PLUGIN_BASENAME, array( $this, 'plugin_action_links' ) );
 		add_filter( 'plugin_row_meta', array( $this, 'plugin_row_meta' ), 10, 2 );

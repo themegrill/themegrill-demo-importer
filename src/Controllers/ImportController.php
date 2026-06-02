@@ -97,4 +97,10 @@ class ImportController {
 		}
 		return $localized_data;
 	}
+
+	public function save_tracking_consent( $request ) {
+		$allow_tracking = (bool) $request['allow_tracking'];
+		update_option( 'tdi_allow_tracking', $allow_tracking ? 'yes' : 'no' );
+		return new WP_REST_Response( array( 'success' => true ), 200 );
+	}
 }
