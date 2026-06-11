@@ -108,7 +108,7 @@ export async function saveTrackingConsent(args: { allowContribution: boolean }) 
 		path: 'tg-demo-importer/v1/tracking-consent',
 		method: 'POST',
 		data: {
-			allow_contribution: args.allowContribution,
+			allow_tracking: args.allowContribution,
 		},
 	});
 	return response;

@@ -10,13 +10,17 @@ class Stats {
 	const FORMBRICKS_ENV_ID = 'TODO'; // Replace with real env ID before deploying.
 
 	protected function init() {
-		// Consent sync and cron bridge work without SDK — register unconditionally.
+		// Consent sync, cron bridge, and debug hooks work without SDK — register unconditionally.
 		add_filter( 'pre_option_themegrill_demo_importer_logger_flag', array( $this, 'get_logger_status' ) );
 		add_action( 'update_option_tdi_allow_contribution', array( $this, 'sync_logger_flag' ), 10, 2 );
 		add_action( 'tdi_weekly_contribution', array( $this, 'fire_sdk_log' ) );
 		add_action( 'themegrill_demo_importer_import_complete', array( $this, 'fire_post_import_ping' ) );
+		add_action( 'themegrill_demo_importer_log_activity', array( $this, 'debug_log_cron_fired' ), 1 );
+		add_filter( 'pre_http_request', array( $this, 'debug_log_payload' ), 10, 3 );
 
 		if ( ! file_exists( dirname( TGDM_PLUGIN_FILE ) . '/vendor/themegrill/themegrill-sdk/load.php' ) ) {
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			error_log( 'Demo Importer SDK vendor not found at: ' . dirname( TGDM_PLUGIN_FILE ) . '/vendor/themegrill/themegrill-sdk/load.php' );
 			return;
 		}
 
@@ -147,12 +151,6 @@ class Stats {
 	}
 
 	/**
-	 * Calculate days since the SDK first registered this plugin.
-	 * SDK sets 'themegrill_demo_importer_install' on first product registration.
-	 *
-	 * @return int
-	 */
-	/**
 	 * Bridge SDK notification hook case mismatch.
 	 * Logger registers on 'themegrill_sdk_registered_notifications' (lowercase),
 	 * but Notification module reads 'themeGrill_sdk_registered_notifications' (capital G).
@@ -180,33 +178,63 @@ class Stats {
 	/**
 	 * Sync SDK logger flag and schedule/unschedule crons when consent changes.
 	 *
-	 * @param mixed $old_value Previous option value.
-	 * @param mixed $new_value New option value.
+	 * @param mixed $_old_value Previous option value.
+	 * @param mixed $new_value  New option value.
 	 */
 	public function sync_logger_flag( $_old_value, $new_value ) {
 		update_option( 'themegrill_demo_importer_logger_flag', $new_value );
 
-		if ( 'yes' !== $new_value ) {
+		if ( 'yes' === $new_value ) {
+			if ( ! wp_next_scheduled( 'tdi_weekly_contribution' ) ) {
+				wp_schedule_event( time() + WEEK_IN_SECONDS, 'weekly', 'tdi_weekly_contribution' );
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				error_log( 'TDI tracking: consent granted → scheduled tdi_weekly_contribution (weekly)' );
+			} else {
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				error_log( 'TDI tracking: consent granted → tdi_weekly_contribution already scheduled' );
+			}
+		} else {
 			wp_clear_scheduled_hook( 'tdi_weekly_contribution' );
+			wp_clear_scheduled_hook( 'themegrill_demo_importer_log_activity' );
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			error_log( 'TDI tracking: consent revoked → cleared tdi_weekly_contribution + themegrill_demo_importer_log_activity' );
 		}
 	}
 
 	/**
-	 * Fire first SDK ping after import completes (so imported_demos is accurate).
-	 * Called by ImportService::completeImport() via action hook.
+	 * Fire immediate ping after import completes so imported_demos data is accurate.
 	 */
 	public function fire_post_import_ping() {
-		if ( 'yes' !== get_option( 'tdi_allow_contribution', 'no' ) ) {
+		$consent = get_option( 'tdi_allow_contribution', 'no' );
+		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+		error_log( 'TDI tracking: import complete hook fired (tdi_allow_contribution=' . $consent . ', imported_demos=' . implode( ',', get_option( '_tgdm_imported_demos', array() ) ) . ')' );
+
+		if ( 'yes' !== $consent ) {
 			return;
 		}
 
-		wp_schedule_single_event( time() - 1, 'themegrill_demo_importer_log_activity' );
+		$this->fire_tracking_immediately();
+	}
 
-		if ( ! wp_next_scheduled( 'tdi_weekly_contribution' ) ) {
-			wp_schedule_event( time() + WEEK_IN_SECONDS, 'weekly', 'tdi_weekly_contribution' );
+	/**
+	 * Re-run Logger::setup_actions() with flag now 'yes', then fire immediately.
+	 * Needed because setup_actions() ran at wp_loaded before consent was given.
+	 */
+	private function fire_tracking_immediately() {
+		global $wp_filter;
+		if ( ! isset( $wp_filter['wp_loaded'] ) || ! class_exists( 'ThemeGrillSDK\Modules\Logger' ) ) {
+			return;
 		}
-
-		spawn_cron();
+		foreach ( $wp_filter['wp_loaded']->callbacks as $callbacks ) {
+			foreach ( $callbacks as $cb ) {
+				if ( is_array( $cb['function'] )
+					&& $cb['function'][0] instanceof \ThemeGrillSDK\Modules\Logger
+					&& 'setup_actions' === $cb['function'][1] ) {
+					$cb['function'][0]->setup_actions();
+				}
+			}
+		}
+		do_action( 'themegrill_demo_importer_log_activity' );
 	}
 
 	/**
@@ -214,6 +242,51 @@ class Stats {
 	 */
 	public function fire_sdk_log() {
 		do_action( 'themegrill_demo_importer_log_activity' );
+	}
+
+	/**
+	 * Log when themegrill_demo_importer_log_activity fires.
+	 */
+	public function debug_log_cron_fired() {
+		global $wp_filter;
+
+		$source = wp_doing_cron() ? 'wp-cron' : 'manual/ajax';
+		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+		error_log( 'Demo Importer cron fired: themegrill_demo_importer_log_activity (source: ' . $source . ', allow_contribution: ' . get_option( 'tdi_allow_contribution', 'not set' ) . ', sdk_loaded: ' . ( class_exists( 'ThemeGrillSDK\Loader' ) ? 'yes' : 'no' ) . ')' );
+
+		if ( isset( $wp_filter['themegrill_demo_importer_log_activity'] ) ) {
+			foreach ( $wp_filter['themegrill_demo_importer_log_activity']->callbacks as $priority => $callbacks ) {
+				foreach ( $callbacks as $cb ) {
+					if ( is_array( $cb['function'] ) ) {
+						$name = get_class( $cb['function'][0] ) . '->' . $cb['function'][1];
+					} elseif ( $cb['function'] instanceof \Closure ) {
+						$name = 'Closure';
+					} else {
+						$name = (string) $cb['function'];
+					}
+					// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+					error_log( '  themegrill_demo_importer_log_activity priority ' . $priority . ': ' . $name );
+				}
+			}
+		}
+	}
+
+	/**
+	 * Log SDK tracking payload when sent to api.themegrill.com.
+	 *
+	 * @param bool|array $pre  Whether to preempt the request.
+	 * @param array      $args Request arguments.
+	 * @param string     $url  Request URL.
+	 * @return bool|array
+	 */
+	public function debug_log_payload( $pre, $args, $url ) {
+		if ( false !== strpos( $url, 'api.themegrill.com/tracking/log' ) ) {
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			error_log( 'Demo Importer SDK payload sent to: ' . $url );
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			error_log( 'Demo Importer SDK body: ' . print_r( json_decode( $args['body'], true ), true ) );
+		}
+		return $pre;
 	}
 
 	private function get_install_days() {

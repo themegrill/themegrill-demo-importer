@@ -99,8 +99,18 @@ class ImportController {
 	}
 
 	public function save_tracking_consent( $request ) {
-		$allow_contribution = (bool) $request['allow_contribution'];
-		update_option( 'tdi_allow_contribution', $allow_contribution ? 'yes' : 'no' );
+		$allow = $request->get_param( 'allow_tracking' );
+
+		// Fallback: parse raw JSON body if WP didn't parse Content-Type header.
+		if ( null === $allow ) {
+			$body  = json_decode( $request->get_body(), true );
+			$allow = isset( $body['allow_tracking'] ) ? $body['allow_tracking'] : false;
+		}
+
+		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+		error_log( 'TDI tracking consent REST: allow_tracking=' . ( $allow ? 'yes' : 'no' ) . ' raw_param=' . var_export( $request->get_param( 'allow_tracking' ), true ) . ' body=' . $request->get_body() );
+
+		update_option( 'tdi_allow_contribution', $allow ? 'yes' : 'no' );
 		return new WP_REST_Response( array( 'success' => true ), 200 );
 	}
 }
