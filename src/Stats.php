@@ -14,6 +14,7 @@ class Stats {
 		add_filter( 'pre_option_themegrill_demo_importer_logger_flag', array( $this, 'get_logger_status' ) );
 		add_action( 'update_option_tdi_allow_contribution', array( $this, 'sync_logger_flag' ), 10, 2 );
 		add_action( 'tdi_weekly_contribution', array( $this, 'fire_sdk_log' ) );
+		add_action( 'themegrill_demo_importer_import_complete', array( $this, 'fire_post_import_ping' ) );
 
 		if ( ! file_exists( dirname( TGDM_PLUGIN_FILE ) . '/vendor/themegrill/themegrill-sdk/load.php' ) ) {
 			return;
@@ -182,18 +183,30 @@ class Stats {
 	 * @param mixed $old_value Previous option value.
 	 * @param mixed $new_value New option value.
 	 */
-	public function sync_logger_flag( $old_value, $new_value ) {
+	public function sync_logger_flag( $_old_value, $new_value ) {
 		update_option( 'themegrill_demo_importer_logger_flag', $new_value );
 
-		if ( 'yes' === $new_value ) {
-			wp_schedule_single_event( time() - 1, 'themegrill_demo_importer_log_activity' );
-			if ( ! wp_next_scheduled( 'tdi_weekly_contribution' ) ) {
-				wp_schedule_event( time() + WEEK_IN_SECONDS, 'weekly', 'tdi_weekly_contribution' );
-			}
-			spawn_cron();
-		} else {
+		if ( 'yes' !== $new_value ) {
 			wp_clear_scheduled_hook( 'tdi_weekly_contribution' );
 		}
+	}
+
+	/**
+	 * Fire first SDK ping after import completes (so imported_demos is accurate).
+	 * Called by ImportService::completeImport() via action hook.
+	 */
+	public function fire_post_import_ping() {
+		if ( 'yes' !== get_option( 'tdi_allow_contribution', 'no' ) ) {
+			return;
+		}
+
+		wp_schedule_single_event( time() - 1, 'themegrill_demo_importer_log_activity' );
+
+		if ( ! wp_next_scheduled( 'tdi_weekly_contribution' ) ) {
+			wp_schedule_event( time() + WEEK_IN_SECONDS, 'weekly', 'tdi_weekly_contribution' );
+		}
+
+		spawn_cron();
 	}
 
 	/**

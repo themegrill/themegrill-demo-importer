@@ -92,6 +92,8 @@ class ImportService {
 			update_option( '_tgdm_imported_demos', array_unique( $imported_demos ), false );
 		}
 
+		do_action( 'themegrill_demo_importer_import_complete' );
+
 		return array(
 			'success' => true,
 			'message' => 'Demo Imported successfully.',
