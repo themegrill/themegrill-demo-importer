@@ -8,7 +8,6 @@ use ThemeGrill\Demo\Importer\Importers\PluginImporter;
 use ThemeGrill\Demo\Importer\Importers\ThemeModsImporter;
 use ThemeGrill\Demo\Importer\Importers\WidgetsImporter;
 use ThemeGrill\Demo\Importer\Logger;
-use ThemeGrill\Demo\Importer\Services\TrackingService;
 use WP_REST_Response;
 
 class ImportService {
@@ -92,8 +91,6 @@ class ImportService {
 			$imported_demos[] = $slug;
 			update_option( '_tgdm_imported_demos', array_unique( $imported_demos ), false );
 		}
-
-		( new TrackingService() )->track_on_import_success();
 
 		return array(
 			'success' => true,

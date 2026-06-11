@@ -125,7 +125,7 @@ class RestApi {
 						return current_user_can( 'install_themes' );
 					},
 					'args'                => array(
-						'allow_tracking' => array(
+						'allow_contribution' => array(
 							'type'     => 'boolean',
 							'required' => true,
 						),

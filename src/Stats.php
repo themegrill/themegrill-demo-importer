@@ -10,13 +10,24 @@ class Stats {
 	const FORMBRICKS_ENV_ID = 'TODO'; // Replace with real env ID before deploying.
 
 	protected function init() {
+		// Consent sync and cron bridge work without SDK — register unconditionally.
+		add_filter( 'pre_option_themegrill_demo_importer_logger_flag', array( $this, 'get_logger_status' ) );
+		add_action( 'update_option_tdi_allow_contribution', array( $this, 'sync_logger_flag' ), 10, 2 );
+		add_action( 'tdi_weekly_contribution', array( $this, 'fire_sdk_log' ) );
+
+		if ( ! file_exists( dirname( TGDM_PLUGIN_FILE ) . '/vendor/themegrill/themegrill-sdk/load.php' ) ) {
+			return;
+		}
+
 		add_filter( 'themegrill_sdk_products', array( $this, 'register_product' ) );
 		add_action( 'init', array( $this, 'customize_deactivation_labels' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'declare_internal_page' ) );
 		add_filter( 'themegrill-sdk/survey/themegrill-demo-importer', array( $this, 'configure_formbricks' ), 10, 2 );
 		add_filter( 'themegrill_demo_importer_logger_data', array( $this, 'logger_data' ) );
-		add_filter( 'pre_http_request', array( $this, 'debug_log_payload' ), 10, 3 );
 		add_action( 'admin_init', array( $this, 'bridge_notification_hooks' ), 20 );
+
+		// Suppress SDK opt-in notice — REST endpoint handles consent.
+		add_filter( 'themegrill_demo_importer_logger_flag_should_show', '__return_false' );
 	}
 
 	/**
@@ -157,19 +168,39 @@ class Stats {
 	}
 
 	/**
-	 * Log the SDK tracking payload to WP error log when WP_DEBUG is true.
+	 * Return tdi_allow_contribution so SDK Logger reads consent from our option.
 	 *
-	 * @param bool|array $preempt Whether to preempt the request.
-	 * @param array      $args    Request arguments.
-	 * @param string     $url     Request URL.
-	 * @return bool|array
+	 * @return string 'yes'|'no'
 	 */
-	public function debug_log_payload( $preempt, $args, $url ) {
-		if ( defined( 'WP_DEBUG' ) && WP_DEBUG && str_contains( $url, 'api.themegrill.com/tracking/log' ) ) {
-			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-			error_log( 'TGSDK Logger payload: ' . print_r( json_decode( $args['body'], true ), true ) );
+	public function get_logger_status() {
+		return get_option( 'tdi_allow_contribution', 'no' );
+	}
+
+	/**
+	 * Sync SDK logger flag and schedule/unschedule crons when consent changes.
+	 *
+	 * @param mixed $old_value Previous option value.
+	 * @param mixed $new_value New option value.
+	 */
+	public function sync_logger_flag( $old_value, $new_value ) {
+		update_option( 'themegrill_demo_importer_logger_flag', $new_value );
+
+		if ( 'yes' === $new_value ) {
+			wp_schedule_single_event( time() - 1, 'themegrill_demo_importer_log_activity' );
+			if ( ! wp_next_scheduled( 'tdi_weekly_contribution' ) ) {
+				wp_schedule_event( time() + WEEK_IN_SECONDS, 'weekly', 'tdi_weekly_contribution' );
+			}
+			spawn_cron();
+		} else {
+			wp_clear_scheduled_hook( 'tdi_weekly_contribution' );
 		}
-		return $preempt;
+	}
+
+	/**
+	 * Cron callback: fire SDK log action so send_log() runs.
+	 */
+	public function fire_sdk_log() {
+		do_action( 'themegrill_demo_importer_log_activity' );
 	}
 
 	private function get_install_days() {

@@ -99,8 +99,8 @@ class ImportController {
 	}
 
 	public function save_tracking_consent( $request ) {
-		$allow_tracking = (bool) $request['allow_tracking'];
-		update_option( 'tdi_allow_tracking', $allow_tracking ? 'yes' : 'no' );
+		$allow_contribution = (bool) $request['allow_contribution'];
+		update_option( 'tdi_allow_contribution', $allow_contribution ? 'yes' : 'no' );
 		return new WP_REST_Response( array( 'success' => true ), 200 );
 	}
 }
