@@ -145,7 +145,7 @@ class Stats {
 		$data['php_version']     = PHP_VERSION;
 		$data['mysql_version']   = $wpdb->db_version();
 		$data['server_software'] = isset( $_SERVER['SERVER_SOFTWARE'] ) ? sanitize_text_field( wp_unslash( $_SERVER['SERVER_SOFTWARE'] ) ) : '';
-		$data['theme_mods']      = get_theme_mods();
+		$data['theme_mods']      = wp_json_encode( get_theme_mods() );
 
 		return $data;
 	}
