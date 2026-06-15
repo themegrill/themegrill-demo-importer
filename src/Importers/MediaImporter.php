@@ -179,13 +179,21 @@ class MediaImporter {
 		$mapping         = get_option( 'themegrill_demo_importer_mapping', array() );
 		$featured_images = get_option( 'themegrill_demo_importer_featured_images', array() );
 
-		// Replace old attachment URLs in post_content (longest first to avoid partial matches).
+		// Replace old attachment URLs in post_content and _elementor_data postmeta
+		// (longest first to avoid partial matches).
 		if ( ! empty( $url_remap ) ) {
 			uksort( $url_remap, fn( $a, $b ) => strlen( $b ) - strlen( $a ) );
 			foreach ( $url_remap as $old_url => $new_url ) {
 				$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
 					$wpdb->prepare(
 						"UPDATE {$wpdb->posts} SET post_content = REPLACE(post_content, %s, %s)",
+						$old_url,
+						$new_url
+					)
+				);
+				$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+					$wpdb->prepare(
+						"UPDATE {$wpdb->postmeta} SET meta_value = REPLACE(meta_value, %s, %s) WHERE meta_key = '_elementor_data'",
 						$old_url,
 						$new_url
 					)
@@ -201,6 +209,25 @@ class MediaImporter {
 					update_post_meta( $post_id, '_thumbnail_id', $new_id );
 				}
 			}
+		}
+
+		// Delete imported Elementor compiled CSS so it regenerates with local paths.
+		// The demo CSS files reference the original multisite server and will 404 on the new site.
+		$imported_posts = get_option( 'themegrill_demo_importer_imported_posts', array() );
+		if ( ! empty( $imported_posts ) ) {
+			$ids          = array_map( 'intval', $imported_posts );
+			$placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
+			$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+				$wpdb->prepare(
+					"DELETE FROM {$wpdb->postmeta} WHERE post_id IN ($placeholders) AND meta_key IN ('_elementor_css', '_elementor_inline_css')", // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
+					...$ids
+				)
+			);
+		}
+
+		// Clear Elementor's global file cache so pages regenerate CSS on next load.
+		if ( class_exists( '\Elementor\Plugin' ) && isset( \Elementor\Plugin::$instance->files_manager ) ) {
+			\Elementor\Plugin::$instance->files_manager->clear_cache();
 		}
 
 		// Clean up temporary options.
