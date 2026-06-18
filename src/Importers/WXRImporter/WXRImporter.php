@@ -67,6 +67,9 @@ class WXRImporter extends WP_Importer {
 	// Attachments collected when fetch_attachments is false, for deferred batch processing.
 	protected $pending_attachments = array();
 
+	// Non-attachment posts collected when collect_posts_only is true, for deferred batch processing.
+	protected $pending_posts = array();
+
 	/**
 	 * Logger instance.
 	 *
@@ -107,6 +110,7 @@ class WXRImporter extends WP_Importer {
 				'prefill_existing_terms'  => true,
 				'update_attachment_guids' => false,
 				'fetch_attachments'       => true,
+				'collect_posts_only'      => false,
 				'aggressive_url_search'   => false,
 				'default_author'          => get_current_user_id(),
 			)
@@ -578,6 +582,17 @@ class WXRImporter extends WP_Importer {
 		// Have we already processed this?
 		if ( isset( $this->mapping['post'][ $original_id ] ) ) {
 			return;
+		}
+
+		// Collect mode: queue non-attachment posts for deferred batch processing.
+		if ( $this->options['collect_posts_only'] && 'attachment' !== ( $data['post_type'] ?? '' ) ) {
+			$this->pending_posts[] = array(
+				'data'     => $data,
+				'meta'     => $meta,
+				'comments' => $comments,
+				'terms'    => $terms,
+			);
+			return false;
 		}
 
 		$this->logger->info( 'Importing post: ' . $data['post_title'], [ 'start_time' => true ] );
@@ -1889,5 +1904,33 @@ class WXRImporter extends WP_Importer {
 
 	public function get_featured_images(): array {
 		return $this->featured_images;
+	}
+
+	public function get_pending_posts(): array {
+		return $this->pending_posts;
+	}
+
+	public function set_mapping( array $mapping ): void {
+		$this->mapping = $mapping;
+	}
+
+	/**
+	 * Insert a single post that was previously collected in collect_posts_only mode.
+	 */
+	public function insert_pending_post( array $post_data ): void {
+		add_filter( 'import_post_meta_key', array( $this, 'is_valid_meta_key' ) );
+		if ( method_exists( '\Elementor\Compatibility', 'on_wxr_importer_pre_process_post_meta' ) ) {
+			remove_action( 'wxr_importer.pre_process.post_meta', array( '\Elementor\Compatibility', 'on_wxr_importer_pre_process_post_meta' ) );
+		}
+		$this->process_post( $post_data['data'], $post_data['meta'], $post_data['comments'], $post_data['terms'] );
+	}
+
+	/**
+	 * Run post-import cleanup: remap unresolved parent IDs and flush caches.
+	 * Call this once after the final batch of posts has been inserted.
+	 */
+	public function run_post_process(): void {
+		$this->post_process();
+		$this->import_end();
 	}
 }

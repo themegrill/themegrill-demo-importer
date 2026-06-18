@@ -229,10 +229,8 @@ class Admin {
 			$zakra_url   = ZAKRA_BASE_URL . TGDM_NAMESPACE;
 			$zakra_demos = static::fetch_demo_data( $zakra_url );
 			if ( is_array( $zakra_demos ) && isset( $zakra_demos['message'] ) ) {
-				return array(
-					'success' => false,
-					'message' => 'Failed to fetch Zakra demos: ' . ( $zakra_demos['message'] ?? 'Unknown error' ),
-				);
+				// Non-fatal: Zakra being unavailable should not block ThemeGrill demos.
+				$zakra_demos = array();
 			}
 
 			$demos = array_merge( $zakra_demos, $themegrill_demos );

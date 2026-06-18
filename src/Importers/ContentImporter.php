@@ -10,6 +10,8 @@ use WP_REST_Response;
 
 class ContentImporter {
 
+	const POST_BATCH_SIZE = 10;
+
 	private $logger;
 
 	public function __construct() {
@@ -26,19 +28,25 @@ class ContentImporter {
 
 		// Clear any stale queues from a previous import before starting fresh.
 		delete_option( 'themegrill_demo_importer_pending_attachments' );
+		delete_option( 'themegrill_demo_importer_pending_posts' );
+		delete_option( 'themegrill_demo_importer_posts_total' );
+		delete_option( 'themegrill_demo_importer_demo_config' );
 		delete_option( 'themegrill_demo_importer_featured_images' );
 		delete_option( 'themegrill_demo_importer_url_remap' );
 		delete_option( 'themegrill_demo_importer_media_total' );
 
+		// Persist demo config so the final post batch can call import_core_options.
+		update_option( 'themegrill_demo_importer_demo_config', $demo );
+
 		if ( $pages ) {
 			foreach ( $pages as $page ) {
 				$page_title = $page['title'];
-				$this->logger->info( "Importing $page_title page...", [ 'import_content_start_time' => true ] );
+				$this->logger->info( "Collecting $page_title page...", [ 'import_content_start_time' => true ] );
 				$response = $this->import_xml( $page['content'] );
 				if ( is_wp_error( $response ) ) {
-					$this->logger->error( "Error importing $page_title: " . $response->get_error_message(), [ 'import_content_end_time' => true ] );
+					$this->logger->error( "Error collecting $page_title: " . $response->get_error_message(), [ 'import_content_end_time' => true ] );
 				} else {
-					$this->logger->info( "$page_title imported successfully.", [ 'import_content_end_time' => true ] );
+					$this->logger->info( "$page_title collected.", [ 'import_content_end_time' => true ] );
 				}
 			}
 		} else {
@@ -47,34 +55,96 @@ class ContentImporter {
 				$this->logger->error( 'No XML content file provided for import.' );
 				return new WP_Error( 'no_content_file', 'No content file.', array( 'status' => 500 ) );
 			}
-			$this->logger->info(
-				'Importing content...',
-				[
-					'import_content_start_time' => true,
-				]
-			);
+			$this->logger->info( 'Collecting content...', [ 'import_content_start_time' => true ] );
 
 			$response = $this->import_xml( $content );
 			if ( is_wp_error( $response ) ) {
-				$this->logger->error( 'Error importing content: ' . $response->get_error_message(), [ 'import_content_end_time' => true ] );
+				$this->logger->error( 'Error collecting content: ' . $response->get_error_message(), [ 'import_content_end_time' => true ] );
 				return $response;
 			}
 
-			$this->logger->info( 'Content imported.', [ 'import_content_end_time' => true ] );
-
+			$this->logger->info( 'Content collected.', [ 'import_content_end_time' => true ] );
 		}
 
-		$this->logger->info( 'Importing core options...', [ 'start_time' => true ] );
-		$this->import_core_options( $demo );
-		$this->logger->info( 'Core options imported.', [ 'end_time' => true ] );
+		$total = count( get_option( 'themegrill_demo_importer_pending_posts', array() ) );
+		update_option( 'themegrill_demo_importer_posts_total', $total );
 
 		return new WP_REST_Response(
 			array(
 				'success' => true,
-				'message' => 'Content Imported.',
+				'message' => 'Content queued for import.',
+				'total'   => $total,
 			),
 			200
 		);
+	}
+
+	/**
+	 * Process the next batch of pending posts.
+	 *
+	 * Returns progress information so the caller can loop until done.
+	 */
+	public function import_post_batch(): array {
+		$pending = get_option( 'themegrill_demo_importer_pending_posts', array() );
+		$total   = (int) get_option( 'themegrill_demo_importer_posts_total', count( $pending ) );
+
+		if ( empty( $pending ) ) {
+			$this->finalize_content();
+			return array(
+				'success'   => true,
+				'done'      => true,
+				'remaining' => 0,
+				'total'     => $total,
+			);
+		}
+
+		$batch = array_splice( $pending, 0, self::POST_BATCH_SIZE );
+		update_option( 'themegrill_demo_importer_pending_posts', $pending );
+
+		$importer = new WXRImporter( array( 'fetch_attachments' => false ) );
+		$importer->set_logger( Logger::getInstance() );
+		$importer->set_mapping( get_option( 'themegrill_demo_importer_mapping', array() ) );
+
+		foreach ( $batch as $post_data ) {
+			$importer->insert_pending_post( $post_data );
+		}
+
+		update_option( 'themegrill_demo_importer_mapping', $importer->get_mapping_data() );
+
+		$remaining = count( $pending );
+
+		if ( 0 === $remaining ) {
+			$importer->run_post_process();
+			$this->finalize_content();
+			return array(
+				'success'   => true,
+				'done'      => true,
+				'remaining' => 0,
+				'total'     => $total,
+			);
+		}
+
+		return array(
+			'success'   => true,
+			'done'      => false,
+			'remaining' => $remaining,
+			'total'     => $total,
+		);
+	}
+
+	/**
+	 * Called after all post batches complete: set front page options and clean up.
+	 */
+	private function finalize_content(): void {
+		$demo = get_option( 'themegrill_demo_importer_demo_config', array() );
+		if ( ! empty( $demo ) ) {
+			$this->logger->info( 'Importing core options...', [ 'start_time' => true ] );
+			$this->import_core_options( $demo );
+			$this->logger->info( 'Core options imported.', [ 'end_time' => true ] );
+		}
+		delete_option( 'themegrill_demo_importer_demo_config' );
+		delete_option( 'themegrill_demo_importer_posts_total' );
+		delete_option( 'themegrill_demo_importer_pending_posts' );
 	}
 
 	public function import_xml( $content ) {
@@ -90,8 +160,8 @@ class ContentImporter {
 		}
 
 		ob_start();
-		// Attachments are skipped here and queued for deferred batch processing via import-media.
-		$importer = new WXRImporter( array( 'fetch_attachments' => false ) );
+		// Posts are collected for deferred batch processing; attachments deferred to import-media.
+		$importer = new WXRImporter( array( 'fetch_attachments' => false, 'collect_posts_only' => true ) );
 		$logger   = Logger::getInstance();
 		$importer->set_logger( $logger );
 		$data = $importer->import( $content );
@@ -100,9 +170,11 @@ class ContentImporter {
 
 		update_option( 'themegrill_demo_importer_mapping', $importer->get_mapping_data() );
 
-		// Accumulate pending attachments and featured-image map across multiple XML files.
-		$existing_pending  = get_option( 'themegrill_demo_importer_pending_attachments', array() );
-		$existing_featured = get_option( 'themegrill_demo_importer_featured_images', array() );
+		// Accumulate all queues across multiple XML files.
+		$existing_pending_posts = get_option( 'themegrill_demo_importer_pending_posts', array() );
+		$existing_pending       = get_option( 'themegrill_demo_importer_pending_attachments', array() );
+		$existing_featured      = get_option( 'themegrill_demo_importer_featured_images', array() );
+		update_option( 'themegrill_demo_importer_pending_posts', array_merge( $existing_pending_posts, $importer->get_pending_posts() ) );
 		update_option( 'themegrill_demo_importer_pending_attachments', array_merge( $existing_pending, $importer->get_pending_attachments() ) );
 		update_option( 'themegrill_demo_importer_featured_images', array_merge( $existing_featured, $importer->get_featured_images() ) );
 

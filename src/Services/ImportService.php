@@ -35,6 +35,9 @@ class ImportService {
 			case 'import-content':
 				return $this->importContent( $demo_config, $options );
 
+			case 'import-content-posts':
+				return $this->importContentPosts();
+
 			case 'import-media':
 				return $this->importMedia();
 
@@ -55,6 +58,11 @@ class ImportService {
 	private function installPlugins( $options ) {
 		$plugins = $options['plugins'] ?? array();
 		return $this->pluginImporter->installPlugins( $plugins );
+	}
+
+	private function importContentPosts() {
+		$result = $this->contentImporter->import_post_batch();
+		return new WP_REST_Response( $result, 200 );
 	}
 
 	private function importMedia() {
