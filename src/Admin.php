@@ -62,6 +62,11 @@ class Admin {
 			);
 			self::$starter_templates_link = 'admin.php?page=tg-starter-templates';
 		} else {
+			// Themes such as Ample Pro register their own "Demo Importer" page under
+			// Appearance (slug: demo-importer) when the old ThemeGrill_Demo_Importer
+			// class is absent. Remove it so only "Starter Templates" appears.
+			remove_submenu_page( 'themes.php', 'demo-importer' );
+
 			$page                         = add_theme_page(
 				__( 'Starter Templates', 'themegrill-demo-importer' ),
 				__( 'Starter Templates', 'themegrill-demo-importer' ),
