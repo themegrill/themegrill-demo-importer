@@ -572,7 +572,7 @@ class WXRImporter extends WP_Importer {
 		 * @param array $terms Terms on the post.
 		 */
 		$data = apply_filters( 'wxr_importer.pre_process.post', $data, $meta, $comments, $terms );
-		if ( empty( $data ) ) {
+		if ( empty( $data ) || ! is_array( $data ) ) {
 			return false;
 		}
 
@@ -1292,7 +1292,7 @@ class WXRImporter extends WP_Importer {
 		 * @param array $meta Meta data.
 		 */
 		$data = apply_filters( 'wxr_importer.pre_process.term', $data, $meta );
-		if ( empty( $data ) ) {
+		if ( empty( $data ) || ! is_array( $data ) ) {
 			return false;
 		}
 
