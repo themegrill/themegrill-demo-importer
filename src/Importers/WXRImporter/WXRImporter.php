@@ -1135,10 +1135,10 @@ class WXRImporter extends WP_Importer {
 				if ( '_elementor_data' === $key ) {
 					if ( is_string( $value ) ) {
 						$value = json_decode( $value, true );
-					} else {
-						$value = $value;
 					}
-					$this->replace_elementor_categories_ids( $value, $this->mapping['term_id'] );
+					if ( is_array( $value ) ) {
+						$this->replace_elementor_categories_ids( $value, $this->mapping['term_id'] );
+					}
 				}
 
 				add_post_meta( $post_id, wp_slash( $key ), wp_slash_strings_only( $value ) );

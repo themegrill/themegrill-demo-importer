@@ -50,7 +50,7 @@ class ContentImporter {
 				}
 			}
 		} else {
-			$content = $demo['content'];
+			$content = $demo['content'] ?? null;
 			if ( ! $content ) {
 				$this->logger->error( 'No XML content file provided for import.' );
 				return new WP_Error( 'no_content_file', 'No content file.', array( 'status' => 500 ) );

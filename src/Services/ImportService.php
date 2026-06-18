@@ -79,8 +79,8 @@ class ImportService {
 	private function importCustomizer( $demo_config, $options ) {
 		$args = array(
 			'custom_logo'   => $options['customLogo'] ?? 0,
-			'color_palette' => $options['colorPalette'],
-			'typography'    => $options['typography'],
+			'color_palette' => $options['colorPalette'] ?? array(),
+			'typography'    => $options['typography'] ?? array(),
 		);
 
 		return $this->customizerImporter->import( $demo_config, $args );
