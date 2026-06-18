@@ -441,6 +441,13 @@ class WXRImporter extends WP_Importer {
 	 * @return array|WP_Error Post data array on success, error otherwise.
 	 */
 	protected function parse_post_node( $node ) {
+		if ( false === $node ) {
+			return new \WP_Error(
+				'wxr_importer.parse.expand_failed',
+				__( 'Failed to expand XML node; the content XML may be malformed.' )
+			);
+		}
+
 		$data     = array();
 		$meta     = array();
 		$comments = array();
@@ -1219,6 +1226,13 @@ class WXRImporter extends WP_Importer {
 
 
 	protected function parse_term_node( $node, $type = 'term' ) {
+		if ( false === $node ) {
+			return new \WP_Error(
+				'wxr_importer.parse.expand_failed',
+				__( 'Failed to expand XML node; the content XML may be malformed.' )
+			);
+		}
+
 		$data = array();
 		$meta = array();
 
