@@ -18,13 +18,20 @@ export const Route = createFileRoute('/import/$theme/$id')({
 			const isEmpty = !data.data || Object.keys(data.data).length === 0;
 
 			const newPlugins: PluginItem[] = Object.entries(data?.data?.plugins || {}).map(
-				([pluginPath, pluginData]) => ({
-					plugin: pluginPath,
-					name: pluginData.name,
-					description: pluginData.description,
-					isSelected: true,
-					isMandatory: pluginData.mandatory,
-				}),
+				([pluginPath, pluginData]) => {
+					const pluginSlug = pluginPath.split('/')[0] || pluginPath;
+					const fallbackName = pluginSlug
+						.split('-')
+						.map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
+						.join(' ');
+					return {
+						plugin: pluginPath,
+						name: pluginData.name || fallbackName,
+						description: pluginData.description || '',
+						isSelected: true,
+						isMandatory: pluginData.mandatory,
+					};
+				},
 			);
 
 			const sortedPlugins = newPlugins.sort((a, b) => {
