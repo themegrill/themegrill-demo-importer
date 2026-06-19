@@ -101,6 +101,10 @@ class ContentImporter {
 		$batch = array_splice( $pending, 0, self::POST_BATCH_SIZE );
 		update_option( 'themegrill_demo_importer_pending_posts', $pending );
 
+		if ( ! class_exists( 'WP_Importer' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/class-wp-importer.php';
+		}
+
 		$importer = new WXRImporter( array( 'fetch_attachments' => false ) );
 		$importer->set_logger( Logger::getInstance() );
 		$importer->set_mapping( get_option( 'themegrill_demo_importer_mapping', array() ) );
