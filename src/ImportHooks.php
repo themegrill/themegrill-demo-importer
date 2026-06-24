@@ -564,7 +564,7 @@ class ImportHooks {
 
 			if ( ! empty( $term_mapped_data ) ) {
 				if ( 'nav_menu' === $widget_type ) {
-					$menu     = $term_mapped_data[ $widget['nav_menu'] ] ?? '';
+					$menu     = isset( $widget['nav_menu'] ) ? ( $term_mapped_data[ $widget['nav_menu'] ] ?? '' ) : '';
 					$nav_menu = wp_get_nav_menu_object( $menu );
 					if ( is_object( $nav_menu ) && $nav_menu->term_id ) {
 						$widget['nav_menu'] = $nav_menu->term_id;

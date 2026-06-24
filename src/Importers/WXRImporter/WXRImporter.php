@@ -1173,6 +1173,9 @@ class WXRImporter extends WP_Importer {
 						$element['settings']['authors_selected'] = array( $current_user_id );
 					} else {
 						$old_ids = $element['settings'][ $field ];
+						if ( ! is_array( $old_ids ) ) {
+							continue;
+						}
 						$new_ids = array();
 
 						foreach ( $old_ids as $old_id ) {
