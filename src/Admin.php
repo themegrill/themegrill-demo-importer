@@ -239,6 +239,7 @@ class Admin {
 			}
 
 			$demos = array_merge( $zakra_demos, $themegrill_demos );
+			$demos = static::apply_thumbnail_fallbacks( $demos );
 			usort(
 				$demos,
 				function ( $a, $b ) {
@@ -248,6 +249,9 @@ class Admin {
 
 			set_transient( 'themegrill_demo_importer_demos', $demos, WEEK_IN_SECONDS );
 
+		} else {
+			// Transient was cached before apply_thumbnail_fallbacks existed; patch in-memory.
+			$demos = static::apply_thumbnail_fallbacks( $demos );
 		}
 		$data = static::get_filtered_data( $demos, $template );
 		return apply_filters(
@@ -385,6 +389,42 @@ class Admin {
 			'demos'      => $filtered_demos,
 		);
 		return $data;
+	}
+
+	/**
+	 * Rewrite all previewImage URLs from the discontinued CloudFront CDN to
+	 * GitHub raw content, and fill in missing previewImage values for Zakra
+	 * demos whose API slug differs from their repository folder name.
+	 */
+	public static function apply_thumbnail_fallbacks( $demos ) {
+		$old_base = 'https://d1sb0nhp4t2db4.cloudfront.net';
+		$new_base = 'https://raw.githubusercontent.com/themegrill/themegrill-demo-pack/master';
+
+		$gh_zakra_base = $new_base . '/resources/zakra';
+		$fallbacks     = array(
+			'main'            => $gh_zakra_base . '/zakra-default/screenshot.jpg',
+			'kunstruct'       => $gh_zakra_base . '/zakra-construction/screenshot.jpg',
+			'applyjobs'       => $gh_zakra_base . '/zakra-apply-jobs/screenshot.jpg',
+			'bizness-v2'      => $gh_zakra_base . '/zakra-business-v2/screenshot.jpg',
+			'online-store-v2' => $gh_zakra_base . '/zakra-online-store/screenshot.jpg',
+			'yoga-trainer-v2' => $gh_zakra_base . '/zakra-yoga-v2/screenshot.jpg',
+			'petcare-v2'      => $gh_zakra_base . '/zakra-petcare/screenshot.jpg',
+			'flora-v2'        => $gh_zakra_base . '/zakra-flora/screenshot.jpg',
+			'eguru-v2'        => $gh_zakra_base . '/zakra-eguru/screenshot.jpg',
+			'eduskill-v2'     => $gh_zakra_base . '/zakra-eduskill/screenshot.jpg',
+			'online-shop-v2'  => $gh_zakra_base . '/zakra-online-shop/screenshot.jpg',
+			'restro-v2'       => $gh_zakra_base . '/zakra-restro/screenshot.jpg',
+		);
+
+		foreach ( $demos as $demo ) {
+			if ( ! empty( $demo->previewImage ) ) {
+				$demo->previewImage = str_replace( $old_base, $new_base, $demo->previewImage );
+			} elseif ( isset( $fallbacks[ $demo->slug ] ) ) {
+				$demo->previewImage = $fallbacks[ $demo->slug ];
+			}
+		}
+
+		return $demos;
 	}
 
 	public static function fetch_demo_data( $url ) {
