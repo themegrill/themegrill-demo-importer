@@ -11,6 +11,8 @@ type DemoProps = {
 const Demo = ({ demo }: DemoProps) => {
 	const isPremium = demo?.categories?.find((c) => c === 'premium');
 
+	const skeletonSrc = require(`../../../../../../assets/images/demo-skeleton.jpg`);
+
 	return (
 		<Link
 			to={'/import/$theme/$id'}
@@ -23,6 +25,12 @@ const Demo = ({ demo }: DemoProps) => {
 						<img
 							src={demo?.previewImage}
 							alt=""
+							onError={(e) => {
+								const img = e.currentTarget;
+								img.onerror = null;
+								img.src = skeletonSrc;
+								img.className = 'w-full h-full rounded-[2px]';
+							}}
 							className={`w-full h-full rounded-t-md ${
 								demo?.previewImage.includes('themegrilldemos') ||
 								demo?.previewImage.includes('zakrademos')
@@ -32,7 +40,7 @@ const Demo = ({ demo }: DemoProps) => {
 						/>
 					) : (
 						<img
-							src={require(`../../../../../../assets/images/demo-skeleton.jpg`)}
+							src={skeletonSrc}
 							className="w-full h-full rounded-[2px]"
 						/>
 					)}

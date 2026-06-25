@@ -219,7 +219,9 @@ class WXRImporter extends WP_Importer {
 
 		// Reset other variables
 		$this->base_url = '';
-		// Start parsing!
+		// Start parsing! Suppress libxml warnings so malformed XML (e.g. extra
+		// content after </rss>) doesn't produce PHP warnings via XMLReader::read().
+		$prev_libxml_errors = \libxml_use_internal_errors( true );
 		while ( $reader->read() ) {
 			// Only deal with element opens
 			if ( $reader->nodeType !== XMLReader::ELEMENT ) {
@@ -328,6 +330,9 @@ class WXRImporter extends WP_Importer {
 					break;
 			}
 		}
+
+		\libxml_clear_errors();
+		\libxml_use_internal_errors( $prev_libxml_errors );
 
 		// Now that we've done the main processing, do any required
 		// post-processing and remapping.

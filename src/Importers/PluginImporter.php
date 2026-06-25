@@ -88,6 +88,7 @@ class PluginImporter {
 						'status'  => 'error',
 						'message' => $result->get_error_message(),
 					);
+					return $results;
 				}
 
 				$this->logger->info( $plugin_data['Name'] . ' successfully activated.', [ 'end_time' => true ] );
@@ -130,15 +131,31 @@ class PluginImporter {
 					'message' => $installed->get_error_message(),
 				);
 				return $results;
-
 			}
 
-			$install_status = install_plugin_install_status( $api );
+			if ( false === $installed ) {
+				$this->logger->warning( 'Failed to install plugin ' . $pg[0] . ': filesystem error or download failed.', [ 'end_time' => true ] );
 
-			if ( is_plugin_inactive( $install_status['file'] ) ) {
+				$results[ $pg[0] ] = array(
+					'status'  => 'error',
+					'message' => __( 'Plugin installation failed (filesystem or download error).', 'themegrill-demo-importer' ),
+				);
+				return $results;
+			}
+
+			// plugin_info() scans the actual installed directory so it returns the
+			// correct basename even when the main file doesn't follow slug/slug.php
+			// (e.g. learning-management-system/lms.php for Masteriyo).
+			$plugin_file = $upgrader->plugin_info();
+			if ( ! $plugin_file ) {
+				$install_status = install_plugin_install_status( $api );
+				$plugin_file    = $install_status['file'] ?? '';
+			}
+
+			if ( $plugin_file && is_plugin_inactive( $plugin_file ) ) {
 				$this->logger->info( 'Activating plugin: ' . $api->name );
 
-				$result = activate_plugin( $install_status['file'] );
+				$result = activate_plugin( $plugin_file );
 
 				if ( is_wp_error( $result ) ) {
 					$this->logger->warning( 'Failed to activate plugin after install ' . $pg[0] . ': ' . $result->get_error_message(), [ 'end_time' => true ] );
@@ -147,7 +164,7 @@ class PluginImporter {
 						'status'  => 'error',
 						'message' => $result->get_error_message(),
 					);
-									return $results;
+					return $results;
 
 				}
 			}
