@@ -2,9 +2,9 @@
 Contributors: ThemeGrill
 Tags: themegrill, theme demos, demo, importer, one click import
 Requires at least: 5.7
-Tested up to: 6.8
+Tested up to: 7.0
 Requires PHP: 8.1.0
-Stable tag: 2.0.0.7
+Stable tag: 2.1.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -33,6 +33,19 @@ Bugs can be reported either in our support forum or preferably on the [GitHub re
 Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/themegrill-demo-importer/) :)
 
 == Changelog ==
+= 2.1.0 - 26-06-2026 =
+* Enhance - Batch media import to prevent server timeouts,
+* Dev - Added data validation to prevent PHP warnings during content import.
+* Dev - Improved widget import to handle missing plugin data.
+* Fix - Demo thumbnails not displaying correctly in Zakra theme.
+* Fix - Zakra Pro Dynamic CSS not generating during demo import.
+* Fix - ColorMag Pro Gossip Demo Import Fails with HTTP 524 Timeout Error.
+* Fix - Added proper array validation checks in WXRImporter and ImportHooks.
+* Fix - Elementor CSS files return 404 after import due to unresolved asset URLs.
+* Fix - Duplicate Menu Items(Demo Importer & Starter Templates) Under Appearance.
+* Fix - PHP Warnings Generated When Importing Demo Content Due to Invalid XML Parsing.
+* Fix - Demo Importer connectivity issue due to client's site url being blocked by server.
+
 = 2.0.0.7 - 30-03-2026 =
 * Fix - REST API permission-related vulnerability.
 

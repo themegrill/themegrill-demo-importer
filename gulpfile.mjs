@@ -96,7 +96,7 @@ const release = series(
 		);
 	},
 	function zip() {
-		return src(['./build/**/*', '!./build/**/composer.json', '!./build/**/composer.lock'], {
+		return src(['./build/**/*', '!./build/**/composer.json', '!./build/**/composer.lock', '!./build/**/vendor/composer/tmp-*.zip'], {
 			encoding: false,
 			dot: true,
 		})
