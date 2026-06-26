@@ -7,6 +7,7 @@ import { Dialog, DialogClose, DialogContent } from '../../../../../ui/Dialog';
 import {
 	cleanupQueryOptions,
 	importDataQueryOptions,
+	importDemo,
 	localizedDataQueryOptions,
 } from '../../../../api/import.api';
 import DialogConfirm from './DialogConfirm';
@@ -52,8 +53,16 @@ const StartImport = ({
 			importDetail: 'Installing required plugins...',
 		},
 		'import-content': {
-			progressWeight: 50,
-			importDetail: 'Importing content i.e. posts, pages, menus, media etc.',
+			progressWeight: 5,
+			importDetail: 'Parsing content XML...',
+		},
+		'import-content-posts': {
+			progressWeight: 25,
+			importDetail: 'Importing posts and pages...',
+		},
+		'import-media': {
+			progressWeight: 30,
+			importDetail: 'Importing media files...',
 		},
 		'import-customizer': {
 			progressWeight: 10,
@@ -101,9 +110,21 @@ const StartImport = ({
 		const results: Record<keyof typeof IMPORT_ACTIONS, any> = {
 			'install-plugins': null,
 			'import-content': null,
+			'import-content-posts': null,
+			'import-media': null,
 			'import-customizer': null,
 			'import-widgets': null,
 			complete: null,
+		};
+
+		const baseParams = {
+			demo: demo,
+			selectedPlugins: selectedPlugins,
+			siteLogoId: siteLogoId,
+			selectedPages: selectedPages,
+			isPagesSelected: isPagesSelected,
+			colorPalette: colorPalette,
+			typography: typography,
 		};
 
 		for (const key in IMPORT_ACTIONS) {
@@ -111,30 +132,44 @@ const StartImport = ({
 			setImportAction(action);
 			setImportProgressImportDetail(IMPORT_ACTIONS[action]?.importDetail ?? '');
 			try {
-				let params = {
-					action: action,
-					demo: demo,
-					selectedPlugins: selectedPlugins,
-					siteLogoId: siteLogoId,
-					selectedPages: selectedPages,
-					isPagesSelected: isPagesSelected,
-					colorPalette: colorPalette,
-					typography: typography,
-				};
+				const batchedActions = ['import-content-posts', 'import-media'] as const;
+				if ((batchedActions as readonly string[]).includes(action)) {
+					// Batch loop — call until server signals done.
+					const actionKeys = Object.keys(IMPORT_ACTIONS);
+					const progressBase = actionKeys
+						.slice(0, actionKeys.indexOf(action))
+						.reduce((sum, k) => sum + (IMPORT_ACTIONS[k as keyof typeof IMPORT_ACTIONS]?.progressWeight ?? 0), 0);
+					const actionWeight = IMPORT_ACTIONS[action]?.progressWeight ?? 0;
+					let total = 0;
+					let remaining = 0;
 
-				const data = await queryClient.ensureQueryData(importDataQueryOptions(params));
-				results[action] = data;
-				if (action === 'complete') {
-					const localizedResponse = await queryClient.ensureQueryData(
-						localizedDataQueryOptions({}),
-					);
-					setLocalizedData(localizedResponse);
-					setImportProgress(100);
+					while (true) {
+						const batchData = await importDemo({ ...baseParams, action });
+						if (!batchData) throw new Error(`Empty response from ${action}`);
+						results[action] = batchData;
+						total = batchData.total ?? total;
+						remaining = batchData.remaining ?? 0;
+
+						if (total > 0) {
+							const imported = total - remaining;
+							setImportProgress(progressBase + Math.round((imported / total) * actionWeight));
+						}
+
+						if (batchData.done) break;
+					}
 				} else {
-					setImportProgress((prev) => {
-						const next = prev + (IMPORT_ACTIONS[action]?.progressWeight ?? 0);
-						return next;
-					});
+					const params = { ...baseParams, action };
+					const data = await queryClient.ensureQueryData(importDataQueryOptions(params));
+					results[action] = data;
+					if (action === 'complete') {
+						const localizedResponse = await queryClient.ensureQueryData(
+							localizedDataQueryOptions({}),
+						);
+						setLocalizedData(localizedResponse);
+						setImportProgress(100);
+					} else {
+						setImportProgress((prev) => prev + (IMPORT_ACTIONS[action]?.progressWeight ?? 0));
+					}
 				}
 			} catch (e) {
 				setImportAction(null);

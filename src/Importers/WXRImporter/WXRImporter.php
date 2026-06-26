@@ -64,6 +64,12 @@ class WXRImporter extends WP_Importer {
 
 	protected $temp_file = null;
 
+	// Attachments collected when fetch_attachments is false, for deferred batch processing.
+	protected $pending_attachments = array();
+
+	// Non-attachment posts collected when collect_posts_only is true, for deferred batch processing.
+	protected $pending_posts = array();
+
 	/**
 	 * Logger instance.
 	 *
@@ -104,6 +110,7 @@ class WXRImporter extends WP_Importer {
 				'prefill_existing_terms'  => true,
 				'update_attachment_guids' => false,
 				'fetch_attachments'       => true,
+				'collect_posts_only'      => false,
 				'aggressive_url_search'   => false,
 				'default_author'          => get_current_user_id(),
 			)
@@ -212,7 +219,9 @@ class WXRImporter extends WP_Importer {
 
 		// Reset other variables
 		$this->base_url = '';
-		// Start parsing!
+		// Start parsing! Suppress libxml warnings so malformed XML (e.g. extra
+		// content after </rss>) doesn't produce PHP warnings via XMLReader::read().
+		$prev_libxml_errors = \libxml_use_internal_errors( true );
 		while ( $reader->read() ) {
 			// Only deal with element opens
 			if ( $reader->nodeType !== XMLReader::ELEMENT ) {
@@ -321,6 +330,9 @@ class WXRImporter extends WP_Importer {
 					break;
 			}
 		}
+
+		\libxml_clear_errors();
+		\libxml_use_internal_errors( $prev_libxml_errors );
 
 		// Now that we've done the main processing, do any required
 		// post-processing and remapping.
@@ -434,6 +446,13 @@ class WXRImporter extends WP_Importer {
 	 * @return array|WP_Error Post data array on success, error otherwise.
 	 */
 	protected function parse_post_node( $node ) {
+		if ( false === $node ) {
+			return new \WP_Error(
+				'wxr_importer.parse.expand_failed',
+				__( 'Failed to expand XML node; the content XML may be malformed.' )
+			);
+		}
+
 		$data     = array();
 		$meta     = array();
 		$comments = array();
@@ -565,7 +584,7 @@ class WXRImporter extends WP_Importer {
 		 * @param array $terms Terms on the post.
 		 */
 		$data = apply_filters( 'wxr_importer.pre_process.post', $data, $meta, $comments, $terms );
-		if ( empty( $data ) ) {
+		if ( empty( $data ) || ! is_array( $data ) ) {
 			return false;
 		}
 
@@ -575,6 +594,17 @@ class WXRImporter extends WP_Importer {
 		// Have we already processed this?
 		if ( isset( $this->mapping['post'][ $original_id ] ) ) {
 			return;
+		}
+
+		// Collect mode: queue non-attachment posts for deferred batch processing.
+		if ( $this->options['collect_posts_only'] && 'attachment' !== ( $data['post_type'] ?? '' ) ) {
+			$this->pending_posts[] = array(
+				'data'     => $data,
+				'meta'     => $meta,
+				'comments' => $comments,
+				'terms'    => $terms,
+			);
+			return false;
 		}
 
 		$this->logger->info( 'Importing post: ' . $data['post_title'], [ 'start_time' => true ] );
@@ -689,17 +719,25 @@ class WXRImporter extends WP_Importer {
 			if ( ! $this->options['fetch_attachments'] ) {
 				$this->logger->notice(
 					sprintf(
-						'Skipping attachment "%s", fetching attachments disabled',
+						'Skipping attachment "%s", queued for deferred import',
 						$data['post_title']
 					),
 					[ 'end_time' => true ]
 				);
-				/**
-				 * Post processing skipped.
-				 *
-				 * @param array $data Raw data imported for the post.
-				 * @param array $meta Raw meta data, already processed by {@see process_post_meta}.
-				 */
+
+				$remote_url = ! empty( $data['attachment_url'] ) ? $data['attachment_url'] : $data['guid'];
+
+				// Rewrite origin domain to proxy so deferred downloads also route through the proxy.
+				$remote_url = str_replace( 'https://themegrilldemos.com', THEMEGRILL_BASE_URL, $remote_url );
+				$remote_url = str_replace( 'https://zakrademos.com', ZAKRA_BASE_URL, $remote_url );
+
+				$this->pending_attachments[] = array(
+					'original_id' => $original_id,
+					'postdata'    => $postdata,
+					'meta'        => $meta,
+					'remote_url'  => $remote_url,
+				);
+
 				do_action( 'wxr_importer.process_skipped.post', $data, $meta );
 				return false;
 			}
@@ -1109,10 +1147,10 @@ class WXRImporter extends WP_Importer {
 				if ( '_elementor_data' === $key ) {
 					if ( is_string( $value ) ) {
 						$value = json_decode( $value, true );
-					} else {
-						$value = $value;
 					}
-					$this->replace_elementor_categories_ids( $value, $this->mapping['term_id'] );
+					if ( is_array( $value ) ) {
+						$this->replace_elementor_categories_ids( $value, $this->mapping['term_id'] );
+					}
 				}
 
 				add_post_meta( $post_id, wp_slash( $key ), wp_slash_strings_only( $value ) );
@@ -1140,6 +1178,9 @@ class WXRImporter extends WP_Importer {
 						$element['settings']['authors_selected'] = array( $current_user_id );
 					} else {
 						$old_ids = $element['settings'][ $field ];
+						if ( ! is_array( $old_ids ) ) {
+							continue;
+						}
 						$new_ids = array();
 
 						foreach ( $old_ids as $old_id ) {
@@ -1193,6 +1234,13 @@ class WXRImporter extends WP_Importer {
 
 
 	protected function parse_term_node( $node, $type = 'term' ) {
+		if ( false === $node ) {
+			return new \WP_Error(
+				'wxr_importer.parse.expand_failed',
+				__( 'Failed to expand XML node; the content XML may be malformed.' )
+			);
+		}
+
 		$data = array();
 		$meta = array();
 
@@ -1266,7 +1314,7 @@ class WXRImporter extends WP_Importer {
 		 * @param array $meta Meta data.
 		 */
 		$data = apply_filters( 'wxr_importer.pre_process.term', $data, $meta );
-		if ( empty( $data ) ) {
+		if ( empty( $data ) || ! is_array( $data ) ) {
 			return false;
 		}
 
@@ -1870,5 +1918,41 @@ class WXRImporter extends WP_Importer {
 
 	public function get_mapping_data() {
 		return $this->mapping;
+	}
+
+	public function get_pending_attachments(): array {
+		return $this->pending_attachments;
+	}
+
+	public function get_featured_images(): array {
+		return $this->featured_images;
+	}
+
+	public function get_pending_posts(): array {
+		return $this->pending_posts;
+	}
+
+	public function set_mapping( array $mapping ): void {
+		$this->mapping = $mapping;
+	}
+
+	/**
+	 * Insert a single post that was previously collected in collect_posts_only mode.
+	 */
+	public function insert_pending_post( array $post_data ): void {
+		add_filter( 'import_post_meta_key', array( $this, 'is_valid_meta_key' ) );
+		if ( method_exists( '\Elementor\Compatibility', 'on_wxr_importer_pre_process_post_meta' ) ) {
+			remove_action( 'wxr_importer.pre_process.post_meta', array( '\Elementor\Compatibility', 'on_wxr_importer_pre_process_post_meta' ) );
+		}
+		$this->process_post( $post_data['data'], $post_data['meta'], $post_data['comments'], $post_data['terms'] );
+	}
+
+	/**
+	 * Run post-import cleanup: remap unresolved parent IDs and flush caches.
+	 * Call this once after the final batch of posts has been inserted.
+	 */
+	public function run_post_process(): void {
+		$this->post_process();
+		$this->import_end();
 	}
 }

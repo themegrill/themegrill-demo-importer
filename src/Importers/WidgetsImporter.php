@@ -106,6 +106,11 @@ class WidgetsImporter {
 
 				$fail = false;
 
+				// Replace legacy REPLACE_TO_ID placeholder so the id_base regex matches correctly.
+				if ( str_contains( $widget_instance_id, 'REPLACE_TO_ID' ) ) {
+					$widget_instance_id = str_replace( 'REPLACE_TO_ID', '1', $widget_instance_id );
+				}
+
 				// Get id_base (remove -# from end) and instance ID number.
 				$id_base            = preg_replace( '/-[0-9]+$/', '', $widget_instance_id );
 				$instance_id_number = str_replace( $id_base . '-', '', $widget_instance_id );

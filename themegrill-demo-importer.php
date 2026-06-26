@@ -24,8 +24,8 @@ const TGDM_PLUGIN_FILE = __FILE__;
 define( 'TGDM_ABSPATH', plugin_dir_path( __FILE__ ) );
 define( 'TGDM_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 // const THEMEGRILL_BASE_URL = 'http://themegrill-demos-api.test';
-const THEMEGRILL_BASE_URL = 'https://themegrilldemos.com';
-const ZAKRA_BASE_URL      = 'https://zakrademos.com';
+const THEMEGRILL_BASE_URL = 'https://api.themegrill.com/demos';
+const ZAKRA_BASE_URL      = 'https://api.themegrill.com/zakra';
 const TGDM_NAMESPACE      = '/wp-json/themegrill-demos/v1';
 
 if ( version_compare( PHP_VERSION, '8.1.0', '<' ) ) {

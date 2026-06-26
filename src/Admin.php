@@ -62,6 +62,11 @@ class Admin {
 			);
 			self::$starter_templates_link = 'admin.php?page=tg-starter-templates';
 		} else {
+			// Themes such as Ample Pro register their own "Demo Importer" page under
+			// Appearance (slug: demo-importer) when the old ThemeGrill_Demo_Importer
+			// class is absent. Remove it so only "Starter Templates" appears.
+			remove_submenu_page( 'themes.php', 'demo-importer' );
+
 			$page                         = add_theme_page(
 				__( 'Starter Templates', 'themegrill-demo-importer' ),
 				__( 'Starter Templates', 'themegrill-demo-importer' ),
@@ -229,13 +234,12 @@ class Admin {
 			$zakra_url   = ZAKRA_BASE_URL . TGDM_NAMESPACE;
 			$zakra_demos = static::fetch_demo_data( $zakra_url );
 			if ( is_array( $zakra_demos ) && isset( $zakra_demos['message'] ) ) {
-				return array(
-					'success' => false,
-					'message' => 'Failed to fetch Zakra demos: ' . ( $zakra_demos['message'] ?? 'Unknown error' ),
-				);
+				// Non-fatal: Zakra being unavailable should not block ThemeGrill demos.
+				$zakra_demos = array();
 			}
 
 			$demos = array_merge( $zakra_demos, $themegrill_demos );
+			$demos = static::apply_thumbnail_fallbacks( $demos );
 			usort(
 				$demos,
 				function ( $a, $b ) {
@@ -245,6 +249,9 @@ class Admin {
 
 			set_transient( 'themegrill_demo_importer_demos', $demos, WEEK_IN_SECONDS );
 
+		} else {
+			// Transient was cached before apply_thumbnail_fallbacks existed; patch in-memory.
+			$demos = static::apply_thumbnail_fallbacks( $demos );
 		}
 		$data = static::get_filtered_data( $demos, $template );
 		return apply_filters(
@@ -382,6 +389,49 @@ class Admin {
 			'demos'      => $filtered_demos,
 		);
 		return $data;
+	}
+
+	/**
+	 * Rewrite all previewImage URLs from the discontinued CloudFront CDN to
+	 * GitHub raw content, and construct a fallback URL for demos whose
+	 * previewImage is empty. Fallback uses resources/{theme_slug}/{slug}/screenshot.jpg
+	 * by default; per-theme overrides handle cases where the repo folder name
+	 * differs from the API slug.
+	 */
+	public static function apply_thumbnail_fallbacks( $demos ) {
+		$old_base = 'https://d1sb0nhp4t2db4.cloudfront.net';
+		$new_base = 'https://raw.githubusercontent.com/themegrill/themegrill-demo-pack/master';
+
+		// Per-theme slug → repo folder overrides (only needed when they differ).
+		$overrides = array(
+			'zakra'    => array(
+				'main'            => 'zakra-default',
+				'kunstruct'       => 'zakra-construction',
+				'applyjobs'       => 'zakra-apply-jobs',
+				'bizness-v2'      => 'zakra-business-v2',
+				'online-store-v2' => 'zakra-online-store',
+				'yoga-trainer-v2' => 'zakra-yoga-v2',
+				'petcare-v2'      => 'zakra-petcare',
+				'flora-v2'        => 'zakra-flora',
+				'eguru-v2'        => 'zakra-eguru',
+				'eduskill-v2'     => 'zakra-eduskill',
+				'online-shop-v2'  => 'zakra-online-shop',
+				'restro-v2'       => 'zakra-restro',
+			),
+			'colormag' => array(),
+		);
+
+		foreach ( $demos as $demo ) {
+			if ( ! empty( $demo->previewImage ) ) {
+				$demo->previewImage = str_replace( $old_base, $new_base, $demo->previewImage );
+			} else {
+				$theme  = $demo->theme_slug;
+				$folder = $overrides[ $theme ][ $demo->slug ] ?? $demo->slug;
+				$demo->previewImage = $new_base . '/resources/' . $theme . '/' . $folder . '/screenshot.jpg';
+			}
+		}
+
+		return $demos;
 	}
 
 	public static function fetch_demo_data( $url ) {

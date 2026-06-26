@@ -4,6 +4,7 @@ namespace ThemeGrill\Demo\Importer\Services;
 
 use Exception;
 use ThemeGrill\Demo\Importer\Importers\ContentImporter;
+use ThemeGrill\Demo\Importer\Importers\MediaImporter;
 use ThemeGrill\Demo\Importer\Importers\PluginImporter;
 use ThemeGrill\Demo\Importer\Importers\ThemeModsImporter;
 use ThemeGrill\Demo\Importer\Importers\WidgetsImporter;
@@ -34,6 +35,12 @@ class ImportService {
 			case 'import-content':
 				return $this->importContent( $demo_config, $options );
 
+			case 'import-content-posts':
+				return $this->importContentPosts();
+
+			case 'import-media':
+				return $this->importMedia();
+
 			case 'import-customizer':
 				return $this->importCustomizer( $demo_config, $options );
 
@@ -53,6 +60,17 @@ class ImportService {
 		return $this->pluginImporter->installPlugins( $plugins );
 	}
 
+	private function importContentPosts() {
+		$result = $this->contentImporter->import_post_batch();
+		return new WP_REST_Response( $result, 200 );
+	}
+
+	private function importMedia() {
+		$importer = new MediaImporter();
+		$result   = $importer->import_batch();
+		return new WP_REST_Response( $result, 200 );
+	}
+
 	private function importContent( $demo_config, $options ) {
 		$pages = $options['pages'] ?? array();
 		return $this->contentImporter->import( $demo_config, $pages );
@@ -61,8 +79,8 @@ class ImportService {
 	private function importCustomizer( $demo_config, $options ) {
 		$args = array(
 			'custom_logo'   => $options['customLogo'] ?? 0,
-			'color_palette' => $options['colorPalette'],
-			'typography'    => $options['typography'],
+			'color_palette' => $options['colorPalette'] ?? array(),
+			'typography'    => $options['typography'] ?? array(),
 		);
 
 		return $this->customizerImporter->import( $demo_config, $args );
