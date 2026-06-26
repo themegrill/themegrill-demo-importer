@@ -393,34 +393,41 @@ class Admin {
 
 	/**
 	 * Rewrite all previewImage URLs from the discontinued CloudFront CDN to
-	 * GitHub raw content, and fill in missing previewImage values for Zakra
-	 * demos whose API slug differs from their repository folder name.
+	 * GitHub raw content, and construct a fallback URL for demos whose
+	 * previewImage is empty. Fallback uses resources/{theme_slug}/{slug}/screenshot.jpg
+	 * by default; per-theme overrides handle cases where the repo folder name
+	 * differs from the API slug.
 	 */
 	public static function apply_thumbnail_fallbacks( $demos ) {
 		$old_base = 'https://d1sb0nhp4t2db4.cloudfront.net';
 		$new_base = 'https://raw.githubusercontent.com/themegrill/themegrill-demo-pack/master';
 
-		$gh_zakra_base = $new_base . '/resources/zakra';
-		$fallbacks     = array(
-			'main'            => $gh_zakra_base . '/zakra-default/screenshot.jpg',
-			'kunstruct'       => $gh_zakra_base . '/zakra-construction/screenshot.jpg',
-			'applyjobs'       => $gh_zakra_base . '/zakra-apply-jobs/screenshot.jpg',
-			'bizness-v2'      => $gh_zakra_base . '/zakra-business-v2/screenshot.jpg',
-			'online-store-v2' => $gh_zakra_base . '/zakra-online-store/screenshot.jpg',
-			'yoga-trainer-v2' => $gh_zakra_base . '/zakra-yoga-v2/screenshot.jpg',
-			'petcare-v2'      => $gh_zakra_base . '/zakra-petcare/screenshot.jpg',
-			'flora-v2'        => $gh_zakra_base . '/zakra-flora/screenshot.jpg',
-			'eguru-v2'        => $gh_zakra_base . '/zakra-eguru/screenshot.jpg',
-			'eduskill-v2'     => $gh_zakra_base . '/zakra-eduskill/screenshot.jpg',
-			'online-shop-v2'  => $gh_zakra_base . '/zakra-online-shop/screenshot.jpg',
-			'restro-v2'       => $gh_zakra_base . '/zakra-restro/screenshot.jpg',
+		// Per-theme slug → repo folder overrides (only needed when they differ).
+		$overrides = array(
+			'zakra'    => array(
+				'main'            => 'zakra-default',
+				'kunstruct'       => 'zakra-construction',
+				'applyjobs'       => 'zakra-apply-jobs',
+				'bizness-v2'      => 'zakra-business-v2',
+				'online-store-v2' => 'zakra-online-store',
+				'yoga-trainer-v2' => 'zakra-yoga-v2',
+				'petcare-v2'      => 'zakra-petcare',
+				'flora-v2'        => 'zakra-flora',
+				'eguru-v2'        => 'zakra-eguru',
+				'eduskill-v2'     => 'zakra-eduskill',
+				'online-shop-v2'  => 'zakra-online-shop',
+				'restro-v2'       => 'zakra-restro',
+			),
+			'colormag' => array(),
 		);
 
 		foreach ( $demos as $demo ) {
 			if ( ! empty( $demo->previewImage ) ) {
 				$demo->previewImage = str_replace( $old_base, $new_base, $demo->previewImage );
-			} elseif ( isset( $fallbacks[ $demo->slug ] ) ) {
-				$demo->previewImage = $fallbacks[ $demo->slug ];
+			} else {
+				$theme  = $demo->theme_slug;
+				$folder = $overrides[ $theme ][ $demo->slug ] ?? $demo->slug;
+				$demo->previewImage = $new_base . '/resources/' . $theme . '/' . $folder . '/screenshot.jpg';
 			}
 		}
 
