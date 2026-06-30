@@ -259,7 +259,11 @@ const Import = () => {
 				)
 			)}
 			{pageImport === 'all' ? (
-				<Content demo={demo} iframeRef={iframeRef} device={device} />
+				<Content
+					demo={demo}
+					iframeRef={iframeRef}
+					device={device}
+				/>
 			) : (
 				<Pages pages={allPages} setAllPages={setAllPages} demo={demo} />
 			)}

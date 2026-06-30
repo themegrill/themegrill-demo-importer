@@ -1,8 +1,18 @@
 import chalk from 'chalk';
 import { spawn } from 'child_process';
+import { rm } from 'fs/promises';
 import { dest, parallel, series, src } from 'gulp';
 import _zip from 'gulp-zip';
 import path from 'path';
+
+async function removeDir(dir) {
+	try {
+		await rm(dir, { recursive: true, force: true, maxRetries: 5, retryDelay: 500 });
+		console.log(chalk.green(`✓ Removed: ${dir}`));
+	} catch (err) {
+		console.warn(chalk.yellow(`⚠ Could not fully remove ${dir}: ${err.message}`));
+	}
+}
 
 function exec(command) {
 	console.log(`Executing: ${command}`);
@@ -84,7 +94,7 @@ const copy = parallel(...copyTasks);
 
 const release = series(
 	function clean() {
-		return exec(`rm -rf release/ build/`);
+		return Promise.all([removeDir('release'), removeDir('build')]);
 	},
 	function build() {
 		return exec(`pnpm build`);
@@ -104,7 +114,7 @@ const release = series(
 			.pipe(dest('release'));
 	},
 	function cleanBuild() {
-		return exec(`rm -rf build/`);
+		return removeDir('build');
 	},
 );
 export { release };

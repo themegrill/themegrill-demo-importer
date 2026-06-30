@@ -213,7 +213,7 @@ class Admin {
 		if ( $force ) {
 			delete_transient( 'themegrill_demo_importer_demos' );
 		}
-		$demos = get_transient( 'themegrill_demo_importer_demos', array() );
+		$demos = get_transient( 'themegrill_demo_importer_demos' );
 		if ( empty( $demos ) ) {
 			$need_fetch = true;
 		}
@@ -250,8 +250,10 @@ class Admin {
 			set_transient( 'themegrill_demo_importer_demos', $demos, WEEK_IN_SECONDS );
 
 		} else {
-			// Transient was cached before apply_thumbnail_fallbacks existed; patch in-memory.
+			// Apply any thumbnail URL migrations to cached data and persist so
+			// subsequent requests don't need to re-apply.
 			$demos = static::apply_thumbnail_fallbacks( $demos );
+			set_transient( 'themegrill_demo_importer_demos', $demos, WEEK_IN_SECONDS );
 		}
 		$data = static::get_filtered_data( $demos, $template );
 		return apply_filters(
@@ -418,16 +420,30 @@ class Admin {
 				'online-shop-v2'  => 'zakra-online-shop',
 				'restro-v2'       => 'zakra-restro',
 			),
-			'colormag' => array(),
+			'colormag' => array(
+				'colormag'    => 'colormag-free',
+				'colormag-01' => 'colormag-free-01',
+				'colormag-02' => 'colormag-free-02',
+			),
 		);
 
 		foreach ( $demos as $demo ) {
-			if ( ! empty( $demo->previewImage ) ) {
+			$theme  = $demo->theme_slug;
+			$folder = $overrides[ $theme ][ $demo->slug ] ?? $demo->slug;
+			$gh_url = $new_base . '/resources/' . $theme . '/' . $folder . '/screenshot.jpg';
+
+			// Always expose the correct GitHub URL so the frontend can use it as a fallback.
+			$demo->githubImage = $gh_url;
+
+			if ( empty( $demo->previewImage ) ) {
+				$demo->previewImage = $gh_url;
+			} elseif ( false !== strpos( $demo->previewImage, $old_base ) ) {
+				// Discontinued CloudFront CDN — swap base, keep path.
 				$demo->previewImage = str_replace( $old_base, $new_base, $demo->previewImage );
-			} else {
-				$theme  = $demo->theme_slug;
-				$folder = $overrides[ $theme ][ $demo->slug ] ?? $demo->slug;
-				$demo->previewImage = $new_base . '/resources/' . $theme . '/' . $folder . '/screenshot.jpg';
+			} elseif ( false !== strpos( $demo->previewImage, 'themegrilldemos.com' ) ) {
+				// Use GitHub directly; letting the browser try themegrilldemos.com first
+				// causes a slow timeout on every image before the fallback kicks in.
+				$demo->previewImage = $gh_url;
 			}
 		}
 

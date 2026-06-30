@@ -12,6 +12,7 @@ const Demo = ({ demo }: DemoProps) => {
 	const isPremium = demo?.categories?.find((c) => c === 'premium');
 
 	const skeletonSrc = require(`../../../../../../assets/images/demo-skeleton.jpg`);
+	const githubSrc = demo?.githubImage ?? '';
 
 	return (
 		<Link
@@ -27,9 +28,15 @@ const Demo = ({ demo }: DemoProps) => {
 							alt=""
 							onError={(e) => {
 								const img = e.currentTarget;
-								img.onerror = null;
-								img.src = skeletonSrc;
-								img.className = 'w-full h-full rounded-[2px]';
+								if (img.src !== githubSrc) {
+									// Primary URL failed — try GitHub raw.
+									img.src = githubSrc;
+								} else {
+									// GitHub also failed — show skeleton.
+									img.onerror = null;
+									img.src = skeletonSrc;
+									img.className = 'w-full h-full rounded-[2px]';
+								}
 							}}
 							className={`w-full h-full rounded-t-md ${
 								demo?.previewImage.includes('themegrilldemos') ||

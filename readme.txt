@@ -33,7 +33,7 @@ Bugs can be reported either in our support forum or preferably on the [GitHub re
 Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/themegrill-demo-importer/) :)
 
 == Changelog ==
-= 2.1.0 - 26-06-2026 =
+= 2.1.0 - 30-06-2026 =
 * Enhance - Batch media import to prevent server timeouts,
 * Dev - Added data validation to prevent PHP warnings during content import.
 * Dev - Improved widget import to handle missing plugin data.
