@@ -114,5 +114,24 @@ class RestApi {
 				),
 			)
 		);
+		register_rest_route(
+			$this->namespace,
+			'/tracking-consent',
+			array(
+				array(
+					'methods'             => 'POST',
+					'callback'            => [ $this->importController, 'save_tracking_consent' ],
+					'permission_callback' => function () {
+						return current_user_can( 'install_themes' );
+					},
+					'args'                => array(
+						'allow_tracking' => array(
+							'type'    => 'boolean',
+							'default' => false,
+						),
+					),
+				),
+			)
+		);
 	}
 }

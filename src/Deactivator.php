@@ -12,5 +12,6 @@ class Deactivator {
 	 * Deactivate TG Demo Importer.
 	 */
 	public static function deactivate() {
+		wp_clear_scheduled_hook( 'tdi_weekly_contribution' );
 	}
 }
