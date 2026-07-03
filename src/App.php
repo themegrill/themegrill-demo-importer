@@ -38,6 +38,7 @@ class App {
 		Admin::instance();
 		RestApi::instance();
 		ImportHooks::instance();
+		Stats::instance();
 	}
 
 	/**

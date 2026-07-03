@@ -102,3 +102,14 @@ export const localizedDataQueryOptions = (args: { refetch?: boolean }) =>
 		queryKey: ['localizedData', args],
 		queryFn: () => localizedData(args),
 	});
+
+export async function saveTrackingConsent(args: { allowContribution: boolean }) {
+	const response = await apiFetch<{ success: boolean }>({
+		path: 'tg-demo-importer/v1/tracking-consent',
+		method: 'POST',
+		data: {
+			allow_tracking: args.allowContribution,
+		},
+	});
+	return response;
+}

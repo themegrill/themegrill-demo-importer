@@ -102,6 +102,16 @@ class ImportService {
 		wp_cache_flush();
 
 		$this->logger->info( 'Demo (' . $demo_config['slug'] . ') imported successfully.', [ 'end_time' => true ] );
+
+		$slug = sanitize_key( $demo_config['slug'] ?? '' );
+		if ( ! empty( $slug ) ) {
+			$imported_demos   = get_option( '_tgdm_imported_demos', array() );
+			$imported_demos[] = $slug;
+			update_option( '_tgdm_imported_demos', array_unique( $imported_demos ), false );
+		}
+
+		do_action( 'themegrill_demo_importer_import_complete' );
+
 		return array(
 			'success' => true,
 			'message' => 'Demo Imported successfully.',
