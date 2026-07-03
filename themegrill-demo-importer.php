@@ -5,7 +5,7 @@
  * Description: Premium starter sites and website templates by ThemeGrill. Import demo content, widgets, and theme settings with one click.
  * Version: 2.1.0
  * Requires at least: 5.7
- * Requires PHP: 8.1.0
+ * Requires PHP: 7.4
  * Author: ThemeGrill
  * Author URI: https://themegrill.com
  * License: GPLv3 or later
@@ -28,12 +28,12 @@ const THEMEGRILL_BASE_URL = 'https://api.themegrill.com/demos';
 const ZAKRA_BASE_URL      = 'https://api.themegrill.com/zakra';
 const TGDM_NAMESPACE      = '/wp-json/themegrill-demos/v1';
 
-if ( version_compare( PHP_VERSION, '8.1.0', '<' ) ) {
+if ( version_compare( PHP_VERSION, '7.4', '<' ) ) {
 	add_action(
 		'admin_notices',
 		function () {
 			echo '<div class="notice notice-error is-dismissible">';
-			echo '<p><strong>Starter Templates & Sites Pack by ThemeGrill Activation Error:</strong> This plugin requires PHP 8.1.0 or higher. Your current version is ' . PHP_VERSION . '.</p>';
+			echo '<p><strong>Starter Templates & Sites Pack by ThemeGrill Activation Error:</strong> This plugin requires PHP 7.4 or higher. Your current version is ' . PHP_VERSION . '.</p>';
 			echo '<p>Please contact your hosting provider to upgrade PHP.</p>';
 			echo '</div>';
 		}
@@ -51,6 +51,8 @@ if ( version_compare( PHP_VERSION, '8.1.0', '<' ) ) {
 
 	return;
 }
+
+require_once __DIR__ . '/includes/compat/php-polyfills.php';
 
 require_once __DIR__ . '/vendor/autoload.php';
 
