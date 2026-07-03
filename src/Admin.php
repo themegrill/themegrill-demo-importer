@@ -440,11 +440,8 @@ class Admin {
 			} elseif ( false !== strpos( $demo->previewImage, $old_base ) ) {
 				// Discontinued CloudFront CDN — swap base, keep path.
 				$demo->previewImage = str_replace( $old_base, $new_base, $demo->previewImage );
-			} elseif ( false !== strpos( $demo->previewImage, 'themegrilldemos.com' ) ) {
-				// Use GitHub directly; letting the browser try themegrilldemos.com first
-				// causes a slow timeout on every image before the fallback kicks in.
-				$demo->previewImage = $gh_url;
 			}
+			// themegrilldemos.com URLs are kept as-is; githubImage serves as the browser-side fallback.
 		}
 
 		return $demos;

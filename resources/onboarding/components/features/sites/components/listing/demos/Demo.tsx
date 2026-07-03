@@ -42,7 +42,7 @@ const Demo = ({ demo }: DemoProps) => {
 								demo?.previewImage.includes('themegrilldemos') ||
 								demo?.previewImage.includes('zakrademos')
 									? ''
-									: 'object-cover object-left'
+									: 'object-cover object-top'
 							}`}
 						/>
 					) : (
