@@ -1,4 +1,8 @@
 == Changelog ==
+= 2.1.1 - 09-07-2026 =
+* Dev - Updated PHP compatibility to support PHP v7.4 as per WordPress standards.
+* Fix - Images not loading properly in the import area.
+
 = 2.1.0 - 30-06-2026 =
 * Enhance - Batch media import to prevent server timeouts,
 * Dev - Added data validation to prevent PHP warnings during content import.

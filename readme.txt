@@ -4,7 +4,7 @@ Tags: themegrill, theme demos, demo, importer, one click import
 Requires at least: 5.7
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 2.1.0
+Stable tag: 2.1.1
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -33,6 +33,10 @@ Bugs can be reported either in our support forum or preferably on the [GitHub re
 Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/themegrill-demo-importer/) :)
 
 == Changelog ==
+= 2.1.1 - 09-07-2026 =
+* Dev - Updated PHP compatibility to support PHP v7.4 as per WordPress standards.
+* Fix - Images not loading properly in the import area.
+
 = 2.1.0 - 30-06-2026 =
 * Enhance - Batch media import to prevent server timeouts,
 * Dev - Added data validation to prevent PHP warnings during content import.
