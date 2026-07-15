@@ -24,8 +24,17 @@ class Stats {
 
 		add_filter( 'themegrill_sdk_products', array( $this, 'register_product' ) );
 		add_action( 'init', array( $this, 'customize_deactivation_labels' ) );
-		add_action( 'admin_enqueue_scripts', array( $this, 'declare_internal_page' ) );
-		add_filter( 'themegrill-sdk/survey/themegrill-demo-importer', array( $this, 'configure_formbricks' ), 10, 2 );
+
+		// Formbricks survey: only wire up when a real environment ID is configured.
+		// There is no survey for the demo importer yet, so leave it disabled —
+		// otherwise the SDK initialises Formbricks with the placeholder ID, which
+		// 400s ("Invalid ID format") and errors out on the Starter Templates page.
+		// Setting FORMBRICKS_ENV_ID to a real ID re-enables it automatically.
+		if ( self::FORMBRICKS_ENV_ID && 'TODO' !== self::FORMBRICKS_ENV_ID ) {
+			add_action( 'admin_enqueue_scripts', array( $this, 'declare_internal_page' ) );
+			add_filter( 'themegrill-sdk/survey/themegrill-demo-importer', array( $this, 'configure_formbricks' ), 10, 2 );
+		}
+
 		add_filter( 'themegrill_demo_importer_logger_data', array( $this, 'logger_data' ) );
 		add_action( 'admin_init', array( $this, 'bridge_notification_hooks' ), 20 );
 
