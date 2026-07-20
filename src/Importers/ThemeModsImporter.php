@@ -104,6 +104,20 @@ class ThemeModsImporter {
 			$data['colormag_footer_menu'] = $footer_menu_id;
 		}
 
+		$category_color_renames = array();
+		foreach ( $data as $key => $value ) {
+			if ( preg_match( '/^colormag_category_color_(\d+)$/', $key, $matches ) ) {
+				$old_cat_id = (int) $matches[1];
+				if ( isset( $term_id_map[ $old_cat_id ] ) && $term_id_map[ $old_cat_id ] != $old_cat_id ) {
+					$category_color_renames[ 'colormag_category_color_' . $term_id_map[ $old_cat_id ] ] = $value;
+					unset( $data[ $key ] );
+				}
+			}
+		}
+		foreach ( $category_color_renames as $new_key => $value ) {
+			$data[ $new_key ] = $value;
+		}
+
 		$mods = [];
 		// Loop through theme mods and update them.
 		foreach ( $data as $key => $value ) {
