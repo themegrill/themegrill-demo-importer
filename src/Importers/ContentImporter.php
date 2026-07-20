@@ -34,6 +34,7 @@ class ContentImporter {
 		delete_option( 'themegrill_demo_importer_featured_images' );
 		delete_option( 'themegrill_demo_importer_url_remap' );
 		delete_option( 'themegrill_demo_importer_media_total' );
+		delete_option( 'themegrill_demo_importer_requires_remapping' );
 
 		// Persist demo config so the final post batch can call import_core_options.
 		update_option( 'themegrill_demo_importer_demo_config', $demo );
@@ -108,12 +109,14 @@ class ContentImporter {
 		$importer = new WXRImporter( array( 'fetch_attachments' => false ) );
 		$importer->set_logger( Logger::getInstance() );
 		$importer->set_mapping( get_option( 'themegrill_demo_importer_mapping', array() ) );
+		$importer->set_requires_remapping( get_option( 'themegrill_demo_importer_requires_remapping', array() ) );
 
 		foreach ( $batch as $post_data ) {
 			$importer->insert_pending_post( $post_data );
 		}
 
 		update_option( 'themegrill_demo_importer_mapping', $importer->get_mapping_data() );
+		update_option( 'themegrill_demo_importer_requires_remapping', $importer->get_requires_remapping() );
 
 		$remaining = count( $pending );
 
@@ -149,6 +152,7 @@ class ContentImporter {
 		delete_option( 'themegrill_demo_importer_demo_config' );
 		delete_option( 'themegrill_demo_importer_posts_total' );
 		delete_option( 'themegrill_demo_importer_pending_posts' );
+		delete_option( 'themegrill_demo_importer_requires_remapping' );
 	}
 
 	public function import_xml( $content ) {
