@@ -618,9 +618,11 @@ class ImportHooks {
 
 			// Update the post content.
 			wp_update_post(
-				array(
-					'ID'           => $post_id,
-					'post_content' => $post_content,
+				wp_slash(
+					array(
+						'ID'           => $post_id,
+						'post_content' => $post_content,
+					)
 				)
 			);
 		}
