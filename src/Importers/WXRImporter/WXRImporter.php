@@ -1936,6 +1936,21 @@ class WXRImporter extends WP_Importer {
 		$this->mapping = $mapping;
 	}
 
+	public function get_requires_remapping(): array {
+		return $this->requires_remapping;
+	}
+
+	/**
+	 * Merges in previously-accumulated remapping flags (e.g. from earlier batches),
+	 * preserving the post/term/etc IDs as array keys - array_merge() would renumber them.
+	 */
+	public function set_requires_remapping( array $requires_remapping ): void {
+		foreach ( $requires_remapping as $type => $ids ) {
+			$existing                          = $this->requires_remapping[ $type ] ?? array();
+			$this->requires_remapping[ $type ] = $ids + $existing;
+		}
+	}
+
 	/**
 	 * Insert a single post that was previously collected in collect_posts_only mode.
 	 */
