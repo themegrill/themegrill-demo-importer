@@ -4,6 +4,7 @@ namespace ThemeGrill\Demo\Importer;
 
 use ThemeGrill\Demo\Importer\Traits\Singleton;
 use WP_Query;
+use WP_REST_Request;
 
 class ImportHooks {
 	use Singleton;
@@ -29,6 +30,7 @@ class ImportHooks {
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_blockart_blocks_settings' ), 10, 2 );
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_elementor_settings' ), 10, 2 );
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'process_evf_posts' ) );
+		add_action( 'themegrill_ajax_demo_imported', array( $this, 'setup_allfeedback_survey' ), 10, 2 );
 
 		add_filter( 'themegrill_widget_import_settings', array( $this, 'update_widget_data' ), 10, 2 );
 		// Disable Masteriyo setup wizard.
@@ -528,6 +530,138 @@ class ImportHooks {
 		}
 
 		update_option( '_blockart_settings', $settings );
+	}
+
+	/**
+	 * Create a curated AllFeedback popup survey for demos that request one.
+	 *
+	 * AllFeedback stores surveys in its own database table (`{$wpdb->prefix}af_surveys`),
+	 * not a post type, so a survey can't ride along with the WXR content import the way
+	 * Everest Forms forms do (see `process_evf_posts()`/`update_evf_form_ids()` above) —
+	 * there is no "old ID" in the import stream to remap. Instead, this creates the survey
+	 * directly through AllFeedback's own REST controllers via `rest_do_request()`, which
+	 * keeps this integration decoupled from AllFeedback's internal domain/service classes
+	 * and reuses its own request validation (allowed field-type/trigger/position enums, etc.)
+	 * rather than duplicating it here.
+	 *
+	 * Expects `$data['allfeedback_survey']` with at least a `title`. `form_schema`,
+	 * `settings`, and `styling` are optional and merged over sensible defaults, so the
+	 * demo payload only needs to specify what's actually curated per demo (e.g. the
+	 * survey copy) — see `default_allfeedback_form_schema()`, `default_allfeedback_settings()`,
+	 * and `default_allfeedback_styling()` below for what "sensible defaults" means.
+	 *
+	 * @param string $id   Demo Id.
+	 * @param array  $data Demo data.
+	 * @return void
+	 */
+	public function setup_allfeedback_survey( $id, $data ) {
+		$survey_data = $data['allfeedback_survey'] ?? array();
+
+		if ( empty( $survey_data['title'] ) ) {
+			return;
+		}
+
+		if ( ! function_exists( 'is_plugin_active' ) ) {
+			include_once ABSPATH . 'wp-admin/includes/plugin.php';
+		}
+
+		if ( ! is_plugin_active( 'allfeedback/allfeedback.php' ) ) {
+			return;
+		}
+
+		$create_request = new WP_REST_Request( 'POST', '/allfeedback/v1/surveys' );
+		$create_request->set_body_params(
+			array(
+				'title'       => sanitize_text_field( $survey_data['title'] ),
+				'description' => wp_kses_post( $survey_data['description'] ?? '' ),
+				'form_schema' => $survey_data['form_schema'] ?? $this->default_allfeedback_form_schema(),
+			)
+		);
+
+		$create_response = rest_do_request( $create_request );
+		$created         = $create_response->get_data();
+
+		if ( $create_response->get_status() >= 300 || empty( $created['data']['id'] ) ) {
+			return;
+		}
+
+		$update_request = new WP_REST_Request( 'PUT', '/allfeedback/v1/surveys/' . (int) $created['data']['id'] );
+		$update_request->set_body_params(
+			array(
+				'settings' => array_merge( $this->default_allfeedback_settings(), $survey_data['settings'] ?? array() ),
+				'styling'  => array_merge( $this->default_allfeedback_styling(), $survey_data['styling'] ?? array() ),
+				'status'   => 'published',
+			)
+		);
+
+		rest_do_request( $update_request );
+	}
+
+	/**
+	 * Default AllFeedback form schema used when a demo doesn't supply its own.
+	 *
+	 * A single NPS question — the minimal valid schema AllFeedback's
+	 * `validateFormSchema()` accepts (a `sections[].fields[]` list of
+	 * `{id, type, label, required, settings}`, `type` one of AllFeedback's
+	 * supported field types).
+	 *
+	 * @return array
+	 */
+	protected function default_allfeedback_form_schema() {
+		return array(
+			'version'  => '1.0',
+			'sections' => array(
+				array(
+					'id'     => 's1',
+					'title'  => __( 'Feedback', 'themegrill-demo-importer' ),
+					'fields' => array(
+						array(
+							'id'       => 'f1',
+							'type'     => 'nps',
+							'label'    => __( 'How likely are you to recommend us to a friend or colleague?', 'themegrill-demo-importer' ),
+							'required' => true,
+							'settings' => array(),
+						),
+					),
+				),
+			),
+		);
+	}
+
+	/**
+	 * Default AllFeedback display/behaviour settings used when a demo doesn't
+	 * fully specify its own — merged under whatever the demo payload provides.
+	 *
+	 * Shows once per visitor, after a short delay, sitewide, to avoid nagging
+	 * demo-preview visitors on every page.
+	 *
+	 * @return array
+	 */
+	protected function default_allfeedback_settings() {
+		return array(
+			'trigger_type'      => 'time_delay',
+			'delay_value'       => 8,
+			'delay_unit'        => 'seconds',
+			'display_frequency' => 'once',
+			'user_state'        => 'all',
+			'target_pages'      => 'all',
+		);
+	}
+
+	/**
+	 * Default AllFeedback widget styling used when a demo doesn't fully specify
+	 * its own — merged under whatever the demo payload provides.
+	 *
+	 * `bottom-left` is deliberate: the live-chat/support widget most Zakra demos
+	 * ship with already occupies bottom-right (see ZAK-238).
+	 *
+	 * @return array
+	 */
+	protected function default_allfeedback_styling() {
+		return array(
+			'widget_position' => 'bottom-left',
+			'widget_label'    => __( 'Feedback', 'themegrill-demo-importer' ),
+		);
 	}
 
 	public function update_nav_menu_items() {
