@@ -204,16 +204,16 @@
         },
         {
             "name": "themegrill/themegrill-sdk",
-            "version": "1.0.1",
+            "version": "1.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/themegrill/themegrill-sdk.git",
-                "reference": "bdcd3b56256ce3126054d0dabb22fe8563b0becc"
+                "reference": "2787bc7bcd0c5d6bf470c986682fd74b390d34c3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/themegrill/themegrill-sdk/zipball/bdcd3b56256ce3126054d0dabb22fe8563b0becc",
-                "reference": "bdcd3b56256ce3126054d0dabb22fe8563b0becc",
+                "url": "https://api.github.com/repos/themegrill/themegrill-sdk/zipball/2787bc7bcd0c5d6bf470c986682fd74b390d34c3",
+                "reference": "2787bc7bcd0c5d6bf470c986682fd74b390d34c3",
                 "shasum": ""
             },
             "require": {
@@ -234,12 +234,12 @@
                     "homepage": "https://themegrill.com"
                 }
             ],
-            "description": "ThemeGrill SDK",
+            "description": "A lightweight SDK that provides common functionality and shared features for ThemeGrill themes and plugins.",
             "support": {
                 "issues": "https://github.com/themegrill/themegrill-sdk/issues",
-                "source": "https://github.com/themegrill/themegrill-sdk/tree/v1.0.1"
+                "source": "https://github.com/themegrill/themegrill-sdk/tree/v1.0.4"
             },
-            "time": "2025-11-12T11:45:29+00:00"
+            "time": "2026-06-12T10:51:17+00:00"
         }
     ],
     "packages-dev": [
@@ -459,16 +459,16 @@
         },
         {
             "name": "mck89/peast",
-            "version": "v1.17.6",
+            "version": "v1.17.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mck89/peast.git",
-                "reference": "b8b4184b1e6912669f9af155caef9050509d9f18"
+                "reference": "89ee39f81e82cb7ed36cc5abaf2edd43cef71770"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mck89/peast/zipball/b8b4184b1e6912669f9af155caef9050509d9f18",
-                "reference": "b8b4184b1e6912669f9af155caef9050509d9f18",
+                "url": "https://api.github.com/repos/mck89/peast/zipball/89ee39f81e82cb7ed36cc5abaf2edd43cef71770",
+                "reference": "89ee39f81e82cb7ed36cc5abaf2edd43cef71770",
                 "shasum": ""
             },
             "require": {
@@ -481,7 +481,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.17.6-dev"
+                    "dev-master": "1.17.7-dev"
                 }
             },
             "autoload": {
@@ -502,9 +502,9 @@
             "description": "Peast is PHP library that generates AST for JavaScript code",
             "support": {
                 "issues": "https://github.com/mck89/peast/issues",
-                "source": "https://github.com/mck89/peast/tree/v1.17.6"
+                "source": "https://github.com/mck89/peast/tree/v1.17.7"
             },
-            "time": "2026-04-24T08:04:05+00:00"
+            "time": "2026-07-21T11:56:06+00:00"
         },
         {
             "name": "mustache/mustache",
@@ -682,16 +682,16 @@
         },
         {
             "name": "wp-cli/php-cli-tools",
-            "version": "v0.12.9",
+            "version": "v0.13.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/wp-cli/php-cli-tools.git",
-                "reference": "c3d25138ce46a66647ec0dc9b17bf300338494aa"
+                "reference": "4a04ffbe322b031b4c54e176edf1dfd299c7fe55"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/wp-cli/php-cli-tools/zipball/c3d25138ce46a66647ec0dc9b17bf300338494aa",
-                "reference": "c3d25138ce46a66647ec0dc9b17bf300338494aa",
+                "url": "https://api.github.com/repos/wp-cli/php-cli-tools/zipball/4a04ffbe322b031b4c54e176edf1dfd299c7fe55",
+                "reference": "4a04ffbe322b031b4c54e176edf1dfd299c7fe55",
                 "shasum": ""
             },
             "require": {
@@ -739,9 +739,9 @@
             ],
             "support": {
                 "issues": "https://github.com/wp-cli/php-cli-tools/issues",
-                "source": "https://github.com/wp-cli/php-cli-tools/tree/v0.12.9"
+                "source": "https://github.com/wp-cli/php-cli-tools/tree/v0.13.0"
             },
-            "time": "2026-03-29T11:12:54+00:00"
+            "time": "2026-04-08T12:28:41+00:00"
         },
         {
             "name": "wp-cli/wp-cli",
@@ -749,19 +749,19 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/wp-cli/wp-cli.git",
-                "reference": "fc140030b5c1a47020812b74e2b8d767d7242725"
+                "reference": "f8a81d1eeee06b712b1e7a2d1578e22030f556dc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/wp-cli/wp-cli/zipball/fc140030b5c1a47020812b74e2b8d767d7242725",
-                "reference": "fc140030b5c1a47020812b74e2b8d767d7242725",
+                "url": "https://api.github.com/repos/wp-cli/wp-cli/zipball/f8a81d1eeee06b712b1e7a2d1578e22030f556dc",
+                "reference": "f8a81d1eeee06b712b1e7a2d1578e22030f556dc",
                 "shasum": ""
             },
             "require": {
                 "mustache/mustache": "^3.0.0",
                 "php": ">=7.2.24 || ^8.0",
                 "wp-cli/mustangostang-spyc": "^0.6.3",
-                "wp-cli/php-cli-tools": "~0.12.7"
+                "wp-cli/php-cli-tools": "~0.13.0"
             },
             "require-dev": {
                 "justinrainbow/json-schema": "^6.3",
@@ -769,6 +769,7 @@
                 "wp-cli/db-command": "^2",
                 "wp-cli/entity-command": "^2",
                 "wp-cli/extension-command": "^2",
+                "wp-cli/language-command": "^2",
                 "wp-cli/package-command": "^2",
                 "wp-cli/wp-cli-tests": "^5"
             },
@@ -825,7 +826,7 @@
                 "issues": "https://github.com/wp-cli/wp-cli/issues",
                 "source": "https://github.com/wp-cli/wp-cli"
             },
-            "time": "2026-06-18T15:36:01+00:00"
+            "time": "2026-07-29T14:30:02+00:00"
         }
     ],
     "aliases": [],

@@ -4,7 +4,7 @@ Tags: themegrill, theme demos, demo, importer, one click import
 Requires at least: 5.7
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 2.1.1
+Stable tag: 2.1.2
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -33,6 +33,13 @@ Bugs can be reported either in our support forum or preferably on the [GitHub re
 Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/themegrill-demo-importer/) :)
 
 == Changelog ==
+= 2.1.2 - 30-07-2026 =
+* Feature - Automatically set up a curated AllFeedback NPS survey after importing a demo (where AllFeedback is active).
+* Fix - Formbricks JavaScript Errors in Browser Console.
+* Fix - ColorMag category colors not applying correctly after import due to unmapped category IDs.
+* Fix - Menu items, post parent/author, and attachment URLs left unresolved when content import ran across multiple batches.
+* Fix - CSS custom property values (e.g. var(--...)) corrupted in imported pages containing Everest Forms blocks.
+
 = 2.1.1 - 09-07-2026 =
 * Dev - Updated PHP compatibility to support PHP v7.4 as per WordPress standards.
 * Fix - Images not loading properly in the import area.
