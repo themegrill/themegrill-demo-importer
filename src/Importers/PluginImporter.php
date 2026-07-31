@@ -33,6 +33,50 @@ class PluginImporter {
 		return $results;
 	}
 
+	/**
+	 * Retry a WordPress.org network call once on failure.
+	 *
+	 * `plugins_api()` and `Plugin_Upgrader::install()` run synchronously, one
+	 * plugin after another, inside a single request with no timeout handling
+	 * of their own — a transient network hiccup on any one of them previously
+	 * just failed outright. Since these failures were also silently swallowed
+	 * client-side until now (see StartImport.tsx), a plugin could look like it
+	 * "just didn't install" with no visible cause. This doesn't fix that
+	 * client-side gap, but it does reduce how often a single flaky request
+	 * causes a failure at all.
+	 *
+	 * @param callable $attempt             Zero-arg callable returning WP_Error|false on failure.
+	 * @param string   $plugin_slug         Plugin slug, for logging only.
+	 * @param string   $action_description  Human-readable action, for logging only.
+	 * @param int      $max_attempts        Total attempts including the first.
+	 * @return mixed The last attempt's result (success or final failure).
+	 */
+	private function withRetry( callable $attempt, $plugin_slug, $action_description, $max_attempts = 2 ) {
+		$result = null;
+
+		for ( $i = 1; $i <= $max_attempts; $i++ ) {
+			$result = $attempt();
+			$failed = is_wp_error( $result ) || false === $result;
+
+			if ( ! $failed ) {
+				return $result;
+			}
+
+			if ( $i < $max_attempts ) {
+				$this->logger->warning( "Attempt {$i} to {$action_description} for {$plugin_slug} failed, retrying..." );
+
+				// Some hosts (e.g. sandboxed free tiers) disable sleep() entirely —
+				// a disabled function is a fatal error, not a WP_Error, so this must
+				// not be called unconditionally.
+				if ( function_exists( 'sleep' ) ) {
+					sleep( 1 );
+				}
+			}
+		}
+
+		return $result;
+	}
+
 	private function installActivatePlugin( $plugin ) {
 		$pg          = explode( '/', $plugin );
 		$plugin_file = WP_PLUGIN_DIR . '/' . $plugin;
@@ -101,11 +145,17 @@ class PluginImporter {
 				return $results;
 			}
 
-			$api = plugins_api(
-				'plugin_information',
-				array(
-					'slug' => sanitize_key( wp_unslash( $pg[0] ) ),
-				)
+			$api = $this->withRetry(
+				function () use ( $pg ) {
+					return plugins_api(
+						'plugin_information',
+						array(
+							'slug' => sanitize_key( wp_unslash( $pg[0] ) ),
+						)
+					);
+				},
+				$pg[0],
+				'fetch plugin info from WordPress.org'
 			);
 			if ( is_wp_error( $api ) ) {
 				$this->logger->warning( 'Failed to fetch plugin info from from WordPress.org for ' . $pg[0] . ': ' . $api->get_error_message(), [ 'end_time' => true ] );
@@ -121,7 +171,13 @@ class PluginImporter {
 
 			$skin      = new \WP_Ajax_Upgrader_Skin();
 			$upgrader  = new \Plugin_Upgrader( $skin );
-			$installed = $upgrader->install( $api->download_link );
+			$installed = $this->withRetry(
+				function () use ( $upgrader, $api ) {
+					return $upgrader->install( $api->download_link );
+				},
+				$pg[0],
+				'download/install plugin from WordPress.org'
+			);
 
 			if ( is_wp_error( $installed ) ) {
 				$this->logger->warning( 'Failed to install plugin ' . $pg[0] . ': ' . $installed->get_error_message(), [ 'end_time' => true ] );

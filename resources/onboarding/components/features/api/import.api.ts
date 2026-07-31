@@ -12,27 +12,36 @@ export async function importDemo(args: {
 	colorPalette: string[];
 	typography: string[];
 }) {
-	try {
-		const response = await apiFetch<Response>({
-			path: 'tg-demo-importer/v1/install?action=' + args.action,
-			method: 'POST',
-			data: {
-				demo_config: args.demo,
-				opts: {
-					plugins: args.selectedPlugins,
-					customLogo: args.siteLogoId,
-					pages: args.isPagesSelected ? args.selectedPages : [],
-					colorPalette: args.colorPalette,
-					typography: args.typography,
-				},
+	const response = await apiFetch<Response>({
+		path: 'tg-demo-importer/v1/install?action=' + args.action,
+		method: 'POST',
+		data: {
+			demo_config: args.demo,
+			opts: {
+				plugins: args.selectedPlugins,
+				customLogo: args.siteLogoId,
+				pages: args.isPagesSelected ? args.selectedPages : [],
+				colorPalette: args.colorPalette,
+				typography: args.typography,
 			},
-			parse: false,
-		});
-		const data = await response.json();
-		return data;
-	} catch (e) {
-		console.error('Failed to import data:', e);
+		},
+		parse: false,
+	});
+
+	// `parse: false` means `apiFetch` resolves even on a 4xx/5xx — fetch() only
+	// rejects on network-level failures, not HTTP error statuses. Check this
+	// before attempting to parse the body: a PHP fatal error (e.g. a 500) isn't
+	// valid JSON, so response.json() would throw a generic SyntaxError that
+	// hides the actual status/reason. Throwing here (rather than swallowing and
+	// returning undefined, as this used to do) also avoids a confusing
+	// "data is undefined" TanStack Query error masking the real failure —
+	// react-query's queryFn contract requires never resolving to undefined.
+	if (!response.ok) {
+		const text = await response.text().catch(() => '');
+		throw new Error(`Request failed (${response.status} ${response.statusText}): ${text.slice(0, 300)}`);
 	}
+
+	return await response.json();
 }
 
 export const importDataQueryOptions = (args: {

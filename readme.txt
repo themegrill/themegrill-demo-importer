@@ -33,7 +33,7 @@ Bugs can be reported either in our support forum or preferably on the [GitHub re
 Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/themegrill-demo-importer/) :)
 
 == Changelog ==
-= 2.1.2 - 30-07-2026 =
+= 2.1.2 - 31-07-2026 =
 * Feature - Automatically set up a curated AllFeedback NPS survey after importing a demo (where AllFeedback is active).
 * Fix - Formbricks JavaScript Errors in Browser Console.
 * Fix - ColorMag category colors not applying correctly after import due to unmapped category IDs.

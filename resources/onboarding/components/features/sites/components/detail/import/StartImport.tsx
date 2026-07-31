@@ -84,6 +84,7 @@ const StartImport = ({
 	const [importProgressImportDetail, setImportProgressImportDetail] =
 		useState('Initializing import...');
 	const [isImportFailed, setIsImportFailed] = useState(false);
+	const [importErrorMessage, setImportErrorMessage] = useState<string | null>(null);
 
 	const checkThemeExists = (demo: Demo) => {
 		const proTheme = demo?.theme_slug + '-pro';
@@ -163,6 +164,25 @@ const StartImport = ({
 					const params = { ...baseParams, action };
 					const data = await queryClient.ensureQueryData(importDataQueryOptions(params));
 					results[action] = data;
+
+					// `install-plugins` returns 200 even when individual plugins fail
+					// (PluginImporter handles WP.org fetch/download/activation errors
+					// gracefully, per-plugin, rather than throwing) — check for those
+					// here, or a failed plugin install silently passes as if nothing
+					// happened and the wizard proceeds anyway.
+					if (action === 'install-plugins' && Array.isArray(data)) {
+						const failed = data
+							.map((entry: Record<string, { status: string; message: string }>) => {
+								const [slug, result] = Object.entries(entry)[0] ?? [];
+								return result?.status === 'error' ? `${slug}: ${result.message}` : null;
+							})
+							.filter(Boolean);
+
+						if (failed.length > 0) {
+							throw new Error(`Failed to install plugin(s) — ${failed.join('; ')}`);
+						}
+					}
+
 					if (action === 'complete') {
 						const localizedResponse = await queryClient.ensureQueryData(
 							localizedDataQueryOptions({}),
@@ -176,6 +196,7 @@ const StartImport = ({
 			} catch (e) {
 				setImportAction(null);
 				setImportProgress(0);
+				setImportErrorMessage(e instanceof Error ? e.message : null);
 				setIsImportFailed(true);
 				break;
 			}
@@ -189,6 +210,7 @@ const StartImport = ({
 		setImportProgressImportDetail(step.importDetail);
 		setImportProgress(0);
 		setIsImportFailed(false);
+		setImportErrorMessage(null);
 		queryClient.clear();
 		handleCleanup(false);
 	};
@@ -203,7 +225,12 @@ const StartImport = ({
 
 	const renderDialog = () => {
 		if (isImportFailed) {
-			return <DialogImportFailed handleTryAgain={handleTryAgain} />;
+			return (
+				<DialogImportFailed
+					handleTryAgain={handleTryAgain}
+					errorMessage={importErrorMessage}
+				/>
+			);
 		}
 
 		if (demo?.premium) {

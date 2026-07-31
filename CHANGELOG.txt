@@ -1,5 +1,5 @@
 == Changelog ==
-= 2.1.2 - 30-07-2026 =
+= 2.1.2 - 31-07-2026 =
 * Feature - Automatically set up a curated AllFeedback NPS survey after importing a demo (where AllFeedback is active).
 * Fix - Formbricks JavaScript Errors in Browser Console.
 * Fix - ColorMag category colors not applying correctly after import due to unmapped category IDs.

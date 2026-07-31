@@ -4,7 +4,13 @@ import { Info } from 'lucide-react';
 import { Button } from '../../../../../ui/Button';
 import { DialogClose } from '../../../../../ui/Dialog';
 
-const DialogImportFailed = ({ handleTryAgain }: { handleTryAgain: () => void }) => {
+const DialogImportFailed = ({
+	handleTryAgain,
+	errorMessage,
+}: {
+	handleTryAgain: () => void;
+	errorMessage?: string | null;
+}) => {
 	const router = useRouter();
 
 	return (
@@ -31,6 +37,12 @@ const DialogImportFailed = ({ handleTryAgain }: { handleTryAgain: () => void }) 
 				</a>
 				{__('.', 'themegrill-demo-importer')}
 			</p>
+
+			{errorMessage && (
+				<p className="text-[13px] leading-[20px] text-[#B91C1C] bg-[#FEF2F2] rounded-md py-[10px] px-[16px] mb-[32px] break-words">
+					{errorMessage}
+				</p>
+			)}
 			<div className="px-[49px]">
 				<Button
 					className="px-5 py-[15px] h-[51px] text-[15px] leading-[21px] text-[#FAFBFF] font-semibold rounded-md bg-[#2563EB] border-none w-full hover:bg-[#2563EB] cursor-pointer"
