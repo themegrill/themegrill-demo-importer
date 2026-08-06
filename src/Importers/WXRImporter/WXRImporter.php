@@ -136,7 +136,8 @@ class WXRImporter extends WP_Importer {
 		if ( filter_var( $file, FILTER_VALIDATE_URL ) ) {
 			$this->logger->debug( 'Downloading XML file from URL: ' . $file );
 
-			$response = wp_remote_get(
+			// Require allowlisted hosts + wp_safe_remote_get to prevent SSRF via demo_config.content.
+			$response = \ThemeGrill\Demo\Importer\Helpers\RemoteRequest::get(
 				$file,
 				array(
 					'headers'   => array(
@@ -144,7 +145,8 @@ class WXRImporter extends WP_Importer {
 					),
 					'sslverify' => true,
 					'timeout'   => 30,
-				)
+				),
+				true
 			);
 
 			if ( is_wp_error( $response ) ) {
@@ -1512,8 +1514,8 @@ class WXRImporter extends WP_Importer {
 			return new WP_Error( 'upload_dir_error', $upload['error'] );
 		}
 
-		// fetch the remote url and write it to the placeholder file
-		$response = wp_remote_get(
+		// fetch the remote url and write it to the placeholder file (safe: blocks private/loopback IPs)
+		$response = \ThemeGrill\Demo\Importer\Helpers\RemoteRequest::get(
 			$url,
 			array(
 				'stream'    => true,

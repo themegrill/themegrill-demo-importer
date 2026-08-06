@@ -4,7 +4,7 @@ Tags: themegrill, theme demos, demo, importer, one click import
 Requires at least: 5.7
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 2.1.2
+Stable tag: 2.1.3
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -33,6 +33,12 @@ Bugs can be reported either in our support forum or preferably on the [GitHub re
 Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/themegrill-demo-importer/) :)
 
 == Changelog ==
+= 2.1.3 - 06-08-2026 =
+* Fix - Authenticated SSRF via demo_config.content by using wp_safe_remote_get and restricting content downloads to ThemeGrill demo hosts.
+* Fix - Arbitrary option updates via demo_config.elementor_settings by allowing only Elementor-namespaced option keys.
+* Fix - Restrict YITH Wishlist settings import to yith_wcwl / yith_wishlist option key prefixes.
+* Tweak - Use safe remote requests for media/attachment downloads during import.
+
 = 2.1.2 - 31-07-2026 =
 * Feature - Automatically set up a curated AllFeedback NPS survey after importing a demo (where AllFeedback is active).
 * Fix - Formbricks JavaScript Errors in Browser Console.

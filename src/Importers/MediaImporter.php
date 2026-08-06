@@ -121,7 +121,8 @@ class MediaImporter {
 			return new WP_Error( 'upload_dir_error', $upload['error'] );
 		}
 
-		$response = wp_remote_get(
+		// Safe remote fetch: blocks private/loopback SSRF targets.
+		$response = \ThemeGrill\Demo\Importer\Helpers\RemoteRequest::get(
 			$remote_url,
 			array(
 				'stream'    => true,
