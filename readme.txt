@@ -34,6 +34,7 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 
 == Changelog ==
 = 2.1.3 - 06-08-2026 =
+* Fix - Validate the demo_config payload against a REST schema on the install route, while still allowing theme specific keys.
 * Fix - Authenticated SSRF via demo_config.content by using wp_safe_remote_get and restricting content downloads to ThemeGrill demo hosts.
 * Fix - Arbitrary option updates via demo_config.elementor_settings by allowing only Elementor-namespaced option keys.
 * Fix - Restrict YITH Wishlist settings import to yith_wcwl / yith_wishlist option key prefixes.
