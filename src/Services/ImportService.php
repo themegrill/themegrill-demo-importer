@@ -100,6 +100,7 @@ class ImportService {
 		delete_option( 'themegrill_demo_importer_mapping' );
 		flush_rewrite_rules();
 		wp_cache_flush();
+		$this->maybeRegenerateWooCommerceLookupTables();
 
 		$this->logger->info( 'Demo (' . $demo_config['slug'] . ') imported successfully.', [ 'end_time' => true ] );
 
@@ -116,6 +117,28 @@ class ImportService {
 			'success' => true,
 			'message' => 'Demo Imported successfully.',
 		);
+	}
+
+	/**
+	 * Imported WooCommerce products are inserted directly via the WXR importer,
+	 * which does not always trigger WooCommerce's lookup table sync. Without it,
+	 * the `wc_product_meta_lookup` table stays empty and widgets such as the
+	 * Price Filter have no data to build their range from.
+	 *
+	 * This regenerates the lookup tables once the import is complete, matching
+	 * what WooCommerce itself runs from Status > Tools > Regenerate lookup tables.
+	 */
+	private function maybeRegenerateWooCommerceLookupTables() {
+		if ( ! function_exists( 'wc_update_product_lookup_tables' ) || ! function_exists( 'wc_update_product_lookup_tables_is_running' ) ) {
+			return;
+		}
+
+		if ( wc_update_product_lookup_tables_is_running() ) {
+			return;
+		}
+
+		wc_update_product_lookup_tables();
+		$this->logger->info( 'Scheduled WooCommerce product lookup table regeneration.' );
 	}
 
 	public function cleanup() {

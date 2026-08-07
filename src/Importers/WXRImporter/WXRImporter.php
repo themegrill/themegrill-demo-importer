@@ -1306,6 +1306,163 @@ class WXRImporter extends WP_Importer {
 		return compact( 'data', 'meta' );
 	}
 
+	/**
+	 * WooCommerce product attribute taxonomies (e.g. `pa_colors`, `pa_size`) are not
+	 * standard WordPress taxonomies. They only get registered once a matching row
+	 * exists in the `wc_attribute_taxonomies` table, which normally happens via
+	 * the WooCommerce admin UI. Demo content WXR files can reference attribute
+	 * terms before that row exists, which makes `wp_insert_term()` fail with an
+	 * "Invalid taxonomy" error and leaves the attribute filter widgets empty.
+	 *
+	 * This auto-creates the missing attribute and registers its taxonomy for the
+	 * current request so term import can proceed as expected.
+	 *
+	 * @param string $taxonomy Taxonomy name from the WXR term node.
+	 */
+	protected function maybe_register_product_attribute_taxonomy( $taxonomy ) {
+		if ( 0 !== strpos( $taxonomy, 'pa_' ) || taxonomy_exists( $taxonomy ) || ! function_exists( 'wc_create_attribute' ) ) {
+			return;
+		}
+
+		$attribute_name = substr( $taxonomy, 3 );
+
+		$attribute_id = wc_create_attribute(
+			array(
+				'name' => ucwords( str_replace( array( '-', '_' ), ' ', $attribute_name ) ),
+				'slug' => $attribute_name,
+				'type' => 'select',
+			)
+		);
+
+		if ( is_wp_error( $attribute_id ) ) {
+			$this->logger->warning(
+				sprintf(
+					'Could not auto-create product attribute for taxonomy "%1$s": %2$s',
+					$taxonomy,
+					$attribute_id->get_error_message()
+				)
+			);
+			return;
+		}
+
+		register_taxonomy(
+			$taxonomy,
+			array( 'product', 'product_variation' ),
+			array(
+				'hierarchical' => false,
+				'show_ui'      => false,
+				'query_var'    => true,
+				'rewrite'      => false,
+				'public'       => true,
+			)
+		);
+
+		$this->logger->info(
+			sprintf( 'Auto-created missing product attribute "%1$s" referenced by demo content.', $attribute_name )
+		);
+	}
+
+	/**
+	 * Some demo WXR exports omit `<category domain="pa_*">` term relationships for
+	 * variable products entirely — the parent product's `_product_attributes` meta
+	 * still lists the taxonomy attribute (e.g. `pa_colors`), but no actual terms get
+	 * attached to the product, and the taxonomy/terms may not even exist. This leaves
+	 * attribute filter widgets empty even though the products are otherwise imported
+	 * correctly.
+	 *
+	 * The per-variation `attribute_pa_*` postmeta (e.g. `attribute_pa_colors = blue`)
+	 * usually survives the export though, since it's plain postmeta rather than a
+	 * taxonomy relationship. This reconstructs the missing taxonomy + terms from that
+	 * variation data and assigns them back to the parent product.
+	 *
+	 * Runs once after all posts (including variations) have been inserted.
+	 */
+	protected function repair_variable_product_attributes(): void {
+		if ( ! function_exists( 'wc_create_attribute' ) ) {
+			return;
+		}
+
+		global $wpdb;
+
+		$product_ids = $wpdb->get_col(
+			"SELECT DISTINCT p.ID FROM {$wpdb->posts} p
+			INNER JOIN {$wpdb->postmeta} pm ON pm.post_id = p.ID AND pm.meta_key = '_product_attributes'
+			WHERE p.post_type = 'product' AND pm.meta_value LIKE '%\"is_taxonomy\";i:1%'"
+		);
+
+		if ( empty( $product_ids ) ) {
+			return;
+		}
+
+		foreach ( $product_ids as $product_id ) {
+			$attributes = get_post_meta( $product_id, '_product_attributes', true );
+			if ( ! is_array( $attributes ) ) {
+				continue;
+			}
+
+			foreach ( $attributes as $attr_key => $attr ) {
+				if ( empty( $attr['is_taxonomy'] ) || 0 !== strpos( $attr_key, 'pa_' ) ) {
+					continue;
+				}
+
+				// Terms already assigned (a well-formed export)? Nothing to repair.
+				$existing = taxonomy_exists( $attr_key ) ? wp_get_post_terms( $product_id, $attr_key, array( 'fields' => 'ids' ) ) : array();
+				if ( ! empty( $existing ) && ! is_wp_error( $existing ) ) {
+					continue;
+				}
+
+				$this->maybe_register_product_attribute_taxonomy( $attr_key );
+				if ( ! taxonomy_exists( $attr_key ) ) {
+					continue;
+				}
+
+				$variation_ids = get_posts(
+					array(
+						'post_type'      => 'product_variation',
+						'post_parent'    => $product_id,
+						'posts_per_page' => -1,
+						'post_status'    => 'any',
+						'fields'         => 'ids',
+					)
+				);
+
+				$slugs = array();
+				foreach ( $variation_ids as $variation_id ) {
+					$value = get_post_meta( $variation_id, 'attribute_' . $attr_key, true );
+					if ( '' !== $value ) {
+						$slugs[] = sanitize_title( $value );
+					}
+				}
+				$slugs = array_unique( array_filter( $slugs ) );
+
+				if ( empty( $slugs ) ) {
+					continue;
+				}
+
+				$term_ids = array();
+				foreach ( $slugs as $slug ) {
+					$term = get_term_by( 'slug', $slug, $attr_key );
+					if ( ! $term ) {
+						$inserted = wp_insert_term( ucwords( str_replace( array( '-', '_' ), ' ', $slug ) ), $attr_key, array( 'slug' => $slug ) );
+						if ( is_wp_error( $inserted ) ) {
+							continue;
+						}
+						$term_ids[] = (int) $inserted['term_id'];
+					} else {
+						$term_ids[] = (int) $term->term_id;
+					}
+				}
+
+				if ( ! empty( $term_ids ) ) {
+					wp_set_object_terms( $product_id, $term_ids, $attr_key, false );
+					$this->logger->info(
+						sprintf( 'Repaired missing "%1$s" terms for product #%2$d from variation data.', $attr_key, $product_id )
+					);
+				}
+			}
+		}
+	}
+
 	protected function process_term( $data, $meta ) {
 		/**
 		 * Pre-process term data.
@@ -1317,6 +1474,8 @@ class WXRImporter extends WP_Importer {
 		if ( empty( $data ) || ! is_array( $data ) ) {
 			return false;
 		}
+
+		$this->maybe_register_product_attribute_taxonomy( $data['taxonomy'] );
 
 		$original_id = isset( $data['id'] ) ? (int) $data['id'] : 0;
 		$parent_id   = isset( $data['parent'] ) ? (int) $data['parent'] : 0;
@@ -1968,6 +2127,7 @@ class WXRImporter extends WP_Importer {
 	 */
 	public function run_post_process(): void {
 		$this->post_process();
+		$this->repair_variable_product_attributes();
 		$this->import_end();
 	}
 }

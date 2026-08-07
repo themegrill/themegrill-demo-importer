@@ -1,4 +1,9 @@
 == Changelog ==
+= 2.1.3 - 07-08-2026 =
+* Fix - WooCommerce product attribute taxonomies (e.g. pa_colors, pa_size) referenced by demo content but not yet registered caused "Invalid taxonomy" errors and left attribute filter widgets empty; taxonomies are now auto-created during import.
+* Fix - Variable products whose demo export omitted parent-level attribute term relationships now have their pa_* terms rebuilt from variation attribute data after import.
+* Fix - WooCommerce product lookup tables not regenerated after import, leaving the Price Filter widget with no data.
+
 = 2.1.2 - 31-07-2026 =
 * Feature - Automatically set up a curated AllFeedback NPS survey after importing a demo (where AllFeedback is active).
 * Fix - Formbricks JavaScript Errors in Browser Console.
