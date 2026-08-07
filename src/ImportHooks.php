@@ -30,7 +30,7 @@ class ImportHooks {
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_magazine_blocks_settings' ), 10, 2 );
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_blockart_blocks_settings' ), 10, 2 );
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_elementor_settings' ), 10, 2 );
-		add_action( 'themegrill_ajax_demo_imported', array( $this, 'process_evf_posts' ), 10, 2 );
+		add_action( 'themegrill_ajax_demo_imported', array( $this, 'process_evf_posts' ) );
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'setup_allfeedback_survey' ), 10, 2 );
 
 		add_filter( 'themegrill_widget_import_settings', array( $this, 'update_widget_data' ), 10, 2 );
@@ -1121,11 +1121,8 @@ class ImportHooks {
 		return $widget;
 	}
 
-	public function process_evf_posts( $demo_id = '', $demo_data = array() ) {
-		if ( ! empty( $demo_data ) && ! $this->demo_has_plugin( (array) $demo_data, array( 'everest-forms' ) ) ) {
-			return;
-		}
-
+	public function process_evf_posts() {
+		// Only populated when the imported content actually contained Everest Forms blocks.
 		$posts_with_evf = get_option( 'themegrill_demo_importer_posts_with_evf', array() );
 
 		if ( empty( $posts_with_evf ) ) {
