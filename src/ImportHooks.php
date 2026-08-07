@@ -18,18 +18,18 @@ class ImportHooks {
 
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_customizer_data' ), 9 );
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_nav_menu_items' ) );
-		add_action( 'themegrill_ajax_demo_imported', array( $this, 'set_elementor_load_fa4_shim' ) );
-		add_action( 'themegrill_ajax_demo_imported', array( $this, 'set_elementor_active_kit' ) );
-		add_action( 'themegrill_ajax_demo_imported', array( $this, 'set_wc_pages' ) );
-		add_action( 'themegrill_ajax_demo_imported', array( $this, 'set_masteriyo_pages' ) );
-		add_action( 'themegrill_ajax_demo_imported', array( $this, 'set_siteorigin_settings' ) );
+		add_action( 'themegrill_ajax_demo_imported', array( $this, 'set_elementor_load_fa4_shim' ), 10, 2 );
+		add_action( 'themegrill_ajax_demo_imported', array( $this, 'set_elementor_active_kit' ), 10, 2 );
+		add_action( 'themegrill_ajax_demo_imported', array( $this, 'set_wc_pages' ), 10, 2 );
+		add_action( 'themegrill_ajax_demo_imported', array( $this, 'set_masteriyo_pages' ), 10, 2 );
+		add_action( 'themegrill_ajax_demo_imported', array( $this, 'set_siteorigin_settings' ), 10, 2 );
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'setup_yith_woocommerce_wishlist' ), 10, 2 );
-		add_action( 'themegrill_ajax_demo_imported', array( $this, 'regenerate_elementor_styles' ), 10 );
+		add_action( 'themegrill_ajax_demo_imported', array( $this, 'regenerate_elementor_styles' ), 10, 2 );
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_masteriyo_data' ), 10, 2 );
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_magazine_blocks_settings' ), 10, 2 );
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_blockart_blocks_settings' ), 10, 2 );
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_elementor_settings' ), 10, 2 );
-		add_action( 'themegrill_ajax_demo_imported', array( $this, 'process_evf_posts' ) );
+		add_action( 'themegrill_ajax_demo_imported', array( $this, 'process_evf_posts' ), 10, 2 );
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'setup_allfeedback_survey' ), 10, 2 );
 
 		add_filter( 'themegrill_widget_import_settings', array( $this, 'update_widget_data' ), 10, 2 );
@@ -38,45 +38,9 @@ class ImportHooks {
 
 		// Disable BlockArt redirection.
 		add_filter( 'blockart_activation_redirect', '__return_false' );
-		add_action(
-			'init',
-			function () {
-				if (
-				! in_array( 'elementor/elementor.php', get_option( 'active_plugins', array() ), true ) ||
-				! get_option( 'themegrill_demo_importer_activated_id' )
-				) {
-					return;
-				}
-				if ( defined( 'ELEMENTOR_VERSION' ) && version_compare( ELEMENTOR_VERSION, '3.0.0', '>=' ) ) {
-					$query = new WP_Query(
-						array(
-							'post_type' => 'elementor_library',
-						)
-					);
 
-					$ids = array_map(
-						function ( $post ) {
-							return $post->ID;
-						},
-						$query->posts
-					);
-
-					$found = null;
-
-					foreach ( $ids as $id ) {
-						if ( is_array( get_post_meta( $id, '_elementor_page_settings', true ) ) ) {
-							$found = $id;
-							continue;
-						}
-					}
-
-					if ( $found ) {
-						update_option( 'elementor_active_kit', $found );
-					}
-				}
-			},
-			PHP_INT_MAX
-		);
+		// One-shot fallback: only runs when an Elementor demo import asked for a deferred kit sync.
+		add_action( 'admin_init', array( $this, 'maybe_sync_pending_elementor_kit' ) );
 
 		add_filter(
 			'themegrill_import_post_data_processed',
@@ -109,6 +73,163 @@ class ImportHooks {
 			},
 			9
 		);
+	}
+
+	/**
+	 * Whether the demo payload lists a plugin matching any of the given needles.
+	 *
+	 * Plugin keys from the API look like `elementor/elementor.php`.
+	 *
+	 * @param array    $demo_data Demo config.
+	 * @param string[] $needles   Substrings or filenames to match against plugin keys.
+	 * @return bool
+	 */
+	private function demo_has_plugin( $demo_data, $needles ) {
+		$plugins = $demo_data['plugins'] ?? array();
+		if ( empty( $plugins ) || ! is_array( $plugins ) ) {
+			return false;
+		}
+
+		$keys = array_map( 'strval', array_keys( $plugins ) );
+		foreach ( (array) $needles as $needle ) {
+			$needle = (string) $needle;
+			if ( '' === $needle ) {
+				continue;
+			}
+			foreach ( $keys as $key ) {
+				if ( $key === $needle || false !== strpos( $key, $needle ) ) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Whether the imported demo uses Elementor.
+	 *
+	 * @param array $demo_data Demo config.
+	 * @return bool
+	 */
+	private function demo_requires_elementor( $demo_data ) {
+		if ( ! empty( $demo_data['elementor_settings'] ) ) {
+			return true;
+		}
+
+		$pagebuilder = strtolower( (string) ( $demo_data['pagebuilder'] ?? '' ) );
+		if ( false !== strpos( $pagebuilder, 'elementor' ) ) {
+			return true;
+		}
+
+		return $this->demo_has_plugin(
+			$demo_data,
+			array( 'elementor/elementor.php', 'elementor', 'companion-elementor' )
+		);
+	}
+
+	/**
+	 * Whether the imported demo uses WooCommerce.
+	 *
+	 * @param array $demo_data Demo config.
+	 * @return bool
+	 */
+	private function demo_requires_woocommerce( $demo_data ) {
+		return $this->demo_has_plugin( $demo_data, array( 'woocommerce/woocommerce.php', 'woocommerce' ) )
+			|| ! empty( $demo_data['yith_woocommerce_wishlist_settings'] );
+	}
+
+	/**
+	 * Whether the imported demo uses Masteriyo / LMS.
+	 *
+	 * @param array $demo_data Demo config.
+	 * @return bool
+	 */
+	private function demo_requires_masteriyo( $demo_data ) {
+		if ( ! empty( $demo_data['masteriyo_data'] ) ) {
+			return true;
+		}
+
+		return $this->demo_has_plugin(
+			$demo_data,
+			array( 'learning-management-system', 'masteriyo', 'lms.php' )
+		);
+	}
+
+	/**
+	 * Whether the imported demo uses SiteOrigin Page Builder.
+	 *
+	 * @param array $demo_data Demo config.
+	 * @return bool
+	 */
+	private function demo_requires_siteorigin( $demo_data ) {
+		$pagebuilder = strtolower( (string) ( $demo_data['pagebuilder'] ?? '' ) );
+		if ( false !== strpos( $pagebuilder, 'siteorigin' ) ) {
+			return true;
+		}
+
+		return $this->demo_has_plugin(
+			$demo_data,
+			array( 'siteorigin-panels', 'siteorigin' )
+		);
+	}
+
+	/**
+	 * Deferred Elementor kit sync — only when an Elementor demo left a pending flag.
+	 */
+	public function maybe_sync_pending_elementor_kit() {
+		if ( ! get_option( 'themegrill_demo_importer_needs_elementor_kit' ) ) {
+			return;
+		}
+
+		if ( ! in_array( 'elementor/elementor.php', get_option( 'active_plugins', array() ), true ) ) {
+			return;
+		}
+
+		$synced = $this->sync_elementor_active_kit();
+		if ( $synced ) {
+			delete_option( 'themegrill_demo_importer_needs_elementor_kit' );
+		}
+	}
+
+	/**
+	 * Find and set the Elementor active kit from imported library posts.
+	 *
+	 * @return bool True when a kit was found and saved.
+	 */
+	private function sync_elementor_active_kit() {
+		$elementor_version = defined( 'ELEMENTOR_VERSION' ) ? ELEMENTOR_VERSION : false;
+		if ( ! $elementor_version || version_compare( $elementor_version, '3.0.0', '<' ) ) {
+			return false;
+		}
+
+		$query = new WP_Query(
+			array(
+				'post_type'      => 'elementor_library',
+				'posts_per_page' => 50,
+				'fields'         => 'ids',
+				'no_found_rows'  => true,
+			)
+		);
+
+		$found = null;
+		foreach ( $query->posts as $id ) {
+			if ( is_array( get_post_meta( $id, '_elementor_page_settings', true ) ) ) {
+				$found = $id;
+				break;
+			}
+		}
+
+		if ( ! $found ) {
+			return false;
+		}
+
+		update_option( 'elementor_active_kit', $found );
+		if ( class_exists( '\Elementor\Plugin' ) ) {
+			\Elementor\Plugin::$instance->files_manager->clear_cache();
+		}
+
+		return true;
 	}
 
 	public function update_customizer_data() {
@@ -175,8 +296,15 @@ class ImportHooks {
 
 	/**
 	 * Set Elementor Load FontAwesome 4 support.
+	 *
+	 * @param string $demo_id   Demo id.
+	 * @param array  $demo_data Demo config.
 	 */
-	public function set_elementor_load_fa4_shim() {
+	public function set_elementor_load_fa4_shim( $demo_id = '', $demo_data = array() ) {
+		if ( ! $this->demo_requires_elementor( (array) $demo_data ) ) {
+			return;
+		}
+
 		$elementor_load_fa4_shim = get_option( 'elementor_load_fa4_shim' );
 
 		if ( ! $elementor_load_fa4_shim ) {
@@ -186,37 +314,18 @@ class ImportHooks {
 
 	/**
 	 * Set Elementor kit properly.
+	 *
+	 * @param string $demo_id   Demo id.
+	 * @param array  $demo_data Demo config.
 	 */
-	public function set_elementor_active_kit() {
-		$elementor_version = defined( 'ELEMENTOR_VERSION' ) ? ELEMENTOR_VERSION : false;
+	public function set_elementor_active_kit( $demo_id = '', $demo_data = array() ) {
+		if ( ! $this->demo_requires_elementor( (array) $demo_data ) ) {
+			return;
+		}
 
-		if ( version_compare( $elementor_version, '3.0.0', '>=' ) ) {
-			$query = new WP_Query(
-				array(
-					'post_type' => 'elementor_library',
-				)
-			);
-
-			$ids = array_map(
-				function ( $post ) {
-					return $post->ID;
-				},
-				$query->posts
-			);
-
-			$found = null;
-
-			foreach ( $ids as $id ) {
-				if ( is_array( get_post_meta( $id, '_elementor_page_settings', true ) ) ) {
-					$found = $id;
-					break;
-				}
-			}
-
-			if ( $found ) {
-				update_option( 'elementor_active_kit', $found );
-				\Elementor\Plugin::$instance->files_manager->clear_cache();
-			}
+		if ( ! $this->sync_elementor_active_kit() ) {
+			// Elementor may not be fully bootstrapped yet — retry once on next admin load.
+			update_option( 'themegrill_demo_importer_needs_elementor_kit', 1, false );
 		}
 	}
 
@@ -228,9 +337,14 @@ class ImportHooks {
 	 *
 	 * Note: WC pages ID are stored in an option and slug are modified to remove any numbers.
 	 *
-	 * @param string $demo_id
+	 * @param string $demo_id   Demo id.
+	 * @param array  $demo_data Demo config.
 	 */
-	public function set_wc_pages( $demo_id ) {
+	public function set_wc_pages( $demo_id, $demo_data = array() ) {
+		if ( ! $this->demo_requires_woocommerce( (array) $demo_data ) ) {
+			return;
+		}
+
 		if ( class_exists( 'WooCommerce' ) ) {
 
 			global $wpdb;
@@ -315,9 +429,13 @@ class ImportHooks {
 	 *
 	 * Note: Masteriyo pages ID are stored in an option and slug are modified to remove any numbers.
 	 *
-	 * @param string $demo_id
+	 * @param string $demo_id   Demo id.
+	 * @param array  $demo_data Demo config.
 	 */
-	public function set_masteriyo_pages( $demo_id ) {
+	public function set_masteriyo_pages( $demo_id, $demo_data = array() ) {
+		if ( ! $this->demo_requires_masteriyo( (array) $demo_data ) ) {
+			return;
+		}
 
 		if ( function_exists( 'masteriyo' ) ) {
 
@@ -415,8 +533,15 @@ class ImportHooks {
 
 	/**
 	 * Set SiteOrigin PageBuilder Default Setting.
+	 *
+	 * @param string $demo_id   Demo id.
+	 * @param array  $demo_data Demo config.
 	 */
-	public function set_siteorigin_settings() {
+	public function set_siteorigin_settings( $demo_id = '', $demo_data = array() ) {
+		if ( ! $this->demo_requires_siteorigin( (array) $demo_data ) ) {
+			return;
+		}
+
 		$siteorigin_version = defined( 'SITEORIGIN_PANELS_VERSION' ) ? SITEORIGIN_PANELS_VERSION : false;
 
 		if ( version_compare( $siteorigin_version, '2.12.0', '>=' ) ) {
@@ -437,12 +562,15 @@ class ImportHooks {
 	 * @return void
 	 */
 	public function setup_yith_woocommerce_wishlist( $demo_id, $demo_data ) {
+		$settings = $demo_data['yith_woocommerce_wishlist_settings'] ?? array();
+		if ( empty( $settings ) && ! $this->demo_has_plugin( (array) $demo_data, array( 'yith-woocommerce-wishlist' ) ) ) {
+			return;
+		}
 
 		if ( ! function_exists( 'YITH_WCWL_Install' ) || YITH_WCWL_Install()->is_installed() ) {
 			return;
 		}
 
-		$settings = $demo_data['yith_woocommerce_wishlist_settings'] ?? array();
 		if ( empty( $settings ) || ! is_array( $settings ) ) {
 			return;
 		}
@@ -471,9 +599,15 @@ class ImportHooks {
 	/**
 	 * Regenerate elementor styles settings.
 	 *
+	 * @param string $demo_id   Demo id.
+	 * @param array  $demo_data Demo config.
 	 * @return void
 	 */
-	public function regenerate_elementor_styles() {
+	public function regenerate_elementor_styles( $demo_id = '', $demo_data = array() ) {
+		if ( ! $this->demo_requires_elementor( (array) $demo_data ) ) {
+			return;
+		}
+
 		if ( class_exists( 'Elementor\Plugin' ) ) {
 			\Elementor\Plugin::instance()->files_manager->clear_cache();
 		}
@@ -488,6 +622,9 @@ class ImportHooks {
 	 * @return void
 	 */
 	public function update_masteriyo_data( $id, $data ) {
+		if ( ! $this->demo_requires_masteriyo( (array) $data ) ) {
+			return;
+		}
 
 		if ( empty( $data['masteriyo_data'] ) ) {
 			return;
@@ -583,14 +720,15 @@ class ImportHooks {
 			return;
 		}
 
-		// AllFeedback redirects to its Setup Wizard on the next admin page load after activation, so mark it completed to suppress that redirect.
-		update_option( 'allfeedback_wizard_status', 'completed' );
-
 		$survey_data = $data['allfeedback_survey'] ?? $this->default_allfeedback_survey_for_demo( $id );
 
+		// No survey for this demo — do not touch AllFeedback options.
 		if ( empty( $survey_data['title'] ) ) {
 			return;
 		}
+
+		// AllFeedback redirects to its Setup Wizard on the next admin page load after activation, so mark it completed to suppress that redirect.
+		update_option( 'allfeedback_wizard_status', 'completed' );
 
 		$create_request = $this->build_json_rest_request(
 			'POST',
@@ -996,7 +1134,11 @@ class ImportHooks {
 		return $widget;
 	}
 
-	public function process_evf_posts() {
+	public function process_evf_posts( $demo_id = '', $demo_data = array() ) {
+		if ( ! empty( $demo_data ) && ! $this->demo_has_plugin( (array) $demo_data, array( 'everest-forms' ) ) ) {
+			return;
+		}
+
 		$posts_with_evf = get_option( 'themegrill_demo_importer_posts_with_evf', array() );
 
 		if ( empty( $posts_with_evf ) ) {
@@ -1123,6 +1265,10 @@ class ImportHooks {
 	}
 
 	public function update_elementor_settings( $id, $data ) {
+		if ( ! $this->demo_requires_elementor( (array) $data ) ) {
+			return;
+		}
+
 		$settings = $data['elementor_settings'] ?? array();
 
 		if ( empty( $settings ) || ! is_array( $settings ) ) {

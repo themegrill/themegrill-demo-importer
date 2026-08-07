@@ -5,6 +5,7 @@
 * Fix - Arbitrary option updates via demo_config.elementor_settings by allowing only Elementor-namespaced option keys.
 * Fix - Restrict YITH Wishlist settings import to yith_wcwl / yith_wishlist option key prefixes.
 * Tweak - Use safe remote requests for media/attachment downloads during import.
+* Tweak - Run post-import integration hooks only when the demo requires them (Elementor, WooCommerce, Masteriyo, SiteOrigin, etc.).
 
 = 2.1.2 - 31-07-2026 =
 * Feature - Automatically set up a curated AllFeedback NPS survey after importing a demo (where AllFeedback is active).
