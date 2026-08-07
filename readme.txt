@@ -4,7 +4,7 @@ Tags: themegrill, theme demos, demo, importer, one click import
 Requires at least: 5.7
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 2.1.3
+Stable tag: 2.1.4
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -33,6 +33,9 @@ Bugs can be reported either in our support forum or preferably on the [GitHub re
 Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/themegrill-demo-importer/) :)
 
 == Changelog ==
+= 2.1.4 - 07-08-2026 =
+* Dev - Reworked the missing product-attribute-term fix to patch the downloaded WXR file itself (injecting the missing <wp:term>/<category> data before parsing) instead of repairing the database after import, so the standard import logic handles it unmodified.
+
 = 2.1.3 - 07-08-2026 =
 * Fix - WooCommerce product attribute taxonomies (e.g. pa_colors, pa_size) referenced by demo content but not yet registered caused "Invalid taxonomy" errors and left attribute filter widgets empty; taxonomies are now auto-created during import.
 * Fix - Variable products whose demo export omitted parent-level attribute term relationships now have their pa_* terms rebuilt from variation attribute data after import.

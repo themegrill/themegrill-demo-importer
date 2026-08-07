@@ -165,6 +165,7 @@ class WXRImporter extends WP_Importer {
 			global $wp_filesystem;
 			WP_Filesystem();
 			$wp_filesystem->put_contents( $file_path, $content );
+			$this->patch_missing_attribute_terms( $file_path );
 			$file            = $file_path;
 			$this->temp_file = $file_path;
 		}
@@ -1363,104 +1364,188 @@ class WXRImporter extends WP_Importer {
 	}
 
 	/**
-	 * Some demo WXR exports omit `<category domain="pa_*">` term relationships for
-	 * variable products entirely — the parent product's `_product_attributes` meta
-	 * still lists the taxonomy attribute (e.g. `pa_colors`), but no actual terms get
-	 * attached to the product, and the taxonomy/terms may not even exist. This leaves
-	 * attribute filter widgets empty even though the products are otherwise imported
-	 * correctly.
+	 * Some demo WXR exports omit `<category domain="pa_*">` term relationships (and
+	 * the corresponding `<wp:term>` definitions) for variable products entirely — the
+	 * parent product's `_product_attributes` meta still lists the taxonomy attribute
+	 * (e.g. `pa_colors`), but nothing in the file actually defines or assigns the
+	 * terms. This leaves attribute filter widgets empty even though the products are
+	 * otherwise exported correctly.
 	 *
 	 * The per-variation `attribute_pa_*` postmeta (e.g. `attribute_pa_colors = blue`)
 	 * usually survives the export though, since it's plain postmeta rather than a
-	 * taxonomy relationship. This reconstructs the missing taxonomy + terms from that
-	 * variation data and assigns them back to the parent product.
+	 * taxonomy relationship. Rather than patching the database after the fact, this
+	 * rewrites the downloaded WXR file itself — inserting the missing `<wp:term>`
+	 * definitions and `<category domain="pa_*">` assignments derived from that
+	 * variation data — so the file is well-formed and the *existing*, unmodified
+	 * `process_term()` / `process_post()` logic imports it exactly as it would have
+	 * if the demo export had included this data in the first place.
 	 *
-	 * Runs once after all posts (including variations) have been inserted.
+	 * @param string $file_path Local path to the downloaded WXR file.
 	 */
-	protected function repair_variable_product_attributes(): void {
-		if ( ! function_exists( 'wc_create_attribute' ) ) {
+	protected function patch_missing_attribute_terms( $file_path ) {
+		if ( ! function_exists( 'wc_create_attribute' ) || ! file_exists( $file_path ) ) {
 			return;
 		}
 
-		global $wpdb;
-
-		$product_ids = $wpdb->get_col(
-			"SELECT DISTINCT p.ID FROM {$wpdb->posts} p
-			INNER JOIN {$wpdb->postmeta} pm ON pm.post_id = p.ID AND pm.meta_key = '_product_attributes'
-			WHERE p.post_type = 'product' AND pm.meta_value LIKE '%\"is_taxonomy\";i:1%'"
-		);
-
-		if ( empty( $product_ids ) ) {
+		$xml = file_get_contents( $file_path );
+		// Cheap check before paying for a full DOM parse of a potentially large file.
+		if ( false === $xml || false === strpos( $xml, '_product_attributes' ) || false === strpos( $xml, 'attribute_pa_' ) ) {
 			return;
 		}
 
-		foreach ( $product_ids as $product_id ) {
-			$attributes = get_post_meta( $product_id, '_product_attributes', true );
-			if ( ! is_array( $attributes ) ) {
+		$doc                = new \DOMDocument();
+		$prev_libxml_errors = libxml_use_internal_errors( true );
+		$loaded             = $doc->loadXML( $xml, defined( 'LIBXML_PARSEHUGE' ) ? LIBXML_PARSEHUGE : 0 );
+		libxml_clear_errors();
+		libxml_use_internal_errors( $prev_libxml_errors );
+
+		if ( ! $loaded ) {
+			return;
+		}
+
+		$xpath = new \DOMXPath( $doc );
+		$xpath->registerNamespace( 'wp', 'http://wordpress.org/export/1.2/' );
+
+		$items = $xpath->query( '//item' );
+		if ( ! $items || 0 === $items->length ) {
+			return;
+		}
+
+		$items_by_id      = array();
+		$variation_values = array(); // parent_id => taxonomy => slug => label.
+
+		foreach ( $items as $item ) {
+			$post_id = $this->xpath_first_value( $xpath, 'wp:post_id', $item );
+			if ( '' === $post_id ) {
+				continue;
+			}
+			$items_by_id[ $post_id ] = $item;
+
+			if ( 'product_variation' !== $this->xpath_first_value( $xpath, 'wp:post_type', $item ) ) {
 				continue;
 			}
 
-			foreach ( $attributes as $attr_key => $attr ) {
-				if ( empty( $attr['is_taxonomy'] ) || 0 !== strpos( $attr_key, 'pa_' ) ) {
+			$parent_id = $this->xpath_first_value( $xpath, 'wp:post_parent', $item );
+			if ( '' === $parent_id || '0' === $parent_id ) {
+				continue;
+			}
+
+			foreach ( $xpath->query( 'wp:postmeta', $item ) as $postmeta ) {
+				$meta_key = $this->xpath_first_value( $xpath, 'wp:meta_key', $postmeta );
+				if ( 0 !== strpos( $meta_key, 'attribute_pa_' ) ) {
 					continue;
 				}
 
-				// Terms already assigned (a well-formed export)? Nothing to repair.
-				$existing = taxonomy_exists( $attr_key ) ? wp_get_post_terms( $product_id, $attr_key, array( 'fields' => 'ids' ) ) : array();
-				if ( ! empty( $existing ) && ! is_wp_error( $existing ) ) {
+				$value = trim( $this->xpath_first_value( $xpath, 'wp:meta_value', $postmeta ) );
+				if ( '' === $value ) {
 					continue;
 				}
 
-				$this->maybe_register_product_attribute_taxonomy( $attr_key );
-				if ( ! taxonomy_exists( $attr_key ) ) {
+				$taxonomy = substr( $meta_key, strlen( 'attribute_' ) );
+				$slug     = sanitize_title( $value );
+				if ( '' === $slug ) {
 					continue;
 				}
 
-				$variation_ids = get_posts(
-					array(
-						'post_type'      => 'product_variation',
-						'post_parent'    => $product_id,
-						'posts_per_page' => -1,
-						'post_status'    => 'any',
-						'fields'         => 'ids',
-					)
-				);
+				$variation_values[ $parent_id ][ $taxonomy ][ $slug ] = ucwords( str_replace( array( '-', '_' ), ' ', $value ) );
+			}
+		}
 
-				$slugs = array();
-				foreach ( $variation_ids as $variation_id ) {
-					$value = get_post_meta( $variation_id, 'attribute_' . $attr_key, true );
-					if ( '' !== $value ) {
-						$slugs[] = sanitize_title( $value );
+		if ( empty( $variation_values ) ) {
+			return;
+		}
+
+		$channel = $xpath->query( '//channel' )->item( 0 );
+		if ( ! $channel ) {
+			return;
+		}
+
+		$existing_terms = array();
+		foreach ( $xpath->query( '//wp:term' ) as $term_node ) {
+			$tax  = $this->xpath_first_value( $xpath, 'wp:term_taxonomy', $term_node );
+			$slug = $this->xpath_first_value( $xpath, 'wp:term_slug', $term_node );
+			if ( '' !== $tax && '' !== $slug ) {
+				$existing_terms[ $tax . ':' . $slug ] = true;
+			}
+		}
+
+		$wp_ns       = 'http://wordpress.org/export/1.2/';
+		$next_new_id = 9000000;
+		$patched     = false;
+
+		foreach ( $variation_values as $parent_id => $taxonomies ) {
+			if ( ! isset( $items_by_id[ $parent_id ] ) ) {
+				continue;
+			}
+			$parent_item = $items_by_id[ $parent_id ];
+
+			// Attributes that already have real <category domain="pa_*"> data are left untouched.
+			$existing_domains = array();
+			foreach ( $xpath->query( 'category', $parent_item ) as $cat ) {
+				$domain = $cat->getAttribute( 'domain' );
+				if ( '' !== $domain ) {
+					$existing_domains[ $domain ] = true;
+				}
+			}
+
+			foreach ( $taxonomies as $taxonomy => $slug_labels ) {
+				if ( isset( $existing_domains[ $taxonomy ] ) ) {
+					continue;
+				}
+
+				foreach ( $slug_labels as $slug => $label ) {
+					$key = $taxonomy . ':' . $slug;
+
+					if ( ! isset( $existing_terms[ $key ] ) ) {
+						$term_node = $doc->createElementNS( $wp_ns, 'wp:term' );
+						$term_node->appendChild( $doc->createElementNS( $wp_ns, 'wp:term_id', (string) $next_new_id++ ) );
+						$term_node->appendChild( $doc->createElementNS( $wp_ns, 'wp:term_taxonomy', $taxonomy ) );
+						$term_node->appendChild( $doc->createElementNS( $wp_ns, 'wp:term_slug', $slug ) );
+						$name_node = $doc->createElementNS( $wp_ns, 'wp:term_name' );
+						$name_node->appendChild( $doc->createCDATASection( $label ) );
+						$term_node->appendChild( $name_node );
+
+						// Must precede every <item> so process_term() runs before process_post() needs it
+						// (the WXR reader streams the file in document order).
+						$channel->insertBefore( $term_node, $channel->firstChild );
+
+						$existing_terms[ $key ] = true;
+						$patched                = true;
 					}
-				}
-				$slugs = array_unique( array_filter( $slugs ) );
 
-				if ( empty( $slugs ) ) {
-					continue;
-				}
+					$category_node = $doc->createElement( 'category' );
+					$category_node->appendChild( $doc->createCDATASection( $label ) );
+					$category_node->setAttribute( 'domain', $taxonomy );
+					$category_node->setAttribute( 'nicename', $slug );
+					$parent_item->appendChild( $category_node );
 
-				$term_ids = array();
-				foreach ( $slugs as $slug ) {
-					$term = get_term_by( 'slug', $slug, $attr_key );
-					if ( ! $term ) {
-						$inserted = wp_insert_term( ucwords( str_replace( array( '-', '_' ), ' ', $slug ) ), $attr_key, array( 'slug' => $slug ) );
-						if ( is_wp_error( $inserted ) ) {
-							continue;
-						}
-						$term_ids[] = (int) $inserted['term_id'];
-					} else {
-						$term_ids[] = (int) $term->term_id;
-					}
-				}
-
-				if ( ! empty( $term_ids ) ) {
-					wp_set_object_terms( $product_id, $term_ids, $attr_key, false );
-					$this->logger->info(
-						sprintf( 'Repaired missing "%1$s" terms for product #%2$d from variation data.', $attr_key, $product_id )
-					);
+					$patched = true;
 				}
 			}
 		}
+
+		if ( $patched ) {
+			$doc->save( $file_path );
+			$this->logger->info( 'Patched missing product attribute terms into the demo XML before import.' );
+		}
+	}
+
+	/**
+	 * Shorthand for reading a single child element's text content via XPath,
+	 * relative to a given context node.
+	 *
+	 * @param \DOMXPath  $xpath   XPath instance with namespaces registered.
+	 * @param string     $query   Relative XPath query.
+	 * @param \DOMElement $context Context node to query relative to.
+	 * @return string
+	 */
+	protected function xpath_first_value( \DOMXPath $xpath, $query, \DOMElement $context ) {
+		$nodes = $xpath->query( $query, $context );
+		if ( ! $nodes || 0 === $nodes->length ) {
+			return '';
+		}
+
+		return trim( $nodes->item( 0 )->textContent );
 	}
 
 	protected function process_term( $data, $meta ) {
@@ -2127,7 +2212,6 @@ class WXRImporter extends WP_Importer {
 	 */
 	public function run_post_process(): void {
 		$this->post_process();
-		$this->repair_variable_product_attributes();
 		$this->import_end();
 	}
 }
