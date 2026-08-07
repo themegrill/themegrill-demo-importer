@@ -3,6 +3,7 @@
 namespace ThemeGrill\Demo\Importer;
 
 use ThemeGrill\Demo\Importer\Traits\Singleton;
+use ThemeGrill\Demo\Importer\Validators\DemoConfigValidator;
 use WP_Query;
 use WP_REST_Request;
 
@@ -562,8 +563,12 @@ class ImportHooks {
 	 * @return void
 	 */
 	public function setup_yith_woocommerce_wishlist( $demo_id, $demo_data ) {
-		$settings = $demo_data['yith_woocommerce_wishlist_settings'] ?? array();
-		if ( empty( $settings ) && ! $this->demo_has_plugin( (array) $demo_data, array( 'yith-woocommerce-wishlist' ) ) ) {
+		$settings = DemoConfigValidator::filter_option_map(
+			$demo_data['yith_woocommerce_wishlist_settings'] ?? array(),
+			'yith_woocommerce_wishlist_settings'
+		);
+
+		if ( empty( $settings ) ) {
 			return;
 		}
 
@@ -571,27 +576,9 @@ class ImportHooks {
 			return;
 		}
 
-		if ( empty( $settings ) || ! is_array( $settings ) ) {
-			return;
-		}
-
 		YITH_WCWL_Install()->init();
 
-		/**
-		 * Filter allowed YITH Wishlist option keys that demos may write.
-		 *
-		 * @param string[] $allowed_prefixes Option key prefixes (matched with strpos === 0).
-		 */
-		$allowed_prefixes = apply_filters(
-			'themegrill_demo_importer_allowed_yith_wishlist_option_prefixes',
-			array( 'yith_wcwl', 'yith_wishlist' )
-		);
-
 		foreach ( $settings as $key => $value ) {
-			$key = sanitize_key( (string) $key );
-			if ( '' === $key || ! self::option_key_has_allowed_prefix( $key, $allowed_prefixes ) ) {
-				continue;
-			}
 			update_option( $key, $value );
 		}
 	}
@@ -1269,58 +1256,10 @@ class ImportHooks {
 			return;
 		}
 
-		$settings = $data['elementor_settings'] ?? array();
-
-		if ( empty( $settings ) || ! is_array( $settings ) ) {
-			return;
-		}
-
-		/**
-		 * Filter allowed Elementor option keys that demos may write.
-		 *
-		 * Empty array means any key starting with elementor_ is accepted (after sanitize_key).
-		 * Non-empty array is treated as an exact allowlist.
-		 *
-		 * @param string[] $allowed_keys Exact option keys, or empty for prefix-based allow.
-		 */
-		$allowed_keys = apply_filters(
-			'themegrill_demo_importer_allowed_elementor_option_keys',
-			array()
-		);
+		$settings = DemoConfigValidator::filter_option_map( $data['elementor_settings'] ?? array(), 'elementor_settings' );
 
 		foreach ( $settings as $key => $value ) {
-			$key = sanitize_key( (string) $key );
-			if ( '' === $key ) {
-				continue;
-			}
-
-			if ( ! empty( $allowed_keys ) ) {
-				if ( ! in_array( $key, $allowed_keys, true ) ) {
-					continue;
-				}
-			} elseif ( 0 !== strpos( $key, 'elementor_' ) ) {
-				// Default: only Elementor-namespaced options; blocks arbitrary wp_options writes.
-				continue;
-			}
-
 			update_option( $key, $value );
 		}
-	}
-
-	/**
-	 * Whether an option key starts with any of the given prefixes.
-	 *
-	 * @param string   $key      Sanitized option key.
-	 * @param string[] $prefixes Allowed prefixes.
-	 * @return bool
-	 */
-	private static function option_key_has_allowed_prefix( $key, $prefixes ) {
-		foreach ( (array) $prefixes as $prefix ) {
-			$prefix = (string) $prefix;
-			if ( '' !== $prefix && 0 === strpos( $key, $prefix ) ) {
-				return true;
-			}
-		}
-		return false;
 	}
 }

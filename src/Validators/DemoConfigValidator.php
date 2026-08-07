@@ -244,6 +244,37 @@ class DemoConfigValidator {
 	}
 
 	/**
+	 * Keep only the option keys a demo_config field is allowed to write.
+	 *
+	 * The REST layer already rejects and strips disallowed keys; this is the same
+	 * rule set for callers that receive demo data outside a validated request,
+	 * such as handlers on the public `themegrill_ajax_demo_imported` hook.
+	 *
+	 * @param mixed  $settings Settings map from the demo config.
+	 * @param string $field    demo_config field name, e.g. `elementor_settings`.
+	 * @return array Sanitized key => value pairs.
+	 */
+	public static function filter_option_map( $settings, $field ) {
+		if ( empty( $settings ) || ! is_array( $settings ) ) {
+			return array();
+		}
+
+		$rules    = self::get_option_map_rules();
+		$prefixes = $rules[ $field ] ?? array();
+		$filtered = array();
+
+		foreach ( $settings as $key => $value ) {
+			$key = sanitize_key( (string) $key );
+			if ( '' === $key || ! self::is_allowed_option_key( $key, $prefixes ) ) {
+				continue;
+			}
+			$filtered[ $key ] = $value;
+		}
+
+		return $filtered;
+	}
+
+	/**
 	 * Whether an option key may be written by a demo import.
 	 *
 	 * @param string   $key      Option key from the request.
