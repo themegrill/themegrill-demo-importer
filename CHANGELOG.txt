@@ -1,18 +1,10 @@
 == Changelog ==
 = 2.1.3 - 06-08-2026 =
-* Fix - Validate the demo_config payload against a REST schema on the install route, while still allowing theme specific keys.
-* Fix - Authenticated SSRF via demo_config.content by using wp_safe_remote_get and restricting content downloads to ThemeGrill demo hosts.
-* Fix - Arbitrary option updates via demo_config.elementor_settings by allowing only Elementor-namespaced option keys.
-* Fix - Restrict YITH Wishlist settings import to yith_wcwl / yith_wishlist option key prefixes.
-* Fix - Install Companion Elementor from ThemeGrill's packaged GitHub ZIP when it is not on WordPress.org; skip install when already active.
-* Fix - Remap classic `[everest_form id="…"]` shortcodes after import so Contact pages render the form.
-* Fix - Show a user-friendly import failure message when the server returns non-JSON, and clarify that Try Again cleans up and restarts.
-* Fix - Render HTML in plugin feature descriptions (e.g. YITH Wishlist) instead of showing raw tags.
-* Fix - Prevent import progress from exceeding 100% when overlapping import runs advance the same bar.
-* Fix - Remap classic `[everest_form id="…"]` shortcodes after import so Contact pages (e.g. ColorMag Top Magazine, Freedom) render the form.
-* Tweak - Use safe remote requests for media/attachment downloads during import.
-* Tweak - Run post-import integration hooks only when the demo requires them (Elementor, WooCommerce, Masteriyo, SiteOrigin, etc.).
-* Tweak - Show a user-friendly import failure message when the server returns non-JSON, and clarify that Try Again cleans up and restarts.
+* Fix - SSRF and arbitrary option update via demo_config (schema validation, safe remote requests, option key restrictions).
+* Fix - Install Companion Elementor from ThemeGrill GitHub ZIP; skip when already active.
+* Fix - Remap Everest Forms shortcodes after import so Contact forms render.
+* Fix - User-friendly import errors, progress bar over 100%, and HTML in plugin feature descriptions.
+* Tweak - Run post-import hooks only when the demo requires them.
 
 = 2.1.2 - 31-07-2026 =
 * Feature - Automatically set up a curated AllFeedback NPS survey after importing a demo (where AllFeedback is active).
