@@ -6,6 +6,7 @@ import { useLocalizedData } from '../../../../../../LocalizedDataContext';
 import { Dialog, DialogClose, DialogContent } from '../../../../../ui/Dialog';
 import {
 	cleanupQueryOptions,
+	getFriendlyImportErrorMessage,
 	importDataQueryOptions,
 	importDemo,
 	localizedDataQueryOptions,
@@ -220,7 +221,7 @@ const StartImport = ({
 			} catch (e) {
 				setImportAction(null);
 				setImportProgress(0);
-				setImportErrorMessage(e instanceof Error ? e.message : null);
+				setImportErrorMessage(getFriendlyImportErrorMessage(e));
 				setIsImportFailed(true);
 				break;
 			}

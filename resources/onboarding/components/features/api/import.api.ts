@@ -1,6 +1,103 @@
 import { queryOptions } from '@tanstack/react-query';
 import apiFetch from '@wordpress/api-fetch';
+import { __ } from '@wordpress/i18n';
 import { Demo, PageWithSelection, TDIDashboardType } from '../../../lib/types';
+
+/**
+ * Map raw fetch/JSON/API failures to a short message the failure dialog can show.
+ * Keeps developer-level parse errors (e.g. HTML 200 responses) out of the UI.
+ */
+export function getFriendlyImportErrorMessage(error: unknown): string {
+	const fallback = __(
+		'The demo import failed because the server returned an unexpected response. Some content may have been partially imported.',
+		'themegrill-demo-importer',
+	);
+
+	if (!(error instanceof Error) || !error.message) {
+		return fallback;
+	}
+
+	const message = error.message;
+
+	// Browser JSON.parse / Response.json() when the body is HTML or empty.
+	if (
+		error instanceof SyntaxError ||
+		/is not valid JSON/i.test(message) ||
+		/Unexpected token/i.test(message) ||
+		/JSON\.parse/i.test(message)
+	) {
+		return fallback;
+	}
+
+	// Network / aborted requests from apiFetch or fetch().
+	if (
+		/Failed to fetch/i.test(message) ||
+		/NetworkError/i.test(message) ||
+		/Load failed/i.test(message) ||
+		/network request failed/i.test(message)
+	) {
+		return __(
+			'The demo import failed because the connection to the server was interrupted. Some content may have been partially imported.',
+			'themegrill-demo-importer',
+		);
+	}
+
+	// HTTP error already shaped by importDemo — strip HTML noise if present.
+	const httpMatch = message.match(/^Request failed \((\d{3})[^)]*\):\s*([\s\S]*)$/);
+	if (httpMatch) {
+		const status = httpMatch[1] ?? '';
+		const body = (httpMatch[2] ?? '').trim();
+		if (!body || body.startsWith('<') || /<!DOCTYPE/i.test(body)) {
+			return __(
+				'The demo import failed because the server returned an error. Some content may have been partially imported.',
+				'themegrill-demo-importer',
+			);
+		}
+
+		// Prefer a REST API JSON error message when the body is JSON.
+		try {
+			const parsed = JSON.parse(body) as { message?: string };
+			if (parsed?.message && typeof parsed.message === 'string') {
+				return parsed.message;
+			}
+		} catch {
+			// Not JSON — fall through with a status-based message.
+		}
+
+		return (
+			__(
+				'The demo import failed because the server returned an error.',
+				'themegrill-demo-importer',
+			) + ` (${status})`
+		);
+	}
+
+	// Plugin install and other intentional Error() messages are already readable.
+	if (message.length <= 280 && !message.startsWith('<')) {
+		return message;
+	}
+
+	return fallback;
+}
+
+async function readResponseJson<T = unknown>(response: Response): Promise<T> {
+	const text = await response.text().catch(() => '');
+
+	if (!text) {
+		throw new SyntaxError('Empty response body');
+	}
+
+	try {
+		return JSON.parse(text) as T;
+	} catch {
+		// Re-throw as SyntaxError so getFriendlyImportErrorMessage can map it.
+		throw new SyntaxError(
+			text.trimStart().startsWith('<')
+				? 'Unexpected token \'<\', "<!DOCTYPE "... is not valid JSON'
+				: 'Response is not valid JSON',
+		);
+	}
+}
 
 export async function importDemo(args: {
 	action: string;
@@ -41,7 +138,7 @@ export async function importDemo(args: {
 		throw new Error(`Request failed (${response.status} ${response.statusText}): ${text.slice(0, 300)}`);
 	}
 
-	return await response.json();
+	return await readResponseJson<any>(response);
 }
 
 export const importDataQueryOptions = (args: {
