@@ -4,6 +4,11 @@
 * Fix - Authenticated SSRF via demo_config.content by using wp_safe_remote_get and restricting content downloads to ThemeGrill demo hosts.
 * Fix - Arbitrary option updates via demo_config.elementor_settings by allowing only Elementor-namespaced option keys.
 * Fix - Restrict YITH Wishlist settings import to yith_wcwl / yith_wishlist option key prefixes.
+* Fix - Install Companion Elementor from ThemeGrill's packaged GitHub ZIP when it is not on WordPress.org; skip install when already active.
+* Fix - Remap classic `[everest_form id="…"]` shortcodes after import so Contact pages render the form.
+* Fix - Show a user-friendly import failure message when the server returns non-JSON, and clarify that Try Again cleans up and restarts.
+* Fix - Render HTML in plugin feature descriptions (e.g. YITH Wishlist) instead of showing raw tags.
+* Fix - Prevent import progress from exceeding 100% when overlapping import runs advance the same bar.
 * Fix - Remap classic `[everest_form id="…"]` shortcodes after import so Contact pages (e.g. ColorMag Top Magazine, Freedom) render the form.
 * Tweak - Use safe remote requests for media/attachment downloads during import.
 * Tweak - Run post-import integration hooks only when the demo requires them (Elementor, WooCommerce, Masteriyo, SiteOrigin, etc.).

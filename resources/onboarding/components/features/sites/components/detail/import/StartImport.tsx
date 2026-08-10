@@ -7,7 +7,6 @@ import { Dialog, DialogClose, DialogContent } from '../../../../../ui/Dialog';
 import {
 	cleanupQueryOptions,
 	getFriendlyImportErrorMessage,
-	importDataQueryOptions,
 	importDemo,
 	localizedDataQueryOptions,
 	saveTrackingConsent,
@@ -185,7 +184,9 @@ const StartImport = ({
 					}
 				} else {
 					const params = { ...baseParams, action };
-					const data = await queryClient.ensureQueryData(importDataQueryOptions(params));
+					// Import steps mutate the site — never reuse a cached react-query
+					// response (e.g. a prior Companion Elementor failure).
+					const data = await importDemo(params);
 					results[action] = data;
 
 					// `install-plugins` returns 200 even when individual plugins fail
