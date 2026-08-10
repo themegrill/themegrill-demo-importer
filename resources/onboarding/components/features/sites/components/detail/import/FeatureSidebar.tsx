@@ -1,6 +1,7 @@
 import { __ } from '@wordpress/i18n';
 import { Check } from 'lucide-react';
 import React from 'react';
+import { sanitizePluginDescriptionHtml } from '../../../../../../lib/sanitize-plugin-description';
 import { Demo, PluginItem } from '../../../../../../lib/types';
 import { Button } from '../../../../../ui/Button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../../../../ui/Tooltip';
@@ -62,10 +63,11 @@ const FeatureSidebar = ({ demo, plugins, setPlugins, onOpen, setShowFeatureLayou
 							</div>
 						</div>
 						<p
-							className={`m-0 mt-2 text-[13px] leading-[23px] text-[#545454] ${item.isMandatory ? 'opacity-65' : 'opacity-100'}`}
-						>
-							{item.description}
-						</p>
+							className={`m-0 mt-2 text-[13px] leading-[23px] text-[#545454] [&_a]:text-[#2563EB] [&_a]:underline ${item.isMandatory ? 'opacity-65' : 'opacity-100'}`}
+							dangerouslySetInnerHTML={{
+								__html: sanitizePluginDescriptionHtml(item.description),
+							}}
+						/>
 					</div>
 				))}
 			</div>
