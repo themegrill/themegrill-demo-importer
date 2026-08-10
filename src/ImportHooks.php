@@ -1122,40 +1122,70 @@ class ImportHooks {
 	}
 
 	public function process_evf_posts() {
-		// Only populated when the imported content actually contained Everest Forms blocks.
+		// Only populated when the imported content actually contained Everest Forms
+		// blocks or `[everest_form]` shortcodes.
 		$posts_with_evf = get_option( 'themegrill_demo_importer_posts_with_evf', array() );
 
 		if ( empty( $posts_with_evf ) ) {
 			return;
 		}
 
+		$mapping_data     = get_option( 'themegrill_demo_importer_mapping', array() );
+		$post_mapped_data = $mapping_data['post'] ?? array();
+
+		if ( empty( $post_mapped_data ) ) {
+			delete_option( 'themegrill_demo_importer_posts_with_evf' );
+			return;
+		}
+
 		foreach ( $posts_with_evf as $post_id ) {
 			$post = get_post( $post_id );
 
-			if ( ! $post || ! has_blocks( $post->post_content ) || ! has_block( 'everest-forms/form-selector', $post->post_content ) ) {
+			if ( ! $post || empty( $post->post_content ) ) {
 				continue;
 			}
 
-			$blocks = parse_blocks( $post->post_content );
+			$content           = $post->post_content;
+			$has_evf_block     = has_blocks( $content ) && has_block( 'everest-forms/form-selector', $content );
+			$has_evf_shortcode = (bool) preg_match( '/\[everest_form\b/i', $content );
 
-			if ( empty( $blocks ) ) {
+			if ( ! $has_evf_block && ! $has_evf_shortcode ) {
 				continue;
 			}
 
-			$mapping_data     = get_option( 'themegrill_demo_importer_mapping', array() );
-			$post_mapped_data = $mapping_data['post'] ?? array();
+			$updated = false;
 
-			$this->update_evf_form_ids( $blocks, $post_mapped_data );
+			// Gutenberg form-selector block: remap attrs.formId.
+			if ( $has_evf_block ) {
+				$blocks = parse_blocks( $content );
 
-			// Convert blocks back to post content.
-			$post_content = serialize_blocks( $blocks );
+				if ( ! empty( $blocks ) ) {
+					$this->update_evf_form_ids( $blocks, $post_mapped_data );
+					$content = serialize_blocks( $blocks );
+					$updated = true;
+				}
+			}
 
-			// Update the post content.
+			// Classic / wp:shortcode embeds: remap [everest_form id="…"].
+			// Done on the string so we do not needlessly re-serialize unrelated blocks
+			// (which previously corrupted CSS var(--…) values when wp_slash was missing).
+			if ( preg_match( '/\[everest_form\b/i', $content ) ) {
+				$remapped = $this->remap_evf_form_shortcodes( $content, $post_mapped_data );
+				if ( $remapped !== $content ) {
+					$content = $remapped;
+					$updated = true;
+				}
+			}
+
+			if ( ! $updated ) {
+				continue;
+			}
+
 			wp_update_post(
 				wp_slash(
 					array(
 						'ID'           => $post_id,
-						'post_content' => $post_content,
+						'post_content' => $content,
 					)
 				)
 			);
@@ -1164,12 +1194,45 @@ class ImportHooks {
 		delete_option( 'themegrill_demo_importer_posts_with_evf' );
 	}
 
+	/**
+	 * Remap Everest Forms shortcode IDs using the import post ID map.
+	 *
+	 * @param string $content      Post content.
+	 * @param array  $post_id_map  Demo post ID => local post ID.
+	 * @return string
+	 */
+	public function remap_evf_form_shortcodes( $content, array $post_id_map ) {
+		return (string) preg_replace_callback(
+			'/\[everest_form([^\]]*)\]/i',
+			function ( $matches ) use ( $post_id_map ) {
+				$attrs = $matches[1];
+
+				$attrs = preg_replace_callback(
+					'/(\bid\s*=\s*)(["\']?)(\d+)\2/i',
+					function ( $id_matches ) use ( $post_id_map ) {
+						$old_id = (int) $id_matches[3];
+						if ( ! isset( $post_id_map[ $old_id ] ) ) {
+							return $id_matches[0];
+						}
+
+						$quote = '' !== $id_matches[2] ? $id_matches[2] : '"';
+						return $id_matches[1] . $quote . (int) $post_id_map[ $old_id ] . $quote;
+					},
+					$attrs
+				);
+
+				return '[everest_form' . $attrs . ']';
+			},
+			$content
+		);
+	}
+
 	public function update_evf_form_ids( array &$blocks, array $post_id_map ) {
 		foreach ( $blocks as &$block ) {
 			if ( isset( $block['blockName'] ) ) {
 				if ( 'everest-forms/form-selector' === $block['blockName'] ) {
 					if ( isset( $block['attrs']['formId'] ) ) {
-						$current_form_id = $block['attrs']['formId'];
+						$current_form_id = (int) $block['attrs']['formId'];
 						if ( isset( $post_id_map[ $current_form_id ] ) ) {
 							$block['attrs']['formId'] = (string) $post_id_map[ $current_form_id ];
 						}
