@@ -136,7 +136,8 @@ class WXRImporter extends WP_Importer {
 		if ( filter_var( $file, FILTER_VALIDATE_URL ) ) {
 			$this->logger->debug( 'Downloading XML file from URL: ' . $file );
 
-			$response = wp_remote_get(
+			// Require allowlisted hosts + wp_safe_remote_get to prevent SSRF via demo_config.content.
+			$response = \ThemeGrill\Demo\Importer\Helpers\RemoteRequest::get(
 				$file,
 				array(
 					'headers'   => array(
@@ -144,7 +145,8 @@ class WXRImporter extends WP_Importer {
 					),
 					'sslverify' => true,
 					'timeout'   => 30,
-				)
+				),
+				true
 			);
 
 			if ( is_wp_error( $response ) ) {
@@ -745,10 +747,12 @@ class WXRImporter extends WP_Importer {
 			$post_id    = $this->process_attachment( $postdata, $meta, $remote_url );
 		} else {
 			$post_id = wp_insert_post( $postdata, true );
-			if ( $postdata['post_content'] && has_blocks( $postdata['post_content'] ) && has_block( 'everest-forms/form-selector', $postdata['post_content'] ) ) {
+			// Flag pages that embed Everest Forms via block or classic shortcode so
+			// ImportHooks::process_evf_posts() can remap demo form IDs after import.
+			if ( ! empty( $postdata['post_content'] ) && ! is_wp_error( $post_id ) && $this->content_references_everest_form( $postdata['post_content'] ) ) {
 				$posts_with_evf   = get_option( 'themegrill_demo_importer_posts_with_evf', array() );
 				$posts_with_evf[] = $post_id;
-				update_option( 'themegrill_demo_importer_posts_with_evf', $posts_with_evf );
+				update_option( 'themegrill_demo_importer_posts_with_evf', array_values( array_unique( $posts_with_evf ) ) );
 			}
 			do_action( 'wp_import_insert_post', $post_id, $original_id, $postdata, $data );
 		}
@@ -1512,8 +1516,8 @@ class WXRImporter extends WP_Importer {
 			return new WP_Error( 'upload_dir_error', $upload['error'] );
 		}
 
-		// fetch the remote url and write it to the placeholder file
-		$response = wp_remote_get(
+		// fetch the remote url and write it to the placeholder file (safe: blocks private/loopback IPs)
+		$response = \ThemeGrill\Demo\Importer\Helpers\RemoteRequest::get(
 			$url,
 			array(
 				'stream'    => true,
@@ -1949,6 +1953,27 @@ class WXRImporter extends WP_Importer {
 			$existing                          = $this->requires_remapping[ $type ] ?? array();
 			$this->requires_remapping[ $type ] = $ids + $existing;
 		}
+	}
+
+	/**
+	 * Whether post content embeds an Everest Forms form via block or shortcode.
+	 *
+	 * Older demos (e.g. ColorMag Top Magazine, Freedom) use `[everest_form id="…"]`
+	 * rather than the `everest-forms/form-selector` block.
+	 *
+	 * @param string $content Post content.
+	 * @return bool
+	 */
+	protected function content_references_everest_form( $content ) {
+		if ( ! is_string( $content ) || '' === $content ) {
+			return false;
+		}
+
+		if ( has_blocks( $content ) && has_block( 'everest-forms/form-selector', $content ) ) {
+			return true;
+		}
+
+		return (bool) preg_match( '/\[everest_form\b/i', $content );
 	}
 
 	/**

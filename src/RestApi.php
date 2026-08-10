@@ -5,6 +5,7 @@ namespace ThemeGrill\Demo\Importer;
 use ThemeGrill\Demo\Importer\Controllers\ImportController;
 use ThemeGrill\Demo\Importer\Controllers\SiteController;
 use ThemeGrill\Demo\Importer\Traits\Singleton;
+use ThemeGrill\Demo\Importer\Validators\DemoConfigValidator;
 use WP_Error;
 use WP_Query;
 use WP_REST_Response;
@@ -49,28 +50,17 @@ class RestApi {
 						return current_user_can( 'install_themes' );
 					},
 					'args'                => array(
-						'action' => array(
+						'action'      => array(
 							'type'     => 'string',
 							'required' => 'true',
 							'enum'     => array( 'install-plugins', 'import-content', 'import-content-posts', 'import-media', 'import-customizer', 'import-widgets', 'complete' ),
 						),
-						// 'complete' => array(
-						//  'type'     => 'boolean',
-						//  'required' => true,
-						//  'default'  => false,
-						// ),
-						// 'demo-data' => [
-
-						// ],
-						// 'opts'   => array(
-						//  'type'       => 'object',
-						//  'required'   => false,
-						//  'properties' => array(
-						//      'logo'                => array(
-						//          'type' => 'number',
-						//      ),
-						//  ),
-						// ),
+						'demo_config' => array(
+							'type'              => 'object',
+							'description'       => __( 'Demo configuration to import. Theme specific keys are allowed, security relevant fields are validated.', 'themegrill-demo-importer' ),
+							'validate_callback' => array( DemoConfigValidator::class, 'validate' ),
+							'sanitize_callback' => array( DemoConfigValidator::class, 'sanitize' ),
+						),
 					),
 				),
 			)

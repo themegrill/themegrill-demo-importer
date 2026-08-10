@@ -22,9 +22,16 @@ const DialogImportFailed = ({
 				<Info size={26} color="#E67E22" />
 			</div>
 
+			<p className="text-[15px] leading-[25px] text-[#6B6B6B] mt-0 mb-[16px] px-[30px]">
+				{__(
+					'The demo import could not be completed. Some content may have been partially imported.',
+					'themegrill-demo-importer',
+				)}
+			</p>
+
 			<p className="text-[15px] leading-[25px] text-[#6B6B6B] mt-0 mb-[32px] px-[30px]">
 				{__(
-					'Unable to import the template. If the problem continues, refer to our ',
+					'Choose Try Again to remove the partially imported content and start the import from the beginning. If the problem continues, refer to our ',
 					'themegrill-demo-importer',
 				)}
 				<a
@@ -39,7 +46,7 @@ const DialogImportFailed = ({
 			</p>
 
 			{errorMessage && (
-				<p className="text-[13px] leading-[20px] text-[#B91C1C] bg-[#FEF2F2] rounded-md py-[10px] px-[16px] mb-[32px] break-words">
+				<p className="text-[13px] leading-[20px] text-[#B91C1C] bg-[#FEF2F2] rounded-md py-[10px] px-[16px] mb-[32px] break-words text-left">
 					{errorMessage}
 				</p>
 			)}

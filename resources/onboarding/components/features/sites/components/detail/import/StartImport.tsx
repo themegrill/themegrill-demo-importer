@@ -1,12 +1,12 @@
 import { X } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { queryClient } from '../../../../../../lib/query-client';
 import { Demo, PageWithSelection, PluginItem } from '../../../../../../lib/types';
 import { useLocalizedData } from '../../../../../../LocalizedDataContext';
 import { Dialog, DialogClose, DialogContent } from '../../../../../ui/Dialog';
 import {
 	cleanupQueryOptions,
-	importDataQueryOptions,
+	getFriendlyImportErrorMessage,
 	importDemo,
 	localizedDataQueryOptions,
 	saveTrackingConsent,
@@ -74,10 +74,13 @@ const StartImport = ({
 			importDetail: 'Importing widgets...',
 		},
 		complete: {
-			progressWeight: 100,
+			progressWeight: 5,
 			importDetail: 'Completing setup and finalizing settings... ',
 		},
 	};
+
+	// 100 is reserved for a finished import — it switches the dialog to the success state.
+	const MAX_IN_PROGRESS = 99;
 
 	const [importAction, setImportAction] = useState<null | keyof typeof IMPORT_ACTIONS>(null);
 	const [importProgress, setImportProgress] = useState(0);
@@ -85,6 +88,10 @@ const StartImport = ({
 		useState('Initializing import...');
 	const [isImportFailed, setIsImportFailed] = useState(false);
 	const [importErrorMessage, setImportErrorMessage] = useState<string | null>(null);
+	const isImportRunning = useRef(false);
+
+	const clampProgress = (value: number) =>
+		Math.min(MAX_IN_PROGRESS, Math.max(0, Math.round(value)));
 
 	const checkThemeExists = (demo: Demo) => {
 		const proTheme = demo?.theme_slug + '-pro';
@@ -99,6 +106,21 @@ const StartImport = ({
 	};
 
 	const handleInstallation = async (allowContribution: boolean = false) => {
+		// A second run (double click on confirm, or a retry while one is still in
+		// flight) would advance the same progress bar twice and push it past 100%.
+		if (isImportRunning.current) {
+			return;
+		}
+		isImportRunning.current = true;
+
+		try {
+			await runImport(allowContribution);
+		} finally {
+			isImportRunning.current = false;
+		}
+	};
+
+	const runImport = async (allowContribution: boolean) => {
 		await saveTrackingConsent({ allowContribution });
 		setShowSidebar(false);
 		const selectedPlugins = plugins
@@ -154,15 +176,17 @@ const StartImport = ({
 						remaining = batchData.remaining ?? 0;
 
 						if (total > 0) {
-							const imported = total - remaining;
-							setImportProgress(progressBase + Math.round((imported / total) * actionWeight));
+							const imported = Math.min(total, Math.max(0, total - remaining));
+							setImportProgress(clampProgress(progressBase + (imported / total) * actionWeight));
 						}
 
 						if (batchData.done) break;
 					}
 				} else {
 					const params = { ...baseParams, action };
-					const data = await queryClient.ensureQueryData(importDataQueryOptions(params));
+					// Import steps mutate the site — never reuse a cached react-query
+					// response (e.g. a prior Companion Elementor failure).
+					const data = await importDemo(params);
 					results[action] = data;
 
 					// `install-plugins` returns 200 even when individual plugins fail
@@ -190,13 +214,15 @@ const StartImport = ({
 						setLocalizedData(localizedResponse);
 						setImportProgress(100);
 					} else {
-						setImportProgress((prev) => prev + (IMPORT_ACTIONS[action]?.progressWeight ?? 0));
+						setImportProgress((prev) =>
+							clampProgress(prev + (IMPORT_ACTIONS[action]?.progressWeight ?? 0)),
+						);
 					}
 				}
 			} catch (e) {
 				setImportAction(null);
 				setImportProgress(0);
-				setImportErrorMessage(e instanceof Error ? e.message : null);
+				setImportErrorMessage(getFriendlyImportErrorMessage(e));
 				setIsImportFailed(true);
 				break;
 			}
