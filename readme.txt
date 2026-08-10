@@ -43,8 +43,10 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 * Fix - Show a user-friendly import failure message when the server returns non-JSON, and clarify that Try Again cleans up and restarts.
 * Fix - Render HTML in plugin feature descriptions (e.g. YITH Wishlist) instead of showing raw tags.
 * Fix - Prevent import progress from exceeding 100% when overlapping import runs advance the same bar.
+* Fix - Remap classic `[everest_form id="…"]` shortcodes after import so Contact pages (e.g. ColorMag Top Magazine, Freedom) render the form.
 * Tweak - Use safe remote requests for media/attachment downloads during import.
 * Tweak - Run post-import integration hooks only when the demo requires them (Elementor, WooCommerce, Masteriyo, SiteOrigin, etc.).
+* Tweak - Show a user-friendly import failure message when the server returns non-JSON, and clarify that Try Again cleans up and restarts.
 
 = 2.1.2 - 31-07-2026 =
 * Feature - Automatically set up a curated AllFeedback NPS survey after importing a demo (where AllFeedback is active).
