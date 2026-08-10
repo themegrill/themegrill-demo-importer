@@ -63,9 +63,10 @@ const FeatureSidebar = ({ demo, plugins, setPlugins, onOpen, setShowFeatureLayou
 							</div>
 						</div>
 						<p
-							className={`m-0 mt-2 text-[13px] leading-[23px] text-[#545454] [&_a]:text-[#2563EB] [&_a]:underline ${item.isMandatory ? 'opacity-65' : 'opacity-100'}`}
+							className={`plugin-feature-description m-0 mt-2 text-[13px] leading-[23px] text-[#545454] [&_a]:text-[#2563EB] [&_a]:underline [&_code]:font-inherit [&_code]:text-inherit ${item.isMandatory ? 'opacity-65' : 'opacity-100'}`}
+							// YITH (and some other plugins) ship HTML in their demo description.
 							dangerouslySetInnerHTML={{
-								__html: sanitizePluginDescriptionHtml(item.description),
+								__html: sanitizePluginDescriptionHtml(item.description || ''),
 							}}
 						/>
 					</div>

@@ -7,12 +7,37 @@ const ALLOWED_ATTRS: Record<string, Set<string>> = {
 	A: new Set(['href', 'title', 'target', 'rel']),
 };
 
+function decodeHtmlEntities(value: string): string {
+	const textarea = document.createElement('textarea');
+	textarea.innerHTML = value;
+	return textarea.value;
+}
+
 export function sanitizePluginDescriptionHtml(html: string): string {
-	if (!html || typeof document === 'undefined') {
-		return html || '';
+	if (!html) {
+		return '';
 	}
 
-	const doc = new DOMParser().parseFromString(html, 'text/html');
+	// SSR / non-DOM: never return raw markup that React would paint as text.
+	if (typeof document === 'undefined') {
+		return html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+	}
+
+	let input = html.trim();
+
+	// Some payloads arrive HTML-escaped (`&lt;strong&gt;…`). Decode up to twice.
+	for (let i = 0; i < 2; i++) {
+		if (!/&lt;\/?[a-z]/i.test(input)) {
+			break;
+		}
+		const decoded = decodeHtmlEntities(input);
+		if (decoded === input) {
+			break;
+		}
+		input = decoded;
+	}
+
+	const doc = new DOMParser().parseFromString(input, 'text/html');
 
 	const sanitizeNode = (node: Node): Node | null => {
 		if (node.nodeType === Node.TEXT_NODE) {
