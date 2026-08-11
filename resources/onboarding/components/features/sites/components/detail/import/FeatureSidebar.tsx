@@ -43,7 +43,7 @@ const FeatureSidebar = ({ demo, plugins, setPlugins, onOpen, setShowFeatureLayou
 								{item.name}
 							</p>
 							<div
-								className={`relative border-2 border-solid rounded-full w-[14px] h-[14px] text-white ${item.isSelected ? (item.isMandatory ? 'border-[#D3D3D3] bg-[#D3D3D3]' : 'border-[#5182EF] bg-[#5182EF] ') : 'border-[#8c8f94]'}`}
+								className={`relative flex-shrink-0 border-2 border-solid rounded-full w-[14px] h-[14px] text-white ${item.isSelected ? (item.isMandatory ? 'border-[#D3D3D3] bg-[#D3D3D3]' : 'border-[#5182EF] bg-[#5182EF] ') : 'border-[#8c8f94]'}`}
 							>
 								{item.isMandatory ? (
 									<Tooltip>
