@@ -57,6 +57,9 @@ class ImportService {
 
 	private function installPlugins( $options ) {
 		$plugins = $options['plugins'] ?? array();
+
+		update_option( 'themegrill_demo_importer_selected_plugins', $plugins, false );
+
 		return $this->pluginImporter->installPlugins( $plugins );
 	}
 
@@ -97,6 +100,7 @@ class ImportService {
 
 		do_action( 'themegrill_ajax_demo_imported', $demo_config['slug'], $demo_config );
 
+		delete_option( 'themegrill_demo_importer_selected_plugins' );
 		delete_option( 'themegrill_demo_importer_mapping' );
 		flush_rewrite_rules();
 		wp_cache_flush();

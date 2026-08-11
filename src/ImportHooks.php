@@ -74,6 +74,8 @@ class ImportHooks {
 			},
 			9
 		);
+
+		add_action( 'themegrill_ajax_demo_imported', array( $this, 'set_urm_pages' ), 10, 2 );
 	}
 
 	/**
@@ -155,6 +157,33 @@ class ImportHooks {
 			$demo_data,
 			array( 'learning-management-system', 'masteriyo', 'lms.php' )
 		);
+	}
+
+	/**
+	 * Whether the imported demo uses URM and user has selected the plugin to import.
+	 *
+	 * @param array $demo_data Demo config.
+	 * @return bool
+	 */
+	private function demo_requires_urm( $demo_data ) {
+		if ( ! $this->demo_has_plugin( $demo_data, array( 'user-registration', 'user-registration.php' ) ) ) {
+			return false;
+		}
+
+		$selected_plugins = get_option( 'themegrill_demo_importer_selected_plugins', null );
+
+		if ( is_array( $selected_plugins ) ) {
+			foreach ( $selected_plugins as $plugin ) {
+				if ( false !== strpos( (string) $plugin, 'user-registration' ) ) {
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		// No selection recorded for this run — fall back to the demo's declared dependency.
+		return true;
 	}
 
 	/**
@@ -1322,4 +1351,225 @@ class ImportHooks {
 			update_option( $key, $value );
 		}
 	}
+
+	/**
+	 * Find the registration form ID referenced inside a page's content, whether it's embedded as
+	 * the classic [user_registration_form id="X"] shortcode or the registration-form block.
+	 *
+	 * @param string $content Page post_content.
+	 * @return int Form post ID, or 0 if none found.
+	 */
+	private function extract_urm_registration_form_id( $content ) {
+		if ( empty( $content ) ) {
+			return 0;
+		}
+
+		if ( function_exists( 'has_blocks' ) && has_blocks( $content ) ) {
+			$form_id = $this->find_urm_form_id_in_blocks( parse_blocks( $content ) );
+
+			if ( $form_id ) {
+				return $form_id;
+			}
+		}
+
+		$shortcode_tag = apply_filters( 'user_registration_form_shortcode_tag', 'user_registration_form' );
+
+		if ( preg_match( '/\[\s*' . preg_quote( $shortcode_tag, '/' ) . '\b[^\]]*\bid=["\']?(\d+)/', $content, $matches ) ) {
+			return (int) $matches[1];
+		}
+
+		return 0;
+	}
+
+	/**
+	 * Recursively search parsed blocks for a user-registration/registration-form block's formId.
+	 *
+	 * @param array $blocks Parsed blocks.
+	 * @return int Form post ID, or 0 if none found.
+	 */
+	private function find_urm_form_id_in_blocks( $blocks ) {
+		foreach ( $blocks as $block ) {
+			if ( isset( $block['blockName'] ) && 'user-registration/registration-form' === $block['blockName'] && ! empty( $block['attrs']['formId'] ) ) {
+				return (int) $block['attrs']['formId'];
+			}
+
+			if ( ! empty( $block['innerBlocks'] ) ) {
+				$found = $this->find_urm_form_id_in_blocks( $block['innerBlocks'] );
+
+				if ( $found ) {
+					return $found;
+				}
+			}
+		}
+
+		return 0;
+	}
+
+	/**
+	 * Set User Registration and Membership pages properly and disable setup wizard redirect.
+	 *
+	 * After importing demo data filter out duplicate URM pages and set them properly.
+	 * Happens when the user run default URM setup wizard during installation.
+	 *
+	 * Note: URM pages ID are stored in an option and slug are modified to remove any numbers.
+	 *
+	 * @param string $demo_id   Demo id.
+	 * @param array  $demo_data Demo config.
+	 */
+	public function set_urm_pages( $demo_id, $demo_data = array() ) {
+		if ( ! $this->demo_requires_urm( (array) $demo_data ) ) {
+			return;
+		}
+
+		if ( function_exists( 'UR' ) ) {
+
+			global $wpdb;
+
+			// True only on a never-configured URM install, so re-imports don't undo later admin changes.
+			$is_fresh_urm_install = (bool) get_transient( '_ur_activation_redirect' ) || (bool) get_option( 'user_registration_first_time_activation_flag', false );
+
+			// Form referenced by the imported Registration/Membership Registration page, if any.
+			$matched_form_id = 0;
+
+			$urm_pages = apply_filters(
+				'themegrill_urm_' . $demo_id . '_pages',
+				array(
+					'login'            => array(
+						'name'         => 'login',
+						'title'        => 'Login',
+						'setting_name' => 'login_page_id',
+					),
+					'registration'    => array(
+						'name'         => 'registration',
+						'title'        => 'Registration',
+						'setting_name' => 'registration_page_id',
+					),
+					'lost-password'                 => array(
+						'name'         => 'lost-password',
+						'title'        => 'Lost Password',
+						'setting_name' => 'lost_password_page_id',
+					),
+					'membership-registration'                => array(
+						'name'         => 'membership-registration',
+						'title'        => 'Membership Registration',
+						'setting_name' => 'member_registration_page_id',
+					),
+					'membership-thankyou'                   => array(
+						'name'         => 'membership-thankyou',
+						'title'        => 'Membership Thank You',
+						'setting_name' => 'thank_you_page_id',
+					),
+					'my-account' => array(
+						'name'         => 'my-account',
+						'title'        => 'My Account',
+						'setting_name' => 'myaccount_page_id',
+					),
+					'membership-pricing'        => array(
+						'name'         => 'membership-pricing',
+						'title'        => 'Membership Pricing',
+						'setting_name' => 'membership_pricing_page_id',
+					),
+				)
+			);
+
+			// Set URM pages properly.
+			foreach ( $urm_pages as $key => $urm_page ) {
+
+				// Get the ID of every page with matching name or title.
+				$page_ids = $wpdb->get_results( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE (post_name = %s OR post_title = %s) AND post_type = 'page' AND post_status = 'publish'", $urm_page['name'], $urm_page['title'] ) );
+
+				if ( ! is_null( $page_ids ) ) {
+
+					$page_id    = 0;
+					$delete_ids = array();
+
+					// Retrieve page with greater id and delete others.
+					if ( count( $page_ids ) > 1 ) {
+
+						foreach ( $page_ids as $page ) {
+							if ( $page->ID > $page_id ) {
+								if ( $page_id ) {
+									$delete_ids[] = $page_id;
+								}
+
+								$page_id = $page->ID;
+							} else {
+								$delete_ids[] = $page->ID;
+							}
+						}
+					} else {
+						$page_id = ! empty( $page_ids ) ? $page_ids[0]->ID : 0;
+					}
+
+					// Delete posts.
+					foreach ( $delete_ids as $delete_id ) {
+						wp_delete_post( $delete_id, true );
+					}
+
+					// Update URM page.
+					if ( $page_id > 0 ) {
+						wp_update_post(
+							array(
+								'ID'        => $page_id,
+								'post_name' => sanitize_title( $urm_page['name'] ),
+							)
+						);
+
+						$setting_name = $urm_page['setting_name'];
+						update_option( "user_registration_{$setting_name}", $page_id );
+
+						if ( 'login' === $key ) {
+							update_option( 'user_registration_login_options_login_redirect_url', $page_id );
+						}
+
+						if ( in_array( $key, array( 'registration', 'membership-registration' ), true ) ) {
+							update_option( 'user_registration_member_registration_page_id', $page_id );
+
+							$page_form_id = $this->extract_urm_registration_form_id( get_post_field( 'post_content', $page_id ) );
+
+							if ( $page_form_id > 0 ) {
+								$matched_form_id = $page_form_id;
+							}
+						}
+					}
+				}
+			}
+
+			// Prefer the matched page's own form over guessing the highest post ID site-wide.
+			$default_form_id = $matched_form_id;
+
+			if ( ! $default_form_id ) {
+				$form_ids        = $wpdb->get_col( "SELECT ID FROM $wpdb->posts WHERE post_type = 'user_registration' AND post_status = 'publish' ORDER BY ID DESC" );
+				$default_form_id = ! empty( $form_ids ) ? (int) $form_ids[0] : 0;
+			}
+
+			if ( $default_form_id ) {
+				update_option( 'user_registration_default_form_page_id', $default_form_id );
+				update_option( 'user_registration_registration_form', $default_form_id );
+			}
+
+			// Only enable registration on a fresh install, so a later re-import can't clobber an admin's change.
+			if ( $is_fresh_urm_install ) {
+				update_option( 'users_can_register', true );
+			}
+
+			// Setup wizard was never run, so mark it as handled to prevent the "wizard was skipped" nag notice.
+			update_option( 'user_registration_first_time_activation_flag', false );
+
+			$enabled_features = get_option( 'user_registration_enabled_features', array() );
+
+			if ( ! in_array( 'user-registration-membership', $enabled_features, true ) ) {
+				$enabled_features[] = 'user-registration-membership';
+				update_option( 'user_registration_enabled_features', $enabled_features );
+			}
+
+			// Create membership DB tables now, since the module's own self-healing migration skips AJAX requests.
+			if ( class_exists( 'WPEverest\URMembership\Admin\Database\Database' ) ) {
+				\WPEverest\URMembership\Admin\Database\Database::create_tables();
+			}
+
+			delete_transient( '_ur_activation_redirect' );
+		}
+	}
+
 }
