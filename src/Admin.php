@@ -295,7 +295,7 @@ class Admin {
 			if ( ! empty( $demo->pagebuilder ) ) {
 				$slug = strtolower( trim( str_replace( array( ' ', '_' ), '-', $demo->pagebuilder ) ) );
 				if ( ! isset( $pagebuilders[ $slug ] ) ) {
-					$value                 = strtolower( trim( str_replace( array( '-', '_' ), ' ', $demo->pagebuilder ) ) );
+					$value                 = trim( str_replace( array( '-', '_' ), ' ', $demo->pagebuilder ) );
 					$pagebuilders[ $slug ] = ucfirst( $value );
 				}
 			}
