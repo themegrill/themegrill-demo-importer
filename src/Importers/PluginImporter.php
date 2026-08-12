@@ -83,6 +83,49 @@ class PluginImporter {
 		$results     = array();
 		$this->logger->info( 'Starting installation for plugin: ' . $pg[0], [ 'start_time' => true ] );
 
+		// Already on disk (any install method) — just make sure it's active and stop
+		// here, regardless of which branch below would otherwise install it. Without
+		// this running first, the `companion-elementor` special case below never got
+		// a chance to notice the plugin was already installed and active, and instead
+		// unconditionally tried (and failed) to reinstall it via `tgda_install_companion_elementor`.
+		if ( file_exists( $plugin_file ) ) {
+			$plugin_data = get_plugin_data( $plugin_file );
+
+			$this->logger->info( $plugin_data['Name'] . ' already installed, checking activation status.' );
+
+			if ( is_plugin_active( $plugin ) ) {
+				$this->logger->info( $plugin_data['Name'] . ' already active, skipping activation.', [ 'end_time' => true ] );
+
+				$results[ $pg[0] ] = array(
+					'status'  => 'success',
+					'message' => $plugin_data['Name'] . ' already activated.',
+				);
+				return $results;
+			}
+
+			$this->logger->info( 'Activating plugin: ' . $plugin_data['Name'] );
+			$result = activate_plugin( $plugin );
+
+			if ( is_wp_error( $result ) ) {
+				$this->logger->warning( 'Failed to activate plugin ' . $plugin . ': ' . $result->get_error_message(), [ 'end_time' => true ] );
+
+				$results[ $pg[0] ] = array(
+					'status'  => 'error',
+					'message' => $result->get_error_message(),
+				);
+				return $results;
+			}
+
+			$this->logger->info( $plugin_data['Name'] . ' successfully activated.', [ 'end_time' => true ] );
+
+			$results[ $pg[0] ] = array(
+				'status'  => 'success',
+				'message' => $plugin_data['Name'] . ' activated.',
+			);
+
+			return $results;
+		}
+
 		if ( 'companion-elementor/companion-elementor.php' === $plugin ) {
 			$response = apply_filters( 'tgda_install_companion_elementor', 'companion-elementor/companion-elementor.php' );
 			if ( is_array( $response ) ) {
@@ -107,44 +150,6 @@ class PluginImporter {
 				);
 			}
 		} else {
-			if ( file_exists( $plugin_file ) ) {
-				$plugin_data = get_plugin_data( $plugin_file );
-
-				$this->logger->info( $plugin_data['Name'] . ' already installed, checking activation status.' );
-
-				if ( is_plugin_active( $plugin ) ) {
-					$this->logger->info( $plugin_data['Name'] . ' already active, skipping activation.', [ 'end_time' => true ] );
-
-					$results[ $pg[0] ] = array(
-						'status'  => 'success',
-						'message' => $plugin_data['Name'] . ' already activated.',
-					);
-					return $results;
-				}
-
-				$this->logger->info( 'Activating plugin: ' . $plugin_data['Name'] );
-				$result = activate_plugin( $plugin );
-
-				if ( is_wp_error( $result ) ) {
-					$this->logger->warning( 'Failed to activate plugin ' . $plugin . ': ' . $result->get_error_message(), [ 'end_time' => true ] );
-
-					$results[ $pg[0] ] = array(
-						'status'  => 'error',
-						'message' => $result->get_error_message(),
-					);
-					return $results;
-				}
-
-				$this->logger->info( $plugin_data['Name'] . ' successfully activated.', [ 'end_time' => true ] );
-
-				$results[ $pg[0] ] = array(
-					'status'  => 'success',
-					'message' => $plugin_data['Name'] . ' activated.',
-				);
-
-				return $results;
-			}
-
 			$api = $this->withRetry(
 				function () use ( $pg ) {
 					return plugins_api(
