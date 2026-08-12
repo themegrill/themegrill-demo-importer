@@ -42,9 +42,10 @@ class WXRImporter extends WP_Importer {
 	protected $version = '1.0';
 
 	// information to import from WXR file
-	protected $categories = array();
-	protected $tags       = array();
-	protected $base_url   = '';
+	protected $categories    = array();
+	protected $tags          = array();
+	protected $base_url      = '';
+	protected $base_blog_url = '';
 
 	// TODO: REMOVE THESE
 	protected $processed_terms      = array();
@@ -220,7 +221,8 @@ class WXRImporter extends WP_Importer {
 		$this->version = '1.0';
 
 		// Reset other variables
-		$this->base_url = '';
+		$this->base_url      = '';
+		$this->base_blog_url = '';
 		// Start parsing! Suppress libxml warnings so malformed XML (e.g. extra
 		// content after </rss>) doesn't produce PHP warnings via XMLReader::read().
 		$prev_libxml_errors = \libxml_use_internal_errors( true );
@@ -250,6 +252,13 @@ class WXRImporter extends WP_Importer {
 
 				case 'wp:base_site_url':
 					$this->base_url = $reader->readString();
+
+					// Handled everything in this node, move on to the next
+					$reader->next();
+					break;
+
+				case 'wp:base_blog_url':
+					$this->base_blog_url = $reader->readString();
 
 					// Handled everything in this node, move on to the next
 					$reader->next();
@@ -727,17 +736,19 @@ class WXRImporter extends WP_Importer {
 					[ 'end_time' => true ]
 				);
 
-				$remote_url = ! empty( $data['attachment_url'] ) ? $data['attachment_url'] : $data['guid'];
+				$original_url = ! empty( $data['attachment_url'] ) ? $data['attachment_url'] : $data['guid'];
+				$original_url = $this->normalize_attachment_url( $original_url );
 
 				// Rewrite origin domain to proxy so deferred downloads also route through the proxy.
-				$remote_url = str_replace( 'https://themegrilldemos.com', THEMEGRILL_BASE_URL, $remote_url );
+				$remote_url = str_replace( 'https://themegrilldemos.com', THEMEGRILL_BASE_URL, $original_url );
 				$remote_url = str_replace( 'https://zakrademos.com', ZAKRA_BASE_URL, $remote_url );
 
 				$this->pending_attachments[] = array(
-					'original_id' => $original_id,
-					'postdata'    => $postdata,
-					'meta'        => $meta,
-					'remote_url'  => $remote_url,
+					'original_id'  => $original_id,
+					'postdata'     => $postdata,
+					'meta'         => $meta,
+					'remote_url'   => $remote_url,
+					'original_url' => $original_url,
 				);
 
 				do_action( 'wxr_importer.process_skipped.post', $data, $meta );
@@ -1922,6 +1933,38 @@ class WXRImporter extends WP_Importer {
 
 	public function get_mapping_data() {
 		return $this->mapping;
+	}
+
+	/**
+	 * Multisite subdirectory installs export an attachment's `<wp:attachment_url>`/`guid`
+	 * without the site's subdirectory slug, even
+	 * though the same media is referenced within post_content with the slug included
+	 * `<wp:base_site_url>` is the network's
+	 * root URL and won't have the slug either, so use `<wp:base_blog_url>` (the exported blog's
+	 * own URL) to detect and insert it when missing.
+	 */
+	protected function normalize_attachment_url( string $url ): string {
+		if ( empty( $this->base_blog_url ) ) {
+			return $url;
+		}
+
+		$base_host = wp_parse_url( $this->base_blog_url, PHP_URL_HOST );
+		$base_path = trim( (string) wp_parse_url( $this->base_blog_url, PHP_URL_PATH ), '/' );
+
+		if ( empty( $base_host ) || '' === $base_path ) {
+			return $url;
+		}
+
+		$url_host = wp_parse_url( $url, PHP_URL_HOST );
+		$url_path = (string) wp_parse_url( $url, PHP_URL_PATH );
+
+		if ( $url_host !== $base_host || 0 === strpos( ltrim( $url_path, '/' ), $base_path . '/' ) ) {
+			return $url;
+		}
+
+		$scheme = wp_parse_url( $url, PHP_URL_SCHEME ) ?: 'https';
+
+		return $scheme . '://' . $url_host . '/' . $base_path . $url_path;
 	}
 
 	public function get_pending_attachments(): array {

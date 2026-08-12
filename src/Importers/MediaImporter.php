@@ -53,11 +53,11 @@ class MediaImporter {
 				continue;
 			}
 
-			$original_id = $attachment['original_id'];
-			$remote_url  = $attachment['remote_url'];
+			$original_id  = $attachment['original_id'];
+			$original_url = $attachment['original_url'];
 
 			$mapping['post'][ $original_id ] = $new_post_id;
-			$url_remap[ $remote_url ]        = wp_get_attachment_url( $new_post_id );
+			$url_remap[ $original_url ]      = wp_get_attachment_url( $new_post_id );
 
 			// Track for cleanup on reset.
 			$imported_posts   = get_option( 'themegrill_demo_importer_imported_posts', array() );
