@@ -30,7 +30,7 @@ class ImportService {
 	public function handleImport( $action, $demo_config, $options ) {
 		switch ( $action ) {
 			case 'install-plugins':
-				return $this->installPlugins( $options );
+				return $this->installPlugins( $demo_config, $options );
 
 			case 'import-content':
 				return $this->importContent( $demo_config, $options );
@@ -55,12 +55,12 @@ class ImportService {
 		}
 	}
 
-	private function installPlugins( $options ) {
+	private function installPlugins( $demo_config, $options ) {
 		$plugins = $options['plugins'] ?? array();
 
 		update_option( 'themegrill_demo_importer_selected_plugins', $plugins, false );
 
-		return $this->pluginImporter->installPlugins( $plugins );
+		return $this->pluginImporter->installPlugins( $plugins, $demo_config );
 	}
 
 	private function importContentPosts() {
@@ -102,8 +102,11 @@ class ImportService {
 
 		delete_option( 'themegrill_demo_importer_selected_plugins' );
 		delete_option( 'themegrill_demo_importer_mapping' );
-		flush_rewrite_rules();
-		wp_cache_flush();
+
+		if ( ! empty( $demo_config['permalink_structure'] ) ) {
+			global $wp_rewrite;
+			$wp_rewrite->set_permalink_structure( $demo_config['permalink_structure'] );
+		}
 
 		$this->logger->info( 'Demo (' . $demo_config['slug'] . ') imported successfully.', [ 'end_time' => true ] );
 
@@ -115,6 +118,13 @@ class ImportService {
 		}
 
 		do_action( 'themegrill_demo_importer_import_complete' );
+
+		if ( ! function_exists( 'save_mod_rewrite_rules' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/misc.php';
+		}
+
+		flush_rewrite_rules();
+		wp_cache_flush();
 
 		return array(
 			'success' => true,
