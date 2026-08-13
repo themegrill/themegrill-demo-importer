@@ -607,6 +607,8 @@ class WXRImporter extends WP_Importer {
 			return;
 		}
 
+		$data['post_content'] = $this->replace_base_url( $data['post_content'] ?? '' );
+
 		// Collect mode: queue non-attachment posts for deferred batch processing.
 		if ( $this->options['collect_posts_only'] && 'attachment' !== ( $data['post_type'] ?? '' ) ) {
 			$this->pending_posts[] = array(
@@ -1965,6 +1967,41 @@ class WXRImporter extends WP_Importer {
 		$scheme = wp_parse_url( $url, PHP_URL_SCHEME ) ?: 'https';
 
 		return $scheme . '://' . $url_host . '/' . $base_path . $url_path;
+	}
+
+	/**
+	 * Rewrite hard-coded `href` links pointing at the demo site within post content
+	 * so they point at this site instead.
+	 *
+	 * Scoped to the `href` attribute only (not `src`, `srcset`, or block-attribute JSON):
+	 * attachment/image URLs are already handled by the exact old-URL => new-URL `url_remap`
+	 * map built while importing media. Rewriting the domain here too would leave those old
+	 * URLs unmatched by that later, more precise replacement, breaking images.
+	 */
+	protected function replace_base_url( $content ) {
+		if ( empty( $this->base_blog_url ) || empty( $content ) || false === stripos( $content, 'href' ) ) {
+			return $content;
+		}
+
+		$host = wp_parse_url( $this->base_blog_url, PHP_URL_HOST );
+
+		if ( empty( $host ) ) {
+			return $content;
+		}
+
+		$path   = trim( (string) wp_parse_url( $this->base_blog_url, PHP_URL_PATH ), '/' );
+		$bare   = preg_replace( '/^www\./i', '', strtolower( $host ) );
+		$prefix = $bare . ( $path ? '/' . $path : '' );
+
+		$pattern = '#\bhref=([\'"])https?://(?:www\.)?' . preg_quote( $prefix, '#' ) . '(/[^\'"]*)?\1#i';
+
+		return preg_replace_callback(
+			$pattern,
+			function ( $matches ) {
+				return 'href=' . $matches[1] . untrailingslashit( home_url() ) . ( $matches[2] ?? '' ) . $matches[1];
+			},
+			$content
+		);
 	}
 
 	public function get_pending_attachments(): array {
