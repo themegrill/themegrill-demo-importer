@@ -2,6 +2,7 @@
 
 namespace ThemeGrill\Demo\Importer;
 
+use ThemeGrill\Demo\Importer\Helpers\DemoRequirements;
 use ThemeGrill\Demo\Importer\Traits\Singleton;
 use ThemeGrill\Demo\Importer\Validators\DemoConfigValidator;
 use WP_Query;
@@ -88,25 +89,7 @@ class ImportHooks {
 	 * @return bool
 	 */
 	private function demo_has_plugin( $demo_data, $needles ) {
-		$plugins = $demo_data['plugins'] ?? array();
-		if ( empty( $plugins ) || ! is_array( $plugins ) ) {
-			return false;
-		}
-
-		$keys = array_map( 'strval', array_keys( $plugins ) );
-		foreach ( (array) $needles as $needle ) {
-			$needle = (string) $needle;
-			if ( '' === $needle ) {
-				continue;
-			}
-			foreach ( $keys as $key ) {
-				if ( $key === $needle || false !== strpos( $key, $needle ) ) {
-					return true;
-				}
-			}
-		}
-
-		return false;
+		return DemoRequirements::has_plugin( $demo_data, $needles );
 	}
 
 	/**
@@ -166,24 +149,7 @@ class ImportHooks {
 	 * @return bool
 	 */
 	private function demo_requires_urm( $demo_data ) {
-		if ( ! $this->demo_has_plugin( $demo_data, array( 'user-registration', 'user-registration.php' ) ) ) {
-			return false;
-		}
-
-		$selected_plugins = get_option( 'themegrill_demo_importer_selected_plugins', null );
-
-		if ( is_array( $selected_plugins ) ) {
-			foreach ( $selected_plugins as $plugin ) {
-				if ( false !== strpos( (string) $plugin, 'user-registration' ) ) {
-					return true;
-				}
-			}
-
-			return false;
-		}
-
-		// No selection recorded for this run — fall back to the demo's declared dependency.
-		return true;
+		return DemoRequirements::requires_urm( $demo_data );
 	}
 
 	/**
@@ -1425,9 +1391,6 @@ class ImportHooks {
 
 			global $wpdb;
 
-			// True only on a never-configured URM install, so re-imports don't undo later admin changes.
-			$is_fresh_urm_install = (bool) get_transient( '_ur_activation_redirect' ) || (bool) get_option( 'user_registration_first_time_activation_flag', false );
-
 			// Form referenced by the imported Registration/Membership Registration page, if any.
 			$matched_form_id = 0;
 
@@ -1548,10 +1511,8 @@ class ImportHooks {
 				update_option( 'user_registration_registration_form', $default_form_id );
 			}
 
-			// Only enable registration on a fresh install, so a later re-import can't clobber an admin's change.
-			if ( $is_fresh_urm_install ) {
-				update_option( 'users_can_register', true );
-			}
+			// enable registration.
+			update_option( 'users_can_register', true );
 
 			// Setup wizard was never run, so mark it as handled to prevent the "wizard was skipped" nag notice.
 			update_option( 'user_registration_first_time_activation_flag', false );
@@ -1563,12 +1524,54 @@ class ImportHooks {
 				update_option( 'user_registration_enabled_features', $enabled_features );
 			}
 
-			// Create membership DB tables now, since the module's own self-healing migration skips AJAX requests.
-			if ( class_exists( 'WPEverest\URMembership\Admin\Database\Database' ) ) {
-				\WPEverest\URMembership\Admin\Database\Database::create_tables();
-			}
+			$this->set_urm_settings( (array) $demo_data );
 
 			delete_transient( '_ur_activation_redirect' );
+		}
+	}
+
+	/**
+	 * Set URM settings from the demo config.
+	 *
+	 * @param array $demo_data Demo config.
+	 */
+	private function set_urm_settings( $demo_data ) {
+		$settings = DemoConfigValidator::filter_option_map(
+			$demo_data['urm_settings'] ?? array(),
+			'urm_settings'
+		);
+
+		if ( empty( $settings ) ) {
+			return;
+		}
+
+		if ( isset( $settings['urm_bank_connection_status'] ) ) {
+			$enabled = function_exists( 'ur_string_to_bool' )
+				? ur_string_to_bool( $settings['urm_bank_connection_status'] )
+				: (bool) $settings['urm_bank_connection_status'];
+
+			update_option( 'urm_bank_connection_status', $enabled );
+		}
+
+		if ( isset( $settings['user_registration_bank_enabled'] ) ) {
+			$enabled = function_exists( 'ur_string_to_bool' )
+				? ur_string_to_bool( $settings['user_registration_bank_enabled'] )
+				: (bool) $settings['user_registration_bank_enabled'];
+
+			update_option( 'user_registration_bank_enabled', $enabled );
+		}
+
+		if ( isset( $settings['user_registration_global_bank_details'] ) ) {
+			update_option( 'user_registration_global_bank_details', wp_kses_post( $settings['user_registration_global_bank_details'] ) );
+		}
+
+		if ( isset( $settings['user_registration_payment_currency'] ) ) {
+			$currency   = sanitize_text_field( $settings['user_registration_payment_currency'] );
+			$currencies = function_exists( 'ur_payment_integration_get_currencies' ) ? ur_payment_integration_get_currencies() : array();
+
+			if ( empty( $currencies ) || isset( $currencies[ $currency ] ) ) {
+				update_option( 'user_registration_payment_currency', $currency ? $currency : 'USD' );
+			}
 		}
 	}
 
