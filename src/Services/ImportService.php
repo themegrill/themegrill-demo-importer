@@ -103,11 +103,6 @@ class ImportService {
 		delete_option( 'themegrill_demo_importer_selected_plugins' );
 		delete_option( 'themegrill_demo_importer_mapping' );
 
-		if ( ! empty( $demo_config['permalink_structure'] ) ) {
-			global $wp_rewrite;
-			$wp_rewrite->set_permalink_structure( $demo_config['permalink_structure'] );
-		}
-
 		$this->logger->info( 'Demo (' . $demo_config['slug'] . ') imported successfully.', [ 'end_time' => true ] );
 
 		$slug = sanitize_key( $demo_config['slug'] ?? '' );
@@ -119,11 +114,23 @@ class ImportService {
 
 		do_action( 'themegrill_demo_importer_import_complete' );
 
+		if ( ! empty( $demo_config['permalink_structure'] ) ) {
+			global $wp_rewrite;
+
+			$permalink_structure = $demo_config['permalink_structure'];
+
+			update_option( 'permalink_structure', $permalink_structure );
+			$wp_rewrite->set_permalink_structure( $permalink_structure );
+		}
+
+		/**
+		 * Regenerate rewrite rules after the permalink structure has been set.
+		 */
 		if ( ! function_exists( 'save_mod_rewrite_rules' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/misc.php';
 		}
 
-		flush_rewrite_rules();
+		flush_rewrite_rules( true );
 		wp_cache_flush();
 
 		return array(
