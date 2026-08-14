@@ -125,12 +125,18 @@ class ImportService {
 
 		/**
 		 * Regenerate rewrite rules after the permalink structure has been set.
+		 *
+		 * A flush attempted here (mid REST request) doesn't reliably persist, so
+		 * also flag it to run again on the next normal `init` (e.g. the page load
+		 * right after the wizard finishes) - the same thing that happens when a
+		 * user re-saves the Permalinks settings screen.
 		 */
 		if ( ! function_exists( 'save_mod_rewrite_rules' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/misc.php';
 		}
 
 		flush_rewrite_rules( true );
+		update_option( 'themegrill_demo_importer_flush_rewrite_rules', 1 );
 		wp_cache_flush();
 
 		return array(
