@@ -767,6 +767,20 @@ class WXRImporter extends WP_Importer {
 				$posts_with_evf[] = $post_id;
 				update_option( 'themegrill_demo_importer_posts_with_evf', array_values( array_unique( $posts_with_evf ) ) );
 			}
+			// Flag pages that embed the User Registration Membership "Buy Now" block so
+			// ImportHooks::process_membership_buy_now_posts() can remap demo membership IDs after import.
+			if ( ! empty( $postdata['post_content'] ) && ! is_wp_error( $post_id ) && $this->content_references_membership_buy_now( $postdata['post_content'] ) ) {
+				$posts_with_membership_buy_now   = get_option( 'themegrill_demo_importer_posts_with_membership_buy_now', array() );
+				$posts_with_membership_buy_now[] = $post_id;
+				update_option( 'themegrill_demo_importer_posts_with_membership_buy_now', array_values( array_unique( $posts_with_membership_buy_now ) ) );
+			}
+			// Flag pages that embed an AllCoach "add to cart" link so
+			// ImportHooks::process_allcoach_add_to_cart_posts() can remap demo program IDs after import.
+			if ( ! empty( $postdata['post_content'] ) && ! is_wp_error( $post_id ) && $this->content_references_allcoach_add_to_cart( $postdata['post_content'] ) ) {
+				$posts_with_allcoach_cart   = get_option( 'themegrill_demo_importer_posts_with_allcoach_cart', array() );
+				$posts_with_allcoach_cart[] = $post_id;
+				update_option( 'themegrill_demo_importer_posts_with_allcoach_cart', array_values( array_unique( $posts_with_allcoach_cart ) ) );
+			}
 			do_action( 'wp_import_insert_post', $post_id, $original_id, $postdata, $data );
 		}
 
@@ -2054,6 +2068,29 @@ class WXRImporter extends WP_Importer {
 		}
 
 		return (bool) preg_match( '/\[everest_form\b/i', $content );
+	}
+
+	/**
+	 * Check whether post content embeds the User Registration Membership "Buy Now" block.
+	 */
+	protected function content_references_membership_buy_now( $content ) {
+		if ( ! is_string( $content ) || '' === $content ) {
+			return false;
+		}
+
+		return has_blocks( $content ) && has_block( 'user-registration/membership-buy-now', $content );
+	}
+
+	/**
+	 * Check whether post content embeds an AllCoach "add to cart" link
+	 * (`?allcoach-add-to-cart=123`), baked into a button block's inner markup.
+	 */
+	protected function content_references_allcoach_add_to_cart( $content ) {
+		if ( ! is_string( $content ) || '' === $content ) {
+			return false;
+		}
+
+		return (bool) preg_match( '/\ballcoach-add-to-cart=\d+/i', $content );
 	}
 
 	/**

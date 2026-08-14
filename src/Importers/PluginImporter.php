@@ -241,7 +241,7 @@ class PluginImporter {
 
 		$this->logger->info( $api->name . ' installed and activated.', [ 'end_time' => true ] );
 
-		$this->maybe_create_urm_tables( $pg[0] );
+		$this->maybe_create_urm_tables( $pg[0], $demo_config );
 
 		$results[ $pg[0] ] = array(
 			'status'  => 'success',

@@ -32,6 +32,8 @@ class ImportHooks {
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_blockart_blocks_settings' ), 10, 2 );
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_elementor_settings' ), 10, 2 );
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'process_evf_posts' ) );
+		add_action( 'themegrill_ajax_demo_imported', array( $this, 'process_membership_buy_now_posts' ) );
+		add_action( 'themegrill_ajax_demo_imported', array( $this, 'process_allcoach_add_to_cart_posts' ) );
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'setup_allfeedback_survey' ), 10, 2 );
 
 		add_filter( 'themegrill_widget_import_settings', array( $this, 'update_widget_data' ), 10, 2 );
@@ -1238,6 +1240,133 @@ class ImportHooks {
 				}
 			}
 		}
+	}
+
+	public function process_membership_buy_now_posts() {
+		$posts_with_membership_buy_now = get_option( 'themegrill_demo_importer_posts_with_membership_buy_now', array() );
+
+		if ( empty( $posts_with_membership_buy_now ) ) {
+			return;
+		}
+
+		$mapping_data     = get_option( 'themegrill_demo_importer_mapping', array() );
+		$post_mapped_data = $mapping_data['post'] ?? array();
+
+		if ( empty( $post_mapped_data ) ) {
+			delete_option( 'themegrill_demo_importer_posts_with_membership_buy_now' );
+			return;
+		}
+
+		foreach ( $posts_with_membership_buy_now as $post_id ) {
+			$post = get_post( $post_id );
+
+			if ( ! $post || empty( $post->post_content ) || ! has_blocks( $post->post_content ) || ! has_block( 'user-registration/membership-buy-now', $post->post_content ) ) {
+				continue;
+			}
+
+			$blocks = parse_blocks( $post->post_content );
+
+			if ( empty( $blocks ) ) {
+				continue;
+			}
+
+			$this->update_membership_buy_now_ids( $blocks, $post_mapped_data );
+			wp_update_post(
+				wp_slash(
+					array(
+						'ID'           => $post_id,
+						'post_content' => serialize_blocks( $blocks ),
+					)
+				)
+			);
+		}
+
+		delete_option( 'themegrill_demo_importer_posts_with_membership_buy_now' );
+	}
+
+	public function update_membership_buy_now_ids( array &$blocks, array $post_id_map ) {
+		foreach ( $blocks as &$block ) {
+			if ( isset( $block['blockName'] ) ) {
+				if ( 'user-registration/membership-buy-now' === $block['blockName'] ) {
+					if ( isset( $block['attrs']['membershipId'] ) ) {
+						$current_membership_id = (int) $block['attrs']['membershipId'];
+						if ( isset( $post_id_map[ $current_membership_id ] ) ) {
+							$block['attrs']['membershipId'] = (string) $post_id_map[ $current_membership_id ];
+						}
+					}
+				}
+				if ( ! empty( $block['innerBlocks'] ) ) {
+					$this->update_membership_buy_now_ids( $block['innerBlocks'], $post_id_map );
+				}
+			}
+		}
+	}
+
+	public function process_allcoach_add_to_cart_posts() {
+		$posts_with_allcoach_cart = get_option( 'themegrill_demo_importer_posts_with_allcoach_cart', array() );
+
+		if ( empty( $posts_with_allcoach_cart ) ) {
+			return;
+		}
+
+		$mapping_data     = get_option( 'themegrill_demo_importer_mapping', array() );
+		$post_mapped_data = $mapping_data['post'] ?? array();
+
+		if ( empty( $post_mapped_data ) ) {
+			delete_option( 'themegrill_demo_importer_posts_with_allcoach_cart' );
+			return;
+		}
+
+		foreach ( $posts_with_allcoach_cart as $post_id ) {
+			$post = get_post( $post_id );
+
+			if ( ! $post || empty( $post->post_content ) ) {
+				continue;
+			}
+
+			$remapped = $this->remap_allcoach_add_to_cart_links( $post->post_content, $post_mapped_data );
+
+			if ( $remapped === $post->post_content ) {
+				continue;
+			}
+
+			wp_update_post(
+				wp_slash(
+					array(
+						'ID'           => $post_id,
+						'post_content' => $remapped,
+					)
+				)
+			);
+		}
+
+		delete_option( 'themegrill_demo_importer_posts_with_allcoach_cart' );
+	}
+
+	/**
+	 * Remap `allcoach-add-to-cart` query-string program IDs using the import post ID map.
+	 *
+	 * Done on the raw string because the
+	 * program ID lives in a plain `<a href="…?allcoach-add-to-cart=123">` link baked
+	 * into the button block's inner markup, not in the block's `attrs` JSON.
+	 *
+	 * @param string $content     Post content.
+	 * @param array  $post_id_map Demo post ID => local post ID.
+	 * @return string
+	 */
+	public function remap_allcoach_add_to_cart_links( $content, array $post_id_map ) {
+		return (string) preg_replace_callback(
+			'/\ballcoach-add-to-cart=(\d+)/i',
+			function ( $matches ) use ( $post_id_map ) {
+				$old_id = (int) $matches[1];
+				if ( ! isset( $post_id_map[ $old_id ] ) ) {
+					return $matches[0];
+				}
+
+				return 'allcoach-add-to-cart=' . (int) $post_id_map[ $old_id ];
+			},
+			$content
+		);
 	}
 
 	public function themegrill_update_block_term_ids( array &$blocks, array $term_id_map ) {
