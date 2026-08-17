@@ -1993,7 +1993,14 @@ class WXRImporter extends WP_Importer {
 	 * URLs unmatched by that later, more precise replacement, breaking images.
 	 */
 	protected function replace_base_url( $content ) {
-		if ( empty( $this->base_blog_url ) || empty( $content ) || false === stripos( $content, 'href' ) ) {
+		if ( empty( $this->base_blog_url ) || empty( $content ) ) {
+			return $content;
+		}
+
+		$has_href     = false !== stripos( $content, 'href' );
+		$has_url_attr = false !== stripos( $content, '"url"' );
+
+		if ( ! $has_href && ! $has_url_attr ) {
 			return $content;
 		}
 
@@ -2003,19 +2010,40 @@ class WXRImporter extends WP_Importer {
 			return $content;
 		}
 
-		$path   = trim( (string) wp_parse_url( $this->base_blog_url, PHP_URL_PATH ), '/' );
-		$bare   = preg_replace( '/^www\./i', '', strtolower( $host ) );
-		$prefix = $bare . ( $path ? '/' . $path : '' );
+		$path = trim( (string) wp_parse_url( $this->base_blog_url, PHP_URL_PATH ), '/' );
 
-		$pattern = '#\bhref=([\'"])https?://(?:www\.)?' . preg_quote( $prefix, '#' ) . '(/[^\'"]*)?\1#i';
+		if ( $has_href ) {
+			$bare   = preg_replace( '/^www\./i', '', strtolower( $host ) );
+			$prefix = $bare . ( $path ? '/' . $path : '' );
 
-		return preg_replace_callback(
-			$pattern,
-			function ( $matches ) {
-				return 'href=' . $matches[1] . untrailingslashit( home_url() ) . ( $matches[2] ?? '' ) . $matches[1];
-			},
-			$content
-		);
+			$pattern = '#\bhref=([\'"])https?://(?:www\.)?' . preg_quote( $prefix, '#' ) . '(/[^\'"]*)?\1#i';
+
+			$content = preg_replace_callback(
+				$pattern,
+				function ( $matches ) {
+					return 'href=' . $matches[1] . untrailingslashit( home_url() ) . ( $matches[2] ?? '' ) . $matches[1];
+				},
+				$content
+			);
+		}
+
+		// Strip the source subsite's subdirectory slug from relative block "url" attrs (e.g. FSE wp_navigation posts).
+		if ( $has_url_attr && $path ) {
+			$home_path = untrailingslashit( (string) wp_parse_url( home_url(), PHP_URL_PATH ) );
+
+			$pattern = '#"url":"/' . preg_quote( $path, '#' ) . '(/[^"]*)?"#i';
+
+			$content = preg_replace_callback(
+				$pattern,
+				function ( $matches ) use ( $home_path ) {
+					$new_url = $home_path . ( $matches[1] ?? '' );
+					return '"url":"' . ( '' !== $new_url ? $new_url : '/' ) . '"';
+				},
+				$content
+			);
+		}
+
+		return $content;
 	}
 
 	public function get_pending_attachments(): array {
