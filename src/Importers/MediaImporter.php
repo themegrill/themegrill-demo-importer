@@ -232,7 +232,6 @@ class MediaImporter {
 		}
 
 		// Clean up temporary options.
-		delete_option( 'themegrill_demo_importer_url_remap' );
 		delete_option( 'themegrill_demo_importer_featured_images' );
 		delete_option( 'themegrill_demo_importer_media_total' );
 		delete_option( 'themegrill_demo_importer_pending_attachments' );

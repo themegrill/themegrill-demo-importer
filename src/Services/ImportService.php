@@ -102,6 +102,7 @@ class ImportService {
 
 		delete_option( 'themegrill_demo_importer_selected_plugins' );
 		delete_option( 'themegrill_demo_importer_mapping' );
+		delete_option( 'themegrill_demo_importer_url_remap' );
 
 		$this->logger->info( 'Demo (' . $demo_config['slug'] . ') imported successfully.', [ 'end_time' => true ] );
 

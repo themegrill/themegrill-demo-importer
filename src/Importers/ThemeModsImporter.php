@@ -233,9 +233,7 @@ class ThemeModsImporter {
 	}
 
 	/**
-	 * Demo content lives on a multisite network under a per-demo subdirectory
-	 * (e.g. zakrademos.com/nutrition-coach/...), so the first path segment is the
-	 * demo's own slug; it's stripped along with the host, keeping the rest of the path.
+	 * Rewrites a theme mod URL not on this site's own host, stripping the assumed demo host + subdirectory slug.
 	 *
 	 * @param  string $value Theme mod value.
 	 * @return string
@@ -250,14 +248,10 @@ class ThemeModsImporter {
 			return $value;
 		}
 
-		$host = preg_replace( '/^www\./i', '', strtolower( $parsed['host'] ) );
+		$host      = preg_replace( '/^www\./i', '', strtolower( $parsed['host'] ) );
+		$site_host = preg_replace( '/^www\./i', '', strtolower( wp_parse_url( home_url(), PHP_URL_HOST ) ) );
 
-		$known_hosts = apply_filters(
-			'themegrill_demo_importer_customizer_link_hosts',
-			array( 'demo.themegrill.com', 'zakrademos.com', 'themegrilldemos.com' )
-		);
-
-		if ( ! in_array( $host, $known_hosts, true ) ) {
+		if ( $host === $site_host ) {
 			return $value;
 		}
 
