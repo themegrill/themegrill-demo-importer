@@ -2,30 +2,35 @@
 
 namespace ThemeGrill\Demo\Importer;
 
-use Psr\Log\LoggerInterface;
-use Psr\Log\LogLevel;
-use Psr\Log\InvalidArgumentException;
+class Logger {
 
-class Logger implements LoggerInterface {
+	const EMERGENCY = 'emergency';
+	const ALERT     = 'alert';
+	const CRITICAL  = 'critical';
+	const ERROR     = 'error';
+	const WARNING   = 'warning';
+	const NOTICE    = 'notice';
+	const INFO      = 'info';
+	const DEBUG     = 'debug';
 
 	private array $logLevels;
-	private string $dateFormat                = 'Y-m-d H:i:s';
-	private static ?LoggerInterface $instance = null;
-	private $startTime                        = null;
-	private $importContentStartTime           = null;
-	private $fetchStartTime                   = null;
-	const LOG_TRANSIENT_KEY                   = 'themegrill_starter_templates_log';
+	private string $dateFormat        = 'Y-m-d H:i:s';
+	private static ?Logger $instance  = null;
+	private $startTime                = null;
+	private $importContentStartTime   = null;
+	private $fetchStartTime           = null;
+	const LOG_TRANSIENT_KEY           = 'themegrill_starter_templates_log';
 
 	private function __construct() {
 		$this->logLevels = [
-			LogLevel::EMERGENCY => 0,
-			LogLevel::ALERT     => 1,
-			LogLevel::CRITICAL  => 2,
-			LogLevel::ERROR     => 3,
-			LogLevel::WARNING   => 4,
-			LogLevel::NOTICE    => 5,
-			LogLevel::INFO      => 6,
-			LogLevel::DEBUG     => 7,
+			self::EMERGENCY => 0,
+			self::ALERT     => 1,
+			self::CRITICAL  => 2,
+			self::ERROR     => 3,
+			self::WARNING   => 4,
+			self::NOTICE    => 5,
+			self::INFO      => 6,
+			self::DEBUG     => 7,
 		];
 	}
 
@@ -43,39 +48,39 @@ class Logger implements LoggerInterface {
 	}
 
 	public function emergency( $message, array $context = [] ): void {
-		$this->log( LogLevel::EMERGENCY, $message, $context );
+		$this->log( self::EMERGENCY, $message, $context );
 	}
 
 	public function alert( $message, array $context = [] ): void {
-		$this->log( LogLevel::ALERT, $message, $context );
+		$this->log( self::ALERT, $message, $context );
 	}
 
 	public function critical( $message, array $context = [] ): void {
-		$this->log( LogLevel::CRITICAL, $message, $context );
+		$this->log( self::CRITICAL, $message, $context );
 	}
 
 	public function error( $message, array $context = [] ): void {
-		$this->log( LogLevel::ERROR, $message, $context );
+		$this->log( self::ERROR, $message, $context );
 	}
 
 	public function warning( $message, array $context = [] ): void {
-		$this->log( LogLevel::WARNING, $message, $context );
+		$this->log( self::WARNING, $message, $context );
 	}
 	public function notice( $message, array $context = [] ): void {
-		$this->log( LogLevel::NOTICE, $message, $context );
+		$this->log( self::NOTICE, $message, $context );
 	}
 
 	public function info( $message, array $context = [] ): void {
-		$this->log( LogLevel::INFO, $message, $context );
+		$this->log( self::INFO, $message, $context );
 	}
 
 	public function debug( $message, array $context = [] ): void {
-		$this->log( LogLevel::DEBUG, $message, $context );
+		$this->log( self::DEBUG, $message, $context );
 	}
 
 	public function log( $level, $message, array $context = [] ): void {
 		if ( ! isset( $this->logLevels[ $level ] ) ) {
-			throw new InvalidArgumentException( esc_html( "Invalid log level: {$level}" ) );
+			throw new \InvalidArgumentException( esc_html( "Invalid log level: {$level}" ) );
 		}
 
 		// Handle timing

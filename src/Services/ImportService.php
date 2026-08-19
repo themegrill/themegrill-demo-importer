@@ -30,7 +30,7 @@ class ImportService {
 	public function handleImport( $action, $demo_config, $options ) {
 		switch ( $action ) {
 			case 'install-plugins':
-				return $this->installPlugins( $options );
+				return $this->installPlugins( $demo_config, $options );
 
 			case 'import-content':
 				return $this->importContent( $demo_config, $options );
@@ -55,9 +55,12 @@ class ImportService {
 		}
 	}
 
-	private function installPlugins( $options ) {
+	private function installPlugins( $demo_config, $options ) {
 		$plugins = $options['plugins'] ?? array();
-		return $this->pluginImporter->installPlugins( $plugins );
+
+		update_option( 'themegrill_demo_importer_selected_plugins', $plugins, false );
+
+		return $this->pluginImporter->installPlugins( $plugins, $demo_config );
 	}
 
 	private function importContentPosts() {
@@ -97,9 +100,9 @@ class ImportService {
 
 		do_action( 'themegrill_ajax_demo_imported', $demo_config['slug'], $demo_config );
 
+		delete_option( 'themegrill_demo_importer_selected_plugins' );
 		delete_option( 'themegrill_demo_importer_mapping' );
-		flush_rewrite_rules();
-		wp_cache_flush();
+		delete_option( 'themegrill_demo_importer_url_remap' );
 
 		$this->logger->info( 'Demo (' . $demo_config['slug'] . ') imported successfully.', [ 'end_time' => true ] );
 
@@ -111,6 +114,31 @@ class ImportService {
 		}
 
 		do_action( 'themegrill_demo_importer_import_complete' );
+
+		if ( ! empty( $demo_config['permalink_structure'] ) ) {
+			global $wp_rewrite;
+
+			$permalink_structure = $demo_config['permalink_structure'];
+
+			update_option( 'permalink_structure', $permalink_structure );
+			$wp_rewrite->set_permalink_structure( $permalink_structure );
+		}
+
+		/**
+		 * Regenerate rewrite rules after the permalink structure has been set.
+		 *
+		 * A flush attempted here (mid REST request) doesn't reliably persist, so
+		 * also flag it to run again on the next normal `init` (e.g. the page load
+		 * right after the wizard finishes) - the same thing that happens when a
+		 * user re-saves the Permalinks settings screen.
+		 */
+		if ( ! function_exists( 'save_mod_rewrite_rules' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/misc.php';
+		}
+
+		flush_rewrite_rules( true );
+		update_option( 'themegrill_demo_importer_flush_rewrite_rules', 1 );
+		wp_cache_flush();
 
 		return array(
 			'success' => true,

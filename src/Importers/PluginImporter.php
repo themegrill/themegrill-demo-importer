@@ -3,6 +3,7 @@
 namespace ThemeGrill\Demo\Importer\Importers;
 
 use Exception;
+use ThemeGrill\Demo\Importer\Helpers\DemoRequirements;
 use ThemeGrill\Demo\Importer\Logger;
 
 class PluginImporter {
@@ -31,12 +32,12 @@ class PluginImporter {
 		require_once ABSPATH . 'wp-admin/includes/file.php';
 	}
 
-	public function installPlugins( $plugins ) {
+	public function installPlugins( $plugins, $demo_config = array() ) {
 		$results = array();
 
 		$results = array_map(
-			function ( $plugin ) {
-				return $this->installActivatePlugin( $plugin );
+			function ( $plugin ) use ( $demo_config ) {
+				return $this->installActivatePlugin( $plugin, $demo_config );
 			},
 			$plugins
 		);
@@ -88,7 +89,27 @@ class PluginImporter {
 		return 'companion-elementor' === $slug || self::COMPANION_ELEMENTOR === $plugin;
 	}
 
-	private function installActivatePlugin( $plugin ) {
+	/**
+	 * User Registration's membership tables only ever get created once the
+	 * plugin is confirmed active (whether it already was, or we just activated
+	 * it) — call this right after that point so later import steps (which run
+	 * as separate requests) never hit a table that doesn't exist yet.
+	 *
+	 * Also re-applies the `user-registration-membership` feature flag here as a
+	 * safety net: ImportService already sets it before activation runs, but this
+	 * covers the flag being missing if activation is ever reached another way.
+	 *
+	 * @param string $slug        Plugin slug, e.g. 'user-registration'.
+	 * @param array  $demo_config Demo config.
+	 */
+	private function maybe_create_urm_tables( $slug, $demo_config = array() ) {
+		if ( 'user-registration' === $slug ) {
+			DemoRequirements::maybe_enable_urm_membership_feature( $demo_config );
+			DemoRequirements::ensure_urm_membership_tables();
+		}
+	}
+
+	private function installActivatePlugin( $plugin, $demo_config = array() ) {
 		// Companion Elementor is not on WordPress.org — handle it separately.
 		if ( $this->is_companion_elementor( $plugin ) ) {
 			return $this->installActivateCompanionElementor();
@@ -106,6 +127,8 @@ class PluginImporter {
 
 			if ( is_plugin_active( $plugin ) ) {
 				$this->logger->info( $plugin_data['Name'] . ' already active, skipping activation.', [ 'end_time' => true ] );
+
+				$this->maybe_create_urm_tables( $pg[0], $demo_config );
 
 				$results[ $pg[0] ] = array(
 					'status'  => 'success',
@@ -128,6 +151,8 @@ class PluginImporter {
 			}
 
 			$this->logger->info( $plugin_data['Name'] . ' successfully activated.', [ 'end_time' => true ] );
+
+			$this->maybe_create_urm_tables( $pg[0], $demo_config );
 
 			$results[ $pg[0] ] = array(
 				'status'  => 'success',
@@ -215,6 +240,8 @@ class PluginImporter {
 		}
 
 		$this->logger->info( $api->name . ' installed and activated.', [ 'end_time' => true ] );
+
+		$this->maybe_create_urm_tables( $pg[0], $demo_config );
 
 		$results[ $pg[0] ] = array(
 			'status'  => 'success',

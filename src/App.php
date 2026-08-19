@@ -29,6 +29,7 @@ class App {
 	private function init_hooks() {
 		// Load plugin text domain.
 		add_action( 'init', array( $this, 'load_plugin_textdomain' ) );
+		add_action( 'init', array( $this, 'maybe_flush_rewrite_rules' ), 999 );
 
 		add_filter( 'plugin_action_links_' . TGDM_PLUGIN_BASENAME, array( $this, 'plugin_action_links' ) );
 		add_filter( 'plugin_row_meta', array( $this, 'plugin_row_meta' ), 10, 2 );
@@ -57,6 +58,18 @@ class App {
 		unload_textdomain( 'themegrill-demo-importer' );
 		load_textdomain( 'themegrill-demo-importer', WP_LANG_DIR . '/themegrill-demo-importer/themegrill-demo-importer-' . $locale . '.mo' );
 		load_plugin_textdomain( 'themegrill-demo-importer', false, plugin_basename( dirname( TGDM_PLUGIN_FILE ) ) . '/languages' );
+	}
+
+	/**
+	 * Flush rewrite rules once on the next full request after an import
+	 * finishes, so the permalink structure set mid-REST-request actually
+	 * takes effect without requiring a manual visit to Permalinks settings.
+	 */
+	public function maybe_flush_rewrite_rules() {
+		if ( get_option( 'themegrill_demo_importer_flush_rewrite_rules' ) ) {
+			delete_option( 'themegrill_demo_importer_flush_rewrite_rules' );
+			flush_rewrite_rules();
+		}
 	}
 
 	/**

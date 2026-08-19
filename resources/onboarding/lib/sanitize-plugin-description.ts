@@ -7,7 +7,7 @@ const ALLOWED_ATTRS: Record<string, Set<string>> = {
 	A: new Set(['href', 'title', 'target', 'rel']),
 };
 
-function decodeHtmlEntities(value: string): string {
+export function decodeHtmlEntities(value: string): string {
 	const textarea = document.createElement('textarea');
 	textarea.innerHTML = value;
 	return textarea.value;

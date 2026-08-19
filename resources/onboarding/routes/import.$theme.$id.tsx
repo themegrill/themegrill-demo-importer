@@ -3,6 +3,7 @@ import { __ } from '@wordpress/i18n';
 import { siteDataQueryOptions } from '../components/features/api/site.api';
 import Import from '../components/features/sites/components/detail/import/Import';
 import ImportSkeleton from '../components/features/sites/components/detail/import/ImportSkeleton';
+import { decodeHtmlEntities } from '../lib/sanitize-plugin-description';
 import { queryClient } from '../lib/query-client';
 import { PluginItem } from '../lib/types';
 
@@ -26,7 +27,7 @@ export const Route = createFileRoute('/import/$theme/$id')({
 						.join(' ');
 					return {
 						plugin: pluginPath,
-						name: pluginData.name || fallbackName,
+						name: decodeHtmlEntities(pluginData.name || fallbackName),
 						description: pluginData.description || '',
 						isSelected: true,
 						isMandatory: pluginData.mandatory,

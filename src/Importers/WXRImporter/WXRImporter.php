@@ -42,9 +42,10 @@ class WXRImporter extends WP_Importer {
 	protected $version = '1.0';
 
 	// information to import from WXR file
-	protected $categories = array();
-	protected $tags       = array();
-	protected $base_url   = '';
+	protected $categories    = array();
+	protected $tags          = array();
+	protected $base_url      = '';
+	protected $base_blog_url = '';
 
 	// TODO: REMOVE THESE
 	protected $processed_terms      = array();
@@ -220,7 +221,8 @@ class WXRImporter extends WP_Importer {
 		$this->version = '1.0';
 
 		// Reset other variables
-		$this->base_url = '';
+		$this->base_url      = '';
+		$this->base_blog_url = '';
 		// Start parsing! Suppress libxml warnings so malformed XML (e.g. extra
 		// content after </rss>) doesn't produce PHP warnings via XMLReader::read().
 		$prev_libxml_errors = \libxml_use_internal_errors( true );
@@ -250,6 +252,13 @@ class WXRImporter extends WP_Importer {
 
 				case 'wp:base_site_url':
 					$this->base_url = $reader->readString();
+
+					// Handled everything in this node, move on to the next
+					$reader->next();
+					break;
+
+				case 'wp:base_blog_url':
+					$this->base_blog_url = $reader->readString();
 
 					// Handled everything in this node, move on to the next
 					$reader->next();
@@ -598,6 +607,8 @@ class WXRImporter extends WP_Importer {
 			return;
 		}
 
+		$data['post_content'] = $this->replace_base_url( $data['post_content'] ?? '' );
+
 		// Collect mode: queue non-attachment posts for deferred batch processing.
 		if ( $this->options['collect_posts_only'] && 'attachment' !== ( $data['post_type'] ?? '' ) ) {
 			$this->pending_posts[] = array(
@@ -727,17 +738,19 @@ class WXRImporter extends WP_Importer {
 					[ 'end_time' => true ]
 				);
 
-				$remote_url = ! empty( $data['attachment_url'] ) ? $data['attachment_url'] : $data['guid'];
+				$original_url = ! empty( $data['attachment_url'] ) ? $data['attachment_url'] : $data['guid'];
+				$original_url = $this->normalize_attachment_url( $original_url );
 
 				// Rewrite origin domain to proxy so deferred downloads also route through the proxy.
-				$remote_url = str_replace( 'https://themegrilldemos.com', THEMEGRILL_BASE_URL, $remote_url );
+				$remote_url = str_replace( 'https://themegrilldemos.com', THEMEGRILL_BASE_URL, $original_url );
 				$remote_url = str_replace( 'https://zakrademos.com', ZAKRA_BASE_URL, $remote_url );
 
 				$this->pending_attachments[] = array(
-					'original_id' => $original_id,
-					'postdata'    => $postdata,
-					'meta'        => $meta,
-					'remote_url'  => $remote_url,
+					'original_id'  => $original_id,
+					'postdata'     => $postdata,
+					'meta'         => $meta,
+					'remote_url'   => $remote_url,
+					'original_url' => $original_url,
 				);
 
 				do_action( 'wxr_importer.process_skipped.post', $data, $meta );
@@ -753,6 +766,20 @@ class WXRImporter extends WP_Importer {
 				$posts_with_evf   = get_option( 'themegrill_demo_importer_posts_with_evf', array() );
 				$posts_with_evf[] = $post_id;
 				update_option( 'themegrill_demo_importer_posts_with_evf', array_values( array_unique( $posts_with_evf ) ) );
+			}
+			// Flag pages that embed the User Registration Membership "Buy Now" block so
+			// ImportHooks::process_membership_buy_now_posts() can remap demo membership IDs after import.
+			if ( ! empty( $postdata['post_content'] ) && ! is_wp_error( $post_id ) && $this->content_references_membership_buy_now( $postdata['post_content'] ) ) {
+				$posts_with_membership_buy_now   = get_option( 'themegrill_demo_importer_posts_with_membership_buy_now', array() );
+				$posts_with_membership_buy_now[] = $post_id;
+				update_option( 'themegrill_demo_importer_posts_with_membership_buy_now', array_values( array_unique( $posts_with_membership_buy_now ) ) );
+			}
+			// Flag pages that embed an AllCoach "add to cart" link so
+			// ImportHooks::process_allcoach_add_to_cart_posts() can remap demo program IDs after import.
+			if ( ! empty( $postdata['post_content'] ) && ! is_wp_error( $post_id ) && $this->content_references_allcoach_add_to_cart( $postdata['post_content'] ) ) {
+				$posts_with_allcoach_cart   = get_option( 'themegrill_demo_importer_posts_with_allcoach_cart', array() );
+				$posts_with_allcoach_cart[] = $post_id;
+				update_option( 'themegrill_demo_importer_posts_with_allcoach_cart', array_values( array_unique( $posts_with_allcoach_cart ) ) );
 			}
 			do_action( 'wp_import_insert_post', $post_id, $original_id, $postdata, $data );
 		}
@@ -934,6 +961,7 @@ class WXRImporter extends WP_Importer {
 			case 'custom':
 				// Custom refers to itself, wonderfully easy.
 				$object_id = $post_id;
+				$this->remap_menu_item_url( $post_id );
 				break;
 
 			default:
@@ -954,6 +982,42 @@ class WXRImporter extends WP_Importer {
 
 		$this->logger->debug( sprintf( 'Menu item %d mapped to %d', $original_object_id, $object_id ) );
 		update_post_meta( $post_id, '_menu_item_object_id', wp_slash( $object_id ) );
+	}
+
+	/**
+	 * Rewrite a custom nav menu item's URL from the demo site to the current site.
+	 *
+	 * @param int $post_id Menu item post ID.
+	 */
+	protected function remap_menu_item_url( $post_id ) {
+		$url = get_post_meta( $post_id, '_menu_item_url', true );
+		if ( empty( $url ) ) {
+			return;
+		}
+
+		$parsed = wp_parse_url( $url );
+		if ( empty( $parsed['host'] ) ) {
+			return;
+		}
+
+		$host      = preg_replace( '/^www\./i', '', strtolower( $parsed['host'] ) );
+		$site_host = preg_replace( '/^www\./i', '', strtolower( (string) wp_parse_url( home_url(), PHP_URL_HOST ) ) );
+		if ( $host === $site_host ) {
+			return;
+		}
+
+		$path = isset( $parsed['path'] ) ? preg_replace( '/^\/[^\/]+/', '', $parsed['path'] ) : '';
+
+		$new_url = untrailingslashit( home_url() ) . $path;
+
+		if ( ! empty( $parsed['query'] ) ) {
+			$new_url .= '?' . $parsed['query'];
+		}
+		if ( ! empty( $parsed['fragment'] ) ) {
+			$new_url .= '#' . $parsed['fragment'];
+		}
+
+		update_post_meta( $post_id, '_menu_item_url', esc_url_raw( $new_url ) );
 	}
 
 	/**
@@ -1154,6 +1218,7 @@ class WXRImporter extends WP_Importer {
 					}
 					if ( is_array( $value ) ) {
 						$this->replace_elementor_categories_ids( $value, $this->mapping['term_id'] );
+						$value = wp_json_encode( $value );
 					}
 				}
 
@@ -1924,6 +1989,101 @@ class WXRImporter extends WP_Importer {
 		return $this->mapping;
 	}
 
+	/**
+	 * Multisite subdirectory installs export an attachment's `<wp:attachment_url>`/`guid`
+	 * without the site's subdirectory slug, even
+	 * though the same media is referenced within post_content with the slug included
+	 * `<wp:base_site_url>` is the network's
+	 * root URL and won't have the slug either, so use `<wp:base_blog_url>` (the exported blog's
+	 * own URL) to detect and insert it when missing.
+	 */
+	protected function normalize_attachment_url( string $url ): string {
+		if ( empty( $this->base_blog_url ) ) {
+			return $url;
+		}
+
+		$base_host = wp_parse_url( $this->base_blog_url, PHP_URL_HOST );
+		$base_path = trim( (string) wp_parse_url( $this->base_blog_url, PHP_URL_PATH ), '/' );
+
+		if ( empty( $base_host ) || '' === $base_path ) {
+			return $url;
+		}
+
+		$url_host = wp_parse_url( $url, PHP_URL_HOST );
+		$url_path = (string) wp_parse_url( $url, PHP_URL_PATH );
+
+		if ( $url_host !== $base_host || 0 === strpos( ltrim( $url_path, '/' ), $base_path . '/' ) ) {
+			return $url;
+		}
+
+		$scheme = wp_parse_url( $url, PHP_URL_SCHEME ) ?: 'https';
+
+		return $scheme . '://' . $url_host . '/' . $base_path . $url_path;
+	}
+
+	/**
+	 * Rewrite hard-coded `href` links pointing at the demo site within post content
+	 * so they point at this site instead.
+	 *
+	 * Scoped to the `href` attribute only (not `src`, `srcset`, or block-attribute JSON):
+	 * attachment/image URLs are already handled by the exact old-URL => new-URL `url_remap`
+	 * map built while importing media. Rewriting the domain here too would leave those old
+	 * URLs unmatched by that later, more precise replacement, breaking images.
+	 */
+	protected function replace_base_url( $content ) {
+		if ( empty( $this->base_blog_url ) || empty( $content ) ) {
+			return $content;
+		}
+
+		$has_href     = false !== stripos( $content, 'href' );
+		$has_url_attr = false !== stripos( $content, '"url"' );
+
+		if ( ! $has_href && ! $has_url_attr ) {
+			return $content;
+		}
+
+		$host = wp_parse_url( $this->base_blog_url, PHP_URL_HOST );
+
+		if ( empty( $host ) ) {
+			return $content;
+		}
+
+		$path = trim( (string) wp_parse_url( $this->base_blog_url, PHP_URL_PATH ), '/' );
+
+		if ( $has_href ) {
+			$bare   = preg_replace( '/^www\./i', '', strtolower( $host ) );
+			$prefix = $bare . ( $path ? '/' . $path : '' );
+
+			$pattern = '#\bhref=([\'"])https?://(?:www\.)?' . preg_quote( $prefix, '#' ) . '(/[^\'"]*)?\1#i';
+
+			$content = preg_replace_callback(
+				$pattern,
+				function ( $matches ) {
+					return 'href=' . $matches[1] . untrailingslashit( home_url() ) . ( $matches[2] ?? '' ) . $matches[1];
+				},
+				$content
+			);
+		}
+
+		// Strip the source subsite's subdirectory slug from relative block "url" attrs (e.g. FSE wp_navigation posts).
+		if ( $has_url_attr && $path ) {
+			$home_path = untrailingslashit( (string) wp_parse_url( home_url(), PHP_URL_PATH ) );
+
+			$pattern = '#"url":"/' . preg_quote( $path, '#' ) . '(/[^"]*)?"#i';
+
+			$content = preg_replace_callback(
+				$pattern,
+				function ( $matches ) use ( $home_path ) {
+					$new_url = $home_path . ( $matches[1] ?? '' );
+					return '"url":"' . ( '' !== $new_url ? $new_url : '/' ) . '"';
+				},
+				$content
+			);
+		}
+
+		return $content;
+	}
+
 	public function get_pending_attachments(): array {
 		return $this->pending_attachments;
 	}
@@ -1974,6 +2134,29 @@ class WXRImporter extends WP_Importer {
 		}
 
 		return (bool) preg_match( '/\[everest_form\b/i', $content );
+	}
+
+	/**
+	 * Check whether post content embeds the User Registration Membership "Buy Now" block.
+	 */
+	protected function content_references_membership_buy_now( $content ) {
+		if ( ! is_string( $content ) || '' === $content ) {
+			return false;
+		}
+
+		return has_blocks( $content ) && has_block( 'user-registration/membership-buy-now', $content );
+	}
+
+	/**
+	 * Check whether post content embeds an AllCoach "add to cart" link
+	 * (`?allcoach-add-to-cart=123`), baked into a button block's inner markup.
+	 */
+	protected function content_references_allcoach_add_to_cart( $content ) {
+		if ( ! is_string( $content ) || '' === $content ) {
+			return false;
+		}
+
+		return (bool) preg_match( '/\ballcoach-add-to-cart=\d+/i', $content );
 	}
 
 	/**

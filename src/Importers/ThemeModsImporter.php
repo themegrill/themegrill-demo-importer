@@ -65,6 +65,9 @@ class ThemeModsImporter {
 			$data = self::import_customizer_images( $data );
 		}
 
+		// Rewrite any remaining links (e.g. header button links) that still point at the demo site.
+		$data = self::replace_demo_site_urls( $data );
+
 		// Import custom options.
 		$options = ! empty( $demo_data['wp_options'] ) ? $demo_data['wp_options'] : array();
 		foreach ( $options as $key => $value ) {
@@ -208,6 +211,62 @@ class ThemeModsImporter {
 		}
 
 		return $mods;
+	}
+
+	/**
+	 * Rewrites any theme mod value (recursively through arrays) that is an absolute URL
+	 * pointing at demo site, e.g. a header button link left over.
+	 *
+	 * @param  mixed $data Theme mod value or array of values.
+	 * @return mixed
+	 */
+	private static function replace_demo_site_urls( $data ) {
+		foreach ( $data as $key => $value ) {
+			if ( is_string( $value ) ) {
+				$data[ $key ] = self::replace_demo_link( $value );
+			} elseif ( is_array( $value ) ) {
+				$data[ $key ] = self::replace_demo_site_urls( $value );
+			}
+		}
+
+		return $data;
+	}
+
+	/**
+	 * Rewrites a theme mod URL not on this site's own host, stripping the assumed demo host + subdirectory slug.
+	 *
+	 * @param  string $value Theme mod value.
+	 * @return string
+	 */
+	private static function replace_demo_link( $value ) {
+		if ( '' === $value ) {
+			return $value;
+		}
+
+		$parsed = wp_parse_url( $value );
+		if ( empty( $parsed['host'] ) ) {
+			return $value;
+		}
+
+		$host      = preg_replace( '/^www\./i', '', strtolower( $parsed['host'] ) );
+		$site_host = preg_replace( '/^www\./i', '', strtolower( wp_parse_url( home_url(), PHP_URL_HOST ) ) );
+
+		if ( $host === $site_host ) {
+			return $value;
+		}
+
+		$path = isset( $parsed['path'] ) ? preg_replace( '/^\/[^\/]+/', '', $parsed['path'] ) : '';
+
+		$new_value = untrailingslashit( home_url() ) . $path;
+
+		if ( ! empty( $parsed['query'] ) ) {
+			$new_value .= '?' . $parsed['query'];
+		}
+		if ( ! empty( $parsed['fragment'] ) ) {
+			$new_value .= '#' . $parsed['fragment'];
+		}
+
+		return $new_value;
 	}
 
 	private static function replace_image_host( $url ) {

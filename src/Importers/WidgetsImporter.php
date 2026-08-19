@@ -74,6 +74,9 @@ class WidgetsImporter {
 		// Begin results.
 		$results = array();
 
+		// Attachment URLs already downloaded elsewhere in the import (e.g. used in a post too), keyed by their original demo URL.
+		$url_remap = get_option( 'themegrill_demo_importer_url_remap', array() );
+
 		// Loop import data's sidebars.
 		foreach ( $data as $sidebar_id => $widgets ) {
 
@@ -137,6 +140,9 @@ class WidgetsImporter {
 				 * Do before identical check because changes may make it identical to end result (such as URL replacements).
 				 */
 				$widget = apply_filters( 'themegrill_widget_import_settings', $widget, $id_base );
+
+				// Rewrite any links left over from the demo site (button/URL fields, or links embedded in text/block widget content).
+				$widget = self::replace_demo_site_urls( $widget, $url_remap );
 
 				// Does widget with identical settings already exist in same sidebar?
 				if ( ! $fail && isset( $widget_instances[ $id_base ] ) ) {
@@ -232,6 +238,109 @@ class WidgetsImporter {
 
 		// Return results.
 		return apply_filters( 'themegrill_widget_import_results', $results );
+	}
+
+	/**
+	 * Rewrites widget links (recursively) to this site; image src is only rewritten when already present in $url_remap.
+	 *
+	 * @param  mixed $data      Widget setting value or array of values.
+	 * @param  array $url_remap Map of original demo attachment URL => new local URL.
+	 * @return mixed
+	 */
+	private static function replace_demo_site_urls( $data, $url_remap = array() ) {
+		if ( is_array( $data ) ) {
+			foreach ( $data as $key => $value ) {
+				$data[ $key ] = self::replace_demo_site_urls( $value, $url_remap );
+			}
+			return $data;
+		}
+
+		if ( ! is_string( $data ) || '' === $data ) {
+			return $data;
+		}
+
+		if ( filter_var( $data, FILTER_VALIDATE_URL ) ) {
+			if ( self::is_media_url( $data ) ) {
+				return $url_remap[ $data ] ?? $data;
+			}
+			return self::rewrite_demo_url( $data );
+		}
+
+		if ( false === stripos( $data, 'href' ) && false === stripos( $data, '"url"' ) && false === stripos( $data, 'src' ) ) {
+			return $data;
+		}
+
+		$data = preg_replace_callback(
+			'#\bhref=([\'"])(https?://[^\'"]+)\1#i',
+			function ( $matches ) {
+				return 'href=' . $matches[1] . self::rewrite_demo_url( $matches[2] ) . $matches[1];
+			},
+			$data
+		);
+
+		$data = preg_replace_callback(
+			'#"url":"(https?://[^"]+)"#i',
+			function ( $matches ) {
+				return '"url":"' . self::rewrite_demo_url( $matches[1] ) . '"';
+			},
+			$data
+		);
+
+		if ( empty( $url_remap ) ) {
+			return $data;
+		}
+
+		return preg_replace_callback(
+			'#\bsrc=([\'"])(https?://[^\'"]+)\1#i',
+			function ( $matches ) use ( $url_remap ) {
+				$new_url = $url_remap[ $matches[2] ] ?? null;
+				return $new_url ? 'src=' . $matches[1] . $new_url . $matches[1] : $matches[0];
+			},
+			$data
+		);
+	}
+
+	/**
+	 * Whether a URL points at a media file, based on its extension.
+	 *
+	 * @param  string $url URL to check.
+	 * @return bool
+	 */
+	private static function is_media_url( $url ) {
+		return (bool) preg_match( '/\.(jpg|jpeg|png|gif|webp|svg|mp4|webm|pdf)(\?.*)?$/i', $url );
+	}
+
+	/**
+	 * Rewrites a URL not on this site's own host, stripping the assumed demo host + subdirectory slug.
+	 *
+	 * @param  string $url URL to rewrite.
+	 * @return string
+	 */
+	private static function rewrite_demo_url( $url ) {
+		$parsed = wp_parse_url( $url );
+		if ( empty( $parsed['host'] ) ) {
+			return $url;
+		}
+
+		$host      = preg_replace( '/^www\./i', '', strtolower( $parsed['host'] ) );
+		$site_host = preg_replace( '/^www\./i', '', strtolower( (string) wp_parse_url( home_url(), PHP_URL_HOST ) ) );
+
+		if ( $host === $site_host ) {
+			return $url;
+		}
+
+		$path = isset( $parsed['path'] ) ? preg_replace( '/^\/[^\/]+/', '', $parsed['path'] ) : '';
+
+		$new_url = untrailingslashit( home_url() ) . $path;
+
+		if ( ! empty( $parsed['query'] ) ) {
+			$new_url .= '?' . $parsed['query'];
+		}
+		if ( ! empty( $parsed['fragment'] ) ) {
+			$new_url .= '#' . $parsed['fragment'];
+		}
+
+		return $new_url;
 	}
 
 	/**

@@ -99,6 +99,14 @@ class DemoConfigValidator {
 			array(
 				'elementor_settings'                 => array( 'elementor_' ),
 				'yith_woocommerce_wishlist_settings' => array( 'yith_wcwl', 'yith_wishlist' ),
+				// Keep in sync with the URM option keys list on the demo export side.
+				'urm_settings'               => array(
+					'urm_bank_connection_status',
+					'user_registration_bank_enabled',
+					'user_registration_global_bank_details',
+					'user_registration_payment_currency',
+					'user_registration_content_restriction_message',
+				),
 			)
 		);
 	}

@@ -1,9 +1,11 @@
 == Changelog ==
-= 2.1.3 - 06-08-2026 =
+= 2.1.3 - TBD =
 * Fix - SSRF and arbitrary option update via demo_config (schema validation, safe remote requests, option key restrictions).
 * Fix - Companion Elementor plugin issue for Elementor Pro demos.
 * Fix - Remap Everest Forms shortcodes after import so Contact forms render.
 * Fix - User-friendly import errors, progress bar over 100%, and HTML in plugin feature descriptions.
+* Fix - User Registration & Membership pages and options configured after import.
+* Fix - Prevent a fatal error when another active plugin uses a newer psr/log version than Demo Importer.
 * Tweak - Run post-import hooks only when the demo requires them.
 
 = 2.1.2 - 31-07-2026 =
