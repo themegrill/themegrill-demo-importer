@@ -33,7 +33,7 @@ Bugs can be reported either in our support forum or preferably on the [GitHub re
 Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/themegrill-demo-importer/) :)
 
 == Changelog ==
-= 2.1.3 - 12-08-2026 =
+= 2.1.3 - TBD =
 * Fix - SSRF and arbitrary option update via demo_config (schema validation, safe remote requests, option key restrictions).
 * Fix - Install Companion Elementor from ThemeGrill GitHub ZIP; skip when already active.
 * Fix - Remap Everest Forms shortcodes after import so Contact forms render.
