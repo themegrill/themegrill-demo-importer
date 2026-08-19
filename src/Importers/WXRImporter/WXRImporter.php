@@ -961,6 +961,7 @@ class WXRImporter extends WP_Importer {
 			case 'custom':
 				// Custom refers to itself, wonderfully easy.
 				$object_id = $post_id;
+				$this->remap_menu_item_url( $post_id );
 				break;
 
 			default:
@@ -981,6 +982,42 @@ class WXRImporter extends WP_Importer {
 
 		$this->logger->debug( sprintf( 'Menu item %d mapped to %d', $original_object_id, $object_id ) );
 		update_post_meta( $post_id, '_menu_item_object_id', wp_slash( $object_id ) );
+	}
+
+	/**
+	 * Rewrite a custom nav menu item's URL from the demo site to the current site.
+	 *
+	 * @param int $post_id Menu item post ID.
+	 */
+	protected function remap_menu_item_url( $post_id ) {
+		$url = get_post_meta( $post_id, '_menu_item_url', true );
+		if ( empty( $url ) ) {
+			return;
+		}
+
+		$parsed = wp_parse_url( $url );
+		if ( empty( $parsed['host'] ) ) {
+			return;
+		}
+
+		$host      = preg_replace( '/^www\./i', '', strtolower( $parsed['host'] ) );
+		$site_host = preg_replace( '/^www\./i', '', strtolower( (string) wp_parse_url( home_url(), PHP_URL_HOST ) ) );
+		if ( $host === $site_host ) {
+			return;
+		}
+
+		$path = isset( $parsed['path'] ) ? preg_replace( '/^\/[^\/]+/', '', $parsed['path'] ) : '';
+
+		$new_url = untrailingslashit( home_url() ) . $path;
+
+		if ( ! empty( $parsed['query'] ) ) {
+			$new_url .= '?' . $parsed['query'];
+		}
+		if ( ! empty( $parsed['fragment'] ) ) {
+			$new_url .= '#' . $parsed['fragment'];
+		}
+
+		update_post_meta( $post_id, '_menu_item_url', esc_url_raw( $new_url ) );
 	}
 
 	/**
