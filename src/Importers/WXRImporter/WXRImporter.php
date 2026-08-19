@@ -1181,6 +1181,7 @@ class WXRImporter extends WP_Importer {
 					}
 					if ( is_array( $value ) ) {
 						$this->replace_elementor_categories_ids( $value, $this->mapping['term_id'] );
+						$value = wp_json_encode( $value );
 					}
 				}
 
