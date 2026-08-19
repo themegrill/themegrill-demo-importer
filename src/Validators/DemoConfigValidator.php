@@ -105,6 +105,7 @@ class DemoConfigValidator {
 					'user_registration_bank_enabled',
 					'user_registration_global_bank_details',
 					'user_registration_payment_currency',
+					'user_registration_content_restriction_message',
 				),
 			)
 		);
