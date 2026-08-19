@@ -1400,9 +1400,20 @@ class ImportHooks {
 						}
 					}
 
-					// Recursively update inner blocks
-					if ( ! empty( $block['innerBlocks'] ) ) {
-						$this->themegrill_update_block_term_ids( $block['innerBlocks'], $term_id_map );
+				}
+				if ( 'woocommerce/featured-category' === $block['blockName'] ) {
+					if ( isset( $block['attrs']['categoryId'] ) && isset( $term_id_map[ $block['attrs']['categoryId'] ] ) ) {
+						$block['attrs']['categoryId'] = (int) $term_id_map[ $block['attrs']['categoryId'] ];
+					}
+				}
+				if ( 'woocommerce/product-category' === $block['blockName'] ) {
+					if ( isset( $block['attrs']['categories'] ) && is_array( $block['attrs']['categories'] ) ) {
+						$block['attrs']['categories'] = array_map(
+							function ( $cat_id ) use ( $term_id_map ) {
+								return isset( $term_id_map[ $cat_id ] ) ? (int) $term_id_map[ $cat_id ] : (int) $cat_id;
+							},
+							$block['attrs']['categories']
+						);
 					}
 				}
 				if ( 'core/group' === $block['blockName'] ) {
@@ -1431,6 +1442,12 @@ class ImportHooks {
 						}
 					}
 				}
+			}
+
+			// Recurse into inner blocks regardless of the parent block type so that
+			// nested blocks (e.g. inside core/columns, core/cover, core/group) are reached.
+			if ( ! empty( $block['innerBlocks'] ) ) {
+				$this->themegrill_update_block_term_ids( $block['innerBlocks'], $term_id_map );
 			}
 		}
 	}
@@ -1694,6 +1711,11 @@ class ImportHooks {
 			update_option( 'user_registration_global_bank_details', wp_kses_post( $settings['user_registration_global_bank_details'] ) );
 		}
 
+		if ( isset( $settings['user_registration_content_restriction_message'] ) ) {
+			$message = $this->replace_demo_links_in_html( $settings['user_registration_content_restriction_message'] );
+			update_option( 'user_registration_content_restriction_message', wp_kses_post( $message ) );
+		}
+
 		if ( isset( $settings['user_registration_payment_currency'] ) ) {
 			$currency   = sanitize_text_field( $settings['user_registration_payment_currency'] );
 			$currencies = function_exists( 'ur_payment_integration_get_currencies' ) ? ur_payment_integration_get_currencies() : array();
@@ -1702,6 +1724,59 @@ class ImportHooks {
 				update_option( 'user_registration_payment_currency', $currency ? $currency : 'USD' );
 			}
 		}
+	}
+
+	/**
+	 * Rewrites href="..." links inside an HTML snippet that aren't on this site's own host to point here instead.
+	 *
+	 * @param  string $content HTML content.
+	 * @return string
+	 */
+	private function replace_demo_links_in_html( $content ) {
+		if ( ! is_string( $content ) || '' === $content || false === stripos( $content, 'href' ) ) {
+			return $content;
+		}
+
+		return preg_replace_callback(
+			'#\bhref=([\'"])(https?://[^\'"]+)\1#i',
+			function ( $matches ) {
+				return 'href=' . $matches[1] . $this->rewrite_demo_url( $matches[2] ) . $matches[1];
+			},
+			$content
+		);
+	}
+
+	/**
+	 * Rewrites a URL not on this site's own host, stripping the assumed demo host + subdirectory slug.
+	 *
+	 * @param  string $url URL to rewrite.
+	 * @return string
+	 */
+	private function rewrite_demo_url( $url ) {
+		$parsed = wp_parse_url( $url );
+		if ( empty( $parsed['host'] ) ) {
+			return $url;
+		}
+
+		$host      = preg_replace( '/^www\./i', '', strtolower( $parsed['host'] ) );
+		$site_host = preg_replace( '/^www\./i', '', strtolower( (string) wp_parse_url( home_url(), PHP_URL_HOST ) ) );
+
+		if ( $host === $site_host ) {
+			return $url;
+		}
+
+		$path = isset( $parsed['path'] ) ? preg_replace( '/^\/[^\/]+/', '', $parsed['path'] ) : '';
+
+		$new_url = untrailingslashit( home_url() ) . $path;
+
+		if ( ! empty( $parsed['query'] ) ) {
+			$new_url .= '?' . $parsed['query'];
+		}
+		if ( ! empty( $parsed['fragment'] ) ) {
+			$new_url .= '#' . $parsed['fragment'];
+		}
+
+		return $new_url;
 	}
 
 }
