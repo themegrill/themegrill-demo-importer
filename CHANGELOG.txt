@@ -1,5 +1,5 @@
 == Changelog ==
-= 2.1.3 - TBD =
+= 2.1.3 - 21-08-2026 =
 * Fix - SSRF and arbitrary option update via demo_config (schema validation, safe remote requests, option key restrictions).
 * Fix - Companion Elementor plugin issue for Elementor Pro demos.
 * Fix - Remap Everest Forms shortcodes after import so Contact forms render.
