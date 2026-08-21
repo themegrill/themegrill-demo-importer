@@ -50,6 +50,12 @@ class MediaImporter {
 		foreach ( $batch as $attachment ) {
 			$new_post_id = $this->process_single( $attachment );
 			if ( ! $new_post_id || is_wp_error( $new_post_id ) ) {
+				// Left unresolved, the demo's original (often stale/staging) URL stays
+				// baked into post_content and _elementor_data - log which one and why,
+				// so a dead demo-asset host shows up here instead of only as a missing
+				// image/video on the front end.
+				$reason = is_wp_error( $new_post_id ) ? $new_post_id->get_error_message() : 'unknown error';
+				$this->logger->warning( 'Skipped attachment ' . ( $attachment['original_url'] ?? '' ) . ': ' . $reason );
 				continue;
 			}
 

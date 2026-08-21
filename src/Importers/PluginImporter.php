@@ -33,15 +33,58 @@ class PluginImporter {
 	}
 
 	public function installPlugins( $plugins, $demo_config = array() ) {
-		$results = array();
+		/**
+		 * `get_filesystem_method()`'s ownership probe (comparing `fileowner()` on a
+		 * freshly written temp file against a core WP file) is unreliable on a lot of
+		 * Windows/local dev stacks (e.g. Local by Flywheel), so it falls back to
+		 * `ftpext`/`ftpsockets` even though direct writes work fine. In a REST/AJAX
+		 * request there is no page to render an FTP-credentials form on, so
+		 * `request_filesystem_credentials()` just returns false and `WP_Upgrader::run()`
+		 * bails with a bare `false` - no WP_Error, no message - which is why a plugin
+		 * that actually needs installing (rather than just activating) can fail with
+		 * no usable reason.
+		 *
+		 * This only ever runs from an authenticated action that already required the
+		 * `install_plugins` capability, so forcing the direct method here is safe: it
+		 * either fixes the false-positive above, or - on a host where direct writes
+		 * genuinely aren't possible - turns that silent failure into a real WP_Error
+		 * we can log and surface instead.
+		 */
+		add_filter( 'filesystem_method', array( __CLASS__, 'force_direct_filesystem_method' ) );
 
-		$results = array_map(
-			function ( $plugin ) use ( $demo_config ) {
-				return $this->installActivatePlugin( $plugin, $demo_config );
-			},
-			$plugins
-		);
+		try {
+			$results = array_map(
+				function ( $plugin ) use ( $demo_config ) {
+					return $this->installActivatePlugin( $plugin, $demo_config );
+				},
+				$plugins
+			);
+		} finally {
+			remove_filter( 'filesystem_method', array( __CLASS__, 'force_direct_filesystem_method' ) );
+		}
+
 		return $results;
+	}
+
+	/**
+	 * `filesystem_method` filter callback - see installPlugins().
+	 *
+	 * @return string
+	 */
+	public static function force_direct_filesystem_method() {
+		return 'direct';
+	}
+
+	/**
+	 * Message for the one `WP_Upgrader::run()` failure mode that reaches us as a
+	 * bare `false` instead of a `WP_Error`: the filesystem connection was refused.
+	 * Since installPlugins() already forces the direct method, seeing this here
+	 * means direct writes to wp-content genuinely aren't available on this host.
+	 *
+	 * @return string
+	 */
+	private static function filesystem_unavailable_message() {
+		return __( 'Plugin installation failed: WordPress could not write to the plugins directory (no direct filesystem access, and no FTP/SSH credentials configured).', 'themegrill-demo-importer' );
 	}
 
 	/**
@@ -207,11 +250,12 @@ class PluginImporter {
 		}
 
 		if ( false === $installed ) {
-			$this->logger->warning( 'Failed to install plugin ' . $pg[0] . ': filesystem error or download failed.', [ 'end_time' => true ] );
+			$message = self::filesystem_unavailable_message();
+			$this->logger->warning( 'Failed to install plugin ' . $pg[0] . ': ' . $message, [ 'end_time' => true ] );
 
 			$results[ $pg[0] ] = array(
 				'status'  => 'error',
-				'message' => __( 'Plugin installation failed (filesystem or download error).', 'themegrill-demo-importer' ),
+				'message' => $message,
 			);
 			return $results;
 		}
@@ -355,7 +399,7 @@ class PluginImporter {
 			$skin_errors = method_exists( $skin, 'get_errors' ) ? $skin->get_errors() : null;
 			$message     = ( is_wp_error( $skin_errors ) && $skin_errors->has_errors() )
 				? $skin_errors->get_error_message()
-				: __( 'Failed to install Companion Elementor.', 'themegrill-demo-importer' );
+				: self::filesystem_unavailable_message();
 
 			$this->logger->warning( 'Failed to install Companion Elementor: ' . $message, [ 'end_time' => true ] );
 			$results[ $slug ] = array(
