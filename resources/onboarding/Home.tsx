@@ -115,7 +115,13 @@ const Home = () => {
 			) : (
 				<div className="flex h-screen content-container">
 					<Sidebar builders={builders} categories={categories} theme={theme} />
-					<Content demos={demos} handleRefetch={handleRefetch} isRefetching={isRefetching} />
+					<Content
+						demos={demos}
+						builders={builders}
+						categories={categories}
+						handleRefetch={handleRefetch}
+						isRefetching={isRefetching}
+					/>
 				</div>
 			)}
 		</>

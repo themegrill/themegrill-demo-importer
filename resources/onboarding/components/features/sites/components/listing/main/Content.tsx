@@ -1,13 +1,15 @@
 import { useGrid, useVirtualizer } from '@virtual-grid/react';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { DemoType } from '../../../../../../lib/types';
+import { DemoType, PagebuilderCategory } from '../../../../../../lib/types';
 import { Route } from '../../../../../../routes';
 import { Button } from '../../../../../ui/Button';
 import Demo from '../demos/Demo';
 
 type ContentProps = {
 	demos: DemoType[];
+	builders: PagebuilderCategory[];
+	categories: PagebuilderCategory[];
 	handleRefetch: () => void;
 	isRefetching: boolean;
 };
@@ -53,7 +55,8 @@ const getResponsiveCardSize = (width: number) => {
 	};
 };
 
-const Content = ({ demos, handleRefetch, isRefetching }: ContentProps) => {
+const Content = ({ demos, builders, categories, handleRefetch, isRefetching }: ContentProps) => {
+	const navigate = Route.useNavigate();
 	const searchParams = Route.useSearch();
 	const search = searchParams.search || '';
 	const builder = searchParams.builder || '';
@@ -61,14 +64,11 @@ const Content = ({ demos, handleRefetch, isRefetching }: ContentProps) => {
 
 	const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
 
-	const newDemos = useMemo(() => {
+	// Search/category matches regardless of the selected builder tab - used both for
+	// the final list and, when that list is empty for this builder, to work out which
+	// other builder tabs actually have matching results.
+	const matchesIgnoringBuilder = useMemo(() => {
 		return demos
-			.filter((d) => {
-				if (!builder) {
-					return true;
-				}
-				return d.pagebuilder.toLowerCase() === builder;
-			})
 			.filter((d) => {
 				if (selectedCategories.length === 0) {
 					return true;
@@ -79,7 +79,46 @@ const Content = ({ demos, handleRefetch, isRefetching }: ContentProps) => {
 				return selectedCategories.some((cat) => normalizedCategories.includes(cat));
 			})
 			.filter((d) => (search ? d.title.toLowerCase().indexOf(search.toLowerCase()) !== -1 : true));
-	}, [selectedCategories, builder, search, demos]);
+	}, [selectedCategories, search, demos]);
+
+	const newDemos = useMemo(() => {
+		if (!builder) {
+			return matchesIgnoringBuilder;
+		}
+		return matchesIgnoringBuilder.filter((d) => d.pagebuilder.toLowerCase() === builder);
+	}, [matchesIgnoringBuilder, builder]);
+
+	// Other builder tabs that DO have matches for the current search/category filters -
+	// used to point the user at them instead of leaving them at a dead end (see
+	// themegrill/flash-pro#16).
+	const buildersWithResults = useMemo(() => {
+		if (newDemos.length > 0 || !builder) {
+			return [];
+		}
+		const idsWithResults = new Set(matchesIgnoringBuilder.map((d) => d.pagebuilder.toLowerCase()));
+		return builders.filter((b) => b.id !== builder && idsWithResults.has(b.id.toLowerCase()));
+	}, [newDemos.length, matchesIgnoringBuilder, builders, builder]);
+
+	const currentBuilderLabel = useMemo(
+		() => builders.find((b) => b.id === builder)?.value || builder,
+		[builders, builder],
+	);
+
+	const selectedCategoryLabel = useMemo(() => {
+		if (selectedCategories.length === 0) return '';
+		return selectedCategories
+			.map((slug) => categories.find((c) => c.id === slug)?.value || slug)
+			.join(' + ');
+	}, [selectedCategories, categories]);
+
+	const switchBuilder = (builderId: string) => {
+		navigate({
+			search: (prev) => ({
+				...prev,
+				builder: builderId,
+			}),
+		});
+	};
 
 	const ref = useRef<HTMLDivElement>(null);
 
@@ -166,12 +205,55 @@ const Content = ({ demos, handleRefetch, isRefetching }: ContentProps) => {
 								</clipPath>
 							</defs>
 						</svg>
-						<h3 className="mb-[7px] mt-[16px] text-[#383838] text-[20px] leading-[29px]">
-							{__('Sorry, no result found', 'themegrill-demo-importer')}
-						</h3>
-						<p className="m-0 text-[14px] leading-[29px] text-[#7A7A7A]">
-							{__('Please try another search', 'themegrill-demo-importer')}
-						</p>
+						{buildersWithResults.length > 0 ? (
+							<>
+								<h3 className="mb-[7px] mt-[16px] text-[#383838] text-[20px] leading-[29px]">
+									{selectedCategoryLabel
+										? sprintf(
+												/* translators: 1: category label (e.g. "Free"), 2: builder label (e.g. "Elementor") */
+												__('No %1$s templates for %2$s yet', 'themegrill-demo-importer'),
+												selectedCategoryLabel,
+												currentBuilderLabel,
+											)
+										: sprintf(
+												/* translators: %s: builder label (e.g. "Elementor") */
+												__('No templates for %s yet', 'themegrill-demo-importer'),
+												currentBuilderLabel,
+											)}
+								</h3>
+								<p className="m-0 mb-5 text-[14px] leading-[29px] text-[#7A7A7A]">
+									{sprintf(
+										/* translators: %s: comma-separated list of builder labels that do have results */
+										__('See %s templates instead', 'themegrill-demo-importer'),
+										buildersWithResults.map((b) => b.value).join(', '),
+									)}
+								</p>
+								<div className="flex gap-3 justify-center flex-wrap">
+									{buildersWithResults.map((b) => (
+										<Button
+											key={b.id}
+											className="cursor-pointer px-5 py-[10px] h-10 rounded-md border-2 border-solid border-[#5182EF] bg-[#5182EF] text-white text-[14px] hover:bg-[#3f6bd6] hover:text-white"
+											onClick={() => switchBuilder(b.id)}
+										>
+											{sprintf(
+												/* translators: %s: builder label (e.g. "SiteOrigin") */
+												__('Switch to %s', 'themegrill-demo-importer'),
+												b.value,
+											)}
+										</Button>
+									))}
+								</div>
+							</>
+						) : (
+							<>
+								<h3 className="mb-[7px] mt-[16px] text-[#383838] text-[20px] leading-[29px]">
+									{__('Sorry, no result found', 'themegrill-demo-importer')}
+								</h3>
+								<p className="m-0 text-[14px] leading-[29px] text-[#7A7A7A]">
+									{__('Please try another search', 'themegrill-demo-importer')}
+								</p>
+							</>
+						)}
 					</div>
 				</div>
 			) : (
