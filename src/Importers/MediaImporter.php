@@ -72,19 +72,31 @@ class MediaImporter {
 			// as this site registers the same image sizes the demo was built with,
 			// WordPress names each generated size file identically
 			// (`{basename}-{width}x{height}.{ext}`), so the demo's original size URL
-			// can be reconstructed from the old directory plus the newly generated
-			// size filename, and remapped the same way as the full-size image.
+			// can be reconstructed from the old directory plus the same naming
+			// convention, and remapped the same way as the full-size image.
+			//
+			// The reconstruction must use the ORIGINAL basename (from $original_url),
+			// not the new file's own basename: when the upload directory already has
+			// a same-named file (e.g. a prior import left one behind), wp_upload_bits()
+			// renames it - "hero.jpg" becomes "hero-1.jpg" - and every generated size
+			// filename is then built from that renamed basename ("hero-1-1024x768.jpg").
+			// The demo's content still references the un-renamed "hero-1024x768.jpg",
+			// so using the new file's basename here would produce a remap key that
+			// never matches anything, leaving those sizes hotlinked.
 			$new_metadata = wp_get_attachment_metadata( $new_post_id );
 			if ( ! empty( $new_metadata['sizes'] ) ) {
-				$original_dir = trailingslashit( dirname( $original_url ) );
-				$new_dir      = trailingslashit( dirname( $new_url ) );
+				$original_dir      = trailingslashit( dirname( $original_url ) );
+				$new_dir           = trailingslashit( dirname( $new_url ) );
+				$original_basename = pathinfo( wp_basename( $original_url ), PATHINFO_FILENAME );
 
 				foreach ( $new_metadata['sizes'] as $size_data ) {
-					if ( empty( $size_data['file'] ) ) {
+					if ( empty( $size_data['file'] ) || empty( $size_data['width'] ) || empty( $size_data['height'] ) ) {
 						continue;
 					}
 
-					$url_remap[ $original_dir . $size_data['file'] ] = $new_dir . $size_data['file'];
+					$size_ext            = pathinfo( $size_data['file'], PATHINFO_EXTENSION );
+					$original_size_file  = $original_basename . '-' . $size_data['width'] . 'x' . $size_data['height'] . '.' . $size_ext;
+					$url_remap[ $original_dir . $original_size_file ] = $new_dir . $size_data['file'];
 				}
 			}
 
@@ -308,7 +320,23 @@ class MediaImporter {
 	private function remap_panels_data_urls( array $url_remap ): void {
 		global $wpdb;
 
-		$rows = $wpdb->get_results( "SELECT meta_id, meta_value FROM {$wpdb->postmeta} WHERE meta_key = 'panels_data'" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.NotPrepared
+		// Scope to posts this import actually touched, and only write back rows
+		// that actually changed - an unscoped, unconditional pass would deserialize,
+		// reserialize and update every panels_data row on the whole site (including
+		// pre-existing SiteOrigin content this import never touched) on every import.
+		$imported_posts = get_option( 'themegrill_demo_importer_imported_posts', array() );
+		if ( empty( $imported_posts ) ) {
+			return;
+		}
+
+		$ids          = array_map( 'intval', $imported_posts );
+		$placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
+		$rows         = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.NotPrepared
+			$wpdb->prepare(
+				"SELECT meta_id, meta_value FROM {$wpdb->postmeta} WHERE meta_key = 'panels_data' AND post_id IN ($placeholders)", // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
+				...$ids
+			)
+		);
 
 		foreach ( $rows as $row ) {
 			$data = maybe_unserialize( $row->meta_value );
@@ -317,6 +345,9 @@ class MediaImporter {
 			}
 
 			$remapped = $this->remap_urls_recursive( $data, $url_remap );
+			if ( $remapped === $data ) {
+				continue;
+			}
 
 			$wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
 				$wpdb->postmeta,
