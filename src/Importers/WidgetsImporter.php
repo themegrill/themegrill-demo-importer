@@ -9,6 +9,16 @@ use WP_REST_Response;
 class WidgetsImporter {
 	private $logger;
 
+	/**
+	 * Per-request cache of sideload_widget_image() results, keyed by source URL, so
+	 * the same unregistered image reused across multiple widgets (e.g. a shared promo
+	 * banner in more than one sidebar) is downloaded once instead of creating a
+	 * separate duplicate attachment per occurrence.
+	 *
+	 * @var array<string, string>
+	 */
+	private static $sideload_cache = array();
+
 	public function __construct() {
 		$this->logger = Logger::getInstance();
 	}
@@ -353,6 +363,10 @@ class WidgetsImporter {
 	 * @return string The new local URL, or the original URL if the download failed.
 	 */
 	private static function sideload_widget_image( $url ) {
+		if ( isset( self::$sideload_cache[ $url ] ) ) {
+			return self::$sideload_cache[ $url ];
+		}
+
 		if ( ! function_exists( 'media_sideload_image' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/media.php';
 			require_once ABSPATH . 'wp-admin/includes/file.php';
@@ -363,6 +377,8 @@ class WidgetsImporter {
 
 		if ( is_wp_error( $attachment_id ) ) {
 			Logger::getInstance()->warning( 'Failed to sideload widget image ' . $url . ': ' . $attachment_id->get_error_message() );
+			// Cache the failure too, so a dead URL repeated across widgets isn't retried.
+			self::$sideload_cache[ $url ] = $url;
 			return $url;
 		}
 
@@ -371,7 +387,9 @@ class WidgetsImporter {
 		$imported_posts[] = $attachment_id;
 		update_option( 'themegrill_demo_importer_imported_posts', array_unique( $imported_posts ) );
 
-		return wp_get_attachment_url( $attachment_id );
+		self::$sideload_cache[ $url ] = wp_get_attachment_url( $attachment_id );
+
+		return self::$sideload_cache[ $url ];
 	}
 
 	/**
