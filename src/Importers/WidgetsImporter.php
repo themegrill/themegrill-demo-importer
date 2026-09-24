@@ -9,6 +9,16 @@ use WP_REST_Response;
 class WidgetsImporter {
 	private $logger;
 
+	/**
+	 * Per-request cache of sideload_widget_image() results, keyed by source URL, so
+	 * the same unregistered image reused across multiple widgets (e.g. a shared promo
+	 * banner in more than one sidebar) is downloaded once instead of creating a
+	 * separate duplicate attachment per occurrence.
+	 *
+	 * @var array<string, string>
+	 */
+	private static $sideload_cache = array();
+
 	public function __construct() {
 		$this->logger = Logger::getInstance();
 	}
@@ -241,7 +251,15 @@ class WidgetsImporter {
 	}
 
 	/**
-	 * Rewrites widget links (recursively) to this site; image src is only rewritten when already present in $url_remap.
+	 * Rewrites widget links (recursively) to this site. Image URLs already known from
+	 * the content/media import (in $url_remap) are remapped directly; any other media
+	 * URL not on this site's own host is sideloaded on the spot (see sideload_widget_image()).
+	 *
+	 * Some widgets (e.g. a "View Pro" promo banner) carry a hardcoded image that's
+	 * never declared as a WXR attachment item at all - sometimes even referencing a
+	 * different site ID or host than the demo's own content - so it can never appear
+	 * in $url_remap no matter how the content/media import behaves. Without this
+	 * fallback, that image stays permanently hotlinked to ThemeGrill's own servers.
 	 *
 	 * @param  mixed $data      Widget setting value or array of values.
 	 * @param  array $url_remap Map of original demo attachment URL => new local URL.
@@ -261,7 +279,7 @@ class WidgetsImporter {
 
 		if ( filter_var( $data, FILTER_VALIDATE_URL ) ) {
 			if ( self::is_media_url( $data ) ) {
-				return $url_remap[ $data ] ?? $data;
+				return self::resolve_media_url( $data, $url_remap );
 			}
 			return self::rewrite_demo_url( $data );
 		}
@@ -286,18 +304,170 @@ class WidgetsImporter {
 			$data
 		);
 
-		if ( empty( $url_remap ) ) {
-			return $data;
-		}
-
-		return preg_replace_callback(
+		$data = preg_replace_callback(
 			'#\bsrc=([\'"])(https?://[^\'"]+)\1#i',
 			function ( $matches ) use ( $url_remap ) {
-				$new_url = $url_remap[ $matches[2] ] ?? null;
-				return $new_url ? 'src=' . $matches[1] . $new_url . $matches[1] : $matches[0];
+				return 'src=' . $matches[1] . self::resolve_media_url( $matches[2], $url_remap ) . $matches[1];
 			},
 			$data
 		);
+
+		// srcset carries a comma-separated list of "<url> <width descriptor>" pairs
+		// (e.g. `srcset="https://.../a.jpg 350w, https://.../b.jpg 269w"`) - a
+		// completely different shape than a single src= URL, so it needs its own pass.
+		return preg_replace_callback(
+			'#\bsrcset=([\'"])([^\'"]+)\1#i',
+			function ( $matches ) use ( $url_remap ) {
+				$candidates = array_map( 'trim', explode( ',', $matches[2] ) );
+				$rewritten  = array_map(
+					function ( $candidate ) use ( $url_remap ) {
+						if ( ! preg_match( '#^(https?://\S+)(\s+\S+)?$#', $candidate, $parts ) ) {
+							return $candidate;
+						}
+						return self::resolve_media_url( $parts[1], $url_remap ) . ( $parts[2] ?? '' );
+					},
+					$candidates
+				);
+				return 'srcset=' . $matches[1] . implode( ', ', $rewritten ) . $matches[1];
+			},
+			$data
+		);
+	}
+
+	/**
+	 * Resolve a single media URL to its local equivalent: the known remap if this
+	 * import already downloaded it, otherwise an on-the-spot sideload, otherwise the
+	 * URL unchanged (already local, or the sideload failed).
+	 *
+	 * @param  string $url       Original media URL.
+	 * @param  array  $url_remap Map of original demo attachment URL => new local URL.
+	 * @return string
+	 */
+	private static function resolve_media_url( $url, array $url_remap ) {
+		if ( isset( $url_remap[ $url ] ) ) {
+			return $url_remap[ $url ];
+		}
+
+		if ( self::is_local_url( $url ) ) {
+			return $url;
+		}
+
+		return self::sideload_widget_image( $url );
+	}
+
+	/**
+	 * Download a widget-embedded image that has no corresponding WXR attachment item
+	 * into the Media Library, so it stops being served from the demo's remote host.
+	 *
+	 * The widgets payload comes from demo_config, which this plugin already treats as
+	 * attacker-controlled input elsewhere (see RemoteRequest) - a crafted widget could
+	 * otherwise point an <img> at an arbitrary internal or third-party URL and have
+	 * this admin-triggered import fetch and store it. So this deliberately does NOT
+	 * use core's media_sideload_image()/download_url(), which fetch via the unsafe
+	 * wp_remote_get() (no loopback/private-IP protection); it re-implements the same
+	 * download steps MediaImporter::process_single() uses for regular attachments,
+	 * on top of RemoteRequest's SSRF-safe, host-allowlisted fetch.
+	 *
+	 * @param  string $url Remote image URL.
+	 * @return string The new local URL, or the original URL if it's disallowed or the download failed.
+	 */
+	private static function sideload_widget_image( $url ) {
+		if ( isset( self::$sideload_cache[ $url ] ) ) {
+			return self::$sideload_cache[ $url ];
+		}
+
+		if ( ! \ThemeGrill\Demo\Importer\Helpers\RemoteRequest::is_allowed_url( $url ) ) {
+			Logger::getInstance()->warning( 'Refused to sideload widget image from disallowed host: ' . $url );
+			self::$sideload_cache[ $url ] = $url;
+			return $url;
+		}
+
+		require_once ABSPATH . 'wp-admin/includes/image.php';
+		require_once ABSPATH . 'wp-admin/includes/media.php';
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+
+		$attachment_id = self::download_and_insert_attachment( $url );
+
+		if ( is_wp_error( $attachment_id ) ) {
+			Logger::getInstance()->warning( 'Failed to sideload widget image ' . $url . ': ' . $attachment_id->get_error_message() );
+			// Cache the failure too, so a dead URL repeated across widgets isn't retried.
+			self::$sideload_cache[ $url ] = $url;
+			return $url;
+		}
+
+		// Track for cleanup on reset, same as attachments imported via the media step.
+		$imported_posts   = get_option( 'themegrill_demo_importer_imported_posts', array() );
+		$imported_posts[] = $attachment_id;
+		update_option( 'themegrill_demo_importer_imported_posts', array_unique( $imported_posts ) );
+
+		self::$sideload_cache[ $url ] = wp_get_attachment_url( $attachment_id );
+
+		return self::$sideload_cache[ $url ];
+	}
+
+	/**
+	 * Safely fetch a single allowlisted URL and insert it as a Media Library attachment.
+	 *
+	 * @param  string $url Remote URL, already checked against the host allowlist.
+	 * @return int|WP_Error New attachment ID on success.
+	 */
+	private static function download_and_insert_attachment( $url ) {
+		$file_name = wp_basename( wp_parse_url( $url, PHP_URL_PATH ) ?? $url );
+		$upload    = wp_upload_bits( $file_name, 0, '' );
+		if ( $upload['error'] ) {
+			return new WP_Error( 'upload_dir_error', $upload['error'] );
+		}
+
+		$response = \ThemeGrill\Demo\Importer\Helpers\RemoteRequest::get(
+			$url,
+			array(
+				'stream'    => true,
+				'filename'  => $upload['file'],
+				'headers'   => array( 'User-Agent' => 'ThemeGrill Starter Template/1.0' ),
+				'sslverify' => true,
+				'timeout'   => 30,
+			),
+			true // Require host allowlist - this URL comes from demo_config, attacker-controlled input.
+		);
+
+		if ( is_wp_error( $response ) ) {
+			@unlink( $upload['file'] ); // phpcs:ignore WordPress.PHP.NoSilencedErrors
+			return $response;
+		}
+
+		$code = (int) wp_remote_retrieve_response_code( $response );
+		if ( 200 !== $code ) {
+			@unlink( $upload['file'] ); // phpcs:ignore WordPress.PHP.NoSilencedErrors
+			return new WP_Error( 'import_file_error', 'Server returned ' . $code . ' for ' . $url );
+		}
+
+		if ( 0 === filesize( $upload['file'] ) ) {
+			@unlink( $upload['file'] ); // phpcs:ignore WordPress.PHP.NoSilencedErrors
+			return new WP_Error( 'import_file_error', 'Zero size file downloaded' );
+		}
+
+		$info = wp_check_filetype( $upload['file'] );
+		if ( empty( $info['type'] ) ) {
+			@unlink( $upload['file'] ); // phpcs:ignore WordPress.PHP.NoSilencedErrors
+			return new WP_Error( 'attachment_processing_error', 'Invalid file type' );
+		}
+
+		$attachment_id = wp_insert_attachment(
+			array(
+				'post_mime_type' => $info['type'],
+				'post_title'     => preg_replace( '/\.[^.]+$/', '', $file_name ),
+				'post_status'    => 'inherit',
+			),
+			$upload['file']
+		);
+		if ( is_wp_error( $attachment_id ) ) {
+			return $attachment_id;
+		}
+
+		$metadata = wp_generate_attachment_metadata( $attachment_id, $upload['file'] );
+		wp_update_attachment_metadata( $attachment_id, $metadata );
+
+		return $attachment_id;
 	}
 
 	/**
@@ -308,6 +478,19 @@ class WidgetsImporter {
 	 */
 	private static function is_media_url( $url ) {
 		return (bool) preg_match( '/\.(jpg|jpeg|png|gif|webp|svg|mp4|webm|pdf)(\?.*)?$/i', $url );
+	}
+
+	/**
+	 * Whether a URL is already on this site's own host.
+	 *
+	 * @param  string $url URL to check.
+	 * @return bool
+	 */
+	private static function is_local_url( $url ) {
+		$host      = preg_replace( '/^www\./i', '', strtolower( (string) wp_parse_url( $url, PHP_URL_HOST ) ) );
+		$site_host = preg_replace( '/^www\./i', '', strtolower( (string) wp_parse_url( home_url(), PHP_URL_HOST ) ) );
+
+		return '' !== $host && $host === $site_host;
 	}
 
 	/**

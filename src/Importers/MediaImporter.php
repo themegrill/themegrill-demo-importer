@@ -61,9 +61,44 @@ class MediaImporter {
 
 			$original_id  = $attachment['original_id'];
 			$original_url = $attachment['original_url'];
+			$new_url      = wp_get_attachment_url( $new_post_id );
 
 			$mapping['post'][ $original_id ] = $new_post_id;
-			$url_remap[ $original_url ]      = wp_get_attachment_url( $new_post_id );
+			$url_remap[ $original_url ]      = $new_url;
+
+			// Demo content can bake a specific registered image size's URL directly
+			// into post_content (e.g. a Gutenberg image block with a "large"
+			// sizeSlug) instead of resolving it dynamically at render time. As long
+			// as this site registers the same image sizes the demo was built with,
+			// WordPress names each generated size file identically
+			// (`{basename}-{width}x{height}.{ext}`), so the demo's original size URL
+			// can be reconstructed from the old directory plus the same naming
+			// convention, and remapped the same way as the full-size image.
+			//
+			// The reconstruction must use the ORIGINAL basename (from $original_url),
+			// not the new file's own basename: when the upload directory already has
+			// a same-named file (e.g. a prior import left one behind), wp_upload_bits()
+			// renames it - "hero.jpg" becomes "hero-1.jpg" - and every generated size
+			// filename is then built from that renamed basename ("hero-1-1024x768.jpg").
+			// The demo's content still references the un-renamed "hero-1024x768.jpg",
+			// so using the new file's basename here would produce a remap key that
+			// never matches anything, leaving those sizes hotlinked.
+			$new_metadata = wp_get_attachment_metadata( $new_post_id );
+			if ( ! empty( $new_metadata['sizes'] ) ) {
+				$original_dir      = trailingslashit( dirname( $original_url ) );
+				$new_dir           = trailingslashit( dirname( $new_url ) );
+				$original_basename = pathinfo( wp_basename( $original_url ), PATHINFO_FILENAME );
+
+				foreach ( $new_metadata['sizes'] as $size_data ) {
+					if ( empty( $size_data['file'] ) || empty( $size_data['width'] ) || empty( $size_data['height'] ) ) {
+						continue;
+					}
+
+					$size_ext            = pathinfo( $size_data['file'], PATHINFO_EXTENSION );
+					$original_size_file  = $original_basename . '-' . $size_data['width'] . 'x' . $size_data['height'] . '.' . $size_ext;
+					$url_remap[ $original_dir . $original_size_file ] = $new_dir . $size_data['file'];
+				}
+			}
 
 			// Track for cleanup on reset.
 			$imported_posts   = get_option( 'themegrill_demo_importer_imported_posts', array() );
@@ -189,8 +224,9 @@ class MediaImporter {
 		// Replace old attachment URLs in post_content and _elementor_data postmeta
 		// (longest first to avoid partial matches).
 		if ( ! empty( $url_remap ) ) {
-			uksort( $url_remap, fn( $a, $b ) => strlen( $b ) - strlen( $a ) );
-			foreach ( $url_remap as $old_url => $new_url ) {
+			$sorted_url_remap = $url_remap;
+			uksort( $sorted_url_remap, fn( $a, $b ) => strlen( $b ) - strlen( $a ) );
+			foreach ( $sorted_url_remap as $old_url => $new_url ) {
 				$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
 					$wpdb->prepare(
 						"UPDATE {$wpdb->posts} SET post_content = REPLACE(post_content, %s, %s)",
@@ -205,7 +241,32 @@ class MediaImporter {
 						$new_url
 					)
 				);
+
+				// SiteOrigin widgets can be embedded directly in post_content via a
+				// `[siteorigin_widget]` shortcode carrying a JSON-encoded "instance"
+				// attribute. json_encode() escapes forward slashes by default, so the
+				// same URL appears there as "https:\/\/..." and the plain-URL REPLACE
+				// above never matches it - replace that escaped form too.
+				$old_url_escaped = str_replace( '/', '\/', $old_url );
+				$new_url_escaped = str_replace( '/', '\/', $new_url );
+
+				$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+					$wpdb->prepare(
+						"UPDATE {$wpdb->posts} SET post_content = REPLACE(post_content, %s, %s)",
+						$old_url_escaped,
+						$new_url_escaped
+					)
+				);
+				$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+					$wpdb->prepare(
+						"UPDATE {$wpdb->postmeta} SET meta_value = REPLACE(meta_value, %s, %s) WHERE meta_key = '_elementor_data'",
+						$old_url_escaped,
+						$new_url_escaped
+					)
+				);
 			}
+
+			$this->remap_panels_data_urls( $url_remap );
 		}
 
 		// Update _thumbnail_id to point to newly imported attachment IDs.
@@ -241,5 +302,80 @@ class MediaImporter {
 		delete_option( 'themegrill_demo_importer_featured_images' );
 		delete_option( 'themegrill_demo_importer_media_total' );
 		delete_option( 'themegrill_demo_importer_pending_attachments' );
+	}
+
+	/**
+	 * Remap attachment URLs inside SiteOrigin Page Builder's `panels_data` postmeta.
+	 *
+	 * Unlike Elementor's `_elementor_data` (a plain JSON string, safe for a direct
+	 * substring REPLACE), `panels_data` is stored PHP-serialized. A serialized string
+	 * encodes each string's byte length up front (`s:45:"https://...";`), so replacing
+	 * an old URL with a new one of a different length via SQL REPLACE() desyncs that
+	 * length from the actual string, corrupting the entire layout for every widget in
+	 * it - not just the one holding the swapped image. Unserializing, walking the
+	 * structure, and reserializing keeps it valid regardless of length changes.
+	 *
+	 * @param array $url_remap Map of old attachment URL => new local URL.
+	 */
+	private function remap_panels_data_urls( array $url_remap ): void {
+		global $wpdb;
+
+		// Scope to posts this import actually touched, and only write back rows
+		// that actually changed - an unscoped, unconditional pass would deserialize,
+		// reserialize and update every panels_data row on the whole site (including
+		// pre-existing SiteOrigin content this import never touched) on every import.
+		$imported_posts = get_option( 'themegrill_demo_importer_imported_posts', array() );
+		if ( empty( $imported_posts ) ) {
+			return;
+		}
+
+		$ids          = array_map( 'intval', $imported_posts );
+		$placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
+		$rows         = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.NotPrepared
+			$wpdb->prepare(
+				"SELECT meta_id, meta_value FROM {$wpdb->postmeta} WHERE meta_key = 'panels_data' AND post_id IN ($placeholders)", // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
+				...$ids
+			)
+		);
+
+		foreach ( $rows as $row ) {
+			$data = maybe_unserialize( $row->meta_value );
+			if ( empty( $data ) ) {
+				continue;
+			}
+
+			$remapped = $this->remap_urls_recursive( $data, $url_remap );
+			if ( $remapped === $data ) {
+				continue;
+			}
+
+			$wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+				$wpdb->postmeta,
+				array( 'meta_value' => maybe_serialize( $remapped ) ), // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
+				array( 'meta_id' => $row->meta_id )
+			);
+		}
+	}
+
+	/**
+	 * Recursively replace attachment URLs within an arbitrarily nested value.
+	 *
+	 * @param mixed $value     Value to search (array, string, or scalar).
+	 * @param array $url_remap Map of old attachment URL => new local URL.
+	 * @return mixed
+	 */
+	private function remap_urls_recursive( $value, array $url_remap ) {
+		if ( is_array( $value ) ) {
+			foreach ( $value as $key => $item ) {
+				$value[ $key ] = $this->remap_urls_recursive( $item, $url_remap );
+			}
+			return $value;
+		}
+
+		if ( is_string( $value ) && false !== strpos( $value, '://' ) ) {
+			return strtr( $value, $url_remap );
+		}
+
+		return $value;
 	}
 }
