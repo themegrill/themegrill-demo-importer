@@ -359,21 +359,34 @@ class WidgetsImporter {
 	 * Download a widget-embedded image that has no corresponding WXR attachment item
 	 * into the Media Library, so it stops being served from the demo's remote host.
 	 *
+	 * The widgets payload comes from demo_config, which this plugin already treats as
+	 * attacker-controlled input elsewhere (see RemoteRequest) - a crafted widget could
+	 * otherwise point an <img> at an arbitrary internal or third-party URL and have
+	 * this admin-triggered import fetch and store it. So this deliberately does NOT
+	 * use core's media_sideload_image()/download_url(), which fetch via the unsafe
+	 * wp_remote_get() (no loopback/private-IP protection); it re-implements the same
+	 * download steps MediaImporter::process_single() uses for regular attachments,
+	 * on top of RemoteRequest's SSRF-safe, host-allowlisted fetch.
+	 *
 	 * @param  string $url Remote image URL.
-	 * @return string The new local URL, or the original URL if the download failed.
+	 * @return string The new local URL, or the original URL if it's disallowed or the download failed.
 	 */
 	private static function sideload_widget_image( $url ) {
 		if ( isset( self::$sideload_cache[ $url ] ) ) {
 			return self::$sideload_cache[ $url ];
 		}
 
-		if ( ! function_exists( 'media_sideload_image' ) ) {
-			require_once ABSPATH . 'wp-admin/includes/media.php';
-			require_once ABSPATH . 'wp-admin/includes/file.php';
-			require_once ABSPATH . 'wp-admin/includes/image.php';
+		if ( ! \ThemeGrill\Demo\Importer\Helpers\RemoteRequest::is_allowed_url( $url ) ) {
+			Logger::getInstance()->warning( 'Refused to sideload widget image from disallowed host: ' . $url );
+			self::$sideload_cache[ $url ] = $url;
+			return $url;
 		}
 
-		$attachment_id = media_sideload_image( $url, 0, null, 'id' );
+		require_once ABSPATH . 'wp-admin/includes/image.php';
+		require_once ABSPATH . 'wp-admin/includes/media.php';
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+
+		$attachment_id = self::download_and_insert_attachment( $url );
 
 		if ( is_wp_error( $attachment_id ) ) {
 			Logger::getInstance()->warning( 'Failed to sideload widget image ' . $url . ': ' . $attachment_id->get_error_message() );
@@ -390,6 +403,71 @@ class WidgetsImporter {
 		self::$sideload_cache[ $url ] = wp_get_attachment_url( $attachment_id );
 
 		return self::$sideload_cache[ $url ];
+	}
+
+	/**
+	 * Safely fetch a single allowlisted URL and insert it as a Media Library attachment.
+	 *
+	 * @param  string $url Remote URL, already checked against the host allowlist.
+	 * @return int|WP_Error New attachment ID on success.
+	 */
+	private static function download_and_insert_attachment( $url ) {
+		$file_name = wp_basename( wp_parse_url( $url, PHP_URL_PATH ) ?? $url );
+		$upload    = wp_upload_bits( $file_name, 0, '' );
+		if ( $upload['error'] ) {
+			return new WP_Error( 'upload_dir_error', $upload['error'] );
+		}
+
+		$response = \ThemeGrill\Demo\Importer\Helpers\RemoteRequest::get(
+			$url,
+			array(
+				'stream'    => true,
+				'filename'  => $upload['file'],
+				'headers'   => array( 'User-Agent' => 'ThemeGrill Starter Template/1.0' ),
+				'sslverify' => true,
+				'timeout'   => 30,
+			),
+			true // Require host allowlist - this URL comes from demo_config, attacker-controlled input.
+		);
+
+		if ( is_wp_error( $response ) ) {
+			@unlink( $upload['file'] ); // phpcs:ignore WordPress.PHP.NoSilencedErrors
+			return $response;
+		}
+
+		$code = (int) wp_remote_retrieve_response_code( $response );
+		if ( 200 !== $code ) {
+			@unlink( $upload['file'] ); // phpcs:ignore WordPress.PHP.NoSilencedErrors
+			return new WP_Error( 'import_file_error', 'Server returned ' . $code . ' for ' . $url );
+		}
+
+		if ( 0 === filesize( $upload['file'] ) ) {
+			@unlink( $upload['file'] ); // phpcs:ignore WordPress.PHP.NoSilencedErrors
+			return new WP_Error( 'import_file_error', 'Zero size file downloaded' );
+		}
+
+		$info = wp_check_filetype( $upload['file'] );
+		if ( empty( $info['type'] ) ) {
+			@unlink( $upload['file'] ); // phpcs:ignore WordPress.PHP.NoSilencedErrors
+			return new WP_Error( 'attachment_processing_error', 'Invalid file type' );
+		}
+
+		$attachment_id = wp_insert_attachment(
+			array(
+				'post_mime_type' => $info['type'],
+				'post_title'     => preg_replace( '/\.[^.]+$/', '', $file_name ),
+				'post_status'    => 'inherit',
+			),
+			$upload['file']
+		);
+		if ( is_wp_error( $attachment_id ) ) {
+			return $attachment_id;
+		}
+
+		$metadata = wp_generate_attachment_metadata( $attachment_id, $upload['file'] );
+		wp_update_attachment_metadata( $attachment_id, $metadata );
+
+		return $attachment_id;
 	}
 
 	/**
