@@ -738,7 +738,7 @@ class WXRImporter extends WP_Importer {
 					[ 'end_time' => true ]
 				);
 
-				$original_url = ! empty( $data['attachment_url'] ) ? $data['attachment_url'] : $data['guid'];
+				$original_url = $this->resolve_attachment_source_url( $data );
 				$original_url = $this->normalize_attachment_url( $original_url );
 
 				// Rewrite origin domain to proxy so deferred downloads also route through the proxy.
@@ -756,7 +756,7 @@ class WXRImporter extends WP_Importer {
 				do_action( 'wxr_importer.process_skipped.post', $data, $meta );
 				return false;
 			}
-			$remote_url = ! empty( $data['attachment_url'] ) ? $data['attachment_url'] : $data['guid'];
+			$remote_url = $this->normalize_attachment_url( $this->resolve_attachment_source_url( $data ) );
 			$post_id    = $this->process_attachment( $postdata, $meta, $remote_url );
 		} else {
 			$post_id = wp_insert_post( $postdata, true );
@@ -1990,12 +1990,18 @@ class WXRImporter extends WP_Importer {
 	}
 
 	/**
-	 * Multisite subdirectory installs export an attachment's `<wp:attachment_url>`/`guid`
-	 * without the site's subdirectory slug, even
-	 * though the same media is referenced within post_content with the slug included
-	 * `<wp:base_site_url>` is the network's
-	 * root URL and won't have the slug either, so use `<wp:base_blog_url>` (the exported blog's
-	 * own URL) to detect and insert it when missing.
+	 * Some multisite subdirectory exports give an attachment's `<wp:attachment_url>`/`guid`
+	 * as a bare `.../wp-content/uploads/...` path, without the site's own subdirectory slug,
+	 * even though the same media is referenced within post_content with the slug included.
+	 * `<wp:base_site_url>` is the network's root URL and won't have the slug either, so use
+	 * `<wp:base_blog_url>` (the exported blog's own URL) to detect and insert it when missing.
+	 *
+	 * Only does this when nothing at all precedes `wp-content` in the path. A path that
+	 * already has some other segment there - this site's own slug, or a stale/shared one
+	 * inherited from how the demo assets were exported - is left alone: prepending on top
+	 * of an existing segment produces a doubled, unfetchable path (e.g. `/a/b/wp-content/...`)
+	 * instead of a valid one, and that existing segment is what actually matches the URL
+	 * baked into post_content, so rewriting it would break the later find/replace remap.
 	 */
 	protected function normalize_attachment_url( string $url ): string {
 		if ( empty( $this->base_blog_url ) ) {
@@ -2012,13 +2018,30 @@ class WXRImporter extends WP_Importer {
 		$url_host = wp_parse_url( $url, PHP_URL_HOST );
 		$url_path = (string) wp_parse_url( $url, PHP_URL_PATH );
 
-		if ( $url_host !== $base_host || 0 === strpos( ltrim( $url_path, '/' ), $base_path . '/' ) ) {
+		if ( $url_host !== $base_host || 0 !== strpos( ltrim( $url_path, '/' ), 'wp-content/' ) ) {
 			return $url;
 		}
 
 		$scheme = wp_parse_url( $url, PHP_URL_SCHEME ) ?: 'https';
 
 		return $scheme . '://' . $url_host . '/' . $base_path . $url_path;
+	}
+
+	/**
+	 * The exported `<wp:attachment_url>` is not reliably what ends up referenced inside
+	 * post_content/postmeta for ThemeGrill's demo content - it can be stale or point at an
+	 * unrelated demo's media path. `guid` consistently matches what's actually embedded in
+	 * the content, so prefer it and only fall back to `attachment_url` when no guid is set.
+	 *
+	 * @param array $data Parsed WXR item data for the attachment.
+	 * @return string
+	 */
+	protected function resolve_attachment_source_url( array $data ): string {
+		if ( ! empty( $data['guid'] ) ) {
+			return $data['guid'];
+		}
+
+		return ! empty( $data['attachment_url'] ) ? $data['attachment_url'] : '';
 	}
 
 	/**
