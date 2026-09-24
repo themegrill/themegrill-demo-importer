@@ -20,11 +20,13 @@ class ThemeModsImporter {
 		}
 		$mapping_data = get_option( 'themegrill_demo_importer_mapping', array() );
 		$term_id_map  = array();
+		$post_id_map  = array();
 		if ( ! empty( $mapping_data ) ) {
 			$term_id_map = $mapping_data['term_id'] ?? array();
+			$post_id_map = $mapping_data['post'] ?? array();
 		}
 		$this->logger->info( 'Importing theme mods...', [ 'start_time' => true ] );
-		$import = $this->processImport( $demo['themeMods'], $demo['slug'], $demo, $term_id_map, $args );
+		$import = $this->processImport( $demo['themeMods'], $demo['slug'], $demo, $term_id_map, $args, $post_id_map );
 		if ( is_wp_error( $import ) ) {
 			$this->logger->error( 'Error importing customizer: ' . $import->get_error_message(), [ 'end_time' => true ] );
 			return new WP_Error( 'import_customizer_failed', 'Error importing customizer.', array( 'status' => 500 ) );
@@ -50,9 +52,10 @@ class ThemeModsImporter {
 	 * @param  array  $demo_data   The data of demo being imported.
 	 * @param  array  $term_id_map   Processed Terms Map
 	 * @param  array  $args   Additional arguments
+	 * @param  array  $post_id_map   Map of the demo's original attachment/post IDs to their newly imported IDs.
 	 * @return void|WP_Error
 	 */
-	public static function processImport( $data, $demo_id, $demo_data, $term_id_map, $args ) {
+	public static function processImport( $data, $demo_id, $demo_data, $term_id_map, $args, $post_id_map = array() ) {
 		global $wp_customize;
 
 		// Data checks.
@@ -125,6 +128,15 @@ class ThemeModsImporter {
 		// Loop through theme mods and update them.
 		foreach ( $data as $key => $value ) {
 			$mods[ $key ] = $value;
+		}
+
+		// `custom_logo` holds the demo's own attachment post ID, not a URL, so the
+		// image-URL rewriting above never touches it - it still points at the
+		// original demo site's ID (meaningless, or coincidentally wrong, here)
+		// unless it's remapped through the newly imported attachment's ID the same
+		// way `_thumbnail_id` is remapped after media import.
+		if ( ! empty( $mods['custom_logo'] ) && isset( $post_id_map[ $mods['custom_logo'] ] ) ) {
+			$mods['custom_logo'] = $post_id_map[ $mods['custom_logo'] ];
 		}
 
 		if ( ! empty( $args['custom_logo'] ) ) {
