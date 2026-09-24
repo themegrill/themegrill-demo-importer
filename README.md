@@ -19,3 +19,4 @@ Support requests in issues on this repository will be closed on sight.
 ## Contributing to Starter Templates & Sites Pack by ThemeGrill
 
 If you have a patch or have stumbled upon an issue with Starter Templates & Sites Pack by ThemeGrill, you can contribute this back to the code. Please read our [contributor guidelines](https://github.com/themegrill/themegrill-demo-importer/blob/master/.github/CONTRIBUTING.md) for more information how you can do this.
+<!-- test PR to verify tg-autopilot onboarding, will be closed after -->
