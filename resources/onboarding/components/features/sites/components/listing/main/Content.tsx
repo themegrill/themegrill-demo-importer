@@ -22,6 +22,18 @@ export enum MediaQuerySizes {
 	'2XL' = 1250,
 }
 
+// Mirrors the PHP-side slug derivation in Admin.php (`strtolower( trim( str_replace(
+// [' ', '_'], '-', $value ) ) )`) used to build both `builders[].id` and
+// `categories[].id`. A raw field like a demo's `pagebuilder` ("Beaver Builder") must
+// go through the same transform before comparing it against those ids, or multi-word
+// names never match (`.toLowerCase()` alone turns "Beaver Builder" into "beaver
+// builder", not "beaver-builder").
+const toSlug = (value: string): string =>
+	value
+		.toLowerCase()
+		.trim()
+		.replace(/[\s_]+/g, '-');
+
 // Helper function to get responsive columns
 const getResponsiveColumns = (width: number): number => {
 	if (width < MediaQuerySizes.MD) return 1;
@@ -73,9 +85,7 @@ const Content = ({ demos, builders, categories, handleRefetch, isRefetching }: C
 				if (selectedCategories.length === 0) {
 					return true;
 				}
-				const normalizedCategories = d.categories.map((cat) =>
-					cat.toLowerCase().replace(/\s+/g, '-'),
-				);
+				const normalizedCategories = d.categories.map(toSlug);
 				return selectedCategories.some((cat) => normalizedCategories.includes(cat));
 			})
 			.filter((d) => (search ? d.title.toLowerCase().indexOf(search.toLowerCase()) !== -1 : true));
@@ -85,7 +95,7 @@ const Content = ({ demos, builders, categories, handleRefetch, isRefetching }: C
 		if (!builder) {
 			return matchesIgnoringBuilder;
 		}
-		return matchesIgnoringBuilder.filter((d) => d.pagebuilder.toLowerCase() === builder);
+		return matchesIgnoringBuilder.filter((d) => toSlug(d.pagebuilder) === builder);
 	}, [matchesIgnoringBuilder, builder]);
 
 	// Other builder tabs that DO have matches for the current search/category filters -
@@ -95,8 +105,8 @@ const Content = ({ demos, builders, categories, handleRefetch, isRefetching }: C
 		if (newDemos.length > 0 || !builder) {
 			return [];
 		}
-		const idsWithResults = new Set(matchesIgnoringBuilder.map((d) => d.pagebuilder.toLowerCase()));
-		return builders.filter((b) => b.id !== builder && idsWithResults.has(b.id.toLowerCase()));
+		const idsWithResults = new Set(matchesIgnoringBuilder.map((d) => toSlug(d.pagebuilder)));
+		return builders.filter((b) => b.id !== builder && idsWithResults.has(toSlug(b.id)));
 	}, [newDemos.length, matchesIgnoringBuilder, builders, builder]);
 
 	const currentBuilderLabel = useMemo(
