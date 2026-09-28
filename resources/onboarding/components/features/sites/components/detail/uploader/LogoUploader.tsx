@@ -30,6 +30,16 @@ type MediaObject = {
 	filesizeInBytes?: number;
 };
 
+// `@wordpress/media-utils` ships a `.d.ts` for `MediaUpload` that omits its props
+// entirely (it types the component as `Component` with no props generic), so we
+// re-type it here to match the props it actually accepts at runtime.
+const TypedMediaUpload = MediaUpload as unknown as React.ComponentType<{
+	allowedTypes?: string[];
+	onSelect: (media: MediaObject) => void;
+	value?: number;
+	render: (args: { open: () => void }) => React.ReactElement;
+}>;
+
 const LogoUploader = ({ iframeRef, setSiteLogoId }: Props) => {
 	const [selectedLogo, setSelectedLogo] = useState<LogoData | null>(null);
 	const [logoBase64, setLogoBase64] = useState<string | null>(null);
@@ -122,7 +132,7 @@ const LogoUploader = ({ iframeRef, setSiteLogoId }: Props) => {
 								: 'opacity-0 translate-y-2 pointer-events-none'
 						}`}
 					>
-						<MediaUpload
+						<TypedMediaUpload
 							allowedTypes={['image']}
 							onSelect={handleLogoSelect}
 							value={selectedLogo.id}
@@ -212,7 +222,7 @@ const LogoUploader = ({ iframeRef, setSiteLogoId }: Props) => {
 			{selectedLogo ? (
 				renderSelectedLogo()
 			) : (
-				<MediaUpload
+				<TypedMediaUpload
 					allowedTypes={['image']}
 					onSelect={handleLogoSelect}
 					render={({ open }: { open: () => void }) => {
