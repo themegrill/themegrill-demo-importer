@@ -109,7 +109,7 @@ export async function importDemo(args: {
 	colorPalette: string[];
 	typography: string[];
 }) {
-	const response = await apiFetch<Response, false>({
+	const response = await apiFetch<Response>({
 		path: 'tg-demo-importer/v1/install?action=' + args.action,
 		method: 'POST',
 		data: {
