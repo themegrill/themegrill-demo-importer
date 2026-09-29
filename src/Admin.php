@@ -425,6 +425,9 @@ class Admin {
 				'colormag-01' => 'colormag-free-01',
 				'colormag-02' => 'colormag-free-02',
 			),
+			'spacious' => array(
+				'spacious-02' => 'spacious-free-02',
+			),
 		);
 
 		foreach ( $demos as $demo ) {
