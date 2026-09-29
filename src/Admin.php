@@ -425,6 +425,11 @@ class Admin {
 				'colormag-01' => 'colormag-free-01',
 				'colormag-02' => 'colormag-free-02',
 			),
+			'flash'    => array(
+				'flash'          => 'flash-default',
+				'flash-pro'      => 'flash-pro-default',
+				'flash-one-page' => 'flash-onepage',
+			),
 		);
 
 		foreach ( $demos as $demo ) {
