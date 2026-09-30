@@ -453,6 +453,15 @@ class Admin {
 				'estore'     => 'estore-free',
 				'estore-pro' => 'estore-pro-default',
 			),
+			'himalayas'  => array(
+				'himalayas' => 'himalayas-free',
+			),
+			'cenote'     => array(
+				'cenote' => 'cenote-free',
+			),
+			'ample'      => array(
+				'ample' => 'ample-free',
+			),
 		);
 
 		foreach ( $demos as $demo ) {
