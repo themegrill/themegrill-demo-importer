@@ -449,6 +449,10 @@ class Admin {
 			'radiate'    => array(
 				'radiate' => 'radiate-free',
 			),
+			'estore'     => array(
+				'estore'     => 'estore-free',
+				'estore-pro' => 'estore-pro-default',
+			),
 		);
 
 		foreach ( $demos as $demo ) {
