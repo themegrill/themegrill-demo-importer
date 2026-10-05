@@ -303,6 +303,7 @@ class MediaImporter {
 		delete_option( 'themegrill_demo_importer_featured_images' );
 		delete_option( 'themegrill_demo_importer_media_total' );
 		delete_option( 'themegrill_demo_importer_pending_attachments' );
+		delete_option( 'themegrill_demo_importer_previous_imported_posts' );
 	}
 
 	/**
@@ -336,7 +337,12 @@ class MediaImporter {
 	private function remap_foreign_elementor_media( array $url_remap ): void {
 		global $wpdb;
 
-		$imported_posts = get_option( 'themegrill_demo_importer_imported_posts', array() );
+		// Only posts imported by this run: the list also holds earlier imports (kept for
+		// cleanup), and their content must not be rewritten to this demo's attachments.
+		$imported_posts = array_diff(
+			array_map( 'intval', (array) get_option( 'themegrill_demo_importer_imported_posts', array() ) ),
+			array_map( 'intval', (array) get_option( 'themegrill_demo_importer_previous_imported_posts', array() ) )
+		);
 		if ( empty( $imported_posts ) ) {
 			return;
 		}
