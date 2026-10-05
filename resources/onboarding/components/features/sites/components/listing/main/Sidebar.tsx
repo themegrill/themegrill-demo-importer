@@ -1,6 +1,7 @@
 import { __ } from '@wordpress/i18n';
 import { ArrowRight, Search, X } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
+import AiEntryCard from '../../../../../../ai/components/AiEntryCard';
 import logo from '../../../../../../assets/images/starter-template-logo.png';
 import { PagebuilderCategory } from '../../../../../../lib/types';
 import { Route } from '../../../../../../routes';
@@ -130,6 +131,7 @@ const Sidebar = ({ builders, categories, theme }: Props) => {
 				</div>
 			</div>
 			<div className="flex flex-col gap-6 box-border px-6 pt-6 pb-10 overflow-y-auto tg-scrollbar">
+				<AiEntryCard />
 				<div>
 					<div className="flex gap-2 items-center mb-5">
 						<h3 className="text-[16px] text-[#1F1F1F] m-0">

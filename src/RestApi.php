@@ -2,6 +2,7 @@
 
 namespace ThemeGrill\Demo\Importer;
 
+use ThemeGrill\Demo\Importer\Controllers\AiController;
 use ThemeGrill\Demo\Importer\Controllers\ImportController;
 use ThemeGrill\Demo\Importer\Controllers\SiteController;
 use ThemeGrill\Demo\Importer\Traits\Singleton;
@@ -120,6 +121,53 @@ class RestApi {
 							'default' => false,
 						),
 					),
+				),
+			)
+		);
+
+		if ( defined( 'TDI_AI_API_BASE' ) && TDI_AI_API_BASE ) {
+			$this->register_ai_endpoints();
+		}
+	}
+
+	/**
+	 * Register the Build with AI proxy endpoints.
+	 */
+	private function register_ai_endpoints() {
+		$controller = new AiController();
+		$routes     = array(
+			'/ai/generate'           => 'generate',
+			'/ai/regenerate-section' => 'regenerate_section',
+			'/ai/switch-demo'        => 'switch_demo',
+			'/ai/apply'              => 'apply',
+		);
+
+		foreach ( $routes as $route => $method ) {
+			register_rest_route(
+				$this->namespace,
+				$route,
+				array(
+					array(
+						'methods'             => 'POST',
+						'callback'            => array( $controller, $method ),
+						'permission_callback' => function () {
+							return current_user_can( 'manage_options' );
+						},
+					),
+				)
+			);
+		}
+
+		register_rest_route(
+			$this->namespace,
+			'/ai/prepare-theme',
+			array(
+				array(
+					'methods'             => 'POST',
+					'callback'            => array( $controller, 'prepare_theme' ),
+					'permission_callback' => function () {
+						return current_user_can( 'install_themes' ) && current_user_can( 'switch_themes' );
+					},
 				),
 			)
 		);
