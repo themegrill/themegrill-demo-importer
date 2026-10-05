@@ -285,24 +285,27 @@ class ThemeModsImporter {
 	 * Finds the attachment this import already created for a demo image URL.
 	 *
 	 * Imported attachments keep the demo's original URL as their guid, so a theme mod
-	 * pointing at the same file (e.g. the transparent header logo) can reuse it.
+	 * pointing at the same file (e.g. the transparent header logo) can reuse it. The
+	 * complete URL, host and demo directory included, has to match; a path suffix alone
+	 * could pick a same-named file from another demo. Only the scheme is allowed to differ.
 	 *
-	 * @param  string $path Path portion of the demo image URL.
+	 * @param  string $url Demo image URL.
 	 * @return string Local attachment URL, or an empty string if none was imported.
 	 */
-	private static function find_imported_attachment_url( $path ) {
+	private static function find_imported_attachment_url( $url ) {
 		global $wpdb;
 
 		$imported = array_map( 'intval', (array) get_option( 'themegrill_demo_importer_imported_posts', array() ) );
-		if ( empty( $imported ) || '' === $path ) {
+		if ( empty( $imported ) || ! preg_match( '#^https?://(.+)$#i', $url, $matches ) ) {
 			return '';
 		}
 
 		$placeholders = implode( ',', array_fill( 0, count( $imported ), '%d' ) );
 		$attachment   = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.NotPrepared
 			$wpdb->prepare(
-				"SELECT ID FROM {$wpdb->posts} WHERE post_type = 'attachment' AND guid LIKE %s AND ID IN ($placeholders) LIMIT 1", // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
-				'%' . $wpdb->esc_like( $path ),
+				"SELECT ID FROM {$wpdb->posts} WHERE post_type = 'attachment' AND guid IN (%s, %s) AND ID IN ($placeholders) ORDER BY ID DESC LIMIT 1", // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
+				'https://' . $matches[1],
+				'http://' . $matches[1],
 				...$imported
 			)
 		);
@@ -330,7 +333,7 @@ class ThemeModsImporter {
 		$site_url = wp_parse_url( home_url() );
 
 		if ( ! empty( $parsed_url['host'] ) && $parsed_url['host'] !== $site_url['host'] ) {
-			$imported_url = self::find_imported_attachment_url( $parsed_url['path'] );
+			$imported_url = self::find_imported_attachment_url( $url );
 			if ( '' !== $imported_url ) {
 				return $imported_url;
 			}
