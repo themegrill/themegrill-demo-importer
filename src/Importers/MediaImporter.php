@@ -267,6 +267,7 @@ class MediaImporter {
 			}
 
 			$this->remap_panels_data_urls( $url_remap );
+			$this->remap_foreign_elementor_media( $url_remap );
 		}
 
 		// Update _thumbnail_id to point to newly imported attachment IDs.
@@ -302,6 +303,123 @@ class MediaImporter {
 		delete_option( 'themegrill_demo_importer_featured_images' );
 		delete_option( 'themegrill_demo_importer_media_total' );
 		delete_option( 'themegrill_demo_importer_pending_attachments' );
+	}
+
+	/**
+	 * Path of an uploads URL relative to the uploads directory, with any multisite
+	 * `sites/{id}/` segment removed, e.g. "2020/06/logo.png".
+	 *
+	 * @param  string $url Media URL.
+	 * @return string Empty when the URL isn't under an uploads directory.
+	 */
+	private function uploads_relative_path( string $url ): string {
+		$path = (string) wp_parse_url( $url, PHP_URL_PATH );
+		if ( ! preg_match( '#/uploads/(?:sites/\d+/)?(.+)$#', $path, $matches ) ) {
+			return '';
+		}
+
+		return $matches[1];
+	}
+
+	/**
+	 * Point images that still reference another host at the attachments this import created.
+	 *
+	 * Elementor data exported from the demo can reference an image through a different
+	 * host than the one the WXR attachment came from (a staging/sandbox site), and with
+	 * the old site's attachment ID as a string. Neither matches the URL remap or the ID
+	 * mapping, so the image stays hotlinked to a host that is often gone, or resolves to
+	 * whatever unrelated attachment happens to own that ID here. The file itself was
+	 * imported, so match it by its uploads-relative path and set both url and id.
+	 *
+	 * @param array $url_remap Map of old attachment URL => new local URL.
+	 */
+	private function remap_foreign_elementor_media( array $url_remap ): void {
+		global $wpdb;
+
+		$imported_posts = get_option( 'themegrill_demo_importer_imported_posts', array() );
+		if ( empty( $imported_posts ) ) {
+			return;
+		}
+
+		$by_path = array();
+		foreach ( $url_remap as $old_url => $new_url ) {
+			$relative = $this->uploads_relative_path( $old_url );
+			if ( '' !== $relative && ! isset( $by_path[ $relative ] ) ) {
+				$by_path[ $relative ] = $new_url;
+			}
+		}
+
+		if ( empty( $by_path ) ) {
+			return;
+		}
+
+		$ids          = array_map( 'intval', $imported_posts );
+		$placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
+		$rows         = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.NotPrepared
+			$wpdb->prepare(
+				"SELECT meta_id, meta_value FROM {$wpdb->postmeta} WHERE meta_key = '_elementor_data' AND post_id IN ($placeholders)", // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
+				...$ids
+			)
+		);
+
+		$local_host = wp_parse_url( home_url(), PHP_URL_HOST );
+
+		foreach ( $rows as $row ) {
+			$data = json_decode( $row->meta_value, true );
+			if ( ! is_array( $data ) ) {
+				continue;
+			}
+
+			$remapped = $this->remap_foreign_media_recursive( $data, $by_path, $local_host );
+			if ( $remapped === $data ) {
+				continue;
+			}
+
+			$wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+				$wpdb->postmeta,
+				array( 'meta_value' => wp_json_encode( $remapped ) ), // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
+				array( 'meta_id' => $row->meta_id )
+			);
+		}
+	}
+
+	/**
+	 * Recursively rewrite Elementor media controls ({ url, id }) that point at another host.
+	 *
+	 * @param array  $data       Decoded Elementor data (or a nested part of it).
+	 * @param array  $by_path    Map of uploads-relative path => new local URL.
+	 * @param string $local_host This site's host.
+	 * @return array
+	 */
+	private function remap_foreign_media_recursive( array $data, array $by_path, string $local_host ): array {
+		foreach ( $data as $key => $value ) {
+			if ( is_array( $value ) ) {
+				$data[ $key ] = $this->remap_foreign_media_recursive( $value, $by_path, $local_host );
+			}
+		}
+
+		if ( empty( $data['url'] ) || ! is_string( $data['url'] ) ) {
+			return $data;
+		}
+
+		$host = wp_parse_url( $data['url'], PHP_URL_HOST );
+		if ( ! $host || $host === $local_host ) {
+			return $data;
+		}
+
+		$relative = $this->uploads_relative_path( $data['url'] );
+		if ( '' === $relative || empty( $by_path[ $relative ] ) ) {
+			return $data;
+		}
+
+		$data['url'] = $by_path[ $relative ];
+
+		$attachment_id = attachment_url_to_postid( $data['url'] );
+		if ( $attachment_id ) {
+			$data['id'] = isset( $data['id'] ) && is_string( $data['id'] ) ? (string) $attachment_id : $attachment_id;
+		}
+
+		return $data;
 	}
 
 	/**
