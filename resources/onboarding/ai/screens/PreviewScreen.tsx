@@ -6,6 +6,7 @@ import { cn } from '../../lib/utils';
 import { outlineButtonClass, primaryButtonClass } from '../components/fields';
 import BrandPanel from '../components/preview/BrandPanel';
 import DesignPanel from '../components/preview/DesignPanel';
+import RemovedSections from '../components/preview/RemovedSections';
 import SectionCard from '../components/preview/SectionCard';
 import { useGoogleFonts } from '../components/preview/useGoogleFonts';
 import { getImportPackage } from '../rebrand';
@@ -104,6 +105,7 @@ const PreviewScreen = () => {
 							</p>
 						)}
 					</div>
+					{page && <RemovedSections key={page.slug} page={page} generationId={pkg.id} />}
 
 					{switching && (
 						<div className="absolute inset-0 flex items-start justify-center pt-24 bg-white/70" role="status">

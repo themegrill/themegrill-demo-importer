@@ -21,6 +21,9 @@ const ROLE_LABELS: Record<string, string> = {
 	cta: __('Call to action', 'themegrill-demo-importer'),
 	contact: __('Contact', 'themegrill-demo-importer'),
 	pricing: __('Pricing', 'themegrill-demo-importer'),
+	logos: __('Logos', 'themegrill-demo-importer'),
+	stats: __('Stats', 'themegrill-demo-importer'),
+	posts: __('Blog posts', 'themegrill-demo-importer'),
 	dynamic: __('Dynamic content', 'themegrill-demo-importer'),
 };
 

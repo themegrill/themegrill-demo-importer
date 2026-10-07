@@ -6,6 +6,7 @@ import { getFriendlyImportErrorMessage } from '../../components/features/api/imp
 import { Demo } from '../../lib/types';
 import { getAiConfig } from '../config';
 import { ApplyPayload } from '../rebrand';
+import { BrandPalette } from '../types';
 
 // restUrl is ".../tg-demo-importer/v1/ai/"; the plugin namespace is one level up.
 const routeUrl = (route: string, query: Record<string, string> = {}) => {
@@ -30,7 +31,7 @@ const call = async <T>(method: 'GET' | 'POST', route: string, body?: unknown, qu
 		throw new Error(`Request failed (${response.status} ${response.statusText}): ${text.slice(0, 300)}`);
 	}
 	if (!response.ok) {
-		throw new Error(json?.message || `Request failed (${response.status} ${response.statusText})`);
+		throw new Error(json?.message || json?.error?.message || `Request failed (${response.status} ${response.statusText})`);
 	}
 	return json as T;
 };
@@ -71,3 +72,6 @@ export const runImportAction = (action: ImportAction, demo: Demo, plugins: strin
 	);
 
 export const applySite = (payload: ApplyPayload) => call<{ updated: number }>('POST', 'ai/apply', payload);
+
+export const getColorMap = (demoSlug: string, palette: BrandPalette) =>
+	call<{ colorMap: Record<string, string> }>('POST', 'ai/color-map', { demoSlug, palette }).then((r) => r.colorMap);

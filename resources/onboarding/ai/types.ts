@@ -54,12 +54,24 @@ export type Section = {
 	title?: string;
 	kinds?: Record<string, string>;
 	fixed?: string[]; // Text kept as designed (stats, prices, contact details).
+	index?: number; // Position on the demo page, for putting restored sections back in order.
+};
+
+// A section group the backend left out because it doesn't fit the business.
+// `sections` hold template copy until restored (restoring regenerates it).
+export type RemovedGroup = {
+	groupId: string;
+	title: string;
+	reason: string;
+	sections: Section[];
+	restored?: boolean;
 };
 
 export type GeneratedPage = {
 	slug: string;
 	title: string;
 	sections: Section[];
+	removed?: RemovedGroup[];
 };
 
 export type GenerationPackage = {

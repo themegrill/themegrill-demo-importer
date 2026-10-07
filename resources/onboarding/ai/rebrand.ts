@@ -2,49 +2,31 @@
 // needs: a rebranded demo config for the existing import steps, and the
 // payload for the AI apply step that patches the imported pages.
 import { Demo } from '../lib/types';
-import { BrandKit, BrandPalette, GenerationPackage, isImageSlot } from './types';
+import { BrandKit, GenerationPackage, isImageSlot } from './types';
 
 type SlotLocation = { path: string; block: string; attr: string; inHtml?: boolean };
 
 export type ImportPackage = {
 	version: number;
 	demoSlug: string;
-	pages: { slug: string; demoPageSlug: string; slots: Record<string, SlotLocation> }[];
-	demoColors: { hex: string; role: 'primary' | 'secondary' | 'accent' }[];
+	pages: {
+		slug: string;
+		demoPageSlug: string;
+		slots: Record<string, SlotLocation>;
+		groups?: Record<string, string[]>; // Removed group id -> its top-level block paths.
+	}[];
 	demoFonts: Record<string, 'heading' | 'body'>;
 };
 
 // Mock packages carry no import data; only live ones can be imported.
 export const getImportPackage = (pkg: GenerationPackage): ImportPackage | null => {
 	const ip = pkg.importPackage as Partial<ImportPackage>;
-	return ip && typeof ip.demoSlug === 'string' && Array.isArray(ip.pages) && Array.isArray(ip.demoColors)
+	return ip && typeof ip.demoSlug === 'string' && Array.isArray(ip.pages) && !!ip.demoFonts
 		? (ip as ImportPackage)
 		: null;
 };
 
-// ---- Colors (same mapping as the backend: palette hue, demo lightness) ----
-
-const toHsl = (hex: string) => {
-	const n = parseInt(hex.slice(1, 7), 16);
-	const [r, g, b] = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map((v) => v / 255) as [number, number, number];
-	const max = Math.max(r, g, b);
-	const min = Math.min(r, g, b);
-	const l = (max + min) / 2;
-	const d = max - min;
-	if (!d) return { h: 0, s: 0, l };
-	const s = d / (1 - Math.abs(2 * l - 1));
-	const h = ((max === r ? ((g - b) / d) % 6 : max === g ? (b - r) / d + 2 : (r - g) / d + 4) * 60 + 360) % 360;
-	return { h, s, l };
-};
-
-const toHex = ({ h, s, l }: { h: number; s: number; l: number }) => {
-	const c = (1 - Math.abs(2 * l - 1)) * s;
-	const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
-	const m = l - c / 2;
-	const [r, g, b] =
-		h < 60 ? [c, x, 0] : h < 120 ? [x, c, 0] : h < 180 ? [0, c, x] : h < 240 ? [0, x, c] : h < 300 ? [x, 0, c] : [c, 0, x];
-	return '#' + [r, g, b].map((v) => Math.round((v + m) * 255).toString(16).padStart(2, '0')).join('');
-};
+// ---- Colors and fonts (the color map comes from the backend's /api/color-map) ----
 
 const normalizeHex = (value: string): string | null => {
 	const v = value.trim().toLowerCase();
@@ -54,15 +36,6 @@ const normalizeHex = (value: string): string | null => {
 	}
 	const rgb = v.match(/^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
 	return rgb ? '#' + [rgb[1], rgb[2], rgb[3]].map((n) => Number(n).toString(16).padStart(2, '0')).join('') : null;
-};
-
-export const buildColorMap = (ip: ImportPackage, palette: BrandPalette): Record<string, string> => {
-	const map: Record<string, string> = {};
-	for (const { hex, role } of ip.demoColors) {
-		const { h, s } = toHsl(palette[role] ?? palette.primary);
-		map[hex] = toHex({ h, s, l: toHsl(hex).l });
-	}
-	return map;
 };
 
 export const buildFontMap = (ip: ImportPackage, fonts: BrandKit['fonts']): Record<string, string> =>
@@ -119,21 +92,27 @@ export type ApplyPayload = {
 		demoPageId: number;
 		demoPageSlug: string;
 		slots: { path: string; attr: string; inHtml: boolean; text?: string; image?: string }[];
+		removeBlocks: string[]; // Top-level blocks of groups still removed.
 	}[];
 };
 
-export const buildApplyPayload = (pkg: GenerationPackage, ip: ImportPackage, demo: Demo): ApplyPayload => ({
+export const buildApplyPayload = (
+	pkg: GenerationPackage,
+	ip: ImportPackage,
+	demo: Demo,
+	colorMap: Record<string, string>,
+): ApplyPayload => ({
 	siteTitle: pkg.brand.siteTitle,
 	tagline: pkg.brand.tagline,
-	colorMap: buildColorMap(ip, pkg.brand.palette),
+	colorMap,
 	fontMap: buildFontMap(ip, pkg.brand.fonts),
 	pages: ip.pages.map((page) => {
-		const values = new Map(
-			(pkg.pages.find((p) => p.slug === page.slug)?.sections ?? []).flatMap((s) => Object.entries(s.slots)),
-		);
+		const generated = pkg.pages.find((p) => p.slug === page.slug);
+		const values = new Map((generated?.sections ?? []).flatMap((s) => Object.entries(s.slots)));
 		return {
 			demoPageId: demo.pages.find((p) => p.slug === page.demoPageSlug)?.id ?? 0,
 			demoPageSlug: page.demoPageSlug,
+			removeBlocks: (generated?.removed ?? []).filter((r) => !r.restored).flatMap((r) => page.groups?.[r.groupId] ?? []),
 			slots: Object.entries(page.slots).flatMap(([id, location]) => {
 				const value = values.get(id);
 				if (value === undefined) return [];

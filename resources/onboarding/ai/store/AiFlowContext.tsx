@@ -21,6 +21,8 @@ export type AiFlowAction =
 	| { type: 'SET_ERROR'; error: AiApiError | null }
 	| { type: 'UPDATE_SLOT'; page: string; sectionId: string; slotId: string; value: SlotValue }
 	| { type: 'REPLACE_SECTION'; page: string; section: Section }
+	// Bring a removed group back (with freshly written sections) or leave it out again.
+	| { type: 'SET_GROUP_RESTORED'; page: string; groupId: string; restored: boolean; sections?: Section[] }
 	| { type: 'UPDATE_BRAND'; patch: Partial<Omit<BrandKit, 'palette' | 'fonts'>> & {
 			palette?: Partial<BrandKit['palette']>;
 			fonts?: Partial<BrandKit['fonts']>;
@@ -77,6 +79,27 @@ const reducer = (state: AiFlowState, action: AiFlowAction): AiFlowState => {
 			return updateSections(state, action.page, (section) =>
 				section.id === action.section.id ? action.section : section,
 			);
+		case 'SET_GROUP_RESTORED': {
+			if (!state.pkg) return state;
+			const pages = state.pkg.pages.map((p) => {
+				const group = p.removed?.find((r) => r.groupId === action.groupId);
+				if (p.slug !== action.page || !group) return p;
+				const ids = new Set(group.sections.map((s) => s.id));
+				// Leaving it out again keeps any edits for the next restore.
+				const sections = action.restored
+					? [...p.sections, ...(action.sections ?? group.sections)].sort((a, b) => (a.index ?? 0) - (b.index ?? 0))
+					: p.sections.filter((s) => !ids.has(s.id));
+				const groupSections = action.restored ? action.sections ?? group.sections : p.sections.filter((s) => ids.has(s.id));
+				return {
+					...p,
+					sections,
+					removed: p.removed!.map((r) =>
+						r.groupId === action.groupId ? { ...r, restored: action.restored, sections: groupSections } : r,
+					),
+				};
+			});
+			return { ...state, pkg: { ...state.pkg, pages } };
+		}
 		case 'UPDATE_BRAND': {
 			if (!state.pkg) return state;
 			const { palette, fonts, ...rest } = action.patch;

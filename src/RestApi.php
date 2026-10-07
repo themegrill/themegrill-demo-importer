@@ -140,6 +140,7 @@ class RestApi {
 			'/ai/regenerate-section' => 'regenerate_section',
 			'/ai/switch-demo'        => 'switch_demo',
 			'/ai/apply'              => 'apply',
+			'/ai/color-map'          => 'color_map',
 		);
 
 		foreach ( $routes as $route => $method ) {

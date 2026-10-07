@@ -89,6 +89,31 @@ class AiController {
 	}
 
 	/**
+	 * Map the demo's colors to an edited brand palette.
+	 *
+	 * @since 2.2.0
+	 *
+	 * @param WP_REST_Request $request Request.
+	 * @return WP_REST_Response
+	 */
+	public function color_map( $request ) {
+		$params  = $request->get_json_params();
+		$palette = array();
+		foreach ( array( 'primary', 'secondary', 'accent', 'text', 'background' ) as $key ) {
+			$value           = isset( $params['palette'][ $key ] ) ? (string) $params['palette'][ $key ] : '';
+			$palette[ $key ] = (string) sanitize_hex_color( $value );
+		}
+
+		return $this->forward(
+			'/api/color-map',
+			array(
+				'demoSlug' => sanitize_key( isset( $params['demoSlug'] ) ? (string) $params['demoSlug'] : '' ),
+				'palette'  => $palette,
+			)
+		);
+	}
+
+	/**
 	 * Install and activate the theme the AI demos are built on.
 	 *
 	 * @since 2.2.0
@@ -153,10 +178,12 @@ class AiController {
 					'image'  => isset( $slot['image'] ) ? esc_url_raw( (string) $slot['image'] ) : null,
 				);
 			}
-			$pages[] = array(
+			$remove_blocks = isset( $page['removeBlocks'] ) ? array_map( 'strval', (array) $page['removeBlocks'] ) : array();
+			$pages[]       = array(
 				'demoPageId'   => absint( $page['demoPageId'] ?? 0 ),
 				'demoPageSlug' => sanitize_title( (string) ( $page['demoPageSlug'] ?? '' ) ),
 				'slots'        => $slots,
+				'removeBlocks' => array_map( 'absint', preg_grep( '/^\d+$/', $remove_blocks ) ),
 			);
 		}
 

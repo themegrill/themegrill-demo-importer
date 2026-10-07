@@ -84,7 +84,7 @@ class AiSiteService {
 	 *
 	 * @since 2.2.0
 	 *
-	 * @param array $payload Sanitized payload: siteTitle, tagline, colorMap, fontMap, pages.
+	 * @param array $payload Sanitized payload: siteTitle, tagline, colorMap, fontMap, pages (slots, removeBlocks).
 	 * @return array Number of pages updated.
 	 */
 	public function apply( array $payload ) {
@@ -92,11 +92,13 @@ class AiSiteService {
 		$post_map  = isset( $mapping['post'] ) ? (array) $mapping['post'] : array();
 		$url_remap = (array) get_option( 'themegrill_demo_importer_url_remap', array() );
 
-		$slots_by_post = array();
+		$slots_by_post  = array();
+		$remove_by_post = array();
 		foreach ( $payload['pages'] as $page ) {
 			$post_id = $this->find_page( $page, $post_map );
 			if ( $post_id ) {
-				$slots_by_post[ $post_id ] = $page['slots'];
+				$slots_by_post[ $post_id ]  = $page['slots'];
+				$remove_by_post[ $post_id ] = $page['removeBlocks'];
 			}
 		}
 
@@ -113,6 +115,10 @@ class AiSiteService {
 			$blocks = parse_blocks( $post->post_content );
 			foreach ( isset( $slots_by_post[ $post_id ] ) ? $slots_by_post[ $post_id ] : array() as $slot ) {
 				$blocks = $this->apply_slot( $blocks, $slot, $url_remap );
+			}
+			// Slot paths index the original page, so sections are removed only after every slot is applied.
+			if ( ! empty( $remove_by_post[ $post_id ] ) ) {
+				$blocks = $this->remove_top_blocks( $blocks, $remove_by_post[ $post_id ] );
 			}
 			$blocks  = $this->rebrand_blocks( $blocks, $payload['colorMap'], $payload['fontMap'] );
 			$content = serialize_blocks( $blocks );
@@ -196,6 +202,42 @@ class AiSiteService {
 	}
 
 	/**
+	 * Array keys of the named blocks in a list, skipping freeform whitespace.
+	 *
+	 * @param array $blocks Parsed blocks.
+	 * @return array
+	 */
+	private function named_keys( array $blocks ) {
+		$keys = array();
+		foreach ( $blocks as $key => $block ) {
+			if ( ! empty( $block['blockName'] ) ) {
+				$keys[] = $key;
+			}
+		}
+
+		return $keys;
+	}
+
+	/**
+	 * Remove top-level blocks by their index among named blocks.
+	 *
+	 * @param array $blocks  Parsed top-level blocks.
+	 * @param int[] $indexes Named-block indexes to remove.
+	 * @return array
+	 */
+	private function remove_top_blocks( array $blocks, array $indexes ) {
+		$named = $this->named_keys( $blocks );
+
+		foreach ( $indexes as $index ) {
+			if ( isset( $named[ $index ] ) ) {
+				unset( $blocks[ $named[ $index ] ] );
+			}
+		}
+
+		return array_values( $blocks );
+	}
+
+	/**
 	 * Update the block at a path of named-block indexes.
 	 *
 	 * @param array    $blocks  Blocks at this level.
@@ -205,14 +247,7 @@ class AiSiteService {
 	 */
 	private function update_at( array $blocks, array $indexes, callable $update ) {
 		$index = array_shift( $indexes );
-		$named = array_keys(
-			array_filter(
-				$blocks,
-				function ( $block ) {
-					return ! empty( $block['blockName'] );
-				}
-			)
-		);
+		$named = $this->named_keys( $blocks );
 
 		if ( ! isset( $named[ $index ] ) ) {
 			return $blocks;

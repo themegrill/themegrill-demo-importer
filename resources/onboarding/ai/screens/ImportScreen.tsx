@@ -7,9 +7,9 @@ import { Progress } from '../../components/ui/Progress';
 import { Demo } from '../../lib/types';
 import { cn } from '../../lib/utils';
 import { useLocalizedData } from '../../LocalizedDataContext';
-import { applySite, friendlyError, getDemoConfig, ImportAction, prepareTheme, runImportAction } from '../api/site';
+import { applySite, friendlyError, getColorMap, getDemoConfig, ImportAction, prepareTheme, runImportAction } from '../api/site';
 import { outlineButtonClass, primaryButtonClass } from '../components/fields';
-import { buildApplyPayload, buildColorMap, buildFontMap, getImportPackage, rebrandDemoConfig } from '../rebrand';
+import { buildApplyPayload, buildFontMap, getImportPackage, rebrandDemoConfig } from '../rebrand';
 import { useAiFlow } from '../store/AiFlowContext';
 
 type Step = { key: 'prepare-theme' | ImportAction | 'apply'; label: string; weight: number };
@@ -71,22 +71,20 @@ const ImportScreen = () => {
 		setProgress(0);
 		dispatch({ type: 'SET_STAGE', stage: 'importing' });
 
-		const brandedDemo = rebrandDemoConfig(
-			config,
-			buildColorMap(ip, pkg.brand.palette),
-			buildFontMap(ip, pkg.brand.fonts),
-			pkg.brand,
-		);
 		const selectedPlugins = plugins.map(([path]) => path).filter((path) => !deselected.includes(path));
 		let done = 0;
 
 		try {
+			// The palette may have been edited in the preview; the backend owns the mapping.
+			const colorMap = await getColorMap(pkg.demo.slug, pkg.brand.palette);
+			const brandedDemo = rebrandDemoConfig(config, colorMap, buildFontMap(ip, pkg.brand.fonts), pkg.brand);
+
 			for (const step of STEPS) {
 				setCurrent(step.key);
 				if (step.key === 'prepare-theme') {
 					await prepareTheme();
 				} else if (step.key === 'apply') {
-					await applySite(buildApplyPayload(pkg, ip, config));
+					await applySite(buildApplyPayload(pkg, ip, config, colorMap));
 				} else if (BATCHED.includes(step.key)) {
 					for (;;) {
 						const batch = await runImportAction(step.key as ImportAction, brandedDemo, selectedPlugins);
