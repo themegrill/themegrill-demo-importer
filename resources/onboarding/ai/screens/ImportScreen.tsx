@@ -7,7 +7,7 @@ import { Progress } from '../../components/ui/Progress';
 import { Demo } from '../../lib/types';
 import { cn } from '../../lib/utils';
 import { useLocalizedData } from '../../LocalizedDataContext';
-import { applySite, friendlyError, getColorMap, getDemoConfig, ImportAction, prepareTheme, runImportAction } from '../api/site';
+import { applySite, friendlyError, getColorMaps, getDemoConfig, ImportAction, prepareTheme, runImportAction } from '../api/site';
 import { outlineButtonClass, primaryButtonClass } from '../components/fields';
 import { buildApplyPayload, buildFontMap, getImportPackage, rebrandDemoConfig } from '../rebrand';
 import { useAiFlow } from '../store/AiFlowContext';
@@ -76,15 +76,15 @@ const ImportScreen = () => {
 
 		try {
 			// The palette may have been edited in the preview; the backend owns the mapping.
-			const colorMap = await getColorMap(pkg.demo.slug, pkg.brand.palette);
-			const brandedDemo = rebrandDemoConfig(config, colorMap, buildFontMap(ip, pkg.brand.fonts), pkg.brand);
+			const colorMaps = await getColorMaps(pkg.demo.slug, pkg.brand.palette);
+			const brandedDemo = rebrandDemoConfig(config, colorMaps.theme, buildFontMap(ip, pkg.brand.fonts), pkg.brand);
 
 			for (const step of STEPS) {
 				setCurrent(step.key);
 				if (step.key === 'prepare-theme') {
 					await prepareTheme();
 				} else if (step.key === 'apply') {
-					await applySite(buildApplyPayload(pkg, ip, config, colorMap));
+					await applySite(buildApplyPayload(pkg, ip, config, colorMaps.blocks));
 				} else if (BATCHED.includes(step.key)) {
 					for (;;) {
 						const batch = await runImportAction(step.key as ImportAction, brandedDemo, selectedPlugins);

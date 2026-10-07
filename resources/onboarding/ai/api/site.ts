@@ -73,5 +73,9 @@ export const runImportAction = (action: ImportAction, demo: Demo, plugins: strin
 
 export const applySite = (payload: ApplyPayload) => call<{ updated: number }>('POST', 'ai/apply', payload);
 
-export const getColorMap = (demoSlug: string, palette: BrandPalette) =>
-	call<{ colorMap: Record<string, string> }>('POST', 'ai/color-map', { demoSlug, palette }).then((r) => r.colorMap);
+// Two maps: page blocks, and theme settings (contrast is checked for each).
+export const getColorMaps = (demoSlug: string, palette: BrandPalette) =>
+	call<{ colorMap: Record<string, string>; themeColorMap?: Record<string, string> }>('POST', 'ai/color-map', {
+		demoSlug,
+		palette,
+	}).then((r) => ({ blocks: r.colorMap, theme: r.themeColorMap ?? r.colorMap }));
