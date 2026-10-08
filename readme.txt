@@ -42,6 +42,7 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 * Fix - Prevent a fatal error when another active plugin uses a newer psr/log version than Demo Importer.
 * Fix - WooCommerce product categories import issue.
 * Fix - Demo's own Sample Page and Privacy Policy duplicating WordPress's default pages.
+* Fix - Flash, WebShop, Kirana, Gizmo, Skincare, Accelerate, Radiate, eStore, Himalayas, Cenote, and Ample template thumbnails not loading in the Starter Templates gallery.
 * Tweak - Run post-import hooks only when the demo requires them.
 
 = 2.1.2 - 31-07-2026 =
