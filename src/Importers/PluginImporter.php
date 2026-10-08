@@ -220,6 +220,27 @@ class PluginImporter {
 		if ( is_wp_error( $api ) ) {
 			$this->logger->warning( 'Failed to fetch plugin info from from WordPress.org for ' . $pg[0] . ': ' . $api->get_error_message(), [ 'end_time' => true ] );
 
+			/**
+			 * A plugin permanently removed from WordPress.org (policy violation,
+			 * security issue, etc.) surfaces here as `plugins_api_failed` with the
+			 * literal message "closed" - `plugins_api()` passes the API's own
+			 * `{"error":"closed",...}` response straight through. Retrying can
+			 * never succeed for this one, unlike a transient network failure, so
+			 * skip it instead of failing the whole import over a plugin the demo
+			 * doesn't strictly need to still be there for.
+			 */
+			if ( 'closed' === $api->get_error_message() ) {
+				$this->logger->info( $pg[0] . ' is closed on WordPress.org, skipping.', array( 'end_time' => true ) );
+
+				$results[ $pg[0] ] = array(
+					'status'  => 'skipped',
+					/* translators: %s: Plugin slug. */
+					'message' => sprintf( __( '%s is no longer available on WordPress.org and was skipped.', 'themegrill-demo-importer' ), $pg[0] ),
+				);
+
+				return $results;
+			}
+
 			$results[ $pg[0] ] = array(
 				'status'  => 'error',
 				'message' => $api->get_error_message(),
