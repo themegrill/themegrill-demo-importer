@@ -281,6 +281,48 @@ class ThemeModsImporter {
 		return $new_value;
 	}
 
+	/**
+	 * Finds the attachment this import already created for a demo image URL.
+	 *
+	 * Imported attachments keep the demo's original URL as their guid, so a theme mod
+	 * pointing at the same file (e.g. the transparent header logo) can reuse it. The
+	 * complete URL, host and demo directory included, has to match; a path suffix alone
+	 * could pick a same-named file from another demo. Only the scheme is allowed to differ.
+	 *
+	 * @param  string $url Demo image URL.
+	 * @return string Local attachment URL, or an empty string if none was imported.
+	 */
+	private static function find_imported_attachment_url( $url ) {
+		global $wpdb;
+
+		$imported = array_map( 'intval', (array) get_option( 'themegrill_demo_importer_imported_posts', array() ) );
+		if ( empty( $imported ) || ! preg_match( '#^https?://(.+)$#i', $url, $matches ) ) {
+			return '';
+		}
+
+		$placeholders = implode( ',', array_fill( 0, count( $imported ), '%d' ) );
+		$attachment   = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.NotPrepared
+			$wpdb->prepare(
+				"SELECT ID FROM {$wpdb->posts} WHERE post_type = 'attachment' AND guid IN (%s, %s) AND ID IN ($placeholders) ORDER BY ID DESC LIMIT 1", // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
+				'https://' . $matches[1],
+				'http://' . $matches[1],
+				...$imported
+			)
+		);
+
+		return $attachment ? (string) wp_get_attachment_url( $attachment ) : '';
+	}
+
+	/**
+	 * Resolves a demo image URL from a theme mod to a file that exists on this site.
+	 *
+	 * Reuses the attachment imported with the demo when there is one, otherwise
+	 * side-loads the file into the Media Library. The old string-only rewrite is kept
+	 * as the last resort, which only works if a same-named upload happens to exist.
+	 *
+	 * @param  string $url Demo image URL.
+	 * @return string
+	 */
 	private static function replace_image_host( $url ) {
 		$parsed_url = wp_parse_url( $url );
 
@@ -289,6 +331,19 @@ class ThemeModsImporter {
 		}
 
 		$site_url = wp_parse_url( home_url() );
+
+		if ( ! empty( $parsed_url['host'] ) && $parsed_url['host'] !== $site_url['host'] ) {
+			$imported_url = self::find_imported_attachment_url( $url );
+			if ( '' !== $imported_url ) {
+				return $imported_url;
+			}
+
+			$sideloaded_url = WidgetsImporter::sideload_widget_image( $url );
+			if ( $sideloaded_url !== $url ) {
+				return $sideloaded_url;
+			}
+		}
+
 		$path     = $parsed_url['path'];
 		$path     = preg_replace( '/\/sites\/\d+/', '', $path );
 		$path     = preg_replace( '/^\/[^\/]+/', '', $path );
