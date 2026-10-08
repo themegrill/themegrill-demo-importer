@@ -990,6 +990,10 @@ class WXRImporter extends WP_Importer {
 	 * @param int $post_id Menu item post ID.
 	 */
 	protected function remap_menu_item_url( $post_id ) {
+		if ( empty( $this->base_blog_url ) ) {
+			return;
+		}
+
 		$url = get_post_meta( $post_id, '_menu_item_url', true );
 		if ( empty( $url ) ) {
 			return;
@@ -1000,9 +1004,12 @@ class WXRImporter extends WP_Importer {
 			return;
 		}
 
+		// Only remap links that pointed back at the demo's own site (e.g. a
+		// hardcoded "Home" link). Any other host - a genuine external link such
+		// as a social profile URL - must be left exactly as exported.
 		$host      = preg_replace( '/^www\./i', '', strtolower( $parsed['host'] ) );
-		$site_host = preg_replace( '/^www\./i', '', strtolower( (string) wp_parse_url( home_url(), PHP_URL_HOST ) ) );
-		if ( $host === $site_host ) {
+		$base_host = preg_replace( '/^www\./i', '', strtolower( (string) wp_parse_url( $this->base_blog_url, PHP_URL_HOST ) ) );
+		if ( $host !== $base_host ) {
 			return;
 		}
 
