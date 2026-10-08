@@ -1905,6 +1905,11 @@ class WXRImporter extends WP_Importer {
 			if ( $existing_page ) {
 				$this->exists['post'][ $exists_key ] = $existing_page->ID;
 
+				// Map the original ID so menu items and demo options resolve to the existing page.
+				if ( ! empty( $data['post_id'] ) ) {
+					$this->mapping['post'][ (int) $data['post_id'] ] = (int) $existing_page->ID;
+				}
+
 				return $existing_page->ID;
 			}
 		}
