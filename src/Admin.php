@@ -426,6 +426,7 @@ class Admin {
 				'colormag-02' => 'colormag-free-02',
 			),
 			'spacious' => array(
+				'spacious'    => 'spacious-free',
 				'spacious-02' => 'spacious-free-02',
 			),
 		);
