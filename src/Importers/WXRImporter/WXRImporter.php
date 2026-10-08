@@ -1906,7 +1906,11 @@ class WXRImporter extends WP_Importer {
 
 			// The default pages are created in the site's language, the demo's are English.
 			if ( ! $existing_page ) {
-				$existing_page = $this->get_page_by_title( __( $data['post_title'] ) ); // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText,WordPress.WP.I18n.MissingArgDomain -- Core's own translation of its default page title.
+				$localized_title = $this->get_core_page_title( $data['post_title'] );
+
+				if ( $localized_title !== $data['post_title'] ) {
+					$existing_page = $this->get_page_by_title( $localized_title );
+				}
 			}
 
 			if ( $existing_page ) {
@@ -1935,6 +1939,30 @@ class WXRImporter extends WP_Importer {
 		$this->exists['post'][ $exists_key ] = $exists;
 
 		return $exists;
+	}
+
+	/**
+	 * Translate one of core's default page titles into the site's language.
+	 *
+	 * @param string $title English page title as exported by the demo.
+	 * @return string Site-language title, or the original when it cannot be translated.
+	 */
+	protected function get_core_page_title( $title ) {
+		$locale = determine_locale();
+
+		if ( 'en_US' === $locale ) {
+			return $title;
+		}
+
+		// "Sample Page" ships only in admin-{locale}.mo, which WordPress does not load
+		// on the REST request the import runs through, so load it before translating.
+		static $loaded = array();
+
+		if ( ! isset( $loaded[ $locale ] ) ) {
+			$loaded[ $locale ] = load_textdomain( 'default', WP_LANG_DIR . '/admin-' . $locale . '.mo', $locale );
+		}
+
+		return __( $title ); // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText,WordPress.WP.I18n.MissingArgDomain -- Core's own translation of its own default page title.
 	}
 
 	/**
