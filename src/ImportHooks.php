@@ -11,13 +11,6 @@ use WP_REST_Request;
 class ImportHooks {
 	use Singleton;
 
-	/**
-	 * Zakra layout theme mods exported with the demo, re-applied after the theme migration.
-	 *
-	 * @var array
-	 */
-	protected $imported_layout_mods = array();
-
 	protected function init() {
 		add_action( 'admin_init', array( $this, 'tg_update_demo_importer_options' ) );
 
@@ -36,7 +29,7 @@ class ImportHooks {
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'regenerate_elementor_styles' ), 10, 2 );
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_masteriyo_data' ), 10, 2 );
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'refresh_masteriyo_content_flags' ), 20, 2 );
-		add_action( 'themegrill_ajax_demo_imported', array( $this, 'restore_zakra_layout_mods' ), 30 );
+		add_action( 'themegrill_ajax_demo_imported', array( $this, 'restore_zakra_layout_mods' ), 35 );
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_magazine_blocks_settings' ), 10, 2 );
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_blockart_blocks_settings' ), 10, 2 );
 		add_action( 'themegrill_ajax_demo_imported', array( $this, 'update_elementor_settings' ), 10, 2 );
@@ -243,10 +236,6 @@ class ImportHooks {
 		$theme_mods = get_option( 'themegrill_starter_template_theme_mods', array() );
 		foreach ( $theme_mods as $key => $value ) {
 			set_theme_mod( $key, $value );
-
-			if ( preg_match( '/^zakra_(?:global|blog|single_page|single_post|others_page|woocommerce_global|woocommerce_page|single_product)_(?:sidebar|container)_layout$/', $key ) ) {
-				$this->imported_layout_mods[ $key ] = $value;
-			}
 		}
 		delete_option( 'themegrill_starter_template_theme_mods' );
 	}
@@ -260,11 +249,15 @@ class ImportHooks {
 	 * @since 2.1.4
 	 */
 	public function restore_zakra_layout_mods() {
-		foreach ( $this->imported_layout_mods as $key => $value ) {
-			set_theme_mod( $key, $value );
+		$layout_mods = get_option( 'themegrill_starter_template_layout_mods', array() );
+
+		if ( is_array( $layout_mods ) ) {
+			foreach ( $layout_mods as $key => $value ) {
+				set_theme_mod( $key, $value );
+			}
 		}
 
-		$this->imported_layout_mods = array();
+		delete_option( 'themegrill_starter_template_layout_mods' );
 	}
 
 	/**
@@ -273,6 +266,7 @@ class ImportHooks {
 	 * The flag is first written on save, before the page builder data exists, and the
 	 * demo's own copy is then added as a second row. Masteriyo reads the first row, so
 	 * pages with course widgets are treated as having none and skip the Masteriyo styles.
+	 * Only posts imported by the current demo are touched.
 	 *
 	 * @since 2.1.4
 	 *
@@ -284,13 +278,21 @@ class ImportHooks {
 			return;
 		}
 
+		$mapping      = get_option( 'themegrill_demo_importer_mapping', array() );
+		$imported_ids = ! empty( $mapping['post'] ) && is_array( $mapping['post'] ) ? array_map( 'absint', array_values( $mapping['post'] ) ) : array();
+
+		if ( empty( $imported_ids ) ) {
+			return;
+		}
+
 		$post_ids = get_posts(
 			array(
-				'post_type'      => 'any',
+				'post__in'       => $imported_ids,
+				'post_type'      => get_post_types(),
 				'post_status'    => 'any',
-				'posts_per_page' => -1,
+				'posts_per_page' => count( $imported_ids ),
 				'fields'         => 'ids',
-				'meta_key'       => '_masteriyo_has_content', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- One-off lookup during import.
+				'meta_key'       => '_masteriyo_has_content', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Limited to the posts imported by this demo.
 				'no_found_rows'  => true,
 			)
 		);

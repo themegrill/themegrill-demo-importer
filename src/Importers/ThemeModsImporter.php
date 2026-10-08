@@ -204,6 +204,10 @@ class ThemeModsImporter {
 		}
 
 		update_option( 'themegrill_starter_template_theme_mods', $mods );
+
+		// Kept apart so the layouts survive Zakra's post-import migration, which rebuilds them.
+		$layout_keys = preg_grep( '/^zakra_(?:global|blog|single_page|single_post|others_page|woocommerce_global|woocommerce_page|single_product)_(?:sidebar|container)_layout$/', array_keys( $mods ) );
+		update_option( 'themegrill_starter_template_layout_mods', array_intersect_key( $mods, array_flip( $layout_keys ) ), false );
 	}
 
 	/**
