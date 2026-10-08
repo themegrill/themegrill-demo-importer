@@ -64,7 +64,15 @@ class MediaImporter {
 			$new_url      = wp_get_attachment_url( $new_post_id );
 
 			$mapping['post'][ $original_id ] = $new_post_id;
-			$url_remap[ $original_url ]      = $new_url;
+
+			// The demo may reference this one file by either of the URLs its export carried
+			// (guid and attachment_url can name the plain, `-scaled` or edited copy, or sit
+			// under a different uploads path), so register every spelling we were given.
+			$source_urls = array_values( array_unique( array_filter( array( $original_url, $attachment['alias_url'] ?? '' ) ) ) );
+
+			foreach ( $source_urls as $source_url ) {
+				$url_remap[ $source_url ] = $new_url;
+			}
 
 			// Demo content can bake a specific registered image size's URL directly
 			// into post_content (e.g. a Gutenberg image block with a "large"
@@ -85,18 +93,22 @@ class MediaImporter {
 			// never matches anything, leaving those sizes hotlinked.
 			$new_metadata = wp_get_attachment_metadata( $new_post_id );
 			if ( ! empty( $new_metadata['sizes'] ) ) {
-				$original_dir      = trailingslashit( dirname( $original_url ) );
-				$new_dir           = trailingslashit( dirname( $new_url ) );
-				$original_basename = pathinfo( wp_basename( $original_url ), PATHINFO_FILENAME );
+				$new_dir = trailingslashit( dirname( $new_url ) );
 
-				foreach ( $new_metadata['sizes'] as $size_data ) {
-					if ( empty( $size_data['file'] ) || empty( $size_data['width'] ) || empty( $size_data['height'] ) ) {
-						continue;
+				foreach ( $source_urls as $source_url ) {
+					$original_dir      = trailingslashit( dirname( $source_url ) );
+					$original_basename = pathinfo( wp_basename( $source_url ), PATHINFO_FILENAME );
+
+					foreach ( $new_metadata['sizes'] as $size_data ) {
+						if ( empty( $size_data['file'] ) || empty( $size_data['width'] ) || empty( $size_data['height'] ) ) {
+							continue;
+						}
+
+						$size_ext           = pathinfo( $size_data['file'], PATHINFO_EXTENSION );
+						$original_size_file = $original_basename . '-' . $size_data['width'] . 'x' . $size_data['height'] . '.' . $size_ext;
+
+						$url_remap[ $original_dir . $original_size_file ] = $new_dir . $size_data['file'];
 					}
-
-					$size_ext            = pathinfo( $size_data['file'], PATHINFO_EXTENSION );
-					$original_size_file  = $original_basename . '-' . $size_data['width'] . 'x' . $size_data['height'] . '.' . $size_ext;
-					$url_remap[ $original_dir . $original_size_file ] = $new_dir . $size_data['file'];
 				}
 			}
 

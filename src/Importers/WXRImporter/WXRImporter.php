@@ -745,12 +745,15 @@ class WXRImporter extends WP_Importer {
 				$remote_url = str_replace( 'https://themegrilldemos.com', THEMEGRILL_BASE_URL, $original_url );
 				$remote_url = str_replace( 'https://zakrademos.com', ZAKRA_BASE_URL, $remote_url );
 
+				$alias_url = $this->normalize_attachment_url( $this->resolve_attachment_alias_url( $data ) );
+
 				$this->pending_attachments[] = array(
 					'original_id'  => $original_id,
 					'postdata'     => $postdata,
 					'meta'         => $meta,
 					'remote_url'   => $remote_url,
 					'original_url' => $original_url,
+					'alias_url'    => $alias_url === $original_url ? '' : $alias_url,
 				);
 
 				do_action( 'wxr_importer.process_skipped.post', $data, $meta );
@@ -2130,11 +2133,41 @@ class WXRImporter extends WP_Importer {
 	 * @return string
 	 */
 	protected function resolve_attachment_source_url( array $data ): string {
-		if ( ! empty( $data['guid'] ) ) {
-			return $data['guid'];
+		$guid           = ! empty( $data['guid'] ) ? $data['guid'] : '';
+		$attachment_url = ! empty( $data['attachment_url'] ) ? $data['attachment_url'] : '';
+
+		// Some exports set the guid to a permalink rather than a file (e.g. a Masteriyo
+		// placeholder at `.../placeholder-2/`). There is nothing to download there and
+		// wp_upload_bits() rejects the extensionless name, so use the attachment URL.
+		if ( '' !== $guid && '' === (string) pathinfo( (string) wp_parse_url( $guid, PHP_URL_PATH ), PATHINFO_EXTENSION ) ) {
+			return '' !== $attachment_url ? $attachment_url : $guid;
 		}
 
-		return ! empty( $data['attachment_url'] ) ? $data['attachment_url'] : '';
+		return '' !== $guid ? $guid : $attachment_url;
+	}
+
+	/**
+	 * The other URL the same attachment is known by, when guid and attachment_url differ.
+	 *
+	 * Demo content does not consistently reference the file the guid names: it may use the
+	 * `-scaled`, edited (`-e<timestamp>`) or differently-pathed copy from attachment_url.
+	 * Returning it lets the media remap register both spellings for the one imported file,
+	 * so either reference stops pointing at the demo server.
+	 *
+	 * @param array $data Parsed WXR item data for the attachment.
+	 * @return string Empty when there is no distinct second URL.
+	 */
+	protected function resolve_attachment_alias_url( array $data ): string {
+		$source = $this->resolve_attachment_source_url( $data );
+		$guid   = ! empty( $data['guid'] ) ? $data['guid'] : '';
+		$other  = ( $source === $guid ) ? ( $data['attachment_url'] ?? '' ) : $guid;
+
+		if ( '' === $other || $other === $source ) {
+			return '';
+		}
+
+		// Only a real file is useful as a remap key.
+		return '' === (string) pathinfo( (string) wp_parse_url( $other, PHP_URL_PATH ), PATHINFO_EXTENSION ) ? '' : $other;
 	}
 
 	/**
@@ -2214,6 +2247,28 @@ class WXRImporter extends WP_Importer {
 
 	public function set_mapping( array $mapping ): void {
 		$this->mapping = $mapping;
+	}
+
+	/**
+	 * The demo's own URL, as read from `<wp:base_blog_url>` while parsing.
+	 *
+	 * @return string Empty when this importer has not parsed a WXR.
+	 */
+	public function get_base_blog_url(): string {
+		return (string) $this->base_blog_url;
+	}
+
+	/**
+	 * Carry the demo's own URL into an importer that never parses the WXR itself.
+	 *
+	 * Posts are collected in one pass and inserted by a second importer in batches, and
+	 * only the parsing pass picks up `<wp:base_blog_url>`. Without this the batch pass
+	 * cannot tell a demo's own links from genuinely external ones.
+	 *
+	 * @param string $url Demo's base blog URL.
+	 */
+	public function set_base_blog_url( string $url ): void {
+		$this->base_blog_url = $url;
 	}
 
 	public function get_requires_remapping(): array {
