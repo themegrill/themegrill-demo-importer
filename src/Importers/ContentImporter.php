@@ -26,6 +26,11 @@ class ContentImporter {
 			set_time_limit( 300 );
 		}
 
+		// Remember what earlier imports left behind, so passes that should only touch
+		// this run's posts can tell them apart. The imported-posts list itself has to
+		// keep accumulating for cleanup.
+		update_option( 'themegrill_demo_importer_previous_imported_posts', get_option( 'themegrill_demo_importer_imported_posts', array() ), false );
+
 		// Clear any stale queues from a previous import before starting fresh.
 		delete_option( 'themegrill_demo_importer_pending_attachments' );
 		delete_option( 'themegrill_demo_importer_pending_posts' );
