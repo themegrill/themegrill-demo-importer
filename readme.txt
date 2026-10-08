@@ -41,6 +41,7 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 * Fix - User Registration & Membership pages and options configured after import.
 * Fix - Prevent a fatal error when another active plugin uses a newer psr/log version than Demo Importer.
 * Fix - WooCommerce product categories import issue.
+* Fix - Demo's own Sample Page and Privacy Policy duplicating WordPress's default pages.
 * Fix - Flash, WebShop, Kirana, Gizmo, Skincare, Accelerate, Radiate, eStore, Himalayas, Cenote, and Ample template thumbnails not loading in the Starter Templates gallery.
 * Fix - Custom menu links to external sites (e.g. social profile URLs) rewritten to the site's own homepage after import.
 * Fix - Demo layouts and Masteriyo course styles not applied after importing Zakra demos.

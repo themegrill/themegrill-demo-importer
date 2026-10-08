@@ -1901,6 +1901,37 @@ class WXRImporter extends WP_Importer {
 		// Constant-time lookup if we prefilled
 		$exists_key = $data['guid'];
 
+		// WordPress's own default placeholder pages (Sample Page, Privacy Policy) are
+		// recreated by the demo with different body content and a different original
+		// date and guid, so neither the prefilled guid lookup nor the exact
+		// title+content+date match below ever recognizes them as duplicates. Match
+		// those by title alone instead, before either of those checks runs. Only a
+		// published page is reused: core ships Privacy Policy as a draft, and the
+		// demo's own published copy must not lose to it.
+		if ( 'page' === $data['post_type'] && in_array( $data['post_title'], array( 'Sample Page', 'Privacy Policy' ), true ) ) {
+			$existing_page = $this->get_page_by_title( $data['post_title'] );
+
+			// The default pages are created in the site's language, the demo's are English.
+			if ( ! $existing_page ) {
+				$localized_title = $this->get_core_page_title( $data['post_title'] );
+
+				if ( $localized_title !== $data['post_title'] ) {
+					$existing_page = $this->get_page_by_title( $localized_title );
+				}
+			}
+
+			if ( $existing_page ) {
+				$this->exists['post'][ $exists_key ] = $existing_page->ID;
+
+				// Map the original ID so menu items and demo options resolve to the existing page.
+				if ( ! empty( $data['post_id'] ) ) {
+					$this->mapping['post'][ (int) $data['post_id'] ] = (int) $existing_page->ID;
+				}
+
+				return $existing_page->ID;
+			}
+		}
+
 		if ( $this->options['prefill_existing_posts'] ) {
 			return isset( $this->exists['post'][ $exists_key ] ) ? $this->exists['post'][ $exists_key ] : false;
 		}
@@ -1915,6 +1946,61 @@ class WXRImporter extends WP_Importer {
 		$this->exists['post'][ $exists_key ] = $exists;
 
 		return $exists;
+	}
+
+	/**
+	 * Translate one of core's default page titles into the site's language.
+	 *
+	 * @param string $title English page title as exported by the demo.
+	 * @return string Site-language title, or the original when it cannot be translated.
+	 */
+	protected function get_core_page_title( $title ) {
+		$locale = determine_locale();
+
+		if ( 'en_US' === $locale ) {
+			return $title;
+		}
+
+		// "Sample Page" ships only in admin-{locale}.mo, which WordPress does not load
+		// on the REST request the import runs through, so load it before translating.
+		static $loaded = array();
+
+		if ( ! isset( $loaded[ $locale ] ) ) {
+			$loaded[ $locale ] = load_textdomain( 'default', WP_LANG_DIR . '/admin-' . $locale . '.mo', $locale );
+		}
+
+		return __( $title ); // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText,WordPress.WP.I18n.MissingArgDomain -- Core's own translation of its own default page title.
+	}
+
+	/**
+	 * Find a published page by its exact title.
+	 *
+	 * @param string $title Page title to match.
+	 * @return WP_Post|null Matching page, or null if none found.
+	 */
+	protected function get_page_by_title( $title ) {
+		if ( ! $title ) {
+			return null;
+		}
+
+		$query = new \WP_Query(
+			array(
+				'post_type'              => 'page',
+				'title'                  => $title,
+				'post_status'            => 'publish',
+				'posts_per_page'         => 1,
+				'no_found_rows'          => true,
+				'ignore_sticky_posts'    => true,
+				'update_post_term_cache' => false,
+				'update_post_meta_cache' => false,
+			)
+		);
+
+		if ( ! $query->have_posts() ) {
+			return null;
+		}
+
+		return current( $query->posts );
 	}
 
 	/**
