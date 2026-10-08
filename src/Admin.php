@@ -461,6 +461,10 @@ class Admin {
 			),
 			'ample'      => array(
 				'ample' => 'ample-free',
+      ),
+			'spacious' => array(
+				'spacious'    => 'spacious-free',
+				'spacious-02' => 'spacious-free-02',
 			),
 		);
 
