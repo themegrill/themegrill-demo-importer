@@ -246,7 +246,7 @@ class ImportHooks {
 	 * Zakra's container/sidebar migration runs on this hook at priority 25 and rebuilds
 	 * the layouts from legacy keys, which overwrites the layouts the demo chose.
 	 *
-	 * @since 2.1.4
+	 * @since 2.1.3
 	 */
 	public function restore_zakra_layout_mods() {
 		$layout_mods = get_option( 'themegrill_starter_template_layout_mods', array() );
@@ -268,7 +268,7 @@ class ImportHooks {
 	 * pages with course widgets are treated as having none and skip the Masteriyo styles.
 	 * Only posts imported by the current demo are touched.
 	 *
-	 * @since 2.1.4
+	 * @since 2.1.3
 	 *
 	 * @param string $demo_id   Demo id.
 	 * @param array  $demo_data Demo config.
