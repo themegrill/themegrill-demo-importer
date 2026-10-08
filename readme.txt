@@ -43,6 +43,7 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 * Fix - WooCommerce product categories import issue.
 * Fix - Flash, WebShop, Kirana, Gizmo, Skincare, Accelerate, Radiate, eStore, Himalayas, Cenote, and Ample template thumbnails not loading in the Starter Templates gallery.
 * Fix - Custom menu links to external sites (e.g. social profile URLs) rewritten to the site's own homepage after import.
+* Fix - Demo layouts and Masteriyo course styles not applied after importing Zakra demos.
 * Tweak - Run post-import hooks only when the demo requires them.
 
 = 2.1.2 - 31-07-2026 =
