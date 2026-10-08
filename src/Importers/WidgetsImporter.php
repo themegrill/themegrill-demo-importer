@@ -371,7 +371,7 @@ class WidgetsImporter {
 	 * @param  string $url Remote image URL.
 	 * @return string The new local URL, or the original URL if it's disallowed or the download failed.
 	 */
-	private static function sideload_widget_image( $url ) {
+	public static function sideload_widget_image( $url ) {
 		if ( isset( self::$sideload_cache[ $url ] ) ) {
 			return self::$sideload_cache[ $url ];
 		}
