@@ -1898,9 +1898,16 @@ class WXRImporter extends WP_Importer {
 		// recreated by the demo with different body content and a different original
 		// date and guid, so neither the prefilled guid lookup nor the exact
 		// title+content+date match below ever recognizes them as duplicates. Match
-		// those by title alone instead, before either of those checks runs.
+		// those by title alone instead, before either of those checks runs. Only a
+		// published page is reused: core ships Privacy Policy as a draft, and the
+		// demo's own published copy must not lose to it.
 		if ( 'page' === $data['post_type'] && in_array( $data['post_title'], array( 'Sample Page', 'Privacy Policy' ), true ) ) {
 			$existing_page = $this->get_page_by_title( $data['post_title'] );
+
+			// The default pages are created in the site's language, the demo's are English.
+			if ( ! $existing_page ) {
+				$existing_page = $this->get_page_by_title( __( $data['post_title'] ) ); // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText,WordPress.WP.I18n.MissingArgDomain -- Core's own translation of its default page title.
+			}
 
 			if ( $existing_page ) {
 				$this->exists['post'][ $exists_key ] = $existing_page->ID;
@@ -1931,7 +1938,7 @@ class WXRImporter extends WP_Importer {
 	}
 
 	/**
-	 * Find a page by its exact title.
+	 * Find a published page by its exact title.
 	 *
 	 * @param string $title Page title to match.
 	 * @return WP_Post|null Matching page, or null if none found.
@@ -1945,7 +1952,7 @@ class WXRImporter extends WP_Importer {
 			array(
 				'post_type'              => 'page',
 				'title'                  => $title,
-				'post_status'            => 'all',
+				'post_status'            => 'publish',
 				'posts_per_page'         => 1,
 				'no_found_rows'          => true,
 				'ignore_sticky_posts'    => true,
