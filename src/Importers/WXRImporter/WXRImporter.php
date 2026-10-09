@@ -993,10 +993,6 @@ class WXRImporter extends WP_Importer {
 	 * @param int $post_id Menu item post ID.
 	 */
 	protected function remap_menu_item_url( $post_id ) {
-		if ( empty( $this->base_blog_url ) ) {
-			return;
-		}
-
 		$url = get_post_meta( $post_id, '_menu_item_url', true );
 		if ( empty( $url ) ) {
 			return;
@@ -1010,13 +1006,14 @@ class WXRImporter extends WP_Importer {
 		// Only remap links that pointed back at the demo's own site (e.g. a
 		// hardcoded "Home" link). Any other host - a genuine external link such
 		// as a social profile URL - must be left exactly as exported.
-		$host      = preg_replace( '/^www\./i', '', strtolower( $parsed['host'] ) );
-		$base_host = preg_replace( '/^www\./i', '', strtolower( (string) wp_parse_url( $this->base_blog_url, PHP_URL_HOST ) ) );
-		if ( $host !== $base_host ) {
+		$host = preg_replace( '/^www\./i', '', strtolower( $parsed['host'] ) );
+		$path = isset( $parsed['path'] ) ? $parsed['path'] : '';
+
+		if ( $this->is_demo_site_link( $host, $path ) ) {
+			$path = preg_replace( '/^\/[^\/]+/', '', $path );
+		} elseif ( ! $this->is_demo_staging_host( $host ) ) {
 			return;
 		}
-
-		$path = isset( $parsed['path'] ) ? preg_replace( '/^\/[^\/]+/', '', $parsed['path'] ) : '';
 
 		$new_url = untrailingslashit( home_url() ) . $path;
 
@@ -1028,6 +1025,44 @@ class WXRImporter extends WP_Importer {
 		}
 
 		update_post_meta( $post_id, '_menu_item_url', esc_url_raw( $new_url ) );
+	}
+
+	/**
+	 * Whether a menu link points at the demo's own site, on its current or a former ThemeGrill host.
+	 *
+	 * @since 2.1.4
+	 *
+	 * @param string $host Link host, lowercase, without "www.".
+	 * @param string $path Link path.
+	 * @return bool
+	 */
+	protected function is_demo_site_link( $host, $path ) {
+		if ( empty( $this->base_blog_url ) ) {
+			return false;
+		}
+
+		$base_host = preg_replace( '/^www\./i', '', strtolower( (string) wp_parse_url( $this->base_blog_url, PHP_URL_HOST ) ) );
+		if ( $host === $base_host ) {
+			return true;
+		}
+
+		// A demo that moved hosts keeps its slug, e.g. themegrill.com/colormag-pro-technology/.
+		$base_slug = explode( '/', trim( (string) wp_parse_url( $this->base_blog_url, PHP_URL_PATH ), '/' ) )[0];
+		$link_slug = explode( '/', trim( $path, '/' ) )[0];
+
+		return '' !== $base_slug && $base_slug === $link_slug && in_array( $host, array( 'themegrill.com', 'demo.themegrill.com', 'themegrilldemos.com', 'zakrademos.com' ), true );
+	}
+
+	/**
+	 * Whether a menu link host is one of the staging services the demos were built on.
+	 *
+	 * @since 2.1.4
+	 *
+	 * @param string $host Link host, lowercase, without "www.".
+	 * @return bool
+	 */
+	protected function is_demo_staging_host( $host ) {
+		return (bool) preg_match( '/(^|\.)(qsandbox\.com|qsandbox\.cloud|wpsandbox\.pro|wp1\.host)$/', $host );
 	}
 
 	/**
