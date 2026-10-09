@@ -48,7 +48,6 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 * Fix - SiteOrigin demo widgets showing the wrong category or background image after import.
 * Fix - Edited and scaled demo images imported as the uncropped original.
 * Fix - Malformed import requests caused a fatal error instead of a clear error response.
-* Fix - WooCommerce pages duplicated when a demo ships them without listing the plugin.
 * Tweak - Sanitize the demo permalink structure before applying it to the site.
 
 = 2.1.3 - 21-08-2026 =
