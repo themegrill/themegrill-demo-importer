@@ -746,14 +746,23 @@ class WXRImporter extends WP_Importer {
 				$remote_url = str_replace( 'https://zakrademos.com', ZAKRA_BASE_URL, $remote_url );
 
 				$alias_url = $this->normalize_attachment_url( $this->resolve_attachment_alias_url( $data ) );
+				$alias_url = $alias_url === $original_url ? '' : $alias_url;
+
+				// Same proxy rewrite as above, so the fallback download routes identically.
+				$remote_fallback_url = '';
+				if ( '' !== $alias_url ) {
+					$remote_fallback_url = str_replace( 'https://themegrilldemos.com', THEMEGRILL_BASE_URL, $alias_url );
+					$remote_fallback_url = str_replace( 'https://zakrademos.com', ZAKRA_BASE_URL, $remote_fallback_url );
+				}
 
 				$this->pending_attachments[] = array(
-					'original_id'  => $original_id,
-					'postdata'     => $postdata,
-					'meta'         => $meta,
-					'remote_url'   => $remote_url,
-					'original_url' => $original_url,
-					'alias_url'    => $alias_url === $original_url ? '' : $alias_url,
+					'original_id'         => $original_id,
+					'postdata'            => $postdata,
+					'meta'                => $meta,
+					'remote_url'          => $remote_url,
+					'remote_fallback_url' => $remote_fallback_url,
+					'original_url'        => $original_url,
+					'alias_url'           => $alias_url,
 				);
 
 				do_action( 'wxr_importer.process_skipped.post', $data, $meta );
@@ -2178,17 +2187,43 @@ class WXRImporter extends WP_Importer {
 	 * @return string
 	 */
 	protected function resolve_attachment_source_url( array $data ): string {
-		$guid           = ! empty( $data['guid'] ) ? $data['guid'] : '';
-		$attachment_url = ! empty( $data['attachment_url'] ) ? $data['attachment_url'] : '';
+		$urls = $this->resolve_attachment_source_urls( $data );
 
-		// Some exports set the guid to a permalink rather than a file (e.g. a Masteriyo
-		// placeholder at `.../placeholder-2/`). There is nothing to download there and
-		// wp_upload_bits() rejects the extensionless name, so use the attachment URL.
-		if ( '' !== $guid && '' === (string) pathinfo( (string) wp_parse_url( $guid, PHP_URL_PATH ), PATHINFO_EXTENSION ) ) {
-			return '' !== $attachment_url ? $attachment_url : $guid;
+		return $urls[0] ?? '';
+	}
+
+	/**
+	 * The URLs this attachment can be fetched from, best first.
+	 *
+	 * `attachment_url` is the file `_wp_attached_file` names, so it is the one the demo's
+	 * content references - the edited (`-e<timestamp>`) or `-scaled` copy where there is
+	 * one. Fetching the guid instead imports the uncropped original and the page loses the
+	 * crop. The guid stays as a second candidate because it is what survives when a demo's
+	 * attachment_url is stale or points at another demo's media path.
+	 *
+	 * @param array $data Parsed WXR item data for the attachment.
+	 * @return array Up to two URLs, in the order they should be tried.
+	 */
+	protected function resolve_attachment_source_urls( array $data ): array {
+		$files = array();
+		$other = array();
+
+		foreach ( array( $data['attachment_url'] ?? '', $data['guid'] ?? '' ) as $candidate ) {
+			if ( '' === $candidate || in_array( $candidate, $files, true ) || in_array( $candidate, $other, true ) ) {
+				continue;
+			}
+
+			// A guid is sometimes a permalink rather than a file (e.g. a Masteriyo
+			// placeholder at `.../placeholder-2/`), and wp_upload_bits() rejects the
+			// extensionless name, so anything that is not a file is tried last.
+			if ( '' !== (string) pathinfo( (string) wp_parse_url( $candidate, PHP_URL_PATH ), PATHINFO_EXTENSION ) ) {
+				$files[] = $candidate;
+			} else {
+				$other[] = $candidate;
+			}
 		}
 
-		return '' !== $guid ? $guid : $attachment_url;
+		return array_merge( $files, $other );
 	}
 
 	/**
@@ -2203,16 +2238,9 @@ class WXRImporter extends WP_Importer {
 	 * @return string Empty when there is no distinct second URL.
 	 */
 	protected function resolve_attachment_alias_url( array $data ): string {
-		$source = $this->resolve_attachment_source_url( $data );
-		$guid   = ! empty( $data['guid'] ) ? $data['guid'] : '';
-		$other  = ( $source === $guid ) ? ( $data['attachment_url'] ?? '' ) : $guid;
+		$urls = $this->resolve_attachment_source_urls( $data );
 
-		if ( '' === $other || $other === $source ) {
-			return '';
-		}
-
-		// Only a real file is useful as a remap key.
-		return '' === (string) pathinfo( (string) wp_parse_url( $other, PHP_URL_PATH ), PATHINFO_EXTENSION ) ? '' : $other;
+		return $urls[1] ?? '';
 	}
 
 	/**

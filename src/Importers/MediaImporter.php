@@ -151,9 +151,8 @@ class MediaImporter {
 		require_once ABSPATH . 'wp-admin/includes/media.php';
 		require_once ABSPATH . 'wp-admin/includes/file.php';
 
-		$postdata   = $attachment['postdata'];
-		$meta       = $attachment['meta'];
-		$remote_url = $attachment['remote_url'];
+		$postdata = $attachment['postdata'];
+		$meta     = $attachment['meta'];
 
 		// Determine upload subfolder from _wp_attached_file meta (e.g. "2024/03").
 		$postdata['upload_date'] = $postdata['post_date'] ?? '';
@@ -167,6 +166,36 @@ class MediaImporter {
 			break;
 		}
 
+		// guid and attachment_url can name different copies of the same image, and either
+		// can be the dead one. Try the preferred source, then the other.
+		$candidates = array_values( array_filter( array( $attachment['remote_url'], $attachment['remote_fallback_url'] ?? '' ) ) );
+		$last_error = new WP_Error( 'import_file_error', 'No source URL for attachment' );
+
+		foreach ( $candidates as $index => $candidate_url ) {
+			$result = $this->store_attachment( $candidate_url, $postdata );
+
+			if ( ! is_wp_error( $result ) ) {
+				return $result;
+			}
+
+			$last_error = $result;
+
+			if ( isset( $candidates[ $index + 1 ] ) ) {
+				$this->logger->notice( 'Retrying ' . $candidate_url . ' from its other exported URL: ' . $result->get_error_message() );
+			}
+		}
+
+		return $last_error;
+	}
+
+	/**
+	 * Download one remote file and attach it.
+	 *
+	 * @param  string $remote_url Source URL.
+	 * @param  array  $postdata   Attachment post data, including `upload_date`.
+	 * @return int|WP_Error New attachment ID, or the reason it could not be stored.
+	 */
+	private function store_attachment( string $remote_url, array $postdata ) {
 		$file_name = basename( $remote_url );
 		$upload    = wp_upload_bits( $file_name, 0, '', $postdata['upload_date'] );
 		if ( $upload['error'] ) {

@@ -46,6 +46,7 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 * Fix - Demo layouts and Masteriyo course styles not applied after importing Zakra demos.
 * Fix - Demo's own Sample Page and Privacy Policy duplicating WordPress's default pages.
 * Fix - SiteOrigin demo widgets showing the wrong category or background image after import.
+* Fix - Edited and scaled demo images imported as the uncropped original.
 
 = 2.1.3 - 21-08-2026 =
 * Fix - SSRF and arbitrary option update via demo_config (schema validation, safe remote requests, option key restrictions).
