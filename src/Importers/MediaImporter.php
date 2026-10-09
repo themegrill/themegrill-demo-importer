@@ -64,7 +64,15 @@ class MediaImporter {
 			$new_url      = wp_get_attachment_url( $new_post_id );
 
 			$mapping['post'][ $original_id ] = $new_post_id;
-			$url_remap[ $original_url ]      = $new_url;
+
+			// The demo may reference this one file by either of the URLs its export carried
+			// (guid and attachment_url can name the plain, `-scaled` or edited copy, or sit
+			// under a different uploads path), so register every spelling we were given.
+			$source_urls = array_values( array_unique( array_filter( array( $original_url, $attachment['alias_url'] ?? '' ) ) ) );
+
+			foreach ( $source_urls as $source_url ) {
+				$url_remap[ $source_url ] = $new_url;
+			}
 
 			// Demo content can bake a specific registered image size's URL directly
 			// into post_content (e.g. a Gutenberg image block with a "large"
@@ -85,18 +93,22 @@ class MediaImporter {
 			// never matches anything, leaving those sizes hotlinked.
 			$new_metadata = wp_get_attachment_metadata( $new_post_id );
 			if ( ! empty( $new_metadata['sizes'] ) ) {
-				$original_dir      = trailingslashit( dirname( $original_url ) );
-				$new_dir           = trailingslashit( dirname( $new_url ) );
-				$original_basename = pathinfo( wp_basename( $original_url ), PATHINFO_FILENAME );
+				$new_dir = trailingslashit( dirname( $new_url ) );
 
-				foreach ( $new_metadata['sizes'] as $size_data ) {
-					if ( empty( $size_data['file'] ) || empty( $size_data['width'] ) || empty( $size_data['height'] ) ) {
-						continue;
+				foreach ( $source_urls as $source_url ) {
+					$original_dir      = trailingslashit( dirname( $source_url ) );
+					$original_basename = pathinfo( wp_basename( $source_url ), PATHINFO_FILENAME );
+
+					foreach ( $new_metadata['sizes'] as $size_data ) {
+						if ( empty( $size_data['file'] ) || empty( $size_data['width'] ) || empty( $size_data['height'] ) ) {
+							continue;
+						}
+
+						$size_ext           = pathinfo( $size_data['file'], PATHINFO_EXTENSION );
+						$original_size_file = $original_basename . '-' . $size_data['width'] . 'x' . $size_data['height'] . '.' . $size_ext;
+
+						$url_remap[ $original_dir . $original_size_file ] = $new_dir . $size_data['file'];
 					}
-
-					$size_ext            = pathinfo( $size_data['file'], PATHINFO_EXTENSION );
-					$original_size_file  = $original_basename . '-' . $size_data['width'] . 'x' . $size_data['height'] . '.' . $size_ext;
-					$url_remap[ $original_dir . $original_size_file ] = $new_dir . $size_data['file'];
 				}
 			}
 
@@ -139,9 +151,8 @@ class MediaImporter {
 		require_once ABSPATH . 'wp-admin/includes/media.php';
 		require_once ABSPATH . 'wp-admin/includes/file.php';
 
-		$postdata   = $attachment['postdata'];
-		$meta       = $attachment['meta'];
-		$remote_url = $attachment['remote_url'];
+		$postdata = $attachment['postdata'];
+		$meta     = $attachment['meta'];
 
 		// Determine upload subfolder from _wp_attached_file meta (e.g. "2024/03").
 		$postdata['upload_date'] = $postdata['post_date'] ?? '';
@@ -155,6 +166,36 @@ class MediaImporter {
 			break;
 		}
 
+		// guid and attachment_url can name different copies of the same image, and either
+		// can be the dead one. Try the preferred source, then the other.
+		$candidates = array_values( array_filter( array( $attachment['remote_url'], $attachment['remote_fallback_url'] ?? '' ) ) );
+		$last_error = new WP_Error( 'import_file_error', 'No source URL for attachment' );
+
+		foreach ( $candidates as $index => $candidate_url ) {
+			$result = $this->store_attachment( $candidate_url, $postdata );
+
+			if ( ! is_wp_error( $result ) ) {
+				return $result;
+			}
+
+			$last_error = $result;
+
+			if ( isset( $candidates[ $index + 1 ] ) ) {
+				$this->logger->notice( 'Retrying ' . $candidate_url . ' from its other exported URL: ' . $result->get_error_message() );
+			}
+		}
+
+		return $last_error;
+	}
+
+	/**
+	 * Download one remote file and attach it.
+	 *
+	 * @param  string $remote_url Source URL.
+	 * @param  array  $postdata   Attachment post data, including `upload_date`.
+	 * @return int|WP_Error New attachment ID, or the reason it could not be stored.
+	 */
+	private function store_attachment( string $remote_url, array $postdata ) {
 		$file_name = basename( $remote_url );
 		$upload    = wp_upload_bits( $file_name, 0, '', $postdata['upload_date'] );
 		if ( $upload['error'] ) {
@@ -269,6 +310,11 @@ class MediaImporter {
 			$this->remap_panels_data_urls( $url_remap );
 			$this->remap_foreign_elementor_media( $url_remap );
 		}
+
+		// Term and attachment IDs inside panels_data are numeric, so the URL pass above
+		// cannot see them. Runs outside that guard: a demo with no media still has
+		// widgets pointing at the demo's categories.
+		$this->remap_panels_data_ids( $mapping );
 
 		// Update _thumbnail_id to point to newly imported attachment IDs.
 		foreach ( $featured_images as $post_id => $old_attachment_id ) {
@@ -479,6 +525,129 @@ class MediaImporter {
 				array( 'meta_id' => $row->meta_id )
 			);
 		}
+	}
+
+	/**
+	 * Remap term and attachment IDs inside SiteOrigin Page Builder's `panels_data`.
+	 *
+	 * The layout is imported verbatim, so widget taxonomy fields and row/cell background
+	 * attachment IDs still carry the demo site's IDs. Those usually do not exist here, and
+	 * on a site with earlier content they can resolve to something unrelated - an empty
+	 * portfolio section, or a row showing someone else's image.
+	 *
+	 * @param array $mapping Import mapping, with `post` and `term_id` keys.
+	 */
+	private function remap_panels_data_ids( array $mapping ): void {
+		global $wpdb;
+
+		$posts = array_map( 'intval', $mapping['post'] ?? array() );
+		$terms = array_map( 'intval', $mapping['term_id'] ?? array() );
+
+		if ( empty( $posts ) && empty( $terms ) ) {
+			return;
+		}
+
+		// Only posts from this run: the imported-posts list also holds earlier imports,
+		// whose layouts must not be rewritten with this demo's IDs.
+		$imported_posts = array_diff(
+			array_map( 'intval', (array) get_option( 'themegrill_demo_importer_imported_posts', array() ) ),
+			array_map( 'intval', (array) get_option( 'themegrill_demo_importer_previous_imported_posts', array() ) )
+		);
+
+		if ( empty( $imported_posts ) ) {
+			return;
+		}
+
+		$ids          = array_values( $imported_posts );
+		$placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
+		$rows         = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.NotPrepared
+			$wpdb->prepare(
+				"SELECT meta_id, meta_value FROM {$wpdb->postmeta} WHERE meta_key = 'panels_data' AND post_id IN ($placeholders)", // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
+				...$ids
+			)
+		);
+
+		foreach ( $rows as $row ) {
+			$data = maybe_unserialize( $row->meta_value );
+			if ( empty( $data ) || ! is_array( $data ) ) {
+				continue;
+			}
+
+			$remapped = $this->remap_panels_ids_recursive( $data, $posts, $terms );
+			if ( $remapped === $data ) {
+				continue;
+			}
+
+			$wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+				$wpdb->postmeta,
+				array( 'meta_value' => maybe_serialize( $remapped ) ), // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
+				array( 'meta_id' => $row->meta_id )
+			);
+		}
+	}
+
+	/**
+	 * Walk panels_data, swapping the demo's term and attachment IDs for the imported ones.
+	 *
+	 * Matched on field name rather than path because the same fields recur at every depth:
+	 * row styles, cell styles, widget styles, and the nested panels_data a layout widget
+	 * carries. `id` is deliberately not touched - that is SiteOrigin's own cell index.
+	 *
+	 * @param array $data  Unserialized panels_data, or a nested part of it.
+	 * @param array $posts Old attachment ID => new attachment ID.
+	 * @param array $terms Old term ID => new term ID.
+	 * @return array
+	 */
+	private function remap_panels_ids_recursive( array $data, array $posts, array $terms ): array {
+		foreach ( $data as $key => $value ) {
+			if ( 'background_image_attachment' === $key ) {
+				$data[ $key ] = $this->swap_panels_id( $value, $posts );
+				continue;
+			}
+
+			if ( 'category' === $key || 'categories' === $key ) {
+				if ( is_array( $value ) ) {
+					foreach ( $value as $index => $term ) {
+						$value[ $index ] = $this->swap_panels_id( $term, $terms );
+					}
+					$data[ $key ] = $value;
+				} else {
+					$data[ $key ] = $this->swap_panels_id( $value, $terms );
+				}
+				continue;
+			}
+
+			if ( is_array( $value ) ) {
+				$data[ $key ] = $this->remap_panels_ids_recursive( $value, $posts, $terms );
+			}
+		}
+
+		return $data;
+	}
+
+	/**
+	 * Swap a single ID through a mapping, preserving the stored value's type.
+	 *
+	 * `0` means "all" or "none" in these fields, and an ID this import did not create is
+	 * left alone rather than guessed at. A non-numeric value (SiteOrigin also accepts a
+	 * URL in the background field) is returned untouched.
+	 *
+	 * @param mixed $value Stored ID, as an int or a numeric string.
+	 * @param array $map   Old ID => new ID.
+	 * @return mixed
+	 */
+	private function swap_panels_id( $value, array $map ) {
+		if ( ! is_scalar( $value ) || ! is_numeric( $value ) ) {
+			return $value;
+		}
+
+		$old = (int) $value;
+
+		if ( $old <= 0 || ! isset( $map[ $old ] ) ) {
+			return $value;
+		}
+
+		return is_string( $value ) ? (string) $map[ $old ] : (int) $map[ $old ];
 	}
 
 	/**

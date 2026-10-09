@@ -2,9 +2,9 @@
 Contributors: ThemeGrill
 Tags: themegrill, theme demos, demo, importer, one click import
 Requires at least: 5.7
-Tested up to: 7.0
+Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 2.1.3
+Stable tag: 2.1.4
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -33,7 +33,24 @@ Bugs can be reported either in our support forum or preferably on the [GitHub re
 Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/themegrill-demo-importer/) :)
 
 == Changelog ==
-= 2.1.3 - TBD =
+= 2.1.4 - xx-xx-xxxx =
+* Fix - Custom logo missing after import because its attachment ID was not remapped.
+* Fix - Starter Templates showed no empty state when a filter matched nothing for the chosen builder.
+* Fix - Demo images hotlinked from the remote demo site instead of being imported.
+* Fix - Spacious template thumbnail showed a placeholder instead of its screenshot.
+* Fix - Demo import failed entirely when a required plugin was closed on WordPress.org.
+* Fix - Flash, WebShop, Kirana, Gizmo, Skincare, Accelerate, Radiate, eStore, Himalayas, Cenote, and Ample template thumbnails not loading in the Starter Templates gallery.
+* Fix - Transparent header logo and other theme mod images not imported with the demo.
+* Fix - Elementor images left pointing at the demo server after import.
+* Fix - Custom menu links to external sites (e.g. social profile URLs) rewritten to the site's own homepage after import.
+* Fix - Demo layouts and Masteriyo course styles not applied after importing Zakra demos.
+* Fix - Demo's own Sample Page and Privacy Policy duplicating WordPress's default pages.
+* Fix - SiteOrigin demo widgets showing the wrong category or background image after import.
+* Fix - Edited and scaled demo images imported as the uncropped original.
+* Fix - Malformed import requests caused a fatal error instead of a clear error response.
+* Tweak - Sanitize the demo permalink structure before applying it to the site.
+
+= 2.1.3 - 21-08-2026 =
 * Fix - SSRF and arbitrary option update via demo_config (schema validation, safe remote requests, option key restrictions).
 * Fix - Install Companion Elementor from ThemeGrill GitHub ZIP; skip when already active.
 * Fix - Remap Everest Forms shortcodes after import so Contact forms render.
@@ -41,10 +58,6 @@ Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/th
 * Fix - User Registration & Membership pages and options configured after import.
 * Fix - Prevent a fatal error when another active plugin uses a newer psr/log version than Demo Importer.
 * Fix - WooCommerce product categories import issue.
-* Fix - Demo's own Sample Page and Privacy Policy duplicating WordPress's default pages.
-* Fix - Flash, WebShop, Kirana, Gizmo, Skincare, Accelerate, Radiate, eStore, Himalayas, Cenote, and Ample template thumbnails not loading in the Starter Templates gallery.
-* Fix - Custom menu links to external sites (e.g. social profile URLs) rewritten to the site's own homepage after import.
-* Fix - Demo layouts and Masteriyo course styles not applied after importing Zakra demos.
 * Tweak - Run post-import hooks only when the demo requires them.
 
 = 2.1.2 - 31-07-2026 =

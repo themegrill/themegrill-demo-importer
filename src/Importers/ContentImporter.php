@@ -38,6 +38,7 @@ class ContentImporter {
 		delete_option( 'themegrill_demo_importer_demo_config' );
 		delete_option( 'themegrill_demo_importer_featured_images' );
 		delete_option( 'themegrill_demo_importer_url_remap' );
+		delete_option( 'themegrill_demo_importer_base_blog_url' );
 		delete_option( 'themegrill_demo_importer_media_total' );
 		delete_option( 'themegrill_demo_importer_requires_remapping' );
 
@@ -115,6 +116,7 @@ class ContentImporter {
 		$importer->set_logger( Logger::getInstance() );
 		$importer->set_mapping( get_option( 'themegrill_demo_importer_mapping', array() ) );
 		$importer->set_requires_remapping( get_option( 'themegrill_demo_importer_requires_remapping', array() ) );
+		$importer->set_base_blog_url( (string) get_option( 'themegrill_demo_importer_base_blog_url', '' ) );
 
 		foreach ( $batch as $post_data ) {
 			$importer->insert_pending_post( $post_data );
@@ -158,6 +160,7 @@ class ContentImporter {
 		delete_option( 'themegrill_demo_importer_posts_total' );
 		delete_option( 'themegrill_demo_importer_pending_posts' );
 		delete_option( 'themegrill_demo_importer_requires_remapping' );
+		delete_option( 'themegrill_demo_importer_base_blog_url' );
 	}
 
 	public function import_xml( $content ) {
@@ -182,6 +185,13 @@ class ContentImporter {
 		ob_end_clean();
 
 		update_option( 'themegrill_demo_importer_mapping', $importer->get_mapping_data() );
+
+		// Only this parsing pass sees <wp:base_blog_url>; the batch pass that actually
+		// inserts the menu items needs it to recognise the demo's own links.
+		$base_blog_url = $importer->get_base_blog_url();
+		if ( '' !== $base_blog_url ) {
+			update_option( 'themegrill_demo_importer_base_blog_url', $base_blog_url, false );
+		}
 
 		// Accumulate all queues across multiple XML files.
 		$existing_pending_posts = get_option( 'themegrill_demo_importer_pending_posts', array() );
