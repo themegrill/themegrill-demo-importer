@@ -55,6 +55,12 @@ class DemoConfigValidator {
 					'type'      => array( 'string', 'null' ),
 					'maxLength' => 100,
 				),
+				// Applied to the live site-wide option on `complete`, so pin the type here
+				// as well as sanitizing it at the point of use.
+				'permalink_structure'                => array(
+					'type'      => array( 'string', 'null' ),
+					'maxLength' => 200,
+				),
 				'content'                            => $remote_file,
 				'pages'                              => array(
 					'type'  => array( 'array', 'null' ),

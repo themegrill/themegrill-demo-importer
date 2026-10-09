@@ -119,17 +119,6 @@ class ImportHooks {
 	}
 
 	/**
-	 * Whether the imported demo uses WooCommerce.
-	 *
-	 * @param array $demo_data Demo config.
-	 * @return bool
-	 */
-	private function demo_requires_woocommerce( $demo_data ) {
-		return $this->demo_has_plugin( $demo_data, array( 'woocommerce/woocommerce.php', 'woocommerce' ) )
-			|| ! empty( $demo_data['yith_woocommerce_wishlist_settings'] );
-	}
-
-	/**
 	 * Whether the imported demo uses Masteriyo / LMS.
 	 *
 	 * @param array $demo_data Demo config.
@@ -405,10 +394,10 @@ class ImportHooks {
 	 * @param array  $demo_data Demo config.
 	 */
 	public function set_wc_pages( $demo_id, $demo_data = array() ) {
-		if ( ! $this->demo_requires_woocommerce( (array) $demo_data ) ) {
-			return;
-		}
-
+		// Deliberately not gated on the demo listing WooCommerce: a demo can ship Shop,
+		// Cart, Checkout and My Account pages in its content without declaring the plugin
+		// (e.g. Spacious Fashion blog), and those still duplicate the ones WooCommerce
+		// created. What matters is that WooCommerce is active on this site.
 		if ( class_exists( 'WooCommerce' ) ) {
 
 			global $wpdb;
