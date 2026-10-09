@@ -58,7 +58,11 @@ class ImportService {
 	private function installPlugins( $demo_config, $options ) {
 		// `opts` has no REST schema, so anything can arrive here. Only a list of plugins
 		// is meaningful; a scalar or null means install nothing rather than fatal.
-		$plugins = isset( $options['plugins'] ) && is_array( $options['plugins'] ) ? $options['plugins'] : array();
+		// Items are plugin files like `woocommerce/woocommerce.php`. Anything else fails
+		// on string conversion further in, so drop it rather than carry it through.
+		$plugins = isset( $options['plugins'] ) && is_array( $options['plugins'] )
+			? array_values( array_filter( $options['plugins'], 'is_string' ) )
+			: array();
 
 		update_option( 'themegrill_demo_importer_selected_plugins', $plugins, false );
 

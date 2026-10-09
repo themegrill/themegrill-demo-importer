@@ -37,6 +37,10 @@ class PluginImporter {
 			return array();
 		}
 
+		// Each entry has to be a plugin file path; a nested array or object throws on
+		// explode() and on the string comparison before it.
+		$plugins = array_values( array_filter( $plugins, 'is_string' ) );
+
 		/**
 		 * `get_filesystem_method()`'s ownership probe (comparing `fileowner()` on a
 		 * freshly written temp file against a core WP file) is unreliable on a lot of
