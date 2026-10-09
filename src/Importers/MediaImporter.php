@@ -282,6 +282,11 @@ class MediaImporter {
 			$this->remap_foreign_elementor_media( $url_remap );
 		}
 
+		// Term and attachment IDs inside panels_data are numeric, so the URL pass above
+		// cannot see them. Runs outside that guard: a demo with no media still has
+		// widgets pointing at the demo's categories.
+		$this->remap_panels_data_ids( $mapping );
+
 		// Update _thumbnail_id to point to newly imported attachment IDs.
 		foreach ( $featured_images as $post_id => $old_attachment_id ) {
 			if ( isset( $mapping['post'][ $old_attachment_id ] ) ) {
@@ -491,6 +496,129 @@ class MediaImporter {
 				array( 'meta_id' => $row->meta_id )
 			);
 		}
+	}
+
+	/**
+	 * Remap term and attachment IDs inside SiteOrigin Page Builder's `panels_data`.
+	 *
+	 * The layout is imported verbatim, so widget taxonomy fields and row/cell background
+	 * attachment IDs still carry the demo site's IDs. Those usually do not exist here, and
+	 * on a site with earlier content they can resolve to something unrelated - an empty
+	 * portfolio section, or a row showing someone else's image.
+	 *
+	 * @param array $mapping Import mapping, with `post` and `term_id` keys.
+	 */
+	private function remap_panels_data_ids( array $mapping ): void {
+		global $wpdb;
+
+		$posts = array_map( 'intval', $mapping['post'] ?? array() );
+		$terms = array_map( 'intval', $mapping['term_id'] ?? array() );
+
+		if ( empty( $posts ) && empty( $terms ) ) {
+			return;
+		}
+
+		// Only posts from this run: the imported-posts list also holds earlier imports,
+		// whose layouts must not be rewritten with this demo's IDs.
+		$imported_posts = array_diff(
+			array_map( 'intval', (array) get_option( 'themegrill_demo_importer_imported_posts', array() ) ),
+			array_map( 'intval', (array) get_option( 'themegrill_demo_importer_previous_imported_posts', array() ) )
+		);
+
+		if ( empty( $imported_posts ) ) {
+			return;
+		}
+
+		$ids          = array_values( $imported_posts );
+		$placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
+		$rows         = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.NotPrepared
+			$wpdb->prepare(
+				"SELECT meta_id, meta_value FROM {$wpdb->postmeta} WHERE meta_key = 'panels_data' AND post_id IN ($placeholders)", // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
+				...$ids
+			)
+		);
+
+		foreach ( $rows as $row ) {
+			$data = maybe_unserialize( $row->meta_value );
+			if ( empty( $data ) || ! is_array( $data ) ) {
+				continue;
+			}
+
+			$remapped = $this->remap_panels_ids_recursive( $data, $posts, $terms );
+			if ( $remapped === $data ) {
+				continue;
+			}
+
+			$wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+				$wpdb->postmeta,
+				array( 'meta_value' => maybe_serialize( $remapped ) ), // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
+				array( 'meta_id' => $row->meta_id )
+			);
+		}
+	}
+
+	/**
+	 * Walk panels_data, swapping the demo's term and attachment IDs for the imported ones.
+	 *
+	 * Matched on field name rather than path because the same fields recur at every depth:
+	 * row styles, cell styles, widget styles, and the nested panels_data a layout widget
+	 * carries. `id` is deliberately not touched - that is SiteOrigin's own cell index.
+	 *
+	 * @param array $data  Unserialized panels_data, or a nested part of it.
+	 * @param array $posts Old attachment ID => new attachment ID.
+	 * @param array $terms Old term ID => new term ID.
+	 * @return array
+	 */
+	private function remap_panels_ids_recursive( array $data, array $posts, array $terms ): array {
+		foreach ( $data as $key => $value ) {
+			if ( 'background_image_attachment' === $key ) {
+				$data[ $key ] = $this->swap_panels_id( $value, $posts );
+				continue;
+			}
+
+			if ( 'category' === $key || 'categories' === $key ) {
+				if ( is_array( $value ) ) {
+					foreach ( $value as $index => $term ) {
+						$value[ $index ] = $this->swap_panels_id( $term, $terms );
+					}
+					$data[ $key ] = $value;
+				} else {
+					$data[ $key ] = $this->swap_panels_id( $value, $terms );
+				}
+				continue;
+			}
+
+			if ( is_array( $value ) ) {
+				$data[ $key ] = $this->remap_panels_ids_recursive( $value, $posts, $terms );
+			}
+		}
+
+		return $data;
+	}
+
+	/**
+	 * Swap a single ID through a mapping, preserving the stored value's type.
+	 *
+	 * `0` means "all" or "none" in these fields, and an ID this import did not create is
+	 * left alone rather than guessed at. A non-numeric value (SiteOrigin also accepts a
+	 * URL in the background field) is returned untouched.
+	 *
+	 * @param mixed $value Stored ID, as an int or a numeric string.
+	 * @param array $map   Old ID => new ID.
+	 * @return mixed
+	 */
+	private function swap_panels_id( $value, array $map ) {
+		if ( ! is_scalar( $value ) || ! is_numeric( $value ) ) {
+			return $value;
+		}
+
+		$old = (int) $value;
+
+		if ( $old <= 0 || ! isset( $map[ $old ] ) ) {
+			return $value;
+		}
+
+		return is_string( $value ) ? (string) $map[ $old ] : (int) $map[ $old ];
 	}
 
 	/**
