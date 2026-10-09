@@ -56,7 +56,9 @@ class ImportService {
 	}
 
 	private function installPlugins( $demo_config, $options ) {
-		$plugins = $options['plugins'] ?? array();
+		// `opts` has no REST schema, so anything can arrive here. Only a list of plugins
+		// is meaningful; a scalar or null means install nothing rather than fatal.
+		$plugins = isset( $options['plugins'] ) && is_array( $options['plugins'] ) ? $options['plugins'] : array();
 
 		update_option( 'themegrill_demo_importer_selected_plugins', $plugins, false );
 
@@ -118,7 +120,11 @@ class ImportService {
 		if ( ! empty( $demo_config['permalink_structure'] ) ) {
 			global $wp_rewrite;
 
-			$permalink_structure = $demo_config['permalink_structure'];
+			// Written straight to a live site-wide option, and the demo config schema does
+			// not cover this key, so run it through core's own sanitizer first.
+			$permalink_structure = is_string( $demo_config['permalink_structure'] )
+				? sanitize_option( 'permalink_structure', $demo_config['permalink_structure'] )
+				: '';
 
 			update_option( 'permalink_structure', $permalink_structure );
 			$wp_rewrite->set_permalink_structure( $permalink_structure );

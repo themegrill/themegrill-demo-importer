@@ -33,6 +33,10 @@ class PluginImporter {
 	}
 
 	public function installPlugins( $plugins, $demo_config = array() ) {
+		if ( ! is_array( $plugins ) ) {
+			return array();
+		}
+
 		/**
 		 * `get_filesystem_method()`'s ownership probe (comparing `fileowner()` on a
 		 * freshly written temp file against a core WP file) is unreliable on a lot of
