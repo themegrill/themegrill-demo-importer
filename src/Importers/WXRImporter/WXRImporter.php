@@ -1993,21 +1993,31 @@ class WXRImporter extends WP_Importer {
 	 * @return string Site-language title, or the original when it cannot be translated.
 	 */
 	protected function get_core_page_title( $title ) {
-		$locale = determine_locale();
+		// Core created these pages in the site language, so match that rather than
+		// determine_locale(): the import runs through api-fetch, which sends
+		// `_locale=user`, making determine_locale() return the admin's own profile
+		// language instead.
+		$locale = get_locale();
 
 		if ( 'en_US' === $locale ) {
 			return $title;
 		}
 
-		// "Sample Page" ships only in admin-{locale}.mo, which WordPress does not load
-		// on the REST request the import runs through, so load it before translating.
-		static $loaded = array();
+		// This request already loaded the admin's language, so translate in the site's.
+		$switched = switch_to_locale( $locale );
 
-		if ( ! isset( $loaded[ $locale ] ) ) {
-			$loaded[ $locale ] = load_textdomain( 'default', WP_LANG_DIR . '/admin-' . $locale . '.mo', $locale );
+		// "Sample Page" ships only in admin-{locale}.mo, which WordPress does not load
+		// on the REST request the import runs through, and switch_to_locale() reloads
+		// the text domains, so this has to come after the switch.
+		load_textdomain( 'default', WP_LANG_DIR . '/admin-' . $locale . '.mo', $locale );
+
+		$translated = __( $title ); // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText,WordPress.WP.I18n.MissingArgDomain -- Core's own translation of its own default page title.
+
+		if ( $switched ) {
+			restore_previous_locale();
 		}
 
-		return __( $title ); // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText,WordPress.WP.I18n.MissingArgDomain -- Core's own translation of its own default page title.
+		return $translated;
 	}
 
 	/**
