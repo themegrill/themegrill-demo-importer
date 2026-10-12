@@ -745,12 +745,24 @@ class WXRImporter extends WP_Importer {
 				$remote_url = str_replace( 'https://themegrilldemos.com', THEMEGRILL_BASE_URL, $original_url );
 				$remote_url = str_replace( 'https://zakrademos.com', ZAKRA_BASE_URL, $remote_url );
 
+				$alias_url = $this->normalize_attachment_url( $this->resolve_attachment_alias_url( $data ) );
+				$alias_url = $alias_url === $original_url ? '' : $alias_url;
+
+				// Same proxy rewrite as above, so the fallback download routes identically.
+				$remote_fallback_url = '';
+				if ( '' !== $alias_url ) {
+					$remote_fallback_url = str_replace( 'https://themegrilldemos.com', THEMEGRILL_BASE_URL, $alias_url );
+					$remote_fallback_url = str_replace( 'https://zakrademos.com', ZAKRA_BASE_URL, $remote_fallback_url );
+				}
+
 				$this->pending_attachments[] = array(
-					'original_id'  => $original_id,
-					'postdata'     => $postdata,
-					'meta'         => $meta,
-					'remote_url'   => $remote_url,
-					'original_url' => $original_url,
+					'original_id'         => $original_id,
+					'postdata'            => $postdata,
+					'meta'                => $meta,
+					'remote_url'          => $remote_url,
+					'remote_fallback_url' => $remote_fallback_url,
+					'original_url'        => $original_url,
+					'alias_url'           => $alias_url,
 				);
 
 				do_action( 'wxr_importer.process_skipped.post', $data, $meta );
@@ -990,10 +1002,6 @@ class WXRImporter extends WP_Importer {
 	 * @param int $post_id Menu item post ID.
 	 */
 	protected function remap_menu_item_url( $post_id ) {
-		if ( empty( $this->base_blog_url ) ) {
-			return;
-		}
-
 		$url = get_post_meta( $post_id, '_menu_item_url', true );
 		if ( empty( $url ) ) {
 			return;
@@ -1007,13 +1015,14 @@ class WXRImporter extends WP_Importer {
 		// Only remap links that pointed back at the demo's own site (e.g. a
 		// hardcoded "Home" link). Any other host - a genuine external link such
 		// as a social profile URL - must be left exactly as exported.
-		$host      = preg_replace( '/^www\./i', '', strtolower( $parsed['host'] ) );
-		$base_host = preg_replace( '/^www\./i', '', strtolower( (string) wp_parse_url( $this->base_blog_url, PHP_URL_HOST ) ) );
-		if ( $host !== $base_host ) {
+		$host = preg_replace( '/^www\./i', '', strtolower( $parsed['host'] ) );
+		$path = isset( $parsed['path'] ) ? $parsed['path'] : '';
+
+		if ( $this->is_demo_site_link( $host, $path ) ) {
+			$path = preg_replace( '/^\/[^\/]+/', '', $path );
+		} elseif ( ! $this->is_demo_staging_host( $host ) ) {
 			return;
 		}
-
-		$path = isset( $parsed['path'] ) ? preg_replace( '/^\/[^\/]+/', '', $parsed['path'] ) : '';
 
 		$new_url = untrailingslashit( home_url() ) . $path;
 
@@ -1025,6 +1034,44 @@ class WXRImporter extends WP_Importer {
 		}
 
 		update_post_meta( $post_id, '_menu_item_url', esc_url_raw( $new_url ) );
+	}
+
+	/**
+	 * Whether a menu link points at the demo's own site, on its current or a former ThemeGrill host.
+	 *
+	 * @since 2.1.4
+	 *
+	 * @param string $host Link host, lowercase, without "www.".
+	 * @param string $path Link path.
+	 * @return bool
+	 */
+	protected function is_demo_site_link( $host, $path ) {
+		if ( empty( $this->base_blog_url ) ) {
+			return false;
+		}
+
+		$base_host = preg_replace( '/^www\./i', '', strtolower( (string) wp_parse_url( $this->base_blog_url, PHP_URL_HOST ) ) );
+		if ( $host === $base_host ) {
+			return true;
+		}
+
+		// A demo that moved hosts keeps its slug, e.g. themegrill.com/colormag-pro-technology/.
+		$base_slug = explode( '/', trim( (string) wp_parse_url( $this->base_blog_url, PHP_URL_PATH ), '/' ) )[0];
+		$link_slug = explode( '/', trim( $path, '/' ) )[0];
+
+		return '' !== $base_slug && $base_slug === $link_slug && in_array( $host, array( 'themegrill.com', 'demo.themegrill.com', 'themegrilldemos.com', 'zakrademos.com' ), true );
+	}
+
+	/**
+	 * Whether a menu link host is one of the staging services the demos were built on.
+	 *
+	 * @since 2.1.4
+	 *
+	 * @param string $host Link host, lowercase, without "www.".
+	 * @return bool
+	 */
+	protected function is_demo_staging_host( $host ) {
+		return (bool) preg_match( '/(^|\.)(qsandbox\.com|qsandbox\.cloud|wpsandbox\.pro|wp1\.host)$/', $host );
 	}
 
 	/**
@@ -1955,21 +2002,31 @@ class WXRImporter extends WP_Importer {
 	 * @return string Site-language title, or the original when it cannot be translated.
 	 */
 	protected function get_core_page_title( $title ) {
-		$locale = determine_locale();
+		// Core created these pages in the site language, so match that rather than
+		// determine_locale(): the import runs through api-fetch, which sends
+		// `_locale=user`, making determine_locale() return the admin's own profile
+		// language instead.
+		$locale = get_locale();
 
 		if ( 'en_US' === $locale ) {
 			return $title;
 		}
 
-		// "Sample Page" ships only in admin-{locale}.mo, which WordPress does not load
-		// on the REST request the import runs through, so load it before translating.
-		static $loaded = array();
+		// This request already loaded the admin's language, so translate in the site's.
+		$switched = switch_to_locale( $locale );
 
-		if ( ! isset( $loaded[ $locale ] ) ) {
-			$loaded[ $locale ] = load_textdomain( 'default', WP_LANG_DIR . '/admin-' . $locale . '.mo', $locale );
+		// "Sample Page" ships only in admin-{locale}.mo, which WordPress does not load
+		// on the REST request the import runs through, and switch_to_locale() reloads
+		// the text domains, so this has to come after the switch.
+		load_textdomain( 'default', WP_LANG_DIR . '/admin-' . $locale . '.mo', $locale );
+
+		$translated = __( $title ); // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText,WordPress.WP.I18n.MissingArgDomain -- Core's own translation of its own default page title.
+
+		if ( $switched ) {
+			restore_previous_locale();
 		}
 
-		return __( $title ); // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText,WordPress.WP.I18n.MissingArgDomain -- Core's own translation of its own default page title.
+		return $translated;
 	}
 
 	/**
@@ -2130,11 +2187,60 @@ class WXRImporter extends WP_Importer {
 	 * @return string
 	 */
 	protected function resolve_attachment_source_url( array $data ): string {
-		if ( ! empty( $data['guid'] ) ) {
-			return $data['guid'];
+		$urls = $this->resolve_attachment_source_urls( $data );
+
+		return $urls[0] ?? '';
+	}
+
+	/**
+	 * The URLs this attachment can be fetched from, best first.
+	 *
+	 * `attachment_url` is the file `_wp_attached_file` names, so it is the one the demo's
+	 * content references - the edited (`-e<timestamp>`) or `-scaled` copy where there is
+	 * one. Fetching the guid instead imports the uncropped original and the page loses the
+	 * crop. The guid stays as a second candidate because it is what survives when a demo's
+	 * attachment_url is stale or points at another demo's media path.
+	 *
+	 * @param array $data Parsed WXR item data for the attachment.
+	 * @return array Up to two URLs, in the order they should be tried.
+	 */
+	protected function resolve_attachment_source_urls( array $data ): array {
+		$files = array();
+		$other = array();
+
+		foreach ( array( $data['attachment_url'] ?? '', $data['guid'] ?? '' ) as $candidate ) {
+			if ( '' === $candidate || in_array( $candidate, $files, true ) || in_array( $candidate, $other, true ) ) {
+				continue;
+			}
+
+			// A guid is sometimes a permalink rather than a file (e.g. a Masteriyo
+			// placeholder at `.../placeholder-2/`), and wp_upload_bits() rejects the
+			// extensionless name, so anything that is not a file is tried last.
+			if ( '' !== (string) pathinfo( (string) wp_parse_url( $candidate, PHP_URL_PATH ), PATHINFO_EXTENSION ) ) {
+				$files[] = $candidate;
+			} else {
+				$other[] = $candidate;
+			}
 		}
 
-		return ! empty( $data['attachment_url'] ) ? $data['attachment_url'] : '';
+		return array_merge( $files, $other );
+	}
+
+	/**
+	 * The other URL the same attachment is known by, when guid and attachment_url differ.
+	 *
+	 * Demo content does not consistently reference the file the guid names: it may use the
+	 * `-scaled`, edited (`-e<timestamp>`) or differently-pathed copy from attachment_url.
+	 * Returning it lets the media remap register both spellings for the one imported file,
+	 * so either reference stops pointing at the demo server.
+	 *
+	 * @param array $data Parsed WXR item data for the attachment.
+	 * @return string Empty when there is no distinct second URL.
+	 */
+	protected function resolve_attachment_alias_url( array $data ): string {
+		$urls = $this->resolve_attachment_source_urls( $data );
+
+		return $urls[1] ?? '';
 	}
 
 	/**
@@ -2214,6 +2320,28 @@ class WXRImporter extends WP_Importer {
 
 	public function set_mapping( array $mapping ): void {
 		$this->mapping = $mapping;
+	}
+
+	/**
+	 * The demo's own URL, as read from `<wp:base_blog_url>` while parsing.
+	 *
+	 * @return string Empty when this importer has not parsed a WXR.
+	 */
+	public function get_base_blog_url(): string {
+		return (string) $this->base_blog_url;
+	}
+
+	/**
+	 * Carry the demo's own URL into an importer that never parses the WXR itself.
+	 *
+	 * Posts are collected in one pass and inserted by a second importer in batches, and
+	 * only the parsing pass picks up `<wp:base_blog_url>`. Without this the batch pass
+	 * cannot tell a demo's own links from genuinely external ones.
+	 *
+	 * @param string $url Demo's base blog URL.
+	 */
+	public function set_base_blog_url( string $url ): void {
+		$this->base_blog_url = $url;
 	}
 
 	public function get_requires_remapping(): array {
