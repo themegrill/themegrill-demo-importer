@@ -33,6 +33,9 @@ Bugs can be reported either in our support forum or preferably on the [GitHub re
 Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/themegrill-demo-importer/) :)
 
 == Changelog ==
+= 2.1.5 - TBD =
+* Fix - Himalayas slider showing no slides after import because its page IDs were not remapped.
+
 = 2.1.4 - 12-10-2026 =
 * Fix - Custom logo missing after import because its attachment ID was not remapped.
 * Fix - Starter Templates showed no empty state when a filter matched nothing for the chosen builder.
