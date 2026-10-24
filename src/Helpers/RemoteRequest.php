@@ -82,4 +82,70 @@ class RemoteRequest {
 
 		return wp_safe_remote_get( $url, $args );
 	}
+
+	/**
+	 * Download several files in parallel, each streamed straight to disk.
+	 *
+	 * @since 2.2.0
+	 *
+	 * @param array $targets Key => array( 'url' => remote URL, 'file' => local path to write ).
+	 * @return array Key => true, or WP_Error when that download failed. Failed files are removed.
+	 */
+	public static function download_many( array $targets ) {
+		$results  = array();
+		$requests = array();
+
+		foreach ( $targets as $key => $target ) {
+			// Same guard as wp_safe_remote_get(): no loopback or private network hosts.
+			if ( ! wp_http_validate_url( $target['url'] ) ) {
+				$results[ $key ] = new WP_Error( 'tgdm_unsafe_url', __( 'The remote URL is not allowed.', 'themegrill-demo-importer' ) );
+				continue;
+			}
+			$requests[ $key ] = array(
+				'url'     => $target['url'],
+				'type'    => 'GET',
+				'options' => array( 'filename' => $target['file'] ),
+			);
+		}
+
+		if ( empty( $requests ) ) {
+			return $results;
+		}
+
+		// WP 6.2 moved Requests into a namespace; older versions load the global class.
+		$requests_class = class_exists( '\WpOrg\Requests\Requests' ) ? '\WpOrg\Requests\Requests' : '\Requests';
+		$responses      = $requests_class::request_multiple(
+			$requests,
+			array(
+				'timeout'   => 30,
+				'redirects' => 3,
+				'useragent' => 'ThemeGrill Starter Template/1.0',
+				'verify'    => ABSPATH . WPINC . '/certificates/ca-bundle.crt',
+			)
+		);
+
+		foreach ( $requests as $key => $request ) {
+			$response = isset( $responses[ $key ] ) ? $responses[ $key ] : null;
+			$file     = $targets[ $key ]['file'];
+
+			if ( ! $response || $response instanceof \Exception ) {
+				$message = $response instanceof \Exception ? $response->getMessage() : 'No response';
+				$error   = new WP_Error( 'http_request_failed', $message );
+			} elseif ( 200 !== (int) $response->status_code ) {
+				$error = new WP_Error( 'import_file_error', 'Server returned ' . $response->status_code . ' for ' . $request['url'] );
+			} elseif ( ! file_exists( $file ) || 0 === filesize( $file ) ) {
+				$error = new WP_Error( 'import_file_error', 'Zero size file downloaded' );
+			} else {
+				$results[ $key ] = true;
+				continue;
+			}
+
+			if ( file_exists( $file ) ) {
+				wp_delete_file( $file );
+			}
+			$results[ $key ] = $error;
+		}
+
+		return $results;
+	}
 }

@@ -4,7 +4,8 @@
 import { Demo } from '../lib/types';
 import { BrandKit, GenerationPackage, isImageSlot } from './types';
 
-type SlotLocation = { path: string; block: string; attr: string; inHtml?: boolean };
+// `url`: the demo image an image slot shows before the AI swaps it.
+type SlotLocation = { path: string; block: string; attr: string; inHtml?: boolean; url?: string };
 
 export type ImportPackage = {
 	version: number;
@@ -16,6 +17,7 @@ export type ImportPackage = {
 		groups?: Record<string, string[]>; // Removed group id -> its top-level block paths.
 	}[];
 	demoFonts: Record<string, 'heading' | 'body'>;
+	keepImages?: string[]; // Demo images used outside the swappable slots above.
 };
 
 // Mock packages carry no import data; only live ones can be imported.
@@ -72,8 +74,11 @@ export const rebrandDemoConfig = (
 			// Theme-level fonts follow the brand even where the demo used defaults.
 			...(heading ? { zakra_heading_typography: { ...heading, 'font-family': brand.fonts.heading } } : {}),
 			...(body ? { zakra_body_typography: { ...body, 'font-family': brand.fonts.body } } : {}),
-			// The demo's logo carries the demo's name; show the site title instead.
+			// The demo's logos carry the demo's name; show the site title instead,
+			// which logo-only demos hide.
+			...Object.fromEntries(Object.keys(themeMods).filter((key) => /logo$/.test(key)).map((key) => [key, ''])),
 			custom_logo: '',
+			zakra_enable_site_identity: true,
 		},
 		...('blockart_blocks_settings' in demo
 			? { blockart_blocks_settings: transformValue((demo as any).blockart_blocks_settings, '', colors, fonts) }
@@ -91,7 +96,7 @@ export type ApplyPayload = {
 	pages: {
 		demoPageId: number;
 		demoPageSlug: string;
-		slots: { path: string; attr: string; inHtml: boolean; text?: string; image?: string }[];
+		slots: { path: string; attr: string; inHtml: boolean; text?: string; image?: string; overlay?: string }[];
 		removeBlocks: string[]; // Top-level blocks of groups still removed.
 	}[];
 };
@@ -121,10 +126,34 @@ export const buildApplyPayload = (
 						path: location.path,
 						attr: location.attr,
 						inHtml: !!location.inHtml,
-						...(isImageSlot(value) ? { image: value.url } : { text: value }),
+						...(isImageSlot(value)
+							? { image: value.url, ...(value.overlays?.[value.url] ? { overlay: value.overlays[value.url] } : {}) }
+							: { text: value }),
 					},
 				];
 			}),
 		};
 	}),
 });
+
+// Demo images that end up replaced or deleted (removed sections), so the media
+// step needn't download them. An image still shown anywhere is kept.
+export const replacedDemoImages = (pkg: GenerationPackage, ip: ImportPackage): string[] => {
+	const replaced = new Set<string>();
+	const kept = new Set(ip.keepImages ?? []);
+	for (const page of ip.pages) {
+		const generated = pkg.pages.find((p) => p.slug === page.slug);
+		const values = new Map((generated?.sections ?? []).flatMap((s) => Object.entries(s.slots)));
+		const removedBlocks = new Set(
+			(generated?.removed ?? []).filter((r) => !r.restored).flatMap((r) => page.groups?.[r.groupId] ?? []),
+		);
+		for (const [id, location] of Object.entries(page.slots)) {
+			if (!location.url) continue;
+			const value = values.get(id);
+			const removed = removedBlocks.has(location.path.split('.')[0] ?? '');
+			if (removed || (isImageSlot(value) && value.url !== location.url)) replaced.add(location.url);
+			else kept.add(location.url);
+		}
+	}
+	return [...replaced].filter((url) => !kept.has(url));
+};

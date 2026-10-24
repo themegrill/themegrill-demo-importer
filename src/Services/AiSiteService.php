@@ -7,6 +7,8 @@
 
 namespace ThemeGrill\Demo\Importer\Services;
 
+use ThemeGrill\Demo\Importer\Helpers\RemoteRequest;
+use ThemeGrill\Demo\Importer\Importers\MediaImporter;
 use ThemeGrill\Demo\Importer\Importers\PluginImporter;
 use WP_Error;
 
@@ -22,6 +24,23 @@ class AiSiteService {
 	 * Theme every AI demo is built on.
 	 */
 	const THEME = 'zakra';
+
+	/**
+	 * Stock photo hosts whose images are copied into the Media Library.
+	 */
+	const STOCK_HOSTS = array( 'pixabay.com', 'cdn.pixabay.com' );
+
+	/**
+	 * BlockArt attribute holding a block's background photo.
+	 */
+	const BACKGROUND_ATTR = 'background.image.image.url';
+
+	/**
+	 * Stock image URL => local URL, filled before slots are applied.
+	 *
+	 * @var array
+	 */
+	private $stock_images = array();
 
 	/**
 	 * Install the theme from WordPress.org if missing, then activate it.
@@ -101,6 +120,8 @@ class AiSiteService {
 				$remove_by_post[ $post_id ] = $page['removeBlocks'];
 			}
 		}
+
+		$this->import_stock_images( wp_list_pluck( array_merge( array(), ...array_values( $slots_by_post ) ), 'image' ) );
 
 		// Copy goes on the chosen pages; colors and fonts on every imported page.
 		$post_ids = array_unique( array_merge( array_keys( $slots_by_post ), $this->imported_pages( $post_map ) ) );
@@ -194,9 +215,12 @@ class AiSiteService {
 			$blocks,
 			$indexes,
 			function ( $block ) use ( $slot, $url_remap ) {
-				return null !== $slot['image']
-					? $this->set_image( $block, $slot['attr'], $slot['image'], $url_remap )
-					: $this->set_text( $block, $slot['attr'], $slot['text'], $slot['inHtml'] );
+				if ( null === $slot['image'] ) {
+					return $this->set_text( $block, $slot['attr'], $slot['text'], $slot['inHtml'] );
+				}
+				$block = $this->set_image( $block, $slot['attr'], $slot['image'], $url_remap );
+
+				return '' !== $slot['overlay'] ? $this->add_overlay( $block, $slot['attr'], $slot['overlay'] ) : $block;
 			}
 		);
 	}
@@ -305,6 +329,58 @@ class AiSiteService {
 	}
 
 	/**
+	 * Layer a gradient over a section's new background photo, above any overlay the demo
+	 * already has, so text designed for the demo photo stays readable.
+	 *
+	 * @param array  $block    Block.
+	 * @param string $attr     Image attribute path.
+	 * @param string $gradient Validated CSS linear-gradient().
+	 * @return array
+	 */
+	private function add_overlay( array $block, $attr, $gradient ) {
+		if ( 'blockart/section' !== $block['blockName'] || self::BACKGROUND_ATTR !== $attr ) {
+			return $block;
+		}
+
+		$has_overlay = ! empty( $block['attrs']['overlay'] );
+		$existing    = $has_overlay ? (array) ( $block['attrs']['overlayBackground'] ?? array() ) : array();
+		$type        = $existing['type'] ?? 'color';
+		if ( 'image' === $type ) {
+			return $block;
+		}
+
+		$layers = array( $gradient );
+		if ( 'gradient' === $type && ! empty( $existing['gradient'] ) ) {
+			$layers[] = $existing['gradient'];
+		} elseif ( ! empty( $existing['color'] ) ) {
+			$layers[] = 'linear-gradient(' . $existing['color'] . ', ' . $existing['color'] . ')';
+		}
+
+		$block['attrs']['overlay']           = true;
+		$block['attrs']['overlayBackground'] = array_merge(
+			$existing,
+			array(
+				'background' => 1,
+				'type'       => 'gradient',
+				'gradient'   => implode( ', ', $layers ),
+			)
+		);
+
+		// The saved markup carries an overlay element only when the demo had an overlay.
+		if ( ! $has_overlay ) {
+			$block = $this->replace_in_html(
+				$block,
+				'/^(\s*<div\b[^>]*>)/',
+				function ( $matches ) {
+					return $matches[1] . '<div class="blockart-overlay"></div>';
+				}
+			);
+		}
+
+		return $block;
+	}
+
+	/**
 	 * Point an image slot at a new URL, preferring the imported local copy.
 	 *
 	 * @param array  $block     Block.
@@ -314,7 +390,11 @@ class AiSiteService {
 	 * @return array
 	 */
 	private function set_image( array $block, $attr, $url, array $url_remap ) {
-		$url = isset( $url_remap[ $url ] ) ? $url_remap[ $url ] : $url;
+		if ( isset( $url_remap[ $url ] ) ) {
+			$url = $url_remap[ $url ];
+		} elseif ( isset( $this->stock_images[ $url ] ) ) {
+			$url = $this->stock_images[ $url ];
+		}
 
 		if ( '@html:img' === $attr ) {
 			return $this->replace_in_html(
@@ -326,19 +406,106 @@ class AiSiteService {
 			);
 		}
 
-		if ( $this->get_path( $block['attrs'], $attr ) === $url ) {
+		$old_url = $this->get_path( $block['attrs'], $attr );
+		if ( $old_url === $url ) {
 			return $block;
 		}
 
 		$block['attrs'] = $this->set_path( $block['attrs'], $attr, esc_url_raw( $url ) );
+		$attachment_id  = attachment_url_to_postid( $url );
 
 		// Keep BlockArt's attachment ID in step with the URL.
 		$id_attr = preg_replace( '/\.url$/', '.id', $attr );
 		if ( $id_attr !== $attr && null !== $this->get_path( $block['attrs'], $id_attr ) ) {
-			$block['attrs'] = $this->set_path( $block['attrs'], $id_attr, attachment_url_to_postid( $url ) );
+			$block['attrs'] = $this->set_path( $block['attrs'], $id_attr, $attachment_id );
+		}
+
+		// Static blocks (blockart/image) also bake the URL into their saved <img>, which is what the front end renders.
+		if ( is_string( $old_url ) && '' !== $old_url && false !== strpos( $block['innerHTML'], $old_url ) ) {
+			$block = $this->replace_in_html(
+				$block,
+				'/<img\b[^>]*\bsrc="' . preg_quote( $old_url, '/' ) . '"[^>]*>/',
+				function ( $matches ) use ( $old_url, $url, $attachment_id ) {
+					$img = str_replace( $old_url, esc_url( $url ), $matches[0] );
+					return $attachment_id ? preg_replace( '/\bwp-image-\d+\b/', 'wp-image-' . $attachment_id, $img ) : $img;
+				}
+			);
 		}
 
 		return $block;
+	}
+
+	/**
+	 * Copy stock photos into the Media Library in parallel, since Pixabay doesn't
+	 * allow hotlinking. Photos that fail to download keep their remote URL.
+	 *
+	 * @param array $urls Slot image URLs; non-stock URLs are ignored.
+	 */
+	private function import_stock_images( array $urls ) {
+		$targets = array();
+
+		foreach ( array_unique( array_filter( $urls ) ) as $url ) {
+			if ( isset( $this->stock_images[ $url ] ) || ! in_array( wp_parse_url( $url, PHP_URL_HOST ), self::STOCK_HOSTS, true ) ) {
+				continue;
+			}
+
+			// Reuse a copy from an earlier import of the same photo.
+			$existing = get_posts(
+				array(
+					'post_type'      => 'attachment',
+					'post_status'    => 'inherit',
+					'posts_per_page' => 1,
+					'fields'         => 'ids',
+					'meta_key'       => '_tdi_source_url', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+					'meta_value'     => $url, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
+				)
+			);
+			if ( $existing ) {
+				$this->stock_images[ $url ] = wp_get_attachment_url( $existing[0] );
+				continue;
+			}
+
+			$targets[ $url ] = array(
+				'url'  => $url,
+				'file' => wp_tempnam( wp_basename( (string) wp_parse_url( $url, PHP_URL_PATH ) ) ),
+			);
+		}
+
+		if ( empty( $targets ) ) {
+			return;
+		}
+
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+		require_once ABSPATH . 'wp-admin/includes/media.php';
+		require_once ABSPATH . 'wp-admin/includes/image.php';
+
+		$attachment_ids = array();
+		add_filter( 'intermediate_image_sizes_advanced', array( MediaImporter::class, 'limit_import_sizes' ) );
+		try {
+			foreach ( RemoteRequest::download_many( $targets ) as $url => $downloaded ) {
+				if ( is_wp_error( $downloaded ) ) {
+					continue;
+				}
+
+				$file          = array(
+					'name'     => wp_basename( (string) wp_parse_url( $url, PHP_URL_PATH ) ),
+					'tmp_name' => $targets[ $url ]['file'],
+				);
+				$attachment_id = media_handle_sideload( $file, 0 );
+				if ( is_wp_error( $attachment_id ) ) {
+					wp_delete_file( $file['tmp_name'] );
+					continue;
+				}
+
+				update_post_meta( $attachment_id, '_tdi_source_url', $url );
+				$this->stock_images[ $url ] = wp_get_attachment_url( $attachment_id );
+				$attachment_ids[]           = $attachment_id;
+			}
+		} finally {
+			remove_filter( 'intermediate_image_sizes_advanced', array( MediaImporter::class, 'limit_import_sizes' ) );
+		}
+
+		MediaImporter::queue_subsizes( $attachment_ids );
 	}
 
 	/**

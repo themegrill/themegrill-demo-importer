@@ -8,8 +8,9 @@ import { AiStage } from '../store/AiFlowContext';
 
 export const FLOW_STEPS: { label: string; stages: AiStage[] }[] = [
 	{ label: __('Describe your site', 'themegrill-demo-importer'), stages: ['describe'] },
+	{ label: __('Choose a design', 'themegrill-demo-importer'), stages: ['design'] },
 	{ label: __('Generate', 'themegrill-demo-importer'), stages: ['generating'] },
-	{ label: __('Preview & tweak', 'themegrill-demo-importer'), stages: ['preview'] },
+	{ label: __('Preview', 'themegrill-demo-importer'), stages: ['preview'] },
 	{ label: __('Import', 'themegrill-demo-importer'), stages: ['confirm', 'importing', 'success'] },
 ];
 

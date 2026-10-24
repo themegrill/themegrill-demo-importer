@@ -3,13 +3,16 @@
 import React, { createContext, useContext, useMemo, useReducer } from 'react';
 import { AiApiError } from '../api/errors';
 import { getSiteLanguage, LANGUAGES } from '../constants';
-import { BrandKit, GenerateRequest, GenerationPackage, Section, SlotValue } from '../types';
+import { BrandKit, DesignsResponse, GenerateRequest, GenerationPackage, Section, SlotValue } from '../types';
 
-export type AiStage = 'describe' | 'generating' | 'preview' | 'confirm' | 'importing' | 'success';
+export type AiStage = 'describe' | 'design' | 'generating' | 'preview' | 'confirm' | 'importing' | 'success';
 
 export type AiFlowState = {
 	stage: AiStage;
 	form: GenerateRequest;
+	// Designs ranked for the described business, and the description they were ranked for.
+	designs: DesignsResponse | null;
+	designsKey: string;
 	pkg: GenerationPackage | null;
 	error: AiApiError | null;
 };
@@ -17,6 +20,7 @@ export type AiFlowState = {
 export type AiFlowAction =
 	| { type: 'UPDATE_FORM'; patch: Partial<GenerateRequest> }
 	| { type: 'SET_STAGE'; stage: AiStage }
+	| { type: 'SET_DESIGNS'; designs: DesignsResponse | null; key: string }
 	| { type: 'SET_PACKAGE'; pkg: GenerationPackage }
 	| { type: 'SET_ERROR'; error: AiApiError | null }
 	| { type: 'UPDATE_SLOT'; page: string; sectionId: string; slotId: string; value: SlotValue }
@@ -31,6 +35,10 @@ export type AiFlowAction =
 
 const siteLanguage = getSiteLanguage();
 
+// What the designs ranking depends on; a different key means rank again.
+export const describeKey = (form: GenerateRequest) =>
+	JSON.stringify([form.brandName.trim(), form.description.trim(), form.niche, form.tone, form.language, form.pages]);
+
 export const initialForm: GenerateRequest = {
 	brandName: '',
 	description: '',
@@ -43,6 +51,8 @@ export const initialForm: GenerateRequest = {
 const initialState: AiFlowState = {
 	stage: 'describe',
 	form: initialForm,
+	designs: null,
+	designsKey: '',
 	pkg: null,
 	error: null,
 };
@@ -65,6 +75,8 @@ const reducer = (state: AiFlowState, action: AiFlowAction): AiFlowState => {
 			return { ...state, form: { ...state.form, ...action.patch } };
 		case 'SET_STAGE':
 			return { ...state, stage: action.stage };
+		case 'SET_DESIGNS':
+			return { ...state, designs: action.designs, designsKey: action.key };
 		case 'SET_PACKAGE':
 			return { ...state, pkg: action.pkg, error: null };
 		case 'SET_ERROR':

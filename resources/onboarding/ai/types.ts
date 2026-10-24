@@ -13,6 +13,9 @@ export type GenerateRequest = {
 	tone: AiTone;
 	language: string;
 	pages: AiPageSlug[];
+	// The design the user picked, and the brief read for the designs list.
+	demoSlug?: string;
+	briefId?: string;
 };
 
 export type DemoSummary = {
@@ -20,6 +23,13 @@ export type DemoSummary = {
 	name: string;
 	thumbnail: string;
 };
+
+// How close a design is to the business, for grouping the designs list.
+export type DesignMatch = 'best' | 'related' | 'other';
+
+export type DesignOption = DemoSummary & { demoUrl: string; premium: boolean; match: DesignMatch };
+
+export type DesignsResponse = { briefId: string; designs: DesignOption[] };
 
 export type BrandPalette = {
 	primary: string;
@@ -41,6 +51,7 @@ export type ImageSlot = {
 	alt: string;
 	credit: string;
 	alternatives: string[];
+	overlays?: Record<string, string>; // Photo URL => overlay the importer adds over it.
 };
 
 export type SlotValue = string | ImageSlot;

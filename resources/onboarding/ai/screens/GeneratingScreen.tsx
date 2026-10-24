@@ -145,8 +145,8 @@ const GeneratingScreen = () => {
 				{sprintf(
 					/* translators: 1: current step, 2: total steps. */
 					__('Step %1$d of %2$d', 'themegrill-demo-importer'),
-					2,
-					4,
+					3,
+					5,
 				)}
 			</p>
 			<h1 className="text-[28px] leading-9 font-semibold text-[#1F1F1F] m-0 p-0">

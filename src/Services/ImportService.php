@@ -39,7 +39,7 @@ class ImportService {
 				return $this->importContentPosts();
 
 			case 'import-media':
-				return $this->importMedia();
+				return $this->importMedia( $options );
 
 			case 'import-customizer':
 				return $this->importCustomizer( $demo_config, $options );
@@ -68,9 +68,16 @@ class ImportService {
 		return new WP_REST_Response( $result, 200 );
 	}
 
-	private function importMedia() {
-		$importer = new MediaImporter();
-		$result   = $importer->import_batch();
+	/**
+	 * Import the next batch of demo media.
+	 *
+	 * @param array $options Import options; skipMedia lists image URLs not to download.
+	 * @return WP_REST_Response
+	 */
+	private function importMedia( $options ) {
+		$skip_urls = array_filter( array_map( 'esc_url_raw', (array) ( $options['skipMedia'] ?? array() ) ) );
+		$importer  = new MediaImporter();
+		$result    = $importer->import_batch( $skip_urls );
 		return new WP_REST_Response( $result, 200 );
 	}
 

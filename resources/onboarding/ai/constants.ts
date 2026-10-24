@@ -52,7 +52,7 @@ export const GENERATION_STEPS: { value: GenerationStep; label: string }[] = [
 ];
 
 export const BRAND_NAME_MAX = 60;
-export const DESCRIPTION_MIN = 20;
+export const DESCRIPTION_MIN = 3;
 export const DESCRIPTION_MAX = 500;
 
 /**

@@ -9,7 +9,7 @@ import { cn } from '../../lib/utils';
 import { useLocalizedData } from '../../LocalizedDataContext';
 import { applySite, friendlyError, getColorMaps, getDemoConfig, ImportAction, prepareTheme, runImportAction } from '../api/site';
 import { outlineButtonClass, primaryButtonClass } from '../components/fields';
-import { buildApplyPayload, buildFontMap, getImportPackage, rebrandDemoConfig } from '../rebrand';
+import { buildApplyPayload, buildFontMap, getImportPackage, rebrandDemoConfig, replacedDemoImages } from '../rebrand';
 import { useAiFlow } from '../store/AiFlowContext';
 
 type Step = { key: 'prepare-theme' | ImportAction | 'apply'; label: string; weight: number };
@@ -78,6 +78,7 @@ const ImportScreen = () => {
 			// The palette may have been edited in the preview; the backend owns the mapping.
 			const colorMaps = await getColorMaps(pkg.demo.slug, pkg.brand.palette);
 			const brandedDemo = rebrandDemoConfig(config, colorMaps.theme, buildFontMap(ip, pkg.brand.fonts), pkg.brand);
+			const skipMedia = replacedDemoImages(pkg, ip);
 
 			for (const step of STEPS) {
 				setCurrent(step.key);
@@ -87,7 +88,12 @@ const ImportScreen = () => {
 					await applySite(buildApplyPayload(pkg, ip, config, colorMaps.blocks));
 				} else if (BATCHED.includes(step.key)) {
 					for (;;) {
-						const batch = await runImportAction(step.key as ImportAction, brandedDemo, selectedPlugins);
+						const batch = await runImportAction(
+							step.key as ImportAction,
+							brandedDemo,
+							selectedPlugins,
+							step.key === 'import-media' ? skipMedia : [],
+						);
 						if (batch?.total > 0) {
 							const imported = Math.min(batch.total, Math.max(0, batch.total - (batch.remaining ?? 0)));
 							setProgress(done + (imported / batch.total) * step.weight);
@@ -253,8 +259,8 @@ const ImportScreen = () => {
 				{sprintf(
 					/* translators: 1: current step, 2: total steps. */
 					__('Step %1$d of %2$d', 'themegrill-demo-importer'),
-					4,
-					4,
+					5,
+					5,
 				)}
 			</p>
 			<h1 className="text-[28px] leading-9 font-semibold text-[#1F1F1F] m-0 p-0">

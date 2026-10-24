@@ -20,6 +20,18 @@ defined( 'ABSPATH' ) || exit;
 class AiController {
 
 	/**
+	 * List every design, closest to the described business first.
+	 *
+	 * @since 2.2.0
+	 *
+	 * @param WP_REST_Request $request Request.
+	 * @return WP_REST_Response
+	 */
+	public function designs( $request ) {
+		return $this->forward( '/api/designs', $this->describe_body( $request->get_json_params() ) );
+	}
+
+	/**
 	 * Generate a site, streaming progress events from the backend.
 	 *
 	 * @since 2.2.0
@@ -29,14 +41,12 @@ class AiController {
 	 */
 	public function generate( $request ) {
 		$params = $request->get_json_params();
-		$pages  = isset( $params['pages'] ) && is_array( $params['pages'] ) ? $params['pages'] : array( 'home' );
-		$body   = array(
-			'brandName'   => sanitize_text_field( $params['brandName'] ?? '' ),
-			'description' => sanitize_textarea_field( $params['description'] ?? '' ),
-			'niche'       => sanitize_key( $params['niche'] ?? 'auto' ),
-			'tone'        => sanitize_key( $params['tone'] ?? 'friendly' ),
-			'language'    => sanitize_key( $params['language'] ?? 'en' ),
-			'pages'       => array_values( array_map( 'sanitize_key', $pages ) ),
+		$body   = array_merge(
+			$this->describe_body( $params ),
+			array(
+				'demoSlug' => sanitize_key( $params['demoSlug'] ?? '' ),
+				'briefId'  => sanitize_key( $params['briefId'] ?? '' ),
+			)
 		);
 
 		if ( ! function_exists( 'curl_init' ) ) {
@@ -44,6 +54,25 @@ class AiController {
 		}
 
 		$this->stream( '/api/generate', $body );
+	}
+
+	/**
+	 * Sanitized business description shared by the designs and generate requests.
+	 *
+	 * @param array $params Request JSON.
+	 * @return array
+	 */
+	private function describe_body( $params ) {
+		$pages = isset( $params['pages'] ) && is_array( $params['pages'] ) ? $params['pages'] : array( 'home' );
+
+		return array(
+			'brandName'   => sanitize_text_field( $params['brandName'] ?? '' ),
+			'description' => sanitize_textarea_field( $params['description'] ?? '' ),
+			'niche'       => sanitize_key( $params['niche'] ?? 'auto' ),
+			'tone'        => sanitize_key( $params['tone'] ?? 'friendly' ),
+			'language'    => sanitize_key( $params['language'] ?? 'en' ),
+			'pages'       => array_values( array_map( 'sanitize_key', $pages ) ),
+		);
 	}
 
 	/**
@@ -171,11 +200,13 @@ class AiController {
 					continue;
 				}
 				$slots[] = array(
-					'path'   => $path,
-					'attr'   => $attr,
-					'inHtml' => ! empty( $slot['inHtml'] ),
-					'text'   => sanitize_textarea_field( (string) ( $slot['text'] ?? '' ) ),
-					'image'  => isset( $slot['image'] ) ? esc_url_raw( (string) $slot['image'] ) : null,
+					'path'    => $path,
+					'attr'    => $attr,
+					'inHtml'  => ! empty( $slot['inHtml'] ),
+					'text'    => sanitize_textarea_field( (string) ( $slot['text'] ?? '' ) ),
+					'image'   => isset( $slot['image'] ) ? esc_url_raw( (string) $slot['image'] ) : null,
+					// Only the overlay gradients the AI backend generates, so nothing else reaches block CSS.
+					'overlay' => isset( $slot['overlay'] ) && preg_match( '/^linear-gradient\(90deg(, rgba\(\d{1,3}, \d{1,3}, \d{1,3}, [01](\.\d{1,2})?\) \d{1,3}%){2,4}\)$/', (string) $slot['overlay'] ) ? (string) $slot['overlay'] : '',
 				);
 			}
 			$remove_blocks = isset( $page['removeBlocks'] ) ? array_map( 'strval', (array) $page['removeBlocks'] ) : array();

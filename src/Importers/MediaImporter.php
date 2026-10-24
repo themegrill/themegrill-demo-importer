@@ -2,12 +2,28 @@
 
 namespace ThemeGrill\Demo\Importer\Importers;
 
+use ThemeGrill\Demo\Importer\Helpers\RemoteRequest;
 use ThemeGrill\Demo\Importer\Logger;
 use WP_Error;
 
 class MediaImporter {
 
-	const BATCH_SIZE = 5;
+	const BATCH_SIZE = 10;
+
+	/**
+	 * Image sizes made during the import; the rest are made in the background afterwards.
+	 */
+	const IMPORT_SIZES = array( 'thumbnail', 'medium' );
+
+	/**
+	 * Cron hook that makes the image sizes skipped during the import.
+	 */
+	const SUBSIZES_HOOK = 'themegrill_demo_importer_generate_subsizes';
+
+	/**
+	 * Attachments made in the background per cron run.
+	 */
+	const SUBSIZES_BATCH = 5;
 
 	private $logger;
 
@@ -19,13 +35,17 @@ class MediaImporter {
 	 * Process the next batch of pending attachments.
 	 *
 	 * Returns progress information so the caller can loop until done.
+	 *
+	 * @param array $skip_urls Image URLs the caller replaces after import, so they are not downloaded.
 	 */
-	public function import_batch(): array {
+	public function import_batch( array $skip_urls = array() ): array {
 		$pending = get_option( 'themegrill_demo_importer_pending_attachments', array() );
 
 		// Record total on the first call so the frontend can show overall progress.
 		$total = get_option( 'themegrill_demo_importer_media_total', false );
 		if ( false === $total ) {
+			$pending = $this->without_skipped( $pending, $skip_urls );
+			update_option( 'themegrill_demo_importer_pending_attachments', $pending );
 			$total = count( $pending );
 			update_option( 'themegrill_demo_importer_media_total', $total );
 		}
@@ -47,8 +67,11 @@ class MediaImporter {
 		$url_remap = get_option( 'themegrill_demo_importer_url_remap', array() );
 		$mapping   = get_option( 'themegrill_demo_importer_mapping', array() );
 
-		foreach ( $batch as $attachment ) {
-			$new_post_id = $this->process_single( $attachment );
+		$results = $this->process_batch( $batch );
+		$new_ids = array();
+
+		foreach ( $batch as $index => $attachment ) {
+			$new_post_id = $results[ $index ] ?? null;
 			if ( ! $new_post_id || is_wp_error( $new_post_id ) ) {
 				// Left unresolved, the demo's original (often stale/staging) URL stays
 				// baked into post_content and _elementor_data - log which one and why,
@@ -66,39 +89,8 @@ class MediaImporter {
 			$mapping['post'][ $original_id ] = $new_post_id;
 			$url_remap[ $original_url ]      = $new_url;
 
-			// Demo content can bake a specific registered image size's URL directly
-			// into post_content (e.g. a Gutenberg image block with a "large"
-			// sizeSlug) instead of resolving it dynamically at render time. As long
-			// as this site registers the same image sizes the demo was built with,
-			// WordPress names each generated size file identically
-			// (`{basename}-{width}x{height}.{ext}`), so the demo's original size URL
-			// can be reconstructed from the old directory plus the same naming
-			// convention, and remapped the same way as the full-size image.
-			//
-			// The reconstruction must use the ORIGINAL basename (from $original_url),
-			// not the new file's own basename: when the upload directory already has
-			// a same-named file (e.g. a prior import left one behind), wp_upload_bits()
-			// renames it - "hero.jpg" becomes "hero-1.jpg" - and every generated size
-			// filename is then built from that renamed basename ("hero-1-1024x768.jpg").
-			// The demo's content still references the un-renamed "hero-1024x768.jpg",
-			// so using the new file's basename here would produce a remap key that
-			// never matches anything, leaving those sizes hotlinked.
-			$new_metadata = wp_get_attachment_metadata( $new_post_id );
-			if ( ! empty( $new_metadata['sizes'] ) ) {
-				$original_dir      = trailingslashit( dirname( $original_url ) );
-				$new_dir           = trailingslashit( dirname( $new_url ) );
-				$original_basename = pathinfo( wp_basename( $original_url ), PATHINFO_FILENAME );
-
-				foreach ( $new_metadata['sizes'] as $size_data ) {
-					if ( empty( $size_data['file'] ) || empty( $size_data['width'] ) || empty( $size_data['height'] ) ) {
-						continue;
-					}
-
-					$size_ext            = pathinfo( $size_data['file'], PATHINFO_EXTENSION );
-					$original_size_file  = $original_basename . '-' . $size_data['width'] . 'x' . $size_data['height'] . '.' . $size_ext;
-					$url_remap[ $original_dir . $original_size_file ] = $new_dir . $size_data['file'];
-				}
-			}
+			$url_remap = $this->remap_size_urls( $url_remap, $original_url, $new_post_id, $new_url );
+			$new_ids[] = $new_post_id;
 
 			// Track for cleanup on reset.
 			$imported_posts   = get_option( 'themegrill_demo_importer_imported_posts', array() );
@@ -108,6 +100,7 @@ class MediaImporter {
 
 		update_option( 'themegrill_demo_importer_url_remap', $url_remap );
 		update_option( 'themegrill_demo_importer_mapping', $mapping );
+		self::queue_subsizes( $new_ids );
 
 		$remaining = count( $pending );
 
@@ -130,84 +123,259 @@ class MediaImporter {
 	}
 
 	/**
-	 * Download and insert a single attachment.
+	 * Download a batch of attachments in parallel, then insert each one.
 	 *
-	 * @return int|WP_Error New post ID on success.
+	 * @param array $batch Pending attachments.
+	 * @return array Batch index => new post ID, or WP_Error.
 	 */
-	private function process_single( array $attachment ) {
+	private function process_batch( array $batch ) {
 		require_once ABSPATH . 'wp-admin/includes/image.php';
 		require_once ABSPATH . 'wp-admin/includes/media.php';
 		require_once ABSPATH . 'wp-admin/includes/file.php';
 
-		$postdata   = $attachment['postdata'];
-		$meta       = $attachment['meta'];
-		$remote_url = $attachment['remote_url'];
+		$results = array();
+		$targets = array();
 
-		// Determine upload subfolder from _wp_attached_file meta (e.g. "2024/03").
-		$postdata['upload_date'] = $postdata['post_date'] ?? '';
-		foreach ( $meta as $meta_item ) {
+		foreach ( $batch as $index => $attachment ) {
+			$upload = $this->prepare_upload( $attachment );
+			if ( is_wp_error( $upload ) ) {
+				$results[ $index ] = $upload;
+				continue;
+			}
+			$targets[ $index ] = array(
+				'url'  => $attachment['remote_url'],
+				'file' => $upload,
+			);
+		}
+
+		foreach ( RemoteRequest::download_many( $targets ) as $index => $downloaded ) {
+			$results[ $index ] = is_wp_error( $downloaded )
+				? $downloaded
+				: $this->insert_attachment( $batch[ $index ], $targets[ $index ]['file'] );
+		}
+
+		return $results;
+	}
+
+	/**
+	 * Reserve the upload path an attachment downloads into.
+	 *
+	 * @param array $attachment Pending attachment.
+	 * @return string|WP_Error Local file path.
+	 */
+	private function prepare_upload( array $attachment ) {
+		// Upload subfolder from _wp_attached_file meta (e.g. "2024/03").
+		$upload_date = $attachment['postdata']['post_date'] ?? '';
+		foreach ( $attachment['meta'] as $meta_item ) {
 			if ( '_wp_attached_file' !== ( $meta_item['key'] ?? '' ) ) {
 				continue;
 			}
 			if ( preg_match( '%^[0-9]{4}/[0-9]{2}%', $meta_item['value'] ?? '', $matches ) ) {
-				$postdata['upload_date'] = $matches[0];
+				$upload_date = $matches[0];
 			}
 			break;
 		}
 
-		$file_name = basename( $remote_url );
-		$upload    = wp_upload_bits( $file_name, 0, '', $postdata['upload_date'] );
+		$file_name = basename( $attachment['remote_url'] );
+		$upload    = wp_upload_bits( $file_name, null, '', $upload_date );
 		if ( $upload['error'] ) {
 			$this->logger->warning( 'Upload dir error for ' . $file_name . ': ' . $upload['error'] );
 			return new WP_Error( 'upload_dir_error', $upload['error'] );
 		}
 
-		// Safe remote fetch: blocks private/loopback SSRF targets.
-		$response = \ThemeGrill\Demo\Importer\Helpers\RemoteRequest::get(
-			$remote_url,
-			array(
-				'stream'    => true,
-				'filename'  => $upload['file'],
-				'headers'   => array( 'User-Agent' => 'ThemeGrill Starter Template/1.0' ),
-				'sslverify' => true,
-				'timeout'   => 30,
-			)
-		);
+		return $upload['file'];
+	}
 
-		if ( is_wp_error( $response ) ) {
-			@unlink( $upload['file'] ); // phpcs:ignore WordPress.PHP.NoSilencedErrors
-			$this->logger->warning( 'Failed to fetch ' . $remote_url . ': ' . $response->get_error_message() );
-			return $response;
-		}
-
-		$code = (int) wp_remote_retrieve_response_code( $response );
-		if ( 200 !== $code ) {
-			@unlink( $upload['file'] ); // phpcs:ignore WordPress.PHP.NoSilencedErrors
-			return new WP_Error( 'import_file_error', 'Server returned ' . $code . ' for ' . $remote_url );
-		}
-
-		if ( 0 === filesize( $upload['file'] ) ) {
-			@unlink( $upload['file'] ); // phpcs:ignore WordPress.PHP.NoSilencedErrors
-			return new WP_Error( 'import_file_error', 'Zero size file downloaded' );
-		}
-
-		$info = wp_check_filetype( $upload['file'] );
-		if ( ! $info ) {
-			@unlink( $upload['file'] ); // phpcs:ignore WordPress.PHP.NoSilencedErrors
+	/**
+	 * Insert a downloaded file as an attachment, making only the import image sizes.
+	 *
+	 * @param array  $attachment Pending attachment.
+	 * @param string $file       Downloaded file path.
+	 * @return int|WP_Error New post ID.
+	 */
+	private function insert_attachment( array $attachment, $file ) {
+		$info = wp_check_filetype( $file );
+		if ( empty( $info['type'] ) ) {
+			wp_delete_file( $file );
 			return new WP_Error( 'attachment_processing_error', 'Invalid file type' );
 		}
 
+		$postdata                   = $attachment['postdata'];
 		$postdata['post_mime_type'] = $info['type'];
 
-		$post_id = wp_insert_attachment( $postdata, $upload['file'] );
+		$post_id = wp_insert_attachment( $postdata, $file );
 		if ( is_wp_error( $post_id ) ) {
 			return $post_id;
 		}
 
-		$metadata = wp_generate_attachment_metadata( $post_id, $upload['file'] );
-		wp_update_attachment_metadata( $post_id, $metadata );
+		self::generate_import_metadata( $post_id, $file );
 
 		return $post_id;
+	}
+
+	/**
+	 * Generate attachment metadata with only the import image sizes.
+	 *
+	 * @since 2.2.0
+	 *
+	 * @param int    $attachment_id Attachment ID.
+	 * @param string $file          Attachment file path.
+	 */
+	public static function generate_import_metadata( $attachment_id, $file ) {
+		add_filter( 'intermediate_image_sizes_advanced', array( __CLASS__, 'limit_import_sizes' ) );
+		try {
+			$metadata = wp_generate_attachment_metadata( $attachment_id, $file );
+		} finally {
+			remove_filter( 'intermediate_image_sizes_advanced', array( __CLASS__, 'limit_import_sizes' ) );
+		}
+		wp_update_attachment_metadata( $attachment_id, $metadata );
+	}
+
+	/**
+	 * Keep only the import image sizes.
+	 *
+	 * @since 2.2.0
+	 *
+	 * @param array $sizes Image sizes to generate.
+	 * @return array
+	 */
+	public static function limit_import_sizes( $sizes ) {
+		return array_intersect_key( (array) $sizes, array_flip( self::IMPORT_SIZES ) );
+	}
+
+	/**
+	 * Queue attachments for the image sizes skipped during import.
+	 *
+	 * @since 2.2.0
+	 *
+	 * @param int[] $attachment_ids Attachment IDs.
+	 */
+	public static function queue_subsizes( array $attachment_ids ) {
+		if ( empty( $attachment_ids ) ) {
+			return;
+		}
+
+		$queue = (array) get_option( 'themegrill_demo_importer_pending_subsizes', array() );
+		update_option( 'themegrill_demo_importer_pending_subsizes', array_values( array_unique( array_merge( $queue, array_map( 'absint', $attachment_ids ) ) ) ), false );
+
+		if ( ! wp_next_scheduled( self::SUBSIZES_HOOK ) ) {
+			wp_schedule_single_event( time() + MINUTE_IN_SECONDS, self::SUBSIZES_HOOK );
+		}
+	}
+
+	/**
+	 * Make the missing image sizes for the next queued attachments.
+	 *
+	 * @since 2.2.0
+	 */
+	public static function generate_pending_subsizes() {
+		$queue = (array) get_option( 'themegrill_demo_importer_pending_subsizes', array() );
+		if ( empty( $queue ) ) {
+			return;
+		}
+
+		require_once ABSPATH . 'wp-admin/includes/image.php';
+
+		foreach ( array_splice( $queue, 0, self::SUBSIZES_BATCH ) as $attachment_id ) {
+			if ( wp_attachment_is_image( $attachment_id ) ) {
+				wp_update_image_subsizes( $attachment_id );
+			}
+		}
+
+		if ( empty( $queue ) ) {
+			delete_option( 'themegrill_demo_importer_pending_subsizes' );
+			return;
+		}
+
+		update_option( 'themegrill_demo_importer_pending_subsizes', $queue, false );
+		wp_schedule_single_event( time() + 10, self::SUBSIZES_HOOK );
+	}
+
+	/**
+	 * Map the demo's size-specific URLs of an attachment to the imported copy.
+	 *
+	 * Demo content can bake a registered size's URL into post_content (a block with a
+	 * "large" sizeSlug). Sizes made later in the background map to the full image, so
+	 * nothing stays hotlinked to the demo site meanwhile. Names use the ORIGINAL basename:
+	 * wp_upload_bits() may rename the new file ("hero-1.jpg"), but content still says "hero-1024x768.jpg".
+	 *
+	 * @param array  $url_remap    Old URL => new URL map.
+	 * @param string $original_url Demo attachment URL.
+	 * @param int    $new_post_id  New attachment ID.
+	 * @param string $new_url      New attachment URL.
+	 * @return array
+	 */
+	private function remap_size_urls( array $url_remap, $original_url, $new_post_id, $new_url ) {
+		$metadata = wp_get_attachment_metadata( $new_post_id );
+		if ( empty( $metadata['width'] ) || empty( $metadata['height'] ) ) {
+			return $url_remap;
+		}
+
+		$generated = array();
+		foreach ( (array) ( $metadata['sizes'] ?? array() ) as $size_data ) {
+			if ( ! empty( $size_data['file'] ) ) {
+				$generated[ $size_data['width'] . 'x' . $size_data['height'] ] = $size_data['file'];
+			}
+		}
+
+		$original_dir      = trailingslashit( dirname( $original_url ) );
+		$new_dir           = trailingslashit( dirname( $new_url ) );
+		$original_basename = pathinfo( wp_basename( $original_url ), PATHINFO_FILENAME );
+		$original_ext      = pathinfo( wp_basename( $original_url ), PATHINFO_EXTENSION );
+
+		foreach ( wp_get_registered_image_subsizes() as $size ) {
+			$dims = image_resize_dimensions( $metadata['width'], $metadata['height'], $size['width'], $size['height'], $size['crop'] );
+			if ( ! $dims ) {
+				continue;
+			}
+			$dimensions = $dims[4] . 'x' . $dims[5];
+
+			$url_remap[ $original_dir . $original_basename . '-' . $dimensions . '.' . $original_ext ] = isset( $generated[ $dimensions ] )
+				? $new_dir . $generated[ $dimensions ]
+				: $new_url;
+		}
+
+		return $url_remap;
+	}
+
+	/**
+	 * Drop attachments the caller replaces after import, unless one is a featured image.
+	 *
+	 * @param array $pending   Pending attachments.
+	 * @param array $skip_urls Image URLs to leave out.
+	 * @return array
+	 */
+	private function without_skipped( array $pending, array $skip_urls ) {
+		if ( empty( $skip_urls ) ) {
+			return $pending;
+		}
+
+		$skip     = array_flip( array_map( array( $this, 'image_key' ), $skip_urls ) );
+		$featured = array_map( 'absint', array_values( (array) get_option( 'themegrill_demo_importer_featured_images', array() ) ) );
+		$kept     = array_filter(
+			$pending,
+			function ( $attachment ) use ( $skip, $featured ) {
+				return in_array( absint( $attachment['original_id'] ), $featured, true ) || ! isset( $skip[ $this->image_key( $attachment['original_url'] ) ] );
+			}
+		);
+
+		$this->logger->info( sprintf( 'Skipping %d replaced attachments', count( $pending ) - count( $kept ) ) );
+
+		return array_values( $kept );
+	}
+
+	/**
+	 * Year/month/filename of an upload URL without size or "-scaled" suffix, so a block's
+	 * size URL matches its attachment whatever host or proxy served it.
+	 *
+	 * @param string $url Upload URL.
+	 * @return string
+	 */
+	private function image_key( $url ) {
+		$path = (string) wp_parse_url( $url, PHP_URL_PATH );
+		$path = preg_replace( '/-(\d+x\d+|scaled)(?=\.\w+$)/', '', $path );
+
+		return strtolower( implode( '/', array_slice( explode( '/', $path ), -3 ) ) );
 	}
 
 	/**
@@ -221,51 +389,8 @@ class MediaImporter {
 		$mapping         = get_option( 'themegrill_demo_importer_mapping', array() );
 		$featured_images = get_option( 'themegrill_demo_importer_featured_images', array() );
 
-		// Replace old attachment URLs in post_content and _elementor_data postmeta
-		// (longest first to avoid partial matches).
 		if ( ! empty( $url_remap ) ) {
-			$sorted_url_remap = $url_remap;
-			uksort( $sorted_url_remap, fn( $a, $b ) => strlen( $b ) - strlen( $a ) );
-			foreach ( $sorted_url_remap as $old_url => $new_url ) {
-				$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-					$wpdb->prepare(
-						"UPDATE {$wpdb->posts} SET post_content = REPLACE(post_content, %s, %s)",
-						$old_url,
-						$new_url
-					)
-				);
-				$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-					$wpdb->prepare(
-						"UPDATE {$wpdb->postmeta} SET meta_value = REPLACE(meta_value, %s, %s) WHERE meta_key = '_elementor_data'",
-						$old_url,
-						$new_url
-					)
-				);
-
-				// SiteOrigin widgets can be embedded directly in post_content via a
-				// `[siteorigin_widget]` shortcode carrying a JSON-encoded "instance"
-				// attribute. json_encode() escapes forward slashes by default, so the
-				// same URL appears there as "https:\/\/..." and the plain-URL REPLACE
-				// above never matches it - replace that escaped form too.
-				$old_url_escaped = str_replace( '/', '\/', $old_url );
-				$new_url_escaped = str_replace( '/', '\/', $new_url );
-
-				$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-					$wpdb->prepare(
-						"UPDATE {$wpdb->posts} SET post_content = REPLACE(post_content, %s, %s)",
-						$old_url_escaped,
-						$new_url_escaped
-					)
-				);
-				$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-					$wpdb->prepare(
-						"UPDATE {$wpdb->postmeta} SET meta_value = REPLACE(meta_value, %s, %s) WHERE meta_key = '_elementor_data'",
-						$old_url_escaped,
-						$new_url_escaped
-					)
-				);
-			}
-
+			$this->remap_content_urls( $url_remap );
 			$this->remap_panels_data_urls( $url_remap );
 		}
 
@@ -302,6 +427,46 @@ class MediaImporter {
 		delete_option( 'themegrill_demo_importer_featured_images' );
 		delete_option( 'themegrill_demo_importer_media_total' );
 		delete_option( 'themegrill_demo_importer_pending_attachments' );
+	}
+
+	/**
+	 * Replace old attachment URLs in post content and Elementor data, one write per changed row.
+	 *
+	 * Replaces a REPLACE() query per URL per table, which scanned every row for each of the
+	 * hundreds of URL and size variants. strtr() also matches longest keys first.
+	 *
+	 * @param array $url_remap Map of old attachment URL => new local URL.
+	 */
+	private function remap_content_urls( array $url_remap ): void {
+		global $wpdb;
+
+		// SiteOrigin shortcodes hold JSON with escaped slashes ("https:\/\/..."), so map that form too.
+		$map = $url_remap;
+		foreach ( $url_remap as $old_url => $new_url ) {
+			$map[ str_replace( '/', '\/', $old_url ) ] = str_replace( '/', '\/', $new_url );
+		}
+
+		$post_ids = $wpdb->get_col( "SELECT ID FROM {$wpdb->posts} WHERE post_content LIKE '%wp-content%'" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- One-off import pass over raw content.
+		foreach ( array_chunk( $post_ids, 100 ) as $chunk ) {
+			$placeholders = implode( ',', array_fill( 0, count( $chunk ), '%d' ) );
+			$posts        = $wpdb->get_results( $wpdb->prepare( "SELECT ID, post_content FROM {$wpdb->posts} WHERE ID IN ($placeholders)", ...$chunk ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- $placeholders is a run of %d built above.
+			foreach ( $posts as $post ) {
+				$content = strtr( $post->post_content, $map );
+				if ( $content !== $post->post_content ) {
+					$wpdb->update( $wpdb->posts, array( 'post_content' => $content ), array( 'ID' => $post->ID ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Cache cleared next line.
+					clean_post_cache( (int) $post->ID );
+				}
+			}
+		}
+
+		$rows = $wpdb->get_results( "SELECT meta_id, post_id, meta_value FROM {$wpdb->postmeta} WHERE meta_key = '_elementor_data'" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- One-off import pass.
+		foreach ( $rows as $row ) {
+			$value = strtr( $row->meta_value, $map );
+			if ( $value !== $row->meta_value ) {
+				$wpdb->update( $wpdb->postmeta, array( 'meta_value' => $value ), array( 'meta_id' => $row->meta_id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.SlowDBQuery.slow_db_query_meta_value -- Cache cleared next line.
+				wp_cache_delete( (int) $row->post_id, 'post_meta' );
+			}
+		}
 	}
 
 	/**

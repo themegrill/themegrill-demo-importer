@@ -3,6 +3,7 @@ import { ArrowLeft, Sparkles } from 'lucide-react';
 import { useEffect } from 'react';
 import AiSidebar, { FLOW_STEPS, getStepIndex, useBackToTemplates } from './components/AiSidebar';
 import DescribeScreen from './screens/DescribeScreen';
+import DesignScreen from './screens/DesignScreen';
 import GeneratingScreen from './screens/GeneratingScreen';
 import ImportScreen from './screens/ImportScreen';
 import PreviewScreen from './screens/PreviewScreen';
@@ -12,6 +13,7 @@ import { AiFlowProvider, AiStage, useAiFlow } from './store/AiFlowContext';
 // survives the stage changes that drive the step indicator.
 const STAGE_SCREENS: Record<AiStage, () => JSX.Element | null> = {
 	describe: DescribeScreen,
+	design: DesignScreen,
 	generating: GeneratingScreen,
 	preview: PreviewScreen,
 	confirm: ImportScreen,

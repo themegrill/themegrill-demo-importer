@@ -5,16 +5,8 @@ import { Button } from '../../components/ui/Button';
 import { cn } from '../../lib/utils';
 import { useBackToTemplates } from '../components/AiSidebar';
 import { fieldClass, invalidClass } from '../components/fields';
-import {
-	BRAND_NAME_MAX,
-	DESCRIPTION_MAX,
-	LANGUAGES,
-	NICHES,
-	PAGES,
-	TONES,
-} from '../constants';
-import { useAiFlow } from '../store/AiFlowContext';
-import { AiPageSlug } from '../types';
+import { BRAND_NAME_MAX, DESCRIPTION_MAX } from '../constants';
+import { describeKey, useAiFlow } from '../store/AiFlowContext';
 import { DescribeErrors, validateDescribe } from '../validation';
 
 
@@ -45,8 +37,6 @@ const DescribeScreen = () => {
 	const ids = {
 		brandName: `${uid}-brand`,
 		description: `${uid}-description`,
-		niche: `${uid}-niche`,
-		language: `${uid}-language`,
 	};
 
 	const [touched, setTouched] = useState<Partial<Record<keyof DescribeErrors, boolean>>>({});
@@ -58,13 +48,6 @@ const DescribeScreen = () => {
 	const visibleError = (field: keyof DescribeErrors) =>
 		submitted || touched[field] ? errors[field] : undefined;
 	const touch = (field: keyof DescribeErrors) => setTouched((t) => ({ ...t, [field]: true }));
-
-	const togglePage = (page: AiPageSlug) => {
-		const pages = form.pages.includes(page)
-			? form.pages.filter((p) => p !== page)
-			: PAGES.map((p) => p.value).filter((p) => p === page || form.pages.includes(p));
-		dispatch({ type: 'UPDATE_FORM', patch: { pages } });
-	};
 
 	const handleSubmit = (event: React.FormEvent) => {
 		event.preventDefault();
@@ -78,15 +61,15 @@ const DescribeScreen = () => {
 			descriptionRef.current?.focus();
 			return;
 		}
-		if (errors.pages) {
-			return;
-		}
 
-		dispatch({
-			type: 'UPDATE_FORM',
-			patch: { brandName: form.brandName.trim(), description: form.description.trim() },
-		});
-		dispatch({ type: 'SET_STAGE', stage: 'generating' });
+		const brandName = form.brandName.trim();
+		const description = form.description.trim();
+		// Designs are ranked for this description; any change ranks them again.
+		if (describeKey(form) !== state.designsKey) {
+			dispatch({ type: 'SET_DESIGNS', designs: null, key: '' });
+		}
+		dispatch({ type: 'UPDATE_FORM', patch: { brandName, description, demoSlug: undefined, briefId: undefined } });
+		dispatch({ type: 'SET_STAGE', stage: 'design' });
 	};
 
 	const descriptionLength = form.description.trim().length;
@@ -100,7 +83,7 @@ const DescribeScreen = () => {
 					/* translators: 1: current step, 2: total steps. */
 					__('Step %1$d of %2$d', 'themegrill-demo-importer'),
 					1,
-					4,
+					5,
 				)}
 			</p>
 			<h1 className="text-[28px] leading-9 font-semibold text-[#1F1F1F] m-0 p-0">
@@ -108,7 +91,7 @@ const DescribeScreen = () => {
 			</h1>
 			<p className="text-[15px] leading-6 text-[#6B6B6B] mt-2 mb-8">
 				{__(
-					'Tell us about your business. We’ll pick a design, write the copy and find images. You can review and edit everything before anything is imported.',
+					'Just two things. We work out the rest: the right design, your copy, images, colors and fonts.',
 					'themegrill-demo-importer',
 				)}
 			</p>
@@ -136,15 +119,15 @@ const DescribeScreen = () => {
 
 				<div>
 					<Label htmlFor={ids.description}>
-						{__('What’s the site about?', 'themegrill-demo-importer')}
+						{__('What does your business do?', 'themegrill-demo-importer')}
 					</Label>
 					<textarea
 						ref={descriptionRef}
 						id={ids.description}
-						rows={4}
+						rows={3}
 						value={form.description}
 						placeholder={__(
-							'A family bakery in Kathmandu selling fresh bread and custom cakes',
+							'e.g. Bakery, or: A family bakery in Kathmandu selling fresh bread and custom cakes',
 							'themegrill-demo-importer',
 						)}
 						onChange={(e) => dispatch({ type: 'UPDATE_FORM', patch: { description: e.target.value } })}
@@ -152,12 +135,12 @@ const DescribeScreen = () => {
 						aria-required="true"
 						aria-invalid={!!descriptionError}
 						aria-describedby={`${ids.description}-hint${descriptionError ? ` ${ids.description}-error` : ''}`}
-						className={cn(fieldClass, '!py-3 !leading-6 resize-y min-h-[120px]', descriptionError && invalidClass)}
+						className={cn(fieldClass, '!py-3 !leading-6 resize-y min-h-[96px]', descriptionError && invalidClass)}
 					/>
 					<div className="flex justify-between gap-4 mt-2">
 						<p id={`${ids.description}-hint`} className="m-0 text-[13px] text-[#6B6B6B]">
 							{__(
-								'Mention what you offer, who it’s for and where you are. More detail gives better copy.',
+								'A niche like “bakery” is enough. A sentence about what you offer and where gives more personal copy.',
 								'themegrill-demo-importer',
 							)}
 						</p>
@@ -173,109 +156,6 @@ const DescribeScreen = () => {
 					<FieldError id={`${ids.description}-error`} message={descriptionError} />
 				</div>
 
-				<div className="grid grid-cols-1 lg:grid-cols-2 gap-7 lg:gap-5">
-					<div>
-						<Label htmlFor={ids.niche} optional>
-							{__('Niche', 'themegrill-demo-importer')}
-						</Label>
-						<select
-							id={ids.niche}
-							value={form.niche}
-							onChange={(e) => dispatch({ type: 'UPDATE_FORM', patch: { niche: e.target.value } })}
-							className={cn(fieldClass, '!h-12 !pr-10 ![background-position:right_12px_center]')}
-						>
-							{NICHES.map((n) => (
-								<option key={n.value} value={n.value}>
-									{n.label}
-								</option>
-							))}
-						</select>
-					</div>
-					<div>
-						<Label htmlFor={ids.language} optional>
-							{__('Language', 'themegrill-demo-importer')}
-						</Label>
-						<select
-							id={ids.language}
-							value={form.language}
-							onChange={(e) => dispatch({ type: 'UPDATE_FORM', patch: { language: e.target.value } })}
-							className={cn(fieldClass, '!h-12 !pr-10 ![background-position:right_12px_center]')}
-						>
-							{LANGUAGES.map((l) => (
-								<option key={l.value} value={l.value}>
-									{l.label}
-								</option>
-							))}
-						</select>
-					</div>
-				</div>
-
-				<fieldset className="m-0 p-0 border-0 min-w-0">
-					<legend className="p-0 text-[14px] font-medium text-[#1F1F1F] mb-3">
-						{__('Tone', 'themegrill-demo-importer')}
-					</legend>
-					<div className="flex flex-wrap gap-3">
-						{TONES.map((tone) => (
-							<label key={tone.value} className="relative cursor-pointer">
-								<input
-									type="radio"
-									name={`${uid}-tone`}
-									value={tone.value}
-									checked={form.tone === tone.value}
-									onChange={() => dispatch({ type: 'UPDATE_FORM', patch: { tone: tone.value } })}
-									className="peer sr-only"
-								/>
-								<span
-									className={cn(
-										'inline-flex items-center h-10 px-5 rounded-full border-2 border-solid text-[14px] transition-colors',
-										'peer-focus-visible:ring-2 peer-focus-visible:ring-[#5182EF] peer-focus-visible:ring-offset-2',
-										form.tone === tone.value
-											? 'bg-[#2563EB] border-[#2563EB] text-white'
-											: 'bg-white border-[#EBEDEF] text-[#383838] hover:border-[#B9CDF9]',
-									)}
-								>
-									{tone.label}
-								</span>
-							</label>
-						))}
-					</div>
-				</fieldset>
-
-				<fieldset className="m-0 p-0 border-0 min-w-0" aria-describedby={errors.pages ? `${uid}-pages-error` : undefined}>
-					<legend className="p-0 text-[14px] font-medium text-[#1F1F1F] mb-3">
-						{__('Pages', 'themegrill-demo-importer')}
-					</legend>
-					<div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-						{PAGES.map((page) => {
-							const checked = form.pages.includes(page.value);
-							return (
-								<label
-									key={page.value}
-									className={cn(
-										'flex items-center gap-3 h-12 px-4 rounded-md border-2 border-solid text-[14px] text-[#383838]',
-										checked ? 'border-[#B9CDF9] bg-[#F5F8FF]' : 'border-[#EBEDEF] bg-white',
-										page.required ? 'cursor-default' : 'cursor-pointer',
-									)}
-								>
-									<input
-										type="checkbox"
-										checked={checked}
-										disabled={page.required}
-										onChange={() => togglePage(page.value)}
-										className="!m-0"
-									/>
-									{page.label}
-									{page.required && (
-										<span className="ml-auto text-[12px] text-[#909090]">
-											{__('Required', 'themegrill-demo-importer')}
-										</span>
-									)}
-								</label>
-							);
-						})}
-					</div>
-					<FieldError id={`${uid}-pages-error`} message={visibleError('pages')} />
-				</fieldset>
 			</div>
 
 			<div className="flex flex-col-reverse sm:flex-row sm:justify-between gap-3 mt-10 pt-6 border-0 border-t border-solid border-[#E9E9E9]">
@@ -293,7 +173,7 @@ const DescribeScreen = () => {
 					className="h-12 px-8 gap-2 cursor-pointer border-0 bg-[#2563EB] text-white text-[15px] hover:bg-[#134FD2]"
 				>
 					<Sparkles size={18} />
-					{__('Generate my site', 'themegrill-demo-importer')}
+					{__('Choose a design', 'themegrill-demo-importer')}
 				</Button>
 			</div>
 		</form>

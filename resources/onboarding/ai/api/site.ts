@@ -60,13 +60,14 @@ export type ImportAction =
 	| 'import-widgets'
 	| 'complete';
 
-export const runImportAction = (action: ImportAction, demo: Demo, plugins: string[]) =>
+// `skipMedia`: demo image URLs the media step needn't download (replaced after import).
+export const runImportAction = (action: ImportAction, demo: Demo, plugins: string[], skipMedia: string[] = []) =>
 	call<any>(
 		'POST',
 		'install',
 		{
 			demo_config: demo,
-			opts: { plugins, customLogo: 0, pages: [], colorPalette: [], typography: [] },
+			opts: { plugins, customLogo: 0, pages: [], colorPalette: [], typography: [], skipMedia },
 		},
 		{ action },
 	);

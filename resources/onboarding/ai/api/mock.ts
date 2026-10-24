@@ -2,8 +2,8 @@
 // description (or a regenerate instruction) to force an error state:
 //   #ratelimit #invalid #fail #unauthorized #network #badresponse
 import { __ } from '@wordpress/i18n';
-import { buildPackage, fillSection, findFixtureByDemo, pickFixture } from '../fixtures';
-import { GenerateRequest, GenerationStep, Section, SlotValue } from '../types';
+import { buildPackage, FIXTURES, fillSection, findFixtureByDemo, pickFixture } from '../fixtures';
+import { DesignOption, GenerateRequest, GenerationStep, Section, SlotValue } from '../types';
 import { AiApiError } from './errors';
 import { AiClient, RequestOptions } from './types';
 
@@ -98,6 +98,27 @@ const rewrite = (value: SlotValue, instruction: string): SlotValue => {
 };
 
 export const mockClient: AiClient = {
+	// The matching fixture's designs first, then the other fixtures'.
+	async designs(request, options = {}) {
+		throwForTag(request.description, 'start');
+		await sleep(1200, options.signal);
+		const first = pickFixture(request);
+		const fixtures = [first, ...FIXTURES.filter((f) => f !== first)];
+		const seen = new Set<string>();
+		const designs = fixtures
+			.flatMap((f) => [f.demo, ...f.alternatives])
+			.filter((d) => !seen.has(d.slug) && seen.add(d.slug))
+			.map(
+				(demo, i): DesignOption => ({
+					...demo,
+					demoUrl: '',
+					premium: false,
+					match: i < 1 ? 'best' : i < 4 ? 'related' : 'other',
+				}),
+			);
+		return { briefId: 'brf_mock', designs };
+	},
+
 	async generate(request, options = {}) {
 		const { signal, onProgress } = options;
 		throwForTag(request.description, 'start');

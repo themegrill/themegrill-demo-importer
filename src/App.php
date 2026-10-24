@@ -2,6 +2,7 @@
 
 namespace ThemeGrill\Demo\Importer;
 
+use ThemeGrill\Demo\Importer\Importers\MediaImporter;
 use ThemeGrill\Demo\Importer\Traits\Singleton;
 
 class App {
@@ -30,6 +31,8 @@ class App {
 		// Load plugin text domain.
 		add_action( 'init', array( $this, 'load_plugin_textdomain' ) );
 		add_action( 'init', array( $this, 'maybe_flush_rewrite_rules' ), 999 );
+
+		add_action( MediaImporter::SUBSIZES_HOOK, array( MediaImporter::class, 'generate_pending_subsizes' ) );
 
 		add_filter( 'plugin_action_links_' . TGDM_PLUGIN_BASENAME, array( $this, 'plugin_action_links' ) );
 		add_filter( 'plugin_row_meta', array( $this, 'plugin_row_meta' ), 10, 2 );

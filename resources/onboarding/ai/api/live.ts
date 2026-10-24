@@ -2,7 +2,7 @@
 // using the request/response contract in AI_STARTER_SITES_KB.md §6.
 import { __ } from '@wordpress/i18n';
 import { getAiConfig } from '../config';
-import { AiErrorPayload, GenerationPackage, GenerationProgress } from '../types';
+import { AiErrorPayload, DesignsResponse, GenerationPackage, GenerationProgress } from '../types';
 import { AiApiError, toAiApiError } from './errors';
 import { AiClient } from './types';
 
@@ -144,6 +144,13 @@ const assertPackage = (pkg: GenerationPackage): GenerationPackage => {
 };
 
 export const liveClient: AiClient = {
+	designs: async (body, options = {}) => {
+		const response = await post<DesignsResponse>('designs', body, options.signal);
+		if (typeof response?.briefId !== 'string' || !Array.isArray(response.designs) || !response.designs.length) {
+			throw unexpected();
+		}
+		return response;
+	},
 	generate: async (body, options = {}) =>
 		assertPackage(await postStream('generate', body, options.onProgress, options.signal)),
 	regenerateSection: (body, options = {}) => post('regenerate-section', body, options.signal),

@@ -136,6 +136,7 @@ class RestApi {
 	private function register_ai_endpoints() {
 		$controller = new AiController();
 		$routes     = array(
+			'/ai/designs'            => 'designs',
 			'/ai/generate'           => 'generate',
 			'/ai/regenerate-section' => 'regenerate_section',
 			'/ai/switch-demo'        => 'switch_demo',

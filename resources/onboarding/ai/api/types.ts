@@ -1,4 +1,5 @@
 import {
+	DesignsResponse,
 	GenerateRequest,
 	GenerationPackage,
 	GenerationProgress,
@@ -16,6 +17,7 @@ export type GenerateOptions = RequestOptions & {
 };
 
 export interface AiClient {
+	designs(request: GenerateRequest, options?: RequestOptions): Promise<DesignsResponse>;
 	generate(request: GenerateRequest, options?: GenerateOptions): Promise<GenerationPackage>;
 	regenerateSection(
 		request: RegenerateSectionRequest,
