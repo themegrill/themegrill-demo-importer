@@ -6,7 +6,7 @@ import { getFriendlyImportErrorMessage } from '../../components/features/api/imp
 import { Demo } from '../../lib/types';
 import { getAiConfig } from '../config';
 import { ApplyPayload } from '../rebrand';
-import { BrandPalette } from '../types';
+import { BrandPalette, GenerationPackage } from '../types';
 
 // restUrl is ".../tg-demo-importer/v1/ai/"; the plugin namespace is one level up.
 const routeUrl = (route: string, query: Record<string, string> = {}) => {
@@ -80,3 +80,15 @@ export const getColorMaps = (demoSlug: string, palette: BrandPalette) =>
 		demoSlug,
 		palette,
 	}).then((r) => ({ blocks: r.colorMap, theme: r.themeColorMap ?? r.colorMap }));
+
+// The generated page drawn on the design's live page, as HTML for a sandboxed frame.
+export const getPreviewHtml = (pkg: GenerationPackage, pageSlug: string) => {
+	const page = pkg.pages.find((p) => p.slug === pageSlug);
+	return call<{ html: string }>('POST', 'ai/preview', {
+		demoSlug: pkg.demo.slug,
+		page: pageSlug,
+		brand: pkg.brand,
+		sections: (page?.sections ?? []).map((s) => ({ id: s.id, slots: s.slots })),
+		removed: (page?.removed ?? []).filter((r) => !r.restored).map((r) => r.groupId),
+	}).then((r) => r.html);
+};

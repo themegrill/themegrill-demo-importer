@@ -1,11 +1,11 @@
 import { __, sprintf } from '@wordpress/i18n';
-import { AlertCircle, ArrowLeft, Sparkles } from 'lucide-react';
+import { AlertCircle, ArrowLeft, Check, Sparkles } from 'lucide-react';
 import React, { useId, useMemo, useRef, useState } from 'react';
 import { Button } from '../../components/ui/Button';
 import { cn } from '../../lib/utils';
 import { useBackToTemplates } from '../components/AiSidebar';
 import { fieldClass, invalidClass } from '../components/fields';
-import { BRAND_NAME_MAX, DESCRIPTION_MAX } from '../constants';
+import { BRAND_NAME_MAX, DESCRIPTION_MAX, PAGES } from '../constants';
 import { describeKey, useAiFlow } from '../store/AiFlowContext';
 import { DescribeErrors, validateDescribe } from '../validation';
 
@@ -156,6 +156,38 @@ const DescribeScreen = () => {
 					<FieldError id={`${ids.description}-error`} message={descriptionError} />
 				</div>
 
+				<fieldset className="m-0 p-0 border-0">
+					<legend className="block p-0 mb-2 text-[14px] font-medium text-[#1F1F1F]">
+						{__('Pages', 'themegrill-demo-importer')}
+					</legend>
+					<ul className="flex flex-wrap gap-2 m-0 p-0 list-none">
+						{PAGES.map((page) =>
+							page.value === 'home' ? (
+								<li
+									key={page.value}
+									className="m-0 flex items-center gap-2 h-10 px-4 rounded-full border-2 border-solid border-[#2563EB] bg-[#F5F8FF] text-[14px] text-[#1E3A8A]"
+								>
+									<Check size={16} aria-hidden="true" />
+									{page.label}
+								</li>
+							) : (
+								<li
+									key={page.value}
+									aria-disabled="true"
+									className="m-0 flex items-center gap-2 h-10 px-4 rounded-full border-2 border-solid border-[#EBEDEF] bg-[#F9FAFB] text-[14px] text-[#A3A3A3] cursor-not-allowed"
+								>
+									{page.label}
+									<span className="text-[11px] font-medium uppercase tracking-wide text-[#909090]">
+										{__('Coming soon', 'themegrill-demo-importer')}
+									</span>
+								</li>
+							),
+						)}
+					</ul>
+					<p className="m-0 mt-2 text-[13px] text-[#6B6B6B]">
+						{__('We build your home page for now. More pages are on the way.', 'themegrill-demo-importer')}
+					</p>
+				</fieldset>
 			</div>
 
 			<div className="flex flex-col-reverse sm:flex-row sm:justify-between gap-3 mt-10 pt-6 border-0 border-t border-solid border-[#E9E9E9]">

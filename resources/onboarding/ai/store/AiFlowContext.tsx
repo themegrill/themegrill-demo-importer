@@ -45,7 +45,8 @@ export const initialForm: GenerateRequest = {
 	niche: 'auto',
 	tone: 'friendly',
 	language: LANGUAGES.some((l) => l.value === siteLanguage) ? siteLanguage : 'en',
-	pages: ['home', 'about', 'services', 'contact'],
+	// Only the home page is generated for now; other pages are coming soon.
+	pages: ['home'],
 };
 
 const initialState: AiFlowState = {

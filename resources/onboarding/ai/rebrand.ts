@@ -79,6 +79,14 @@ export const rebrandDemoConfig = (
 			...Object.fromEntries(Object.keys(themeMods).filter((key) => /logo$/.test(key)).map((key) => [key, ''])),
 			custom_logo: '',
 			zakra_enable_site_identity: true,
+			// Logo demos never styled the title: match the menu so it reads on their header.
+			...(typeof themeMods.zakra_primary_menu_text_color === 'string'
+				? {
+						zakra_header_site_identity_color:
+							themeMods.zakra_header_site_identity_color || themeMods.zakra_primary_menu_text_color,
+						zakra_site_identity_color: themeMods.zakra_site_identity_color || themeMods.zakra_primary_menu_text_color,
+					}
+				: {}),
 		},
 		...('blockart_blocks_settings' in demo
 			? { blockart_blocks_settings: transformValue((demo as any).blockart_blocks_settings, '', colors, fonts) }

@@ -1,33 +1,46 @@
 import { __, sprintf } from '@wordpress/i18n';
+import { useQuery } from '@tanstack/react-query';
 import { ArrowRight, Info, PencilLine, RefreshCw } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '../../components/ui/Button';
 import { cn } from '../../lib/utils';
 import { outlineButtonClass, primaryButtonClass } from '../components/fields';
 import SectionPreview from '../components/preview/SectionPreview';
+import SitePreview from '../components/preview/SitePreview';
 import { useGoogleFonts } from '../components/preview/useGoogleFonts';
+import { getPreviewHtml } from '../api/site';
 import { getImportPackage } from '../rebrand';
 import { useAiFlow } from '../store/AiFlowContext';
 
 const PreviewScreen = () => {
 	const { state, dispatch } = useAiFlow();
 	const pkg = state.pkg;
-	const [pageSlug, setPageSlug] = useState(pkg?.pages[0]?.slug ?? 'home');
 	const [confirmReset, setConfirmReset] = useState(false);
+	// Only the home page is generated for now.
+	const page = pkg?.pages.find((p) => p.slug === 'home') ?? pkg?.pages[0];
+	const importable = !!pkg && !!getImportPackage(pkg);
 
-	useGoogleFonts(pkg ? [pkg.brand.fonts.heading, pkg.brand.fonts.body] : []);
+	// The real page needs the live service; mock packages show section cards.
+	const preview = useQuery({
+		queryKey: ['ai-preview', pkg?.id, page?.slug],
+		queryFn: () => getPreviewHtml(pkg!, page!.slug),
+		enabled: importable && !!page,
+		staleTime: Infinity,
+		retry: 1,
+	});
+	const showCards = !importable || preview.isError;
+
+	useGoogleFonts(pkg && showCards ? [pkg.brand.fonts.heading, pkg.brand.fonts.body] : []);
 
 	if (!pkg) {
 		return null;
 	}
 
-	const page = pkg.pages.find((p) => p.slug === pageSlug) ?? pkg.pages[0];
-	const importable = !!getImportPackage(pkg);
 	// Same description and design, fresh copy and images.
 	const regenerate = () => dispatch({ type: 'SET_STAGE', stage: 'generating' });
 
 	return (
-		<div className="max-w-[1000px] mx-auto">
+		<div className="max-w-[1200px] mx-auto">
 			<p className="text-[13px] font-medium uppercase tracking-wide text-[#2563EB] m-0 mb-2">
 				{sprintf(
 					/* translators: 1: current step, 2: total steps. */
@@ -78,37 +91,15 @@ const PreviewScreen = () => {
 				</div>
 			)}
 
-			<div role="tablist" aria-label={__('Pages', 'themegrill-demo-importer')} className="flex flex-wrap gap-2 mb-4">
-				{pkg.pages.map((p) => (
-					<button
-						key={p.slug}
-						type="button"
-						role="tab"
-						aria-selected={p.slug === page?.slug}
-						onClick={() => setPageSlug(p.slug)}
-						className={cn(
-							'h-9 px-4 rounded-full border-2 border-solid text-[14px] cursor-pointer',
-							p.slug === page?.slug
-								? 'bg-[#2563EB] border-[#2563EB] text-white'
-								: 'bg-white border-[#EBEDEF] text-[#383838] hover:border-[#B9CDF9]',
-						)}
-					>
-						{p.title}
-					</button>
-				))}
-			</div>
-
-			<div role="tabpanel" className="flex flex-col gap-4">
-				{page && page.sections.length > 0 ? (
-					page.sections.map((section) => (
+			{showCards ? (
+				<div className="flex flex-col gap-4">
+					{page?.sections.map((section) => (
 						<SectionPreview key={`${page.slug}-${section.id}`} section={section} brand={pkg.brand} />
-					))
-				) : (
-					<p className="m-0 p-6 rounded-lg border border-dashed border-[#E2E8F0] text-[14px] text-[#6B6B6B] text-center">
-						{__('This page is filled in automatically (for example, your latest blog posts).', 'themegrill-demo-importer')}
-					</p>
-				)}
-			</div>
+					))}
+				</div>
+			) : (
+				<SitePreview html={preview.data} loading={preview.isPending} title={pkg.brand.siteTitle} />
+			)}
 
 			<div className="sticky bottom-0 -mx-4 sm:-mx-10 lg:-mx-14 mt-8 px-4 sm:px-10 lg:px-14 py-4 bg-white border-0 border-t border-solid border-[#E9E9E9] flex flex-wrap items-center justify-between gap-3">
 				{confirmReset ? (

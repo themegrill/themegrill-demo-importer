@@ -143,6 +143,31 @@ class AiController {
 	}
 
 	/**
+	 * Render the generated page on the design's live page, for the preview frame.
+	 *
+	 * The HTML is shown in a sandboxed iframe, so it never runs as this site.
+	 *
+	 * @since 2.2.0
+	 *
+	 * @param WP_REST_Request $request Request.
+	 * @return WP_REST_Response
+	 */
+	public function preview( $request ) {
+		$params = $request->get_json_params();
+
+		return $this->forward(
+			'/api/preview',
+			array(
+				'demoSlug' => sanitize_key( isset( $params['demoSlug'] ) ? (string) $params['demoSlug'] : '' ),
+				'page'     => sanitize_key( isset( $params['page'] ) ? (string) $params['page'] : 'home' ),
+				'brand'    => isset( $params['brand'] ) && is_array( $params['brand'] ) ? $params['brand'] : array(),
+				'sections' => isset( $params['sections'] ) && is_array( $params['sections'] ) ? $params['sections'] : array(),
+				'removed'  => isset( $params['removed'] ) && is_array( $params['removed'] ) ? array_map( 'sanitize_key', $params['removed'] ) : array(),
+			)
+		);
+	}
+
+	/**
 	 * Install and activate the theme the AI demos are built on.
 	 *
 	 * @since 2.2.0
