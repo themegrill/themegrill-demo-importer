@@ -234,7 +234,15 @@ class ImportHooks {
 
 	public function update_customizer_data() {
 		$theme_mods = get_option( 'themegrill_starter_template_theme_mods', array() );
+		$mapping    = get_option( 'themegrill_demo_importer_mapping', array() );
+		$post_map   = ! empty( $mapping['post'] ) && is_array( $mapping['post'] ) ? $mapping['post'] : array();
+
 		foreach ( $theme_mods as $key => $value ) {
+			// Himalayas slider slots hold the demo's own page IDs, which differ on this site.
+			if ( preg_match( '/^himalayas_slide\d+$/', $key ) && is_scalar( $value ) && isset( $post_map[ $value ] ) ) {
+				$value = $post_map[ $value ];
+			}
+
 			set_theme_mod( $key, $value );
 		}
 		delete_option( 'themegrill_starter_template_theme_mods' );
