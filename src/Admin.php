@@ -186,11 +186,59 @@ class Admin {
 	}
 
 	/**
+	 * Map an installed theme directory name to its canonical supported slug.
+	 *
+	 * WordPress keeps whatever folder name a theme was installed under, so a
+	 * re-downloaded package (e.g. a browser saving `flash-pro-2.zip`) can end up
+	 * in `wp-content/themes/flash-pro-2`. Strip a trailing `-<number>` only when
+	 * the result is a supported theme, so unrelated themes are left untouched.
+	 *
+	 * @param string $slug Theme directory name.
+	 * @return string
+	 */
+	public static function normalize_theme_slug( $slug ) {
+		$slug             = (string) $slug;
+		$supported_themes = self::get_core_supported_themes();
+
+		if ( in_array( $slug, $supported_themes, true ) ) {
+			return $slug;
+		}
+
+		$base = preg_replace( '/-\d+$/', '', $slug );
+		if ( $base !== $slug && in_array( $base, $supported_themes, true ) ) {
+			return $base;
+		}
+
+		return $slug;
+	}
+
+	/**
+	 * Resolve a canonical theme slug (e.g. `flash-pro`) to the directory it is
+	 * actually installed in (e.g. `flash-pro-2`).
+	 *
+	 * @param string $slug Canonical theme slug.
+	 * @return string|false Installed directory name, or false if not installed.
+	 */
+	public static function get_installed_theme_dir( $slug ) {
+		if ( wp_get_theme( $slug )->exists() ) {
+			return $slug;
+		}
+
+		foreach ( array_keys( wp_get_themes() ) as $dir ) {
+			if ( self::normalize_theme_slug( $dir ) === $slug ) {
+				return $dir;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * check whether the current active theme is in core supported themes list
 	 */
 	public static function get_theme() {
 		$supported_themes = self::get_core_supported_themes();
-		$theme            = get_option( 'template' );
+		$theme            = self::normalize_theme_slug( get_option( 'template' ) );
 		if ( in_array( $theme, $supported_themes, true ) ) {
 			$is_pro_theme = strpos( $theme, '-pro' ) !== false;
 			if ( $is_pro_theme ) {
@@ -540,7 +588,13 @@ class Admin {
 	}
 
 	public static function get_localized_data() {
-		$installed_themes       = array_keys( wp_get_themes() );
+		$installed_themes = array_keys( wp_get_themes() );
+		// Also expose canonical slugs so suffixed folders (e.g. `flash-pro-2`) are recognised.
+		$installed_themes       = array_values(
+			array_unique(
+				array_merge( $installed_themes, array_map( array( __CLASS__, 'normalize_theme_slug' ), $installed_themes ) )
+			)
+		);
 		$installed_plugins      = array_keys( get_plugins() );
 		$is_installed_zakra_pro = in_array( 'zakra-pro/zakra-pro.php', $installed_plugins, true ) ? true : false;
 		$is_active_zakra_pro    = false;
@@ -553,7 +607,7 @@ class Admin {
 			'theme'               => $theme,
 			'siteUrl'             => site_url(),
 			'installed_themes'    => $installed_themes,
-			'current_theme'       => get_option( 'template' ),
+			'current_theme'       => static::normalize_theme_slug( get_option( 'template' ) ),
 			'zakra_pro_installed' => $is_installed_zakra_pro,
 			'zakra_pro_activated' => $is_active_zakra_pro,
 		);
