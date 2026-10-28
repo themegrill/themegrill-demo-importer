@@ -72,7 +72,16 @@ class ImportController {
 		if ( 'zakra-pro' === $slug ) {
 			activate_plugin( 'zakra-pro/zakra-pro.php' );
 		} else {
-			switch_theme( $slug );
+			// The theme may be installed under a suffixed folder such as `flash-pro-2`.
+			$theme_dir = Admin::get_installed_theme_dir( $slug );
+			if ( ! $theme_dir ) {
+				return new WP_Error(
+					'theme_not_installed',
+					__( 'The requested theme is not installed.', 'themegrill-demo-importer' ),
+					array( 'status' => 404 )
+				);
+			}
+			switch_theme( $theme_dir );
 		}
 
 		return new WP_REST_Response(
