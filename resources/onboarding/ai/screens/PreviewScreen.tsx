@@ -102,7 +102,7 @@ const PreviewScreen = () => {
 				<SitePreview html={preview.data} loading={preview.isPending} title={pkg.brand.siteTitle} />
 			)}
 
-			<div className="sticky bottom-0 -mx-4 sm:-mx-10 lg:-mx-14 mt-8 px-4 sm:px-10 lg:px-14 py-4 bg-white border-0 border-t border-solid border-[#E9E9E9] flex flex-wrap items-center justify-between gap-3">
+			<div className="sticky z-10 -bottom-8 lg:-bottom-14 -mx-4 sm:-mx-10 lg:-mx-14 -mb-8 lg:-mb-14 mt-8 px-4 sm:px-10 lg:px-14 py-4 bg-white border-0 border-t border-solid border-[#E9E9E9] flex flex-wrap items-center justify-between gap-3">
 				{confirmReset ? (
 					<div className="flex flex-wrap items-center gap-2 text-[14px] text-[#383838]">
 						{__('Discard this site and start over?', 'themegrill-demo-importer')}
