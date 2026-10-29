@@ -57,7 +57,15 @@ export type ImageSlot = {
 	overlays?: Record<string, string>; // Photo URL => overlay the importer adds over it.
 };
 
-export type SlotValue = string | ImageSlot;
+// A pictogram swapped for a BlockArt icon: the icon block's name, colors and sizes.
+export type IconSlot = {
+	icon: string; // BlockArt icon name, e.g. "paw-solid".
+	color: string;
+	size: number; // px
+	shape?: { color: string; radius: number; padding: number }; // radius in %, padding in px
+};
+
+export type SlotValue = string | ImageSlot | IconSlot;
 
 export type Section = {
 	id: string;
@@ -96,6 +104,14 @@ export type GenerationPackage = {
 	pages: GeneratedPage[];
 	importPackage: Record<string, unknown>;
 	notes?: string[]; // e.g. a requested page the design doesn't have.
+	products?: GeneratedProduct[]; // The demo's shop products, rewritten for the business.
+};
+
+export type GeneratedProduct = {
+	demoId: number; // Product ID in the demo; the import finds the imported product by it.
+	name: string;
+	description: string;
+	image?: ImageSlot;
 };
 
 export type RegenerateSectionRequest = {
@@ -142,3 +158,6 @@ export type AiErrorPayload = {
 
 export const isImageSlot = (value: SlotValue | undefined): value is ImageSlot =>
 	typeof value === 'object' && value !== null && 'url' in value;
+
+export const isIconSlot = (value: SlotValue | undefined): value is IconSlot =>
+	typeof value === 'object' && value !== null && 'icon' in value;

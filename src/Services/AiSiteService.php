@@ -103,8 +103,8 @@ class AiSiteService {
 	 *
 	 * @since 2.2.0
 	 *
-	 * @param array $payload Sanitized payload: siteTitle, tagline, colorMap, fontMap, pages (slots, removeBlocks).
-	 * @return array Number of pages updated.
+	 * @param array $payload Sanitized payload: siteTitle, tagline, colorMap, fontMap, pages (slots, removeBlocks), products.
+	 * @return array Number of pages and products updated.
 	 */
 	public function apply( array $payload ) {
 		$mapping   = get_option( 'themegrill_demo_importer_mapping', array() );
@@ -121,7 +121,12 @@ class AiSiteService {
 			}
 		}
 
-		$this->import_stock_images( wp_list_pluck( array_merge( array(), ...array_values( $slots_by_post ) ), 'image' ) );
+		$this->import_stock_images(
+			array_merge(
+				wp_list_pluck( array_merge( array(), ...array_values( $slots_by_post ) ), 'image' ),
+				wp_list_pluck( $payload['products'], 'image' )
+			)
+		);
 
 		// Copy goes on the chosen pages; colors and fonts on every imported page.
 		$post_ids = array_unique( array_merge( array_keys( $slots_by_post ), $this->imported_pages( $post_map ) ) );
@@ -163,7 +168,56 @@ class AiSiteService {
 		}
 		update_option( 'blogdescription', $payload['tagline'] );
 
-		return array( 'updated' => $updated );
+		return array(
+			'updated'  => $updated,
+			'products' => $this->apply_products( $payload['products'], $post_map ),
+		);
+	}
+
+	/**
+	 * Rename the imported WooCommerce products and give them their new photos.
+	 * Prices, categories and stock stay as the demo set them.
+	 *
+	 * @param array $products Sanitized products: demoId, name, description, image.
+	 * @param array $post_map Demo post ID => imported post ID.
+	 * @return int Number of products updated.
+	 */
+	private function apply_products( array $products, array $post_map ) {
+		$updated = 0;
+
+		foreach ( $products as $product ) {
+			$post_id = isset( $post_map[ $product['demoId'] ] ) ? absint( $post_map[ $product['demoId'] ] ) : 0;
+			if ( ! $post_id || 'product' !== get_post_type( $post_id ) ) {
+				continue;
+			}
+
+			$result = wp_update_post(
+				wp_slash(
+					array(
+						'ID'           => $post_id,
+						'post_title'   => $product['name'],
+						'post_name'    => sanitize_title( $product['name'] ),
+						'post_excerpt' => $product['description'],
+						'post_content' => $product['description'],
+					)
+				),
+				true
+			);
+			if ( is_wp_error( $result ) ) {
+				continue;
+			}
+
+			$local         = isset( $this->stock_images[ $product['image'] ] ) ? $this->stock_images[ $product['image'] ] : '';
+			$attachment_id = $local ? attachment_url_to_postid( $local ) : 0;
+			if ( $attachment_id ) {
+				set_post_thumbnail( $post_id, $attachment_id );
+				// The demo's gallery photos show the old product.
+				delete_post_meta( $post_id, '_product_image_gallery' );
+			}
+			++$updated;
+		}
+
+		return $updated;
 	}
 
 	/**
@@ -204,7 +258,7 @@ class AiSiteService {
 	 * Apply one slot value to the block at its path.
 	 *
 	 * @param array $blocks    Parsed blocks.
-	 * @param array $slot      Slot payload: path, attr, inHtml, and text or image.
+	 * @param array $slot      Slot payload: path, attr, inHtml, and text, image or icon.
 	 * @param array $url_remap Demo media URL => imported media URL.
 	 * @return array
 	 */
@@ -215,6 +269,9 @@ class AiSiteService {
 			$blocks,
 			$indexes,
 			function ( $block ) use ( $slot, $url_remap ) {
+				if ( null !== $slot['icon'] ) {
+					return $this->set_icon( $block, $slot['attr'], $slot['icon'] );
+				}
 				if ( null === $slot['image'] ) {
 					return $this->set_text( $block, $slot['attr'], $slot['text'], $slot['inHtml'] );
 				}
@@ -414,8 +471,8 @@ class AiSiteService {
 		$block['attrs'] = $this->set_path( $block['attrs'], $attr, esc_url_raw( $url ) );
 		$attachment_id  = attachment_url_to_postid( $url );
 
-		// Keep BlockArt's attachment ID in step with the URL.
-		$id_attr = preg_replace( '/\.url$/', '.id', $attr );
+		// Keep the attachment ID in step with the URL (BlockArt's "image.id", core/cover's "id").
+		$id_attr = 'url' === $attr ? 'id' : preg_replace( '/\.url$/', '.id', $attr );
 		if ( $id_attr !== $attr && null !== $this->get_path( $block['attrs'], $id_attr ) ) {
 			$block['attrs'] = $this->set_path( $block['attrs'], $id_attr, $attachment_id );
 		}
@@ -430,9 +487,138 @@ class AiSiteService {
 					return $attachment_id ? preg_replace( '/\bwp-image-\d+\b/', 'wp-image-' . $attachment_id, $img ) : $img;
 				}
 			);
+			// A parallax or repeated core/cover paints it as a CSS background instead.
+			$block = $this->replace_in_html(
+				$block,
+				'/background-image:url\(' . preg_quote( $old_url, '/' ) . '\)/',
+				function () use ( $url ) {
+					return 'background-image:url(' . esc_url( $url ) . ')';
+				}
+			);
 		}
 
 		return $block;
+	}
+
+	/**
+	 * Swap a pictogram for a BlockArt icon: an image block becomes an icon
+	 * block, and a heading that draws its icon as a background gets the icon as
+	 * an SVG background instead. Left as is when BlockArt isn't active.
+	 *
+	 * @param array  $block Block.
+	 * @param string $attr  Attribute path of the demo image.
+	 * @param array  $icon  Sanitized icon: name, color, size, optional shape.
+	 * @return array
+	 */
+	private function set_icon( array $block, $attr, array $icon ) {
+		$svg = $this->icon_svg( $icon['name'] );
+		if ( '' === $svg['inner'] ) {
+			return $block;
+		}
+
+		if ( self::BACKGROUND_ATTR === $attr ) {
+			$block['attrs'] = $this->set_path( $block['attrs'], $attr, $this->icon_data_uri( $svg, $icon ) );
+			unset( $block['attrs']['background']['image']['image']['id'] );
+			return $block;
+		}
+
+		$attrs = $block['attrs'];
+		$id    = isset( $attrs['clientId'] ) ? sanitize_key( $attrs['clientId'] ) : substr( md5( wp_json_encode( $attrs ) . $block['innerHTML'] ), 0, 8 );
+		$align = $this->get_path( $attrs, 'alignment.desktop' ) ?? ( $attrs['align'] ?? '' );
+		$align = in_array( $align, array( 'left', 'center', 'right' ), true ) ? $align : '';
+
+		$icon_attrs = array_filter(
+			array(
+				'clientId'     => $id,
+				'icon'         => $icon['name'],
+				'color'        => $icon['color'],
+				'iconSize'     => $icon['size'],
+				'alignment'    => $align,
+				'blockMargin'  => $attrs['blockMargin'] ?? null,
+				'blockPadding' => $attrs['blockPadding'] ?? null,
+			)
+		);
+		if ( isset( $icon['shape'] ) ) {
+			$padding                         = $icon['shape']['padding'];
+			$icon_attrs['shapeColor']        = $icon['shape']['color'];
+			$icon_attrs['shapeBorderRadius'] = $icon['shape']['radius'];
+			$icon_attrs['shapePadding']      = array(
+				'dimension' => 1,
+				'desktop'   => array(
+					'lock'   => true,
+					'unit'   => 'px',
+					'top'    => $padding,
+					'right'  => $padding,
+					'bottom' => $padding,
+					'left'   => $padding,
+				),
+			);
+		}
+
+		// The markup BlockArt's icon block saves, so the editor sees a valid block.
+		$html = sprintf(
+			'<div class="blockart-icon-block blockart-icon-%1$s%2$s"><a class="blockart-outside-icon blockart-icon-link"><span class="blockart-icon-wrapper"><svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="%3$s" class="blockart-icon" aria-hidden="true">%4$s</svg></span></a></div>',
+			esc_attr( $id ),
+			$align ? ' blockart-' . $align : '',
+			esc_attr( $svg['viewBox'] ),
+			preg_replace( '/<(path|circle|rect|polygon|ellipse|line|polyline)\b([^>]*?)\s*\/>/', '<$1$2></$1>', $svg['inner'] )
+		);
+
+		return array(
+			'blockName'    => 'blockart/icon',
+			'attrs'        => $icon_attrs,
+			'innerBlocks'  => array(),
+			'innerHTML'    => $html,
+			'innerContent' => array( $html ),
+		);
+	}
+
+	/**
+	 * A BlockArt icon's viewBox and inner SVG markup.
+	 *
+	 * @param string $name BlockArt icon name, e.g. "paw-solid".
+	 * @return array viewBox and inner; inner is empty when the icon is unknown.
+	 */
+	private function icon_svg( $name ) {
+		$svg = function_exists( 'blockart_get_icon' ) ? (string) blockart_get_icon( $name ) : '';
+		if ( ! preg_match( '/viewBox="([^"]+)"/', $svg, $box ) || ! preg_match( '/<svg\b[^>]*>(.*)<\/svg>/s', $svg, $inner ) ) {
+			return array(
+				'viewBox' => '',
+				'inner'   => '',
+			);
+		}
+
+		return array(
+			'viewBox' => $box[1],
+			'inner'   => $inner[1],
+		);
+	}
+
+	/**
+	 * The icon as an SVG data URI, on its circle or tile when it has one.
+	 *
+	 * @param array $svg  Icon viewBox and inner markup.
+	 * @param array $icon Sanitized icon: color, size, optional shape.
+	 * @return string
+	 */
+	private function icon_data_uri( array $svg, array $icon ) {
+		$pad  = isset( $icon['shape'] ) ? $icon['shape']['padding'] : 0;
+		$box  = $icon['size'] + 2 * $pad;
+		$tile = isset( $icon['shape'] )
+			? sprintf( '<rect width="%1$d" height="%1$d" rx="%2$s" fill="%3$s"/>', $box, $box * $icon['shape']['radius'] / 100, $icon['shape']['color'] )
+			: '';
+		$out  = sprintf(
+			'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %1$d %1$d">%2$s<svg x="%3$d" y="%3$d" width="%4$d" height="%4$d" viewBox="%5$s" fill="%6$s">%7$s</svg></svg>',
+			$box,
+			$tile,
+			$pad,
+			$icon['size'],
+			esc_attr( $svg['viewBox'] ),
+			$icon['color'],
+			$svg['inner']
+		);
+
+		return 'data:image/svg+xml,' . rawurlencode( $out );
 	}
 
 	/**

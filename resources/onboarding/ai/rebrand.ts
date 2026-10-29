@@ -2,7 +2,7 @@
 // needs: a rebranded demo config for the existing import steps, and the
 // payload for the AI apply step that patches the imported pages.
 import { Demo } from '../lib/types';
-import { BrandKit, GenerationPackage, isImageSlot } from './types';
+import { BrandKit, GenerationPackage, IconSlot, isIconSlot, isImageSlot } from './types';
 
 // `url`: the demo image an image slot shows before the AI swaps it.
 type SlotLocation = { path: string; block: string; attr: string; inHtml?: boolean; url?: string };
@@ -109,9 +109,18 @@ export type ApplyPayload = {
 	pages: {
 		demoPageId: number;
 		demoPageSlug: string;
-		slots: { path: string; attr: string; inHtml: boolean; text?: string; image?: string; overlay?: string }[];
+		slots: {
+			path: string;
+			attr: string;
+			inHtml: boolean;
+			text?: string;
+			image?: string;
+			overlay?: string;
+			icon?: Omit<IconSlot, 'icon'> & { name: string };
+		}[];
 		removeBlocks: string[]; // Top-level blocks of groups still removed.
 	}[];
+	products: { demoId: number; name: string; description: string; image?: string }[];
 };
 
 export const buildApplyPayload = (
@@ -124,6 +133,12 @@ export const buildApplyPayload = (
 	tagline: pkg.brand.tagline,
 	colorMap,
 	fontMap: buildFontMap(ip, pkg.brand.fonts),
+	products: (pkg.products ?? []).map((p) => ({
+		demoId: p.demoId,
+		name: p.name,
+		description: p.description,
+		...(p.image ? { image: p.image.url } : {}),
+	})),
 	pages: ip.pages.map((page) => {
 		const generated = pkg.pages.find((p) => p.slug === page.slug);
 		const values = new Map((generated?.sections ?? []).flatMap((s) => Object.entries(s.slots)));
@@ -139,9 +154,11 @@ export const buildApplyPayload = (
 						path: location.path,
 						attr: location.attr,
 						inHtml: !!location.inHtml,
-						...(isImageSlot(value)
-							? { image: value.url, ...(value.overlays?.[value.url] ? { overlay: value.overlays[value.url] } : {}) }
-							: { text: value }),
+						...(isIconSlot(value)
+							? { icon: { name: value.icon, color: value.color, size: value.size, ...(value.shape ? { shape: value.shape } : {}) } }
+							: isImageSlot(value)
+								? { image: value.url, ...(value.overlays?.[value.url] ? { overlay: value.overlays[value.url] } : {}) }
+								: { text: value }),
 					},
 				];
 			}),
@@ -164,7 +181,7 @@ export const replacedDemoImages = (pkg: GenerationPackage, ip: ImportPackage): s
 			if (!location.url) continue;
 			const value = values.get(id);
 			const removed = removedBlocks.has(location.path.split('.')[0] ?? '');
-			if (removed || (isImageSlot(value) && value.url !== location.url)) replaced.add(location.url);
+			if (removed || isIconSlot(value) || (isImageSlot(value) && value.url !== location.url)) replaced.add(location.url);
 			else kept.add(location.url);
 		}
 	}

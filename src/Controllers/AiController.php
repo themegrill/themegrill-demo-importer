@@ -174,6 +174,7 @@ class AiController {
 				'brand'    => isset( $params['brand'] ) && is_array( $params['brand'] ) ? $params['brand'] : array(),
 				'sections' => isset( $params['sections'] ) && is_array( $params['sections'] ) ? $params['sections'] : array(),
 				'removed'  => isset( $params['removed'] ) && is_array( $params['removed'] ) ? array_map( 'sanitize_key', $params['removed'] ) : array(),
+				'products' => isset( $params['products'] ) && is_array( $params['products'] ) ? $params['products'] : array(),
 			)
 		);
 	}
@@ -199,6 +200,38 @@ class AiController {
 		}
 
 		return new WP_REST_Response( $result, 200 );
+	}
+
+	/**
+	 * Sanitize a slot's BlockArt icon: a name from BlockArt's icon set, hex
+	 * colors and pixel sizes.
+	 *
+	 * @param array $icon Icon payload: name, color, size, and an optional shape.
+	 * @return array|null Null when the name or color is invalid.
+	 */
+	private function icon_slot( array $icon ) {
+		$name  = (string) ( $icon['name'] ?? '' );
+		$color = sanitize_hex_color( (string) ( $icon['color'] ?? '' ) );
+		if ( ! preg_match( '/^[a-z0-9-]{1,60}$/', $name ) || ! $color ) {
+			return null;
+		}
+
+		$clean = array(
+			'name'  => $name,
+			'color' => $color,
+			'size'  => min( 400, max( 8, absint( $icon['size'] ?? 30 ) ) ),
+		);
+		$shape = isset( $icon['shape'] ) ? (array) $icon['shape'] : array();
+		$fill  = sanitize_hex_color( (string) ( $shape['color'] ?? '' ) );
+		if ( $fill ) {
+			$clean['shape'] = array(
+				'color'   => $fill,
+				'radius'  => min( 50, absint( $shape['radius'] ?? 0 ) ),
+				'padding' => min( 200, absint( $shape['padding'] ?? 0 ) ),
+			);
+		}
+
+		return $clean;
 	}
 
 	/**
@@ -235,12 +268,17 @@ class AiController {
 				if ( ! preg_match( '/^\d+(\.\d+)*$/', $path ) || ! preg_match( '/^[A-Za-z0-9_.@:-]+$/', $attr ) ) {
 					continue;
 				}
+				// A value this build can't read (an older or newer dashboard script) is left alone, never written as text.
+				if ( isset( $slot['text'] ) && ! is_scalar( $slot['text'] ) ) {
+					continue;
+				}
 				$slots[] = array(
 					'path'    => $path,
 					'attr'    => $attr,
 					'inHtml'  => ! empty( $slot['inHtml'] ),
 					'text'    => sanitize_textarea_field( (string) ( $slot['text'] ?? '' ) ),
 					'image'   => isset( $slot['image'] ) ? esc_url_raw( (string) $slot['image'] ) : null,
+					'icon'    => isset( $slot['icon'] ) ? $this->icon_slot( (array) $slot['icon'] ) : null,
 					// Only the overlay gradients the AI backend generates, so nothing else reaches block CSS.
 					'overlay' => isset( $slot['overlay'] ) && preg_match( '/^linear-gradient\(90deg(, rgba\(\d{1,3}, \d{1,3}, \d{1,3}, [01](\.\d{1,2})?\) \d{1,3}%){2,4}\)$/', (string) $slot['overlay'] ) ? (string) $slot['overlay'] : '',
 				);
@@ -254,6 +292,21 @@ class AiController {
 			);
 		}
 
+		$products = array();
+		foreach ( (array) ( $params['products'] ?? array() ) as $product ) {
+			$demo_id = absint( $product['demoId'] ?? 0 );
+			$name    = sanitize_text_field( (string) ( $product['name'] ?? '' ) );
+			if ( ! $demo_id || '' === $name ) {
+				continue;
+			}
+			$products[] = array(
+				'demoId'      => $demo_id,
+				'name'        => $name,
+				'description' => sanitize_textarea_field( (string) ( $product['description'] ?? '' ) ),
+				'image'       => isset( $product['image'] ) ? esc_url_raw( (string) $product['image'] ) : '',
+			);
+		}
+
 		$result = ( new AiSiteService() )->apply(
 			array(
 				'siteTitle' => sanitize_text_field( (string) ( $params['siteTitle'] ?? '' ) ),
@@ -261,6 +314,7 @@ class AiController {
 				'colorMap'  => $color_map,
 				'fontMap'   => $font_map,
 				'pages'     => $pages,
+				'products'  => $products,
 			)
 		);
 

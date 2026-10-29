@@ -91,5 +91,6 @@ export const getPreviewHtml = (pkg: GenerationPackage, pageSlug: string) => {
 		brand: pkg.brand,
 		sections: (page?.sections ?? []).map((s) => ({ id: s.id, slots: s.slots })),
 		removed: (page?.removed ?? []).filter((r) => !r.restored).map((r) => r.groupId),
+		products: (pkg.products ?? []).map((p) => ({ demoId: p.demoId, name: p.name, image: p.image })),
 	}).then((r) => r.html);
 };
