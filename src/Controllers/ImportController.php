@@ -26,7 +26,7 @@ class ImportController {
 			return new WP_Error(
 				'invalid_action',
 				__( 'Invalid action provided', 'themegrill-demo-importer' ),
-				array( 'status' => 500 )
+				array( 'status' => 400 )
 			);
 		}
 		$demo_config = $request['demo_config'] ?? array();
@@ -37,7 +37,7 @@ class ImportController {
 			return new WP_Error(
 				'invalid_demo_config',
 				__( 'Invalid demo config provided', 'themegrill-demo-importer' ),
-				array( 'status' => 500 )
+				array( 'status' => 400 )
 			);
 		}
 		$options = $request['opts'] ?? array();
@@ -65,7 +65,7 @@ class ImportController {
 			return new WP_Error(
 				'invalid_slug',
 				__( 'Invalid slug provided', 'themegrill-demo-importer' ),
-				array( 'status' => 500 )
+				array( 'status' => 400 )
 			);
 		}
 

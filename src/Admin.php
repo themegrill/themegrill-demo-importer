@@ -406,7 +406,7 @@ class Admin {
 
 		// Per-theme slug → repo folder overrides (only needed when they differ).
 		$overrides = array(
-			'zakra'    => array(
+			'zakra'      => array(
 				'main'            => 'zakra-default',
 				'kunstruct'       => 'zakra-construction',
 				'applyjobs'       => 'zakra-apply-jobs',
@@ -420,10 +420,51 @@ class Admin {
 				'online-shop-v2'  => 'zakra-online-shop',
 				'restro-v2'       => 'zakra-restro',
 			),
-			'colormag' => array(
+			'colormag'   => array(
 				'colormag'    => 'colormag-free',
 				'colormag-01' => 'colormag-free-01',
 				'colormag-02' => 'colormag-free-02',
+			),
+			'flash'      => array(
+				'flash'          => 'flash-default',
+				'flash-pro'      => 'flash-pro-default',
+				'flash-one-page' => 'flash-onepage',
+			),
+			'webshop'    => array(
+				'webshop' => 'webshop-default',
+			),
+			'kirana'     => array(
+				'kirana' => 'kirana-default',
+			),
+			'gizmo'      => array(
+				'gizmo' => 'gizmo-default',
+			),
+			'skincare'   => array(
+				'skincare' => 'skincare-default',
+			),
+			'accelerate' => array(
+				'accelerate'                => 'accelerate-free',
+				'accelerate-pro-technology' => 'accelerate-technology',
+			),
+			'radiate'    => array(
+				'radiate' => 'radiate-free',
+			),
+			'estore'     => array(
+				'estore'     => 'estore-free',
+				'estore-pro' => 'estore-pro-default',
+			),
+			'himalayas'  => array(
+				'himalayas' => 'himalayas-free',
+			),
+			'cenote'     => array(
+				'cenote' => 'cenote-free',
+			),
+			'ample'      => array(
+				'ample' => 'ample-free',
+      ),
+			'spacious' => array(
+				'spacious'    => 'spacious-free',
+				'spacious-02' => 'spacious-free-02',
 			),
 		);
 

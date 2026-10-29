@@ -95,6 +95,12 @@ class WidgetsImporter {
 				continue;
 			}
 
+			// `widgets` is a free-form object in the schema, so a sidebar can arrive
+			// holding a scalar instead of its widget list.
+			if ( ! is_array( $widgets ) ) {
+				continue;
+			}
+
 			// Check if sidebar is available on this site. Otherwise add widgets to inactive, and say so.
 			if ( isset( $wp_registered_sidebars[ $sidebar_id ] ) ) {
 				$sidebar_available    = true;
@@ -371,7 +377,7 @@ class WidgetsImporter {
 	 * @param  string $url Remote image URL.
 	 * @return string The new local URL, or the original URL if it's disallowed or the download failed.
 	 */
-	private static function sideload_widget_image( $url ) {
+	public static function sideload_widget_image( $url ) {
 		if ( isset( self::$sideload_cache[ $url ] ) ) {
 			return self::$sideload_cache[ $url ];
 		}

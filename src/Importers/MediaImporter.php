@@ -87,9 +87,19 @@ class MediaImporter {
 			$new_url      = wp_get_attachment_url( $new_post_id );
 
 			$mapping['post'][ $original_id ] = $new_post_id;
-			$url_remap[ $original_url ]      = $new_url;
 
-			$url_remap = $this->remap_size_urls( $url_remap, $original_url, $new_post_id, $new_url );
+			// The demo may reference this one file by either of the URLs its export carried
+			// (guid and attachment_url can name the plain, `-scaled` or edited copy, or sit
+			// under a different uploads path), so register every spelling we were given.
+			$source_urls = array_values( array_unique( array_filter( array( $original_url, $attachment['alias_url'] ?? '' ) ) ) );
+
+			foreach ( $source_urls as $source_url ) {
+				$url_remap[ $source_url ] = $new_url;
+			}
+
+			foreach ( $source_urls as $source_url ) {
+				$url_remap = $this->remap_size_urls( $url_remap, $source_url, $new_post_id, $new_url );
+			}
 			$new_ids[] = $new_post_id;
 
 			// Track for cleanup on reset.
@@ -134,24 +144,42 @@ class MediaImporter {
 		require_once ABSPATH . 'wp-admin/includes/file.php';
 
 		$results = array();
-		$targets = array();
-
+		$sources = array();
 		foreach ( $batch as $index => $attachment ) {
-			$upload = $this->prepare_upload( $attachment );
-			if ( is_wp_error( $upload ) ) {
-				$results[ $index ] = $upload;
-				continue;
-			}
-			$targets[ $index ] = array(
-				'url'  => $attachment['remote_url'],
-				'file' => $upload,
-			);
+			$sources[ $index ] = array_values( array_filter( array( $attachment['remote_url'], $attachment['remote_fallback_url'] ?? '' ) ) );
+			$results[ $index ] = new WP_Error( 'import_file_error', 'No source URL for attachment' );
 		}
 
-		foreach ( RemoteRequest::download_many( $targets ) as $index => $downloaded ) {
-			$results[ $index ] = is_wp_error( $downloaded )
-				? $downloaded
-				: $this->insert_attachment( $batch[ $index ], $targets[ $index ]['file'] );
+		// guid and attachment_url can name different copies of the same image, and either can be
+		// the dead one: download every first choice together, then retry the failures from the other.
+		for ( $round = 0; $round < 2; $round++ ) {
+			$targets = array();
+			foreach ( $sources as $index => $urls ) {
+				if ( empty( $urls[ $round ] ) ) {
+					continue;
+				}
+				$upload = $this->prepare_upload( $batch[ $index ], $urls[ $round ] );
+				if ( is_wp_error( $upload ) ) {
+					$results[ $index ] = $upload;
+					continue;
+				}
+				$targets[ $index ] = array(
+					'url'  => $urls[ $round ],
+					'file' => $upload,
+				);
+			}
+
+			foreach ( RemoteRequest::download_many( $targets ) as $index => $downloaded ) {
+				$results[ $index ] = is_wp_error( $downloaded )
+					? $downloaded
+					: $this->insert_attachment( $batch[ $index ], $targets[ $index ]['file'] );
+
+				if ( ! is_wp_error( $results[ $index ] ) ) {
+					unset( $sources[ $index ] );
+				} elseif ( isset( $sources[ $index ][ $round + 1 ] ) ) {
+					$this->logger->notice( 'Retrying ' . $targets[ $index ]['url'] . ' from its other exported URL: ' . $results[ $index ]->get_error_message() );
+				}
+			}
 		}
 
 		return $results;
@@ -160,10 +188,11 @@ class MediaImporter {
 	/**
 	 * Reserve the upload path an attachment downloads into.
 	 *
-	 * @param array $attachment Pending attachment.
+	 * @param array  $attachment Pending attachment.
+	 * @param string $url        Source URL being downloaded.
 	 * @return string|WP_Error Local file path.
 	 */
-	private function prepare_upload( array $attachment ) {
+	private function prepare_upload( array $attachment, $url ) {
 		// Upload subfolder from _wp_attached_file meta (e.g. "2024/03").
 		$upload_date = $attachment['postdata']['post_date'] ?? '';
 		foreach ( $attachment['meta'] as $meta_item ) {
@@ -176,7 +205,7 @@ class MediaImporter {
 			break;
 		}
 
-		$file_name = basename( $attachment['remote_url'] );
+		$file_name = basename( $url );
 		$upload    = wp_upload_bits( $file_name, null, '', $upload_date );
 		if ( $upload['error'] ) {
 			$this->logger->warning( 'Upload dir error for ' . $file_name . ': ' . $upload['error'] );
@@ -392,7 +421,13 @@ class MediaImporter {
 		if ( ! empty( $url_remap ) ) {
 			$this->remap_content_urls( $url_remap );
 			$this->remap_panels_data_urls( $url_remap );
+			$this->remap_foreign_elementor_media( $url_remap );
 		}
+
+		// Term and attachment IDs inside panels_data are numeric, so the URL pass above
+		// cannot see them. Runs outside that guard: a demo with no media still has
+		// widgets pointing at the demo's categories.
+		$this->remap_panels_data_ids( $mapping );
 
 		// Update _thumbnail_id to point to newly imported attachment IDs.
 		foreach ( $featured_images as $post_id => $old_attachment_id ) {
@@ -427,6 +462,129 @@ class MediaImporter {
 		delete_option( 'themegrill_demo_importer_featured_images' );
 		delete_option( 'themegrill_demo_importer_media_total' );
 		delete_option( 'themegrill_demo_importer_pending_attachments' );
+		delete_option( 'themegrill_demo_importer_previous_imported_posts' );
+	}
+
+	/**
+	 * Path of an uploads URL relative to the uploads directory, with any multisite
+	 * `sites/{id}/` segment removed, e.g. "2020/06/logo.png".
+	 *
+	 * @param  string $url Media URL.
+	 * @return string Empty when the URL isn't under an uploads directory.
+	 */
+	private function uploads_relative_path( string $url ): string {
+		$path = (string) wp_parse_url( $url, PHP_URL_PATH );
+		if ( ! preg_match( '#/uploads/(?:sites/\d+/)?(.+)$#', $path, $matches ) ) {
+			return '';
+		}
+
+		return $matches[1];
+	}
+
+	/**
+	 * Point images that still reference another host at the attachments this import created.
+	 *
+	 * Elementor data exported from the demo can reference an image through a different
+	 * host than the one the WXR attachment came from (a staging/sandbox site), and with
+	 * the old site's attachment ID as a string. Neither matches the URL remap or the ID
+	 * mapping, so the image stays hotlinked to a host that is often gone, or resolves to
+	 * whatever unrelated attachment happens to own that ID here. The file itself was
+	 * imported, so match it by its uploads-relative path and set both url and id.
+	 *
+	 * @param array $url_remap Map of old attachment URL => new local URL.
+	 */
+	private function remap_foreign_elementor_media( array $url_remap ): void {
+		global $wpdb;
+
+		// Only posts imported by this run: the list also holds earlier imports (kept for
+		// cleanup), and their content must not be rewritten to this demo's attachments.
+		$imported_posts = array_diff(
+			array_map( 'intval', (array) get_option( 'themegrill_demo_importer_imported_posts', array() ) ),
+			array_map( 'intval', (array) get_option( 'themegrill_demo_importer_previous_imported_posts', array() ) )
+		);
+		if ( empty( $imported_posts ) ) {
+			return;
+		}
+
+		$by_path = array();
+		foreach ( $url_remap as $old_url => $new_url ) {
+			$relative = $this->uploads_relative_path( $old_url );
+			if ( '' !== $relative && ! isset( $by_path[ $relative ] ) ) {
+				$by_path[ $relative ] = $new_url;
+			}
+		}
+
+		if ( empty( $by_path ) ) {
+			return;
+		}
+
+		$ids          = array_map( 'intval', $imported_posts );
+		$placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
+		$rows         = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.NotPrepared
+			$wpdb->prepare(
+				"SELECT meta_id, meta_value FROM {$wpdb->postmeta} WHERE meta_key = '_elementor_data' AND post_id IN ($placeholders)", // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
+				...$ids
+			)
+		);
+
+		$local_host = wp_parse_url( home_url(), PHP_URL_HOST );
+
+		foreach ( $rows as $row ) {
+			$data = json_decode( $row->meta_value, true );
+			if ( ! is_array( $data ) ) {
+				continue;
+			}
+
+			$remapped = $this->remap_foreign_media_recursive( $data, $by_path, $local_host );
+			if ( $remapped === $data ) {
+				continue;
+			}
+
+			$wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+				$wpdb->postmeta,
+				array( 'meta_value' => wp_json_encode( $remapped ) ), // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
+				array( 'meta_id' => $row->meta_id )
+			);
+		}
+	}
+
+	/**
+	 * Recursively rewrite Elementor media controls ({ url, id }) that point at another host.
+	 *
+	 * @param array  $data       Decoded Elementor data (or a nested part of it).
+	 * @param array  $by_path    Map of uploads-relative path => new local URL.
+	 * @param string $local_host This site's host.
+	 * @return array
+	 */
+	private function remap_foreign_media_recursive( array $data, array $by_path, string $local_host ): array {
+		foreach ( $data as $key => $value ) {
+			if ( is_array( $value ) ) {
+				$data[ $key ] = $this->remap_foreign_media_recursive( $value, $by_path, $local_host );
+			}
+		}
+
+		if ( empty( $data['url'] ) || ! is_string( $data['url'] ) ) {
+			return $data;
+		}
+
+		$host = wp_parse_url( $data['url'], PHP_URL_HOST );
+		if ( ! $host || $host === $local_host ) {
+			return $data;
+		}
+
+		$relative = $this->uploads_relative_path( $data['url'] );
+		if ( '' === $relative || empty( $by_path[ $relative ] ) ) {
+			return $data;
+		}
+
+		$data['url'] = $by_path[ $relative ];
+
+		$attachment_id = attachment_url_to_postid( $data['url'] );
+		if ( $attachment_id ) {
+			$data['id'] = isset( $data['id'] ) && is_string( $data['id'] ) ? (string) $attachment_id : $attachment_id;
+		}
+
+		return $data;
 	}
 
 	/**
@@ -520,6 +678,129 @@ class MediaImporter {
 				array( 'meta_id' => $row->meta_id )
 			);
 		}
+	}
+
+	/**
+	 * Remap term and attachment IDs inside SiteOrigin Page Builder's `panels_data`.
+	 *
+	 * The layout is imported verbatim, so widget taxonomy fields and row/cell background
+	 * attachment IDs still carry the demo site's IDs. Those usually do not exist here, and
+	 * on a site with earlier content they can resolve to something unrelated - an empty
+	 * portfolio section, or a row showing someone else's image.
+	 *
+	 * @param array $mapping Import mapping, with `post` and `term_id` keys.
+	 */
+	private function remap_panels_data_ids( array $mapping ): void {
+		global $wpdb;
+
+		$posts = array_map( 'intval', $mapping['post'] ?? array() );
+		$terms = array_map( 'intval', $mapping['term_id'] ?? array() );
+
+		if ( empty( $posts ) && empty( $terms ) ) {
+			return;
+		}
+
+		// Only posts from this run: the imported-posts list also holds earlier imports,
+		// whose layouts must not be rewritten with this demo's IDs.
+		$imported_posts = array_diff(
+			array_map( 'intval', (array) get_option( 'themegrill_demo_importer_imported_posts', array() ) ),
+			array_map( 'intval', (array) get_option( 'themegrill_demo_importer_previous_imported_posts', array() ) )
+		);
+
+		if ( empty( $imported_posts ) ) {
+			return;
+		}
+
+		$ids          = array_values( $imported_posts );
+		$placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
+		$rows         = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.NotPrepared
+			$wpdb->prepare(
+				"SELECT meta_id, meta_value FROM {$wpdb->postmeta} WHERE meta_key = 'panels_data' AND post_id IN ($placeholders)", // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
+				...$ids
+			)
+		);
+
+		foreach ( $rows as $row ) {
+			$data = maybe_unserialize( $row->meta_value );
+			if ( empty( $data ) || ! is_array( $data ) ) {
+				continue;
+			}
+
+			$remapped = $this->remap_panels_ids_recursive( $data, $posts, $terms );
+			if ( $remapped === $data ) {
+				continue;
+			}
+
+			$wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+				$wpdb->postmeta,
+				array( 'meta_value' => maybe_serialize( $remapped ) ), // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
+				array( 'meta_id' => $row->meta_id )
+			);
+		}
+	}
+
+	/**
+	 * Walk panels_data, swapping the demo's term and attachment IDs for the imported ones.
+	 *
+	 * Matched on field name rather than path because the same fields recur at every depth:
+	 * row styles, cell styles, widget styles, and the nested panels_data a layout widget
+	 * carries. `id` is deliberately not touched - that is SiteOrigin's own cell index.
+	 *
+	 * @param array $data  Unserialized panels_data, or a nested part of it.
+	 * @param array $posts Old attachment ID => new attachment ID.
+	 * @param array $terms Old term ID => new term ID.
+	 * @return array
+	 */
+	private function remap_panels_ids_recursive( array $data, array $posts, array $terms ): array {
+		foreach ( $data as $key => $value ) {
+			if ( 'background_image_attachment' === $key ) {
+				$data[ $key ] = $this->swap_panels_id( $value, $posts );
+				continue;
+			}
+
+			if ( 'category' === $key || 'categories' === $key ) {
+				if ( is_array( $value ) ) {
+					foreach ( $value as $index => $term ) {
+						$value[ $index ] = $this->swap_panels_id( $term, $terms );
+					}
+					$data[ $key ] = $value;
+				} else {
+					$data[ $key ] = $this->swap_panels_id( $value, $terms );
+				}
+				continue;
+			}
+
+			if ( is_array( $value ) ) {
+				$data[ $key ] = $this->remap_panels_ids_recursive( $value, $posts, $terms );
+			}
+		}
+
+		return $data;
+	}
+
+	/**
+	 * Swap a single ID through a mapping, preserving the stored value's type.
+	 *
+	 * `0` means "all" or "none" in these fields, and an ID this import did not create is
+	 * left alone rather than guessed at. A non-numeric value (SiteOrigin also accepts a
+	 * URL in the background field) is returned untouched.
+	 *
+	 * @param mixed $value Stored ID, as an int or a numeric string.
+	 * @param array $map   Old ID => new ID.
+	 * @return mixed
+	 */
+	private function swap_panels_id( $value, array $map ) {
+		if ( ! is_scalar( $value ) || ! is_numeric( $value ) ) {
+			return $value;
+		}
+
+		$old = (int) $value;
+
+		if ( $old <= 0 || ! isset( $map[ $old ] ) ) {
+			return $value;
+		}
+
+		return is_string( $value ) ? (string) $map[ $old ] : (int) $map[ $old ];
 	}
 
 	/**
