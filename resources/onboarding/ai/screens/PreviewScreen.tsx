@@ -36,8 +36,8 @@ const PreviewScreen = () => {
 		return null;
 	}
 
-	// Same description and design, fresh copy and images.
-	const regenerate = () => dispatch({ type: 'SET_STAGE', stage: 'generating' });
+	// Back to the designs: another one, or the same one again for fresh copy and images.
+	const regenerate = () => dispatch({ type: 'SET_STAGE', stage: 'design' });
 
 	return (
 		<div className="max-w-[1200px] mx-auto">
@@ -65,8 +65,9 @@ const PreviewScreen = () => {
 					pkg.brand.fonts.body,
 				)}
 				<span className="flex gap-1" aria-hidden="true">
-					{Object.values(pkg.brand.palette).map((color, i) => (
-						<span key={i} className="w-4 h-4 rounded-full border border-solid border-black/10" style={{ background: color }} />
+					{/* A one-color design repeats its primary; each color shows once. */}
+					{[...new Set(Object.values(pkg.brand.palette))].map((color) => (
+						<span key={color} className="w-4 h-4 rounded-full border border-solid border-black/10" style={{ background: color }} />
 					))}
 				</span>
 			</p>
@@ -74,7 +75,7 @@ const PreviewScreen = () => {
 			<div className="flex gap-3 items-start mb-6 p-4 rounded-lg border border-solid border-[#B9CDF9] bg-[#F5F8FF] text-[14px] leading-6 text-[#1E3A8A]">
 				<PencilLine size={18} className="shrink-0 mt-[3px]" aria-hidden="true" />
 				<p className="m-0">
-					{__('Happy with it? Import it, and edit any text, image, color or font later in the WordPress editor. Not quite right? Regenerate for fresh copy and images.', 'themegrill-demo-importer')}
+					{__('Happy with it? Import it, and edit any text, image, color or font later in the WordPress editor. Not quite right? Regenerate to pick another design, or the same one for fresh copy and images.', 'themegrill-demo-importer')}
 				</p>
 			</div>
 

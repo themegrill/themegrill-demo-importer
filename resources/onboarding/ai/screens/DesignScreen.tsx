@@ -38,12 +38,21 @@ const ProBadge = () => (
 	</span>
 );
 
+// The design of the site in the preview, when coming back to pick again.
+const CurrentBadge = () => (
+	<span className="absolute top-2 left-2 px-2 py-[2px] rounded text-[11px] font-semibold uppercase tracking-wide bg-[#2563EB] text-white">
+		{__('Current', 'themegrill-demo-importer')}
+	</span>
+);
+
 const DesignCard = ({
 	design,
+	current,
 	onPreview,
 	onSelect,
 }: {
 	design: DesignOption;
+	current: boolean;
 	onPreview: () => void;
 	onSelect: () => void;
 }) => (
@@ -66,6 +75,7 @@ const DesignCard = ({
 					className="block w-full h-full object-cover object-top transition-transform duration-300 group-hover:scale-[1.03]"
 				/>
 			)}
+			{current && <CurrentBadge />}
 			{design.premium && <ProBadge />}
 		</button>
 		<div className="flex items-center justify-between gap-2 px-3 py-[10px]">
@@ -177,7 +187,7 @@ const SkeletonGrid = () => (
 
 const DesignScreen = () => {
 	const { state, dispatch } = useAiFlow();
-	const { form, designs } = state;
+	const { form, designs, pkg } = state;
 	const [error, setError] = useState<AiApiError | null>(null);
 	const [attempt, setAttempt] = useState(0);
 	const [preview, setPreview] = useState<DesignOption | null>(null);
@@ -311,6 +321,7 @@ const DesignScreen = () => {
 											<DesignCard
 												key={design.slug}
 												design={design}
+												current={!!pkg && design.slug === pkg.demo.slug}
 												onPreview={() => setPreview(design)}
 												onSelect={() => select(design)}
 											/>
