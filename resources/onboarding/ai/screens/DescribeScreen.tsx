@@ -195,7 +195,7 @@ const DescribeScreen = () => {
 						</div>
 					) : (
 						<p className="m-0 mt-2 text-[13px] text-[#6B6B6B]">
-							{__('We keep the colors of the design you pick. You can change them in the preview.', 'themegrill-demo-importer')}
+							{__('We keep the colors of the design you pick.', 'themegrill-demo-importer')}
 						</p>
 					)}
 				</fieldset>

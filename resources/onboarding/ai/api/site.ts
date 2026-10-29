@@ -6,7 +6,7 @@ import { getFriendlyImportErrorMessage } from '../../components/features/api/imp
 import { Demo } from '../../lib/types';
 import { getAiConfig } from '../config';
 import { ApplyPayload } from '../rebrand';
-import { BrandPalette, GenerationPackage } from '../types';
+import { GenerationPackage } from '../types';
 
 // restUrl is ".../tg-demo-importer/v1/ai/"; the plugin namespace is one level up.
 const routeUrl = (route: string, query: Record<string, string> = {}) => {
@@ -74,14 +74,13 @@ export const runImportAction = (action: ImportAction, demo: Demo, plugins: strin
 
 export const applySite = (payload: ApplyPayload) => call<{ updated: number }>('POST', 'ai/apply', payload);
 
-// The design recolored around one primary color: maps for page blocks and theme
-// settings (contrast is checked for each), and the palette it gives.
+// The design recolored around one primary color: maps for page blocks and
+// theme settings (contrast is checked for each).
 export const getColorMaps = (demoSlug: string, primaryColor: string) =>
-	call<{ colorMap: Record<string, string>; themeColorMap?: Record<string, string>; palette?: BrandPalette }>(
-		'POST',
-		'ai/color-map',
-		{ demoSlug, primaryColor },
-	).then((r) => ({ blocks: r.colorMap, theme: r.themeColorMap ?? r.colorMap, palette: r.palette }));
+	call<{ colorMap: Record<string, string>; themeColorMap?: Record<string, string> }>('POST', 'ai/color-map', {
+		demoSlug,
+		primaryColor,
+	}).then((r) => ({ blocks: r.colorMap, theme: r.themeColorMap ?? r.colorMap }));
 
 // The generated page drawn on the design's live page, as HTML for a sandboxed frame.
 export const getPreviewHtml = (pkg: GenerationPackage, pageSlug: string) => {

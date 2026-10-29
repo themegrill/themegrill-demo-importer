@@ -1,15 +1,14 @@
 import { __, sprintf } from '@wordpress/i18n';
-import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { ArrowRight, Info, Loader2, PencilLine, RefreshCw, RotateCcw } from 'lucide-react';
-import { useEffect, useId, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { ArrowRight, Info, PencilLine, RefreshCw } from 'lucide-react';
+import { useState } from 'react';
 import { Button } from '../../components/ui/Button';
 import { cn } from '../../lib/utils';
-import BrandColorField from '../components/BrandColorField';
 import { outlineButtonClass, primaryButtonClass } from '../components/fields';
 import SectionPreview from '../components/preview/SectionPreview';
 import SitePreview from '../components/preview/SitePreview';
 import { useGoogleFonts } from '../components/preview/useGoogleFonts';
-import { getColorMaps, getPreviewHtml } from '../api/site';
+import { getPreviewHtml } from '../api/site';
 import { getImportPackage } from '../rebrand';
 import { useAiFlow } from '../store/AiFlowContext';
 
@@ -17,41 +16,17 @@ const PreviewScreen = () => {
 	const { state, dispatch } = useAiFlow();
 	const pkg = state.pkg;
 	const [confirmReset, setConfirmReset] = useState(false);
-	const colorId = useId();
 	// Only the home page is generated for now.
 	const page = pkg?.pages.find((p) => p.slug === 'home') ?? pkg?.pages[0];
 	const importable = !!pkg && !!getImportPackage(pkg);
-	const primary = pkg?.brand.palette.primary ?? '';
-	const designColor = pkg?.demo.primaryColor;
-
-	// Applied once the picker settles, not on every step of a drag.
-	const [draftColor, setDraftColor] = useState(primary);
-	useEffect(() => setDraftColor(primary), [primary]);
-	useEffect(() => {
-		if (!pkg || draftColor === primary) return undefined;
-		const timer = setTimeout(() => {
-			// Regenerating keeps the color; the design's own color needs no override.
-			dispatch({ type: 'UPDATE_FORM', patch: { primaryColor: draftColor === designColor ? undefined : draftColor } });
-			dispatch({ type: 'UPDATE_BRAND', patch: { palette: { primary: draftColor } } });
-			if (!importable) return;
-			// The other swatches follow the backend's mapping; the preview only needs the primary.
-			getColorMaps(pkg.demo.slug, draftColor)
-				.then(({ palette }) => palette && dispatch({ type: 'UPDATE_BRAND', patch: { palette } }))
-				.catch(() => undefined);
-		}, 400);
-		return () => clearTimeout(timer);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [draftColor]);
 
 	// The real page needs the live service; mock packages show section cards.
 	const preview = useQuery({
-		queryKey: ['ai-preview', pkg?.id, page?.slug, primary],
+		queryKey: ['ai-preview', pkg?.id, page?.slug],
 		queryFn: () => getPreviewHtml(pkg!, page!.slug),
 		enabled: importable && !!page,
 		staleTime: Infinity,
 		retry: 1,
-		// A new color re-renders the page; keep showing the last one meanwhile.
-		placeholderData: keepPreviousData,
 	});
 	const showCards = !importable || preview.isError;
 
@@ -95,34 +70,6 @@ const PreviewScreen = () => {
 					))}
 				</span>
 			</p>
-
-			<div className="flex flex-wrap items-end gap-x-6 gap-y-3 mb-6">
-				<div>
-					<label htmlFor={colorId} className="block text-[14px] font-medium text-[#1F1F1F] mb-2">
-						{__('Brand color', 'themegrill-demo-importer')}
-					</label>
-					<BrandColorField id={colorId} value={draftColor} onChange={setDraftColor} />
-				</div>
-				<div className="flex items-center gap-3 h-12">
-					{designColor && draftColor !== designColor && (
-						<Button
-							type="button"
-							variant="outline"
-							onClick={() => setDraftColor(designColor)}
-							className={cn(outlineButtonClass, 'h-10 px-4 gap-2 text-[14px]')}
-						>
-							<RotateCcw size={14} />
-							{__('Use the design’s color', 'themegrill-demo-importer')}
-						</Button>
-					)}
-					{preview.isFetching && !preview.isPending && (
-						<span className="flex items-center gap-2 text-[13px] text-[#6B6B6B]" role="status">
-							<Loader2 size={14} className="animate-spin" aria-hidden="true" />
-							{__('Updating the preview…', 'themegrill-demo-importer')}
-						</span>
-					)}
-				</div>
-			</div>
 
 			<div className="flex gap-3 items-start mb-6 p-4 rounded-lg border border-solid border-[#B9CDF9] bg-[#F5F8FF] text-[14px] leading-6 text-[#1E3A8A]">
 				<PencilLine size={18} className="shrink-0 mt-[3px]" aria-hidden="true" />
