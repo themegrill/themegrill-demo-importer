@@ -46,7 +46,8 @@ class AiController {
 			array(
 				'demoSlug' => sanitize_key( $params['demoSlug'] ?? '' ),
 				'briefId'  => sanitize_key( $params['briefId'] ?? '' ),
-			)
+			),
+			$this->primary_color( $params )
 		);
 
 		if ( ! function_exists( 'curl_init' ) ) {
@@ -73,6 +74,18 @@ class AiController {
 			'language'    => sanitize_key( $params['language'] ?? 'en' ),
 			'pages'       => array_values( array_map( 'sanitize_key', $pages ) ),
 		);
+	}
+
+	/**
+	 * The brand's primary color, when the user chose one; without it the design keeps its own colors.
+	 *
+	 * @param array $params Request JSON.
+	 * @return array
+	 */
+	private function primary_color( $params ) {
+		$color = sanitize_hex_color( isset( $params['primaryColor'] ) ? (string) $params['primaryColor'] : '' );
+
+		return $color ? array( 'primaryColor' => $color ) : array();
 	}
 
 	/**
@@ -110,15 +123,18 @@ class AiController {
 
 		return $this->forward(
 			'/api/switch-demo',
-			array(
-				'generationId' => sanitize_text_field( $params['generationId'] ?? '' ),
-				'demoSlug'     => sanitize_key( $params['demoSlug'] ?? '' ),
+			array_merge(
+				array(
+					'generationId' => sanitize_text_field( $params['generationId'] ?? '' ),
+					'demoSlug'     => sanitize_key( $params['demoSlug'] ?? '' ),
+				),
+				$this->primary_color( $params )
 			)
 		);
 	}
 
 	/**
-	 * Map the demo's colors to an edited brand palette.
+	 * Recolor the demo around a primary color.
 	 *
 	 * @since 2.2.0
 	 *
@@ -126,18 +142,13 @@ class AiController {
 	 * @return WP_REST_Response
 	 */
 	public function color_map( $request ) {
-		$params  = $request->get_json_params();
-		$palette = array();
-		foreach ( array( 'primary', 'secondary', 'accent', 'text', 'background' ) as $key ) {
-			$value           = isset( $params['palette'][ $key ] ) ? (string) $params['palette'][ $key ] : '';
-			$palette[ $key ] = (string) sanitize_hex_color( $value );
-		}
+		$params = $request->get_json_params();
 
 		return $this->forward(
 			'/api/color-map',
 			array(
-				'demoSlug' => sanitize_key( isset( $params['demoSlug'] ) ? (string) $params['demoSlug'] : '' ),
-				'palette'  => $palette,
+				'demoSlug'     => sanitize_key( isset( $params['demoSlug'] ) ? (string) $params['demoSlug'] : '' ),
+				'primaryColor' => (string) sanitize_hex_color( isset( $params['primaryColor'] ) ? (string) $params['primaryColor'] : '' ),
 			)
 		);
 	}

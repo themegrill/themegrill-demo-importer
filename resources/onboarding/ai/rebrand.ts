@@ -40,8 +40,13 @@ const normalizeHex = (value: string): string | null => {
 	return rgb ? '#' + [rgb[1], rgb[2], rgb[3]].map((n) => Number(n).toString(16).padStart(2, '0')).join('') : null;
 };
 
+// A role still set to one of the design's own fonts keeps all its families, script accents included.
 export const buildFontMap = (ip: ImportPackage, fonts: BrandKit['fonts']): Record<string, string> =>
-	Object.fromEntries(Object.entries(ip.demoFonts).map(([family, role]) => [family, fonts[role]]));
+	Object.fromEntries(
+		Object.entries(ip.demoFonts)
+			.filter(([, role]) => ip.demoFonts[fonts[role]] !== role)
+			.map(([family, role]) => [family, fonts[role]]),
+	);
 
 // Recolor and refont theme settings (header, links, buttons, palette).
 const transformValue = (value: unknown, key: string, colors: Record<string, string>, fonts: Record<string, string>): unknown => {

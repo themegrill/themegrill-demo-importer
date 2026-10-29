@@ -16,12 +16,15 @@ export type GenerateRequest = {
 	// The design the user picked, and the brief read for the designs list.
 	demoSlug?: string;
 	briefId?: string;
+	// #rrggbb. The other colors follow it; unset keeps the design's own colors.
+	primaryColor?: string;
 };
 
 export type DemoSummary = {
 	slug: string;
 	name: string;
 	thumbnail: string;
+	primaryColor?: string; // The design's own primary color.
 };
 
 // How close a design is to the business, for grouping the designs list.
@@ -105,6 +108,7 @@ export type RegenerateSectionRequest = {
 export type SwitchDemoRequest = {
 	generationId: string;
 	demoSlug: string;
+	primaryColor?: string;
 };
 
 export type GenerationStep =

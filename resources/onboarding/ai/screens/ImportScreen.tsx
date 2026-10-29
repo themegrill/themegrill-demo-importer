@@ -75,8 +75,8 @@ const ImportScreen = () => {
 		let done = 0;
 
 		try {
-			// The palette may have been edited in the preview; the backend owns the mapping.
-			const colorMaps = await getColorMaps(pkg.demo.slug, pkg.brand.palette);
+			// The color may have been changed in the preview; the backend owns the mapping.
+			const colorMaps = await getColorMaps(pkg.demo.slug, pkg.brand.palette.primary);
 			const brandedDemo = rebrandDemoConfig(config, colorMaps.theme, buildFontMap(ip, pkg.brand.fonts), pkg.brand);
 			const skipMedia = replacedDemoImages(pkg, ip);
 

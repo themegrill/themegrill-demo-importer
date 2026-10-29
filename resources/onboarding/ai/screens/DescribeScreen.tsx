@@ -4,6 +4,7 @@ import React, { useId, useMemo, useRef, useState } from 'react';
 import { Button } from '../../components/ui/Button';
 import { cn } from '../../lib/utils';
 import { useBackToTemplates } from '../components/AiSidebar';
+import BrandColorField from '../components/BrandColorField';
 import { fieldClass, invalidClass } from '../components/fields';
 import { BRAND_NAME_MAX, DESCRIPTION_MAX, PAGES } from '../constants';
 import { describeKey, useAiFlow } from '../store/AiFlowContext';
@@ -29,6 +30,8 @@ const FieldError = ({ id, message }: { id: string; message?: string }) =>
 		</p>
 	) : null;
 
+const DEFAULT_BRAND_COLOR = '#2563eb';
+
 const DescribeScreen = () => {
 	const { state, dispatch } = useAiFlow();
 	const { form } = state;
@@ -37,7 +40,12 @@ const DescribeScreen = () => {
 	const ids = {
 		brandName: `${uid}-brand`,
 		description: `${uid}-description`,
+		color: `${uid}-color`,
 	};
+	// Kept while the toggle is off, so turning it back on restores the last pick.
+	const [color, setColor] = useState(form.primaryColor ?? DEFAULT_BRAND_COLOR);
+	const setPrimaryColor = (primaryColor: string | undefined) =>
+		dispatch({ type: 'UPDATE_FORM', patch: { primaryColor } });
 
 	const [touched, setTouched] = useState<Partial<Record<keyof DescribeErrors, boolean>>>({});
 	const [submitted, setSubmitted] = useState(false);
@@ -91,7 +99,7 @@ const DescribeScreen = () => {
 			</h1>
 			<p className="text-[15px] leading-6 text-[#6B6B6B] mt-2 mb-8">
 				{__(
-					'Just two things. We work out the rest: the right design, your copy, images, colors and fonts.',
+					'Just two things. We work out the rest: the right design, your copy and images.',
 					'themegrill-demo-importer',
 				)}
 			</p>
@@ -155,6 +163,42 @@ const DescribeScreen = () => {
 					</div>
 					<FieldError id={`${ids.description}-error`} message={descriptionError} />
 				</div>
+
+				<fieldset className="m-0 p-0 border-0">
+					<legend className="block p-0 mb-2 text-[14px] font-medium text-[#1F1F1F]">
+						{__('Brand color', 'themegrill-demo-importer')}
+						<span className="font-normal text-[#909090]"> {__('(optional)', 'themegrill-demo-importer')}</span>
+					</legend>
+					<label className="flex items-center gap-2 text-[14px] text-[#383838] cursor-pointer">
+						<input
+							type="checkbox"
+							checked={!!form.primaryColor}
+							onChange={(e) => setPrimaryColor(e.target.checked ? color : undefined)}
+							className="!m-0"
+						/>
+						{__('Use my brand color', 'themegrill-demo-importer')}
+					</label>
+					{form.primaryColor ? (
+						<div className="mt-3">
+							<BrandColorField
+								id={ids.color}
+								value={form.primaryColor}
+								describedBy={`${ids.color}-hint`}
+								onChange={(next) => {
+									setColor(next);
+									setPrimaryColor(next);
+								}}
+							/>
+							<p id={`${ids.color}-hint`} className="m-0 mt-2 text-[13px] text-[#6B6B6B]">
+								{__('Buttons, links and highlights use it; the design’s other colors are matched to it.', 'themegrill-demo-importer')}
+							</p>
+						</div>
+					) : (
+						<p className="m-0 mt-2 text-[13px] text-[#6B6B6B]">
+							{__('We keep the colors of the design you pick. You can change them in the preview.', 'themegrill-demo-importer')}
+						</p>
+					)}
+				</fieldset>
 
 				<fieldset className="m-0 p-0 border-0">
 					<legend className="block p-0 mb-2 text-[14px] font-medium text-[#1F1F1F]">

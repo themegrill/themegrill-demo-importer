@@ -57,7 +57,7 @@ export const buildPackage = (
 		brand: {
 			...fixture.brand,
 			siteTitle: request.brandName,
-			palette: { ...fixture.brand.palette },
+			palette: { ...fixture.brand.palette, ...(request.primaryColor ? { primary: request.primaryColor } : {}) },
 			fonts: { ...fixture.brand.fonts },
 		},
 		pages: PAGES.filter((p) => requested.has(p.value)).map((p) => ({

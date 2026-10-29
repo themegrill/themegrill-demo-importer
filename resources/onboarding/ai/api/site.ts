@@ -74,12 +74,14 @@ export const runImportAction = (action: ImportAction, demo: Demo, plugins: strin
 
 export const applySite = (payload: ApplyPayload) => call<{ updated: number }>('POST', 'ai/apply', payload);
 
-// Two maps: page blocks, and theme settings (contrast is checked for each).
-export const getColorMaps = (demoSlug: string, palette: BrandPalette) =>
-	call<{ colorMap: Record<string, string>; themeColorMap?: Record<string, string> }>('POST', 'ai/color-map', {
-		demoSlug,
-		palette,
-	}).then((r) => ({ blocks: r.colorMap, theme: r.themeColorMap ?? r.colorMap }));
+// The design recolored around one primary color: maps for page blocks and theme
+// settings (contrast is checked for each), and the palette it gives.
+export const getColorMaps = (demoSlug: string, primaryColor: string) =>
+	call<{ colorMap: Record<string, string>; themeColorMap?: Record<string, string>; palette?: BrandPalette }>(
+		'POST',
+		'ai/color-map',
+		{ demoSlug, primaryColor },
+	).then((r) => ({ blocks: r.colorMap, theme: r.themeColorMap ?? r.colorMap, palette: r.palette }));
 
 // The generated page drawn on the design's live page, as HTML for a sandboxed frame.
 export const getPreviewHtml = (pkg: GenerationPackage, pageSlug: string) => {
