@@ -853,6 +853,7 @@ class ImportHooks {
 	 *
 	 * - `agency`   — general creative/digital agency (portfolio, pricing plans,
 	 *                team, client reviews). Client-services, referral-driven.
+	 * - `agency-03` — BlockArt build of Zakra Agency; reuses the agency survey.
 	 * - `suffice`  — marketing/growth agency ("Book Now" CTA, services: Marketing,
 	 *                Branding, Web Design, Strategy). Same referral logic as agency.
 	 * - `lawyer`   — law firm (practice areas, case stats, consultations). Also
@@ -1054,6 +1055,16 @@ class ImportHooks {
 					'widget_color' => '#AE7729',
 				),
 			),
+		);
+
+		// BlockArt version of Zakra Agency: same survey, its own green accent (zakra_primary_color).
+		$curated['agency-03'] = array_merge(
+			$curated['agency'],
+			array(
+				'styling' => array(
+					'widget_color' => '#06965c',
+				),
+			)
 		);
 
 		return $curated[ $id ] ?? array();
