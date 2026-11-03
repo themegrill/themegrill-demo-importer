@@ -22,6 +22,7 @@ const Demo = ({ demo }: DemoProps) => {
 		>
 			<div>
 				<div className="relative h-full" style={{ aspectRatio: '.84 / 1' }}>
+					{/* Thumbnail comes from `previewImage` on the demos API; see Admin::apply_thumbnail_fallbacks(). */}
 					{demo?.previewImage ? (
 						<img
 							src={demo?.previewImage}
