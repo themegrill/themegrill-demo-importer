@@ -2,6 +2,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { ArrowLeft, Sparkles } from 'lucide-react';
 import { useEffect } from 'react';
 import AiSidebar, { FLOW_STEPS, getStepIndex, useBackToTemplates } from './components/AiSidebar';
+import ModeTabs from './components/ModeTabs';
 import DescribeScreen from './screens/DescribeScreen';
 import DesignScreen from './screens/DesignScreen';
 import GeneratingScreen from './screens/GeneratingScreen';
@@ -62,7 +63,10 @@ const AiFlowLayout = () => {
 			<AiSidebar stage={state.stage} />
 			<main className="flex-1 flex flex-col min-w-0 bg-white">
 				<MobileHeader />
-				<div className="flex-1 overflow-y-auto tg-scrollbar px-4 py-8 sm:px-10 lg:px-14 lg:py-14">
+				<div className="hidden md:flex px-10 pt-8 lg:px-14">
+					<ModeTabs active="ai" />
+				</div>
+				<div className="flex-1 overflow-y-auto tg-scrollbar px-4 py-8 sm:px-10 lg:px-14">
 					{Screen ? <Screen /> : null}
 				</div>
 			</main>

@@ -1,6 +1,6 @@
 import { useRouter } from '@tanstack/react-router';
 import { __ } from '@wordpress/i18n';
-import { ArrowLeft, Check, Sparkles, X } from 'lucide-react';
+import { Check, Sparkles, X } from 'lucide-react';
 import logo from '../../assets/images/starter-template-logo.png';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../components/ui/Tooltip';
 import { cn } from '../../lib/utils';
@@ -30,7 +30,6 @@ export const useBackToTemplates = () => {
 };
 
 const AiSidebar = ({ stage }: { stage: AiStage }) => {
-	const backToTemplates = useBackToTemplates();
 	const current = getStepIndex(stage);
 
 	return (
@@ -57,15 +56,6 @@ const AiSidebar = ({ stage }: { stage: AiStage }) => {
 			</div>
 
 			<div className="flex flex-col gap-8 px-6 pt-6 pb-10 overflow-y-auto tg-scrollbar">
-				<button
-					type="button"
-					onClick={backToTemplates}
-					className="self-start flex items-center gap-2 bg-transparent border-0 p-0 cursor-pointer text-[14px] text-[#6B6B6B] hover:text-[#1F1F1F]"
-				>
-					<ArrowLeft size={16} />
-					{__('Back to Starter Templates', 'themegrill-demo-importer')}
-				</button>
-
 				<div>
 					<div className="flex items-center gap-2 mb-2">
 						<Sparkles size={20} color="#2563EB" />

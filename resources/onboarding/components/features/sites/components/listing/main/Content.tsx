@@ -1,6 +1,8 @@
 import { useGrid, useVirtualizer } from '@virtual-grid/react';
 import { __, sprintf } from '@wordpress/i18n';
+import { RefreshCw } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import ModeTabs from '../../../../../../ai/components/ModeTabs';
 import { orderDemos } from '../../../../../../lib/demo-order';
 import { DemoType, PagebuilderCategory } from '../../../../../../lib/types';
 import { Route } from '../../../../../../routes';
@@ -197,7 +199,19 @@ const Content = ({ demos, builders, categories, handleRefetch, isRefetching }: C
 	}, [columns, cardSize, rowVirtualizer, columnVirtualizer]);
 
 	return (
-		<>
+		<div className="flex-1 flex flex-col min-w-0 bg-[#fff]">
+			<div className="flex items-center justify-between gap-4 px-14 pt-8 2xl:px-[88px]">
+				<ModeTabs active="templates" />
+				<Button
+					className={`ml-auto cursor-pointer h-11 px-4 gap-2 bg-white border border-solid border-[#E3E3E3] rounded-md text-[#1F1F1F] text-[14px] font-medium hover:bg-[#FAFBFC] hover:text-[#1F1F1F] ${isRefetching ? 'pointer-events-none opacity-50' : ''}`}
+					onClick={handleRefetch}
+				>
+					<RefreshCw size={16} className={isRefetching ? 'animate-spin' : ''} />
+					{isRefetching
+						? __('Syncing...', 'themegrill-demo-importer')
+						: __('Sync', 'themegrill-demo-importer')}
+				</Button>
+			</div>
 			{newDemos.length === 0 ? (
 				<div className="flex-1 flex items-center justify-center bg-[#fff]">
 					<div className="text-center">
@@ -270,54 +284,46 @@ const Content = ({ demos, builders, categories, handleRefetch, isRefetching }: C
 					</div>
 				</div>
 			) : (
-				<>
-					<Button
-						className={`tg-refresh-btn absolute right-[108px] top-7 cursor-pointer bg-transparent border-1 border-solid h-10 border-[#5182ef] text-[#5182ef] text-[15px] hover:bg-[#5182ef] hover:text-white ${isRefetching ? 'pointer-events-none opacity-50' : ''}`}
-						onClick={handleRefetch}
-					>
-						{isRefetching ? 'Syncing...' : 'Sync'}
-					</Button>
-					<div
-						ref={ref}
-						className="flex-1 p-14 sm:p-14 2xl:p-[88px] overflow-y-auto bg-[#fff] content-wrapper"
-					>
-						{containerSize.width > 0 && (
-							<div
-								style={{
-									position: 'relative',
-									height: `${rowVirtualizer.getTotalSize()}px`,
-									width: `${columnVirtualizer.getTotalSize()}px`,
-								}}
-							>
-								{rowVirtualizer.getVirtualItems().map((virtualRow) => (
-									<React.Fragment key={virtualRow.key}>
-										{columnVirtualizer.getVirtualItems().map((virtualColumn) => {
-											const item = grid.getVirtualItem({
-												row: virtualRow,
-												column: virtualColumn,
-											});
+				<div
+					ref={ref}
+					className="flex-1 px-14 pt-8 pb-14 2xl:px-[88px] 2xl:pb-[88px] overflow-y-auto bg-[#fff] content-wrapper"
+				>
+					{containerSize.width > 0 && (
+						<div
+							style={{
+								position: 'relative',
+								height: `${rowVirtualizer.getTotalSize()}px`,
+								width: `${columnVirtualizer.getTotalSize()}px`,
+							}}
+						>
+							{rowVirtualizer.getVirtualItems().map((virtualRow) => (
+								<React.Fragment key={virtualRow.key}>
+									{columnVirtualizer.getVirtualItems().map((virtualColumn) => {
+										const item = grid.getVirtualItem({
+											row: virtualRow,
+											column: virtualColumn,
+										});
 
-											if (!item) return null;
+										if (!item) return null;
 
-											const demoIndex = virtualRow.index * columns + virtualColumn.index;
-											const demo = newDemos[demoIndex];
+										const demoIndex = virtualRow.index * columns + virtualColumn.index;
+										const demo = newDemos[demoIndex];
 
-											if (!demo) return null;
+										if (!demo) return null;
 
-											return (
-												<div key={virtualColumn.key} style={item.style}>
-													<Demo demo={demo} />
-												</div>
-											);
-										})}
-									</React.Fragment>
-								))}
-							</div>
-						)}
-					</div>
-				</>
+										return (
+											<div key={virtualColumn.key} style={item.style}>
+												<Demo demo={demo} />
+											</div>
+										);
+									})}
+								</React.Fragment>
+							))}
+						</div>
+					)}
+				</div>
 			)}
-		</>
+		</div>
 	);
 };
 
