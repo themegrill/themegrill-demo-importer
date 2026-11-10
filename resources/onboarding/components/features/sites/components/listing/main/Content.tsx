@@ -1,6 +1,7 @@
 import { useGrid, useVirtualizer } from '@virtual-grid/react';
 import { __, sprintf } from '@wordpress/i18n';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { orderDemos } from '../../../../../../lib/demo-order';
 import { DemoType, PagebuilderCategory } from '../../../../../../lib/types';
 import { Route } from '../../../../../../routes';
 import { Button } from '../../../../../ui/Button';
@@ -79,8 +80,10 @@ const Content = ({ demos, builders, categories, handleRefetch, isRefetching }: C
 	// Search/category matches regardless of the selected builder tab - used both for
 	// the final list and, when that list is empty for this builder, to work out which
 	// other builder tabs actually have matching results.
+	const orderedDemos = useMemo(() => orderDemos(demos), [demos]);
+
 	const matchesIgnoringBuilder = useMemo(() => {
-		return demos
+		return orderedDemos
 			.filter((d) => {
 				if (selectedCategories.length === 0) {
 					return true;
@@ -89,7 +92,7 @@ const Content = ({ demos, builders, categories, handleRefetch, isRefetching }: C
 				return selectedCategories.some((cat) => normalizedCategories.includes(cat));
 			})
 			.filter((d) => (search ? d.title.toLowerCase().indexOf(search.toLowerCase()) !== -1 : true));
-	}, [selectedCategories, search, demos]);
+	}, [selectedCategories, search, orderedDemos]);
 
 	const newDemos = useMemo(() => {
 		if (!builder) {

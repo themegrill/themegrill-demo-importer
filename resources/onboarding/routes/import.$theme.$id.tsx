@@ -7,6 +7,16 @@ import { decodeHtmlEntities } from '../lib/sanitize-plugin-description';
 import { queryClient } from '../lib/query-client';
 import { PluginItem } from '../lib/types';
 
+const EASY_MCP_AI_PLUGIN = 'easy-mcp-ai/easy-mcp-ai.php';
+
+// Shorter copy for plugins whose demo API description is too long for the sidebar.
+const getDescriptionOverrides = (): Record<string, string> => ({
+	'allfeedback/allfeedback.php': __(
+		'Collect feedback with simple forms, stored on your own site.',
+		'themegrill-demo-importer',
+	),
+});
+
 export const Route = createFileRoute('/import/$theme/$id')({
 	component: RouteComponent,
 	loader: async ({ params }) => {
@@ -17,6 +27,7 @@ export const Route = createFileRoute('/import/$theme/$id')({
 			}
 
 			const isEmpty = !data.data || Object.keys(data.data).length === 0;
+			const descriptionOverrides = getDescriptionOverrides();
 
 			const newPlugins: PluginItem[] = Object.entries(data?.data?.plugins || {}).map(
 				([pluginPath, pluginData]) => {
@@ -28,7 +39,7 @@ export const Route = createFileRoute('/import/$theme/$id')({
 					return {
 						plugin: pluginPath,
 						name: decodeHtmlEntities(pluginData.name || fallbackName),
-						description: pluginData.description || '',
+						description: descriptionOverrides[pluginPath] || pluginData.description || '',
 						isSelected: true,
 						isMandatory: pluginData.mandatory,
 					};
@@ -39,6 +50,20 @@ export const Route = createFileRoute('/import/$theme/$id')({
 				if (a.isMandatory === b.isMandatory) return 0;
 				return a.isMandatory ? -1 : 1;
 			});
+
+			// Easy MCP AI is offered on every template as the last, opt-in feature.
+			if (!isEmpty && !sortedPlugins.some((item) => item.plugin === EASY_MCP_AI_PLUGIN)) {
+				sortedPlugins.push({
+					plugin: EASY_MCP_AI_PLUGIN,
+					name: 'Easy MCP AI',
+					description: __(
+						'Let AI assistants like Claude and ChatGPT work with your site.',
+						'themegrill-demo-importer',
+					),
+					isSelected: false,
+					isMandatory: false,
+				});
+			}
 
 			return {
 				demo: data?.data,

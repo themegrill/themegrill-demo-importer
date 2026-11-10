@@ -399,6 +399,10 @@ class Admin {
 	 * previewImage is empty. Fallback uses resources/{theme_slug}/{slug}/screenshot.jpg
 	 * by default; per-theme overrides handle cases where the repo folder name
 	 * differs from the API slug.
+	 *
+	 * To change a demo's thumbnail, update its `previewImage` on the demos API
+	 * (e.g. https://api.themegrill.com/zakra/wp-json/themegrill-demos/v1/sites),
+	 * not here. Use a 768x903 image hosted on the demo site.
 	 */
 	public static function apply_thumbnail_fallbacks( $demos ) {
 		$old_base = 'https://d1sb0nhp4t2db4.cloudfront.net';
