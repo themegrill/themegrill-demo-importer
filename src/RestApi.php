@@ -5,6 +5,7 @@ namespace ThemeGrill\Demo\Importer;
 use ThemeGrill\Demo\Importer\Controllers\AiController;
 use ThemeGrill\Demo\Importer\Controllers\ImportController;
 use ThemeGrill\Demo\Importer\Controllers\SiteController;
+use ThemeGrill\Demo\Importer\Services\AiSiteService;
 use ThemeGrill\Demo\Importer\Traits\Singleton;
 use ThemeGrill\Demo\Importer\Validators\DemoConfigValidator;
 use WP_Error;
@@ -125,7 +126,7 @@ class RestApi {
 			)
 		);
 
-		if ( defined( 'TDI_AI_API_BASE' ) && TDI_AI_API_BASE ) {
+		if ( AiSiteService::is_supported() ) {
 			$this->register_ai_endpoints();
 		}
 	}

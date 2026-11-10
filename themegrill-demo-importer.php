@@ -29,6 +29,11 @@ const THEMEGRILL_BASE_URL = 'https://api.themegrill.com/demos';
 const ZAKRA_BASE_URL      = 'https://api.themegrill.com/zakra';
 const TGDM_NAMESPACE      = '/wp-json/themegrill-demos/v1';
 
+// Build with AI backend; define TDI_AI_API_BASE in wp-config.php to override (e.g. http://localhost:3000).
+if ( ! defined( 'TDI_AI_API_BASE' ) ) {
+	define( 'TDI_AI_API_BASE', 'https://ai-starter-sites.vercel.app' );
+}
+
 if ( version_compare( PHP_VERSION, '7.4', '<' ) ) {
 	add_action(
 		'admin_notices',

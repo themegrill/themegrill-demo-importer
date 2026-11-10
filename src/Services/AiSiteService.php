@@ -43,6 +43,17 @@ class AiSiteService {
 	private $stock_images = array();
 
 	/**
+	 * Whether Build with AI can run: a backend is set and Zakra (or a child theme) is active.
+	 *
+	 * @since 2.2.0
+	 *
+	 * @return bool
+	 */
+	public static function is_supported() {
+		return defined( 'TDI_AI_API_BASE' ) && TDI_AI_API_BASE && self::THEME === get_template();
+	}
+
+	/**
 	 * Install the theme from WordPress.org if missing, then activate it.
 	 *
 	 * @since 2.2.0

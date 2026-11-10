@@ -15,7 +15,7 @@ defined( 'ABSPATH' ) || exit;
 
 /**
  * Forwards Build with AI requests to the AI backend so the browser only talks
- * to this site and the site token never reaches the page.
+ * to this site.
  */
 class AiController {
 
@@ -341,7 +341,6 @@ class AiController {
 		return array(
 			'Content-Type' => 'application/json',
 			'Accept'       => $accept,
-			'X-Site-Token' => defined( 'TDI_AI_SITE_TOKEN' ) ? TDI_AI_SITE_TOKEN : '',
 		);
 	}
 

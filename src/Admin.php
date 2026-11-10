@@ -3,6 +3,7 @@
 namespace ThemeGrill\Demo\Importer;
 
 use ThemeGrill\Demo\Importer\Importers\WXRImporter;
+use ThemeGrill\Demo\Importer\Services\AiSiteService;
 use ThemeGrill\Demo\Importer\Traits\Singleton;
 
 class Admin {
@@ -562,12 +563,14 @@ class Admin {
 			'zakra_pro_activated' => $is_active_zakra_pro,
 		);
 
-		// Build with AI goes through this site's REST proxy; without TDI_AI_API_BASE the UI uses its mock.
-		if ( defined( 'TDI_AI_API_BASE' ) && TDI_AI_API_BASE ) {
+		// Build with AI goes through this site's REST proxy and only supports Zakra for now.
+		if ( AiSiteService::is_supported() ) {
 			$localized_data['ai'] = array(
 				'restUrl' => esc_url_raw( rest_url( 'tg-demo-importer/v1/ai/' ) ),
 				'nonce'   => wp_create_nonce( 'wp_rest' ),
 			);
+		} else {
+			$localized_data['ai'] = array( 'enabled' => false );
 		}
 
 		return $localized_data;

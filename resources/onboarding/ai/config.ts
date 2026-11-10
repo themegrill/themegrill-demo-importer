@@ -1,6 +1,6 @@
 // Runtime config for the AI flow, localized by PHP under `__TDI_DASHBOARD__.ai`.
-// The browser calls this site's REST proxy, which holds the backend URL and
-// site token server-side. Without it, the UI runs on the built-in mock.
+// The browser calls this site's REST proxy, which holds the backend URL
+// server-side. Without it, the UI runs on the built-in mock.
 
 type AiConfig = {
 	enabled: boolean; // Hook for pro/billing gating.
