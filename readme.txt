@@ -4,7 +4,7 @@ Tags: themegrill, theme demos, demo, importer, one click import
 Requires at least: 5.7
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 2.1.4
+Stable tag: 2.1.5
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -33,6 +33,9 @@ Bugs can be reported either in our support forum or preferably on the [GitHub re
 Yes you can! Join in on our [GitHub repository](https://github.com/themegrill/themegrill-demo-importer/) :)
 
 == Changelog ==
+= 2.1.5 - 27-11-2026 =
+* Tweak - Updated the ThemeGrill SDK to 1.0.6.
+
 = 2.1.4 - 12-10-2026 =
 * Fix - Custom logo missing after import because its attachment ID was not remapped.
 * Fix - Starter Templates showed no empty state when a filter matched nothing for the chosen builder.
